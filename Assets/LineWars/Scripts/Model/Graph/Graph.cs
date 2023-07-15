@@ -7,18 +7,19 @@ namespace LineWars.Model
 {
     public class Graph: MonoBehaviour
     {
-        public static Graph Instance { get; private set; }
+        private Node[] allNodes;
+        private Edge[] allEdges;
+        private Node[] spawnNodes;
         
-        private void Awake()
+        public void Initialize(IEnumerable<Node> allNodes, IEnumerable<Edge> allEdges, IEnumerable<Node> spawnNodes)
         {
-            Instance = this;
+            this.allNodes = allNodes.ToArray();
+            this.allEdges = allEdges.ToArray();
+            this.spawnNodes = spawnNodes.ToArray();
         }
-        
-        private IEnumerable<Node> FindNodes()
-        {
-            return transform.GetChildes()
-                .Select(child => child.GetComponent<Node>())
-                .Where(node => node != null);
-        }
+
+        public IReadOnlyCollection<Node> AllNodes => allNodes;
+        public IReadOnlyCollection<Edge> AllEdges => allEdges;
+        public IReadOnlyCollection<Node> SpawnNodes => spawnNodes;
     }
 }

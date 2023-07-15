@@ -7,12 +7,8 @@ namespace LineWars.Controllers
     public class Selector : MonoBehaviour
     {
         private static Selector instance;
-        private Queue<GameObject> selectedObjects = new ();
         private GameObject selectedObject;
-
-        public static event Action<GameObject, GameObject> SelectedObjectsChanged; 
-
-        //public static Queue<GameObject> SelectedObjects => instance.selectedObjects;
+        public static event Action<GameObject, GameObject> SelectedObjectsChanged;
 
         public static GameObject SelectedObject
         {
@@ -35,7 +31,6 @@ namespace LineWars.Controllers
                 instance = this;
             }
         }
-
-        //public static void ClearQueue() => instance.selectedObjects.Clear();
+        
     }
 }

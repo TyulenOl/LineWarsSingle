@@ -6,42 +6,41 @@ using LineWars.Model;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace LineWars.Controllers
+namespace LineWars
 {
-    public class GraphDataDrawer
+    public class GraphBuilder
     {
         private List<Node> allNodes;
         private List<Edge> allEdges;
-        private Stack<Node> spawnNodes;
+        private List<Node> spawnNodes;
         
         private GameObject nodePrefab;
         private GameObject edgePrefab;
 
-        private GameObject graph;
+        private Graph graph;
 
         private GraphData graphData;
-
-        public GraphDataDrawer()
+        
+        public GraphBuilder()
         {
             nodePrefab = Resources.Load<GameObject>("Prefabs/Node");
             edgePrefab = Resources.Load<GameObject>("Prefabs/Line");
         }
 
-        public void DrawGraph([NotNull] GraphData graphData)
+        public Graph BuildGraph([NotNull] GraphData graphData)
         {
             if (graphData == null) throw new ArgumentNullException(nameof(graphData));
             
             this.graphData = graphData;
-            graph = Object.FindObjectOfType<Graph>().gameObject;
+            graph = Object.FindObjectOfType<Graph>();
             if (graph == null)
             {
-                graph = new GameObject("Graph");
-                graph.AddComponent<Graph>();
+                graph = new GameObject("Graph").AddComponent<Graph>();
             }
 
             allNodes = new List<Node>(graphData.NodesCount);
             allEdges = new List<Edge>(graphData.EdgesCount);
-            spawnNodes = new Stack<Node>(graphData.SpawnCount);
+            spawnNodes = new List<Node>(graphData.SpawnCount);
             
             
             var nodeIndex = 0;
@@ -54,7 +53,7 @@ namespace LineWars.Controllers
 
                 if (IsSpawn(node))
                 {
-                    spawnNodes.Push(node);
+                    spawnNodes.Add(node);
                     node.IsSpawn = true;
                 }
 
@@ -73,6 +72,9 @@ namespace LineWars.Controllers
                 allEdges.Add(edge);
                 edgeIndex++;
             }
+
+            graph.Initialize(allNodes, allEdges, spawnNodes);
+            return graph;
         }
         
         

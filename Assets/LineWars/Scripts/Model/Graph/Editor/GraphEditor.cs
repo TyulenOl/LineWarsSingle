@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using LineWars;
 using LineWars.Controllers;
 using LineWars.Model;
 using UnityEditor;
@@ -67,8 +68,8 @@ public class GraphEditor : Editor
         
         if (graphData != null)
         {
-            var drawer = new GraphDataDrawer();
-            drawer.DrawGraph(graphData);
+            var drawer = new GraphBuilder();
+            drawer.BuildGraph(graphData);
             isDraw = true;
         }
         else

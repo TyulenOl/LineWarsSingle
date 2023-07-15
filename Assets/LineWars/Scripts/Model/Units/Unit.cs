@@ -1,24 +1,24 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using LineWars.Extensions.Attributes;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace LineWars.Model
 {
-    public class Unit: MonoBehaviour,
+    public class Unit: Owned,
         IAlive,
-        IMovable,
-        IHitHandler, 
+        IHitHandler,
         IHitCreator
     { 
         [SerializeField] private InitialBaseUnitCharacteristics initialBaseUnitCharacteristics;
         [SerializeField] [ReadOnlyInspector] private AllianceType allianceType;
         
-        [SerializeField, ReadOnlyInspector] private Player owner;
-        
         protected BaseUnitCharacteristics BaseUnitCharacteristics;
         protected UnitMovementLogic MovementLogic;
         private UnitDirection unitDirection;
+        
+        [NotNull] private Point myPoint;
 
         [HideInInspector] public UnityEvent<UnitSize, UnitDirection> UnitDirectionChance;  
         
@@ -29,7 +29,6 @@ namespace LineWars.Model
         public UnitSize Size => BaseUnitCharacteristics.UnitSize;
         public LineType MinimaLineType => BaseUnitCharacteristics.MovingLineType;
         public AllianceType AllianceType => allianceType;
-        public Player Owner => owner;
 
         public UnitDirection UnitDirection
         {
@@ -46,38 +45,41 @@ namespace LineWars.Model
             BaseUnitCharacteristics = new BaseUnitCharacteristics(initialBaseUnitCharacteristics);
             MovementLogic = GetComponent<UnitMovementLogic>();
         }
-
-        private void OnEnable()
-        {
-            MovementLogic.TargetChanced += MovementLogicOnTargetChanced;
-        }
         
-        private void OnDisable()
-        {
-            MovementLogic.TargetChanced -= MovementLogicOnTargetChanced;
-        }
-
-        protected  void OnValidate()
+        protected void OnValidate()
         {
             if (GetComponent<UnitMovementLogic>() == null)
             {
-                Debug.LogWarning($"у {name} не обнаружен компонент {nameof(UnitMovementLogic)}");
+                Debug.LogError($"у {name} не обнаружен компонент {nameof(UnitMovementLogic)}");
             }
         }
-        
-        private void MovementLogicOnTargetChanced(Transform before, Transform after)
+
+        public void Initialize(Point myPoint)
         {
-            //TODO
-            //var point = GetComponent<Point>();
-            
+            this.myPoint = myPoint;
         }
         
         public void MoveTo(Point target)
         {
-            
             MovementLogic.MoveTo(target.transform);
         }
-        
+
+        public bool IsCanMoveTo(Point target)
+        {
+            return SizeCondition() && LineCondition();
+
+            bool SizeCondition()
+            {
+                return Size == UnitSize.Little && (target.LeftIsFree || target.RightIsFree)
+                       || Size == UnitSize.Lage && (target.LeftIsFree && target.RightIsFree);
+            }
+
+            bool LineCondition()
+            {
+                return myPoint.HasLine(target);
+            }
+        }
+
         public void Accept(Hit hit)
         {
             throw new NotImplementedException();

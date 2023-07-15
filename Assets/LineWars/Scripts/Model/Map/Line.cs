@@ -7,13 +7,16 @@ namespace LineWars.Model
     {
         [SerializeField] [Min(1)] private int maxHp;
         [SerializeField] [ReadOnlyInspector] private int hp;
+        [SerializeField] [ReadOnlyInspector] private LineType lineType;
         
-        private IEdge edge;
+        private Edge edge;
 
+        public LineType LineType => lineType;
         public int Hp => hp;
+        
         private void Awake()
         {
-            edge = GetComponent<IEdge>();
+            edge = GetComponent<Edge>();
         }
 
         protected void OnValidate()

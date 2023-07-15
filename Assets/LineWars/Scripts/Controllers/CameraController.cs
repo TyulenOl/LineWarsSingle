@@ -1,7 +1,7 @@
 using UnityEngine;
 
 
-public class PlayerCameraController : MonoBehaviour
+public class CameraController : MonoBehaviour
 {
     private void Awake()
     {

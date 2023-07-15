@@ -8,20 +8,38 @@ namespace LineWars.Controllers
     {
         public SingleGameManager Instance { get; private set; }
         [SerializeField, ReadOnlyInspector] private string mapToLoad;
+        [SerializeField] private Player playerPrefab;
         
         private void Awake()
         {
             Instance = this;
-            
-
         }
 
         private void Start()
         {
             mapToLoad = "TestMap";
-            
-            if (LevelsManager.ExistenceMap(mapToLoad))
-                LevelsManager.LoadMap(mapToLoad);
+            InitializeMap();
+            InitializePlayer();
+        }
+
+        private void InitializeMap()
+        {
+            LevelsManager.LoadMap(mapToLoad);
+        }
+        
+        private void InitializePlayer()
+        {
+            // можно перенести в класс PlayerBuilder
+            if (LevelsManager.HasSpawnPoint())
+            {
+                var spawnPoint = LevelsManager.GetSpawnPoint();
+                var player = Instantiate(playerPrefab);
+                Owned.Connect(player, spawnPoint);
+            }
+            else
+            {
+                Debug.LogError("Игрок не создался, потому что нет точек для его спавна");
+            }
         }
 
         public void ToMainMenu()
