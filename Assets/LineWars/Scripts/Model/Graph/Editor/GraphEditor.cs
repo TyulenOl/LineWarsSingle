@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using LineWars;
 using LineWars.Controllers;
@@ -94,18 +92,13 @@ public class GraphEditor : Editor
 
         var graphData = CreateInstance<GraphData>();
         
-        graphData.Initialize(allNodes, GetSpawnNodes(allNodes));
+        graphData.Initialize(allNodes);
 
         var uniqueAssetFileName = GetUniqueRelativePath();
 
         AssetDatabase.CreateAsset(graphData, uniqueAssetFileName);
     }
-
-    private IReadOnlyList<Node> GetSpawnNodes(IReadOnlyList<Node> nodes)
-    {
-        return nodes.Where(node => node.IsSpawn).ToList();
-    }
-
+    
     private string GetUniqueRelativePath()
     {
         var relativePath = Path.GetRelativePath(assetsDirectory.Parent.FullName, graphDirectory.FullName);

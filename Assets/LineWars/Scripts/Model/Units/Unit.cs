@@ -18,7 +18,7 @@ namespace LineWars.Model
         protected UnitMovementLogic MovementLogic;
         private UnitDirection unitDirection;
         
-        [NotNull] private Point myPoint;
+        [NotNull] private Node myNode;
 
         [HideInInspector] public UnityEvent<UnitSize, UnitDirection> UnitDirectionChance;  
         
@@ -54,17 +54,17 @@ namespace LineWars.Model
             }
         }
 
-        public void Initialize(Point myPoint)
+        public void Initialize(Node myNode)
         {
-            this.myPoint = myPoint;
+            this.myNode = myNode;
         }
         
-        public void MoveTo(Point target)
+        public void MoveTo(Node target)
         {
-            MovementLogic.MoveTo(target.transform);
+            MovementLogic.MoveTo(target.transform); 
         }
 
-        public bool IsCanMoveTo(Point target)
+        public bool IsCanMoveTo(Node target)
         {
             return SizeCondition() && LineCondition();
 
@@ -76,7 +76,11 @@ namespace LineWars.Model
 
             bool LineCondition()
             {
-                return myPoint.HasLine(target);
+                var line = myNode.GetLine(target);
+                return line != null
+                       && line.LineType != LineType.Visibility
+                       && line.LineType != LineType.Firing
+                       && this.MinimaLineType <= line.LineType;
             }
         }
 

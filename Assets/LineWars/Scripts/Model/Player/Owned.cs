@@ -1,10 +1,11 @@
-﻿using UnityEngine;
+﻿using LineWars.Extensions.Attributes;
+using UnityEngine;
 
 namespace LineWars
 {
     public abstract class Owned: MonoBehaviour
     {
-        protected Player owner;
+        [SerializeField] [ReadOnlyInspector] protected Player owner;
         public Player Owner => owner;
 
         public virtual void SetOwner(Player newOwner)

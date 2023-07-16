@@ -32,7 +32,7 @@ namespace LineWars.Controllers
         //     point.AddUnitToVacantPosition(unit);
         // }
         //
-        public void MoveOrAttackUnit([NotNull] Player owner, [NotNull] Unit unit, [NotNull] Point target)
+        public void MoveOrAttackOrder([NotNull] Player owner, [NotNull] Unit unit, [NotNull] Node target)
         {
             if (owner.IsMyOwn(unit))
             {

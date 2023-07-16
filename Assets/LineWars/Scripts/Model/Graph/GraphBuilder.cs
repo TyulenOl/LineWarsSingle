@@ -98,6 +98,9 @@ namespace LineWars
             edge.Initialize(node1, node2);
             node1.AddEdge(edge);
             node2.AddEdge(edge);
+
+            var additionalData = graphData.EdgeAdditionalDatas[edge.Index];
+            edge.LineType = additionalData.LineType;
         }
         
         private bool IsSpawn(Node node) => graphData.SpawnNodeIndexes.Contains(node.Index);

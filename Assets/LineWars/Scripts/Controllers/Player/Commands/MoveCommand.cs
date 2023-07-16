@@ -5,9 +5,9 @@ namespace LineWars
     public class MoveCommand: ICommand
     {
         private readonly Unit unit;
-        private readonly Point target;
+        private readonly Node target;
         
-        public MoveCommand(Unit unit, Point target)
+        public MoveCommand(Unit unit, Node target)
         {
             this.unit = unit;
             this.target = target;

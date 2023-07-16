@@ -62,7 +62,7 @@ public class SceneTransition : MonoBehaviour
         {
             animator.SetTrigger("sceneOpening");
             shouldPlayOpeningAnimation = false;
-            Debug.Log("StartUnload");
+            //Debug.Log("StartUnload");
             StartUnload?.Invoke();
         }
 
@@ -138,7 +138,7 @@ public class SceneTransition : MonoBehaviour
 
     private void OnCompleteLoad()
     {
-        Debug.Log("EndLoad");
+        //Debug.Log("EndLoad");
         EndLoad?.Invoke();
         isLoading = false;
         isStartLoading = false;
@@ -164,13 +164,13 @@ public class SceneTransition : MonoBehaviour
 
     public void ANIMATION_EVENT_StartAnimation()
     {
-        Debug.Log("StartLoad");
+        //Debug.Log("StartLoad");
         StartLoad?.Invoke();
     }
 
     public void ANIMATION_EVENT_EndAnimation()
     {
-        Debug.Log("EndUnload");
+        //Debug.Log("EndUnload");
         EndUnload?.Invoke();
     }
 

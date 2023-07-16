@@ -223,7 +223,7 @@ public class GraphTool : EditorTool
 
     private void ReDrawEdges(Node node)
     {
-        foreach (var edge in node.GetEdgesList())
+        foreach (var edge in node.Edges)
         {
             Undo.RecordObject(edge.transform, "ReDrawEdge");
             Undo.RecordObject(edge.Drawer.LineSpriteRenderer, "ReDrawEdge");
@@ -244,8 +244,8 @@ public class GraphTool : EditorTool
 
     private List<Edge> GetIntersectEdges(Node firstNode, Node secondNode)
     {
-        return firstNode.GetEdgesList()
-            .Intersect(secondNode.GetEdgesList())
+        return firstNode.Edges
+            .Intersect(secondNode.Edges)
             .ToList();
     }
 

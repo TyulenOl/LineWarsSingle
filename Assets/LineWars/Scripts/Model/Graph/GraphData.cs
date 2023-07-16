@@ -6,29 +6,29 @@ using UnityEngine.Serialization;
 
 namespace LineWars.Model
 {
+    [Serializable]
+    public class AdditionalEdgeData
+    {
+        [SerializeField] public LineType lineType;
+        public LineType LineType => lineType;
+
+        public AdditionalEdgeData(LineType lineType)
+        {
+            this.lineType = lineType;
+        }
+    }
+    
     public class GraphData: ScriptableObject
     {
-        [Serializable]
-        private class Edge
-        {
-            [SerializeField] public int First;
-            [SerializeField] public int Second;
-
-            public Edge(int first, int second)
-            {
-                First = first;
-                Second = second;
-            }
-        }
-        
         [SerializeField] [HideInInspector] private Vector2[] nodes;
-        [SerializeField] [HideInInspector] private Edge[] edges;
+        [SerializeField] [HideInInspector] private Vector2Int[] edges;
         [SerializeField] [HideInInspector] private List<int> spawnNodeIndexes;
+        [FormerlySerializedAs("edgeDatas")] [SerializeField] [HideInInspector] private AdditionalEdgeData[] edgeAdditionalDatas;
 
         private int currentNodeIndex;
         private int currentEdgeIndex;
-        private List<INode> graph;
-        private HashSet<INode> spawnNodes;
+        private List<Node> graph;
+        private HashSet<Node> spawnNodes;
 
         public int EdgesCount => edges.Length;
         public int NodesCount => nodes.Length;
@@ -37,12 +37,13 @@ namespace LineWars.Model
         public Vector2[] NodesPositions => nodes.ToArray();
 
         public (int,int)[] Edges => edges
-            .Select(x => (x.First,x.Second))
+            .Select(vector2Int => (vector2Int.x,vector2Int.y))
             .ToArray();
 
         public IReadOnlyList<int> SpawnNodeIndexes => spawnNodeIndexes;
+        public IReadOnlyList<AdditionalEdgeData> EdgeAdditionalDatas => edgeAdditionalDatas;
 
-        public void Initialize(IReadOnlyCollection<INode> graph, IReadOnlyCollection<INode> spawnNodes)
+        public void Initialize(IReadOnlyCollection<Node> graph)
         {
             var nodesCount = graph.Count;
             nodes = new Vector2[nodesCount];
@@ -53,11 +54,13 @@ namespace LineWars.Model
                 .Distinct()
                 .Count();
 
-            edges = new Edge[edgesCount];
-            
+            edges = new Vector2Int[edgesCount];
+            edgeAdditionalDatas = new AdditionalEdgeData[edgesCount];
             
             this.graph = graph.ToList();
-            this.spawnNodes = spawnNodes.ToHashSet();
+            this.spawnNodes = graph
+                .Where(x => x.IsSpawn)
+                .ToHashSet();
 
             spawnNodeIndexes = new List<int>();
             
@@ -67,11 +70,11 @@ namespace LineWars.Model
             }
         }
         
-        private void WidthTraversal(INode prop)
+        private void WidthTraversal(Node prop)
         {
-            var queue = new Queue<INode>();
-            var nodeRegister = new Dictionary<INode, int>();
-            var openedNodes = new HashSet<INode>();
+            var queue = new Queue<Node>();
+            var nodeRegister = new Dictionary<Node, int>();
+            var openedNodes = new HashSet<Node>();
 
             queue.Enqueue(prop);
             openedNodes.Add(prop);
@@ -102,13 +105,19 @@ namespace LineWars.Model
                     else
                     {
                         var otherNodeIndex = nodeRegister[otherNode];
-                        edges[currentEdgeIndex] = new Edge(otherNodeIndex, currentNodeIndex);
+                        edges[currentEdgeIndex] = new Vector2Int(otherNodeIndex, currentNodeIndex);
+                        edgeAdditionalDatas[currentEdgeIndex] = GetAdditionalEdgeData(edge);
                         currentEdgeIndex++;
                     }
                 }
 
                 currentNodeIndex++;
             }
+        }
+
+        private AdditionalEdgeData GetAdditionalEdgeData(Edge edge)
+        {
+            return new AdditionalEdgeData(edge.LineType);
         }
     }
 }
