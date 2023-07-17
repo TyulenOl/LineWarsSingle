@@ -17,12 +17,13 @@ namespace LineWars.Model
             this.lineType = lineType;
         }
     }
-    
-    public class GraphData: ScriptableObject
+
+    public class GraphData : ScriptableObject
     {
         [SerializeField] [HideInInspector] private Vector2[] nodes;
         [SerializeField] [HideInInspector] private Vector2Int[] edges;
         [SerializeField] [HideInInspector] private List<int> spawnNodeIndexes;
+
         [FormerlySerializedAs("edgeDatas")] [SerializeField] [HideInInspector] private AdditionalEdgeData[] edgeAdditionalDatas;
 
         private int currentNodeIndex;
@@ -33,11 +34,11 @@ namespace LineWars.Model
         public int EdgesCount => edges.Length;
         public int NodesCount => nodes.Length;
         public int SpawnCount => spawnNodeIndexes.Count;
-        
+
         public Vector2[] NodesPositions => nodes.ToArray();
 
-        public (int,int)[] Edges => edges
-            .Select(vector2Int => (vector2Int.x,vector2Int.y))
+        public (int, int)[] Edges => edges
+            .Select(vector2Int => (vector2Int.x, vector2Int.y))
             .ToArray();
 
         public IReadOnlyList<int> SpawnNodeIndexes => spawnNodeIndexes;
@@ -47,8 +48,8 @@ namespace LineWars.Model
         {
             var nodesCount = graph.Count;
             nodes = new Vector2[nodesCount];
-            
-            
+
+
             var edgesCount = graph
                 .SelectMany(x => x.Edges)
                 .Distinct()
@@ -56,20 +57,20 @@ namespace LineWars.Model
 
             edges = new Vector2Int[edgesCount];
             edgeAdditionalDatas = new AdditionalEdgeData[edgesCount];
-            
+
             this.graph = graph.ToList();
             this.spawnNodes = graph
                 .Where(x => x.IsSpawn)
                 .ToHashSet();
 
             spawnNodeIndexes = new List<int>();
-            
+
             while (this.graph.Count > 0)
             {
                 WidthTraversal(this.graph.First());
             }
         }
-        
+
         private void WidthTraversal(Node prop)
         {
             var queue = new Queue<Node>();
@@ -86,7 +87,7 @@ namespace LineWars.Model
 
                 if (spawnNodes.Contains(currentNode))
                     spawnNodeIndexes.Add(currentNodeIndex);
-                
+
                 nodes[currentNodeIndex] = currentNode.Position;
 
                 nodeRegister.Add(currentNode, currentNodeIndex);
@@ -118,6 +119,16 @@ namespace LineWars.Model
         private AdditionalEdgeData GetAdditionalEdgeData(Edge edge)
         {
             return new AdditionalEdgeData(edge.LineType);
+        }
+
+        public void RefreshFrom(GraphData graphData)
+        {
+            if (graphData == null)
+                return;
+            nodes = graphData.nodes;
+            edges = graphData.edges;
+            edgeAdditionalDatas = graphData.edgeAdditionalDatas;
+            spawnNodeIndexes = graphData.spawnNodeIndexes;
         }
     }
 }

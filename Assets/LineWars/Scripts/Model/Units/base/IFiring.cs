@@ -1,6 +1,6 @@
 ﻿namespace LineWars.Model
 {
-    public interface IFiring
+    public interface IFiring: IAttackerVisitor
     {
         public bool IsExplosive { get; }
         public int FireDistance { get; }

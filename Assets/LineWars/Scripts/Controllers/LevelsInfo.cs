@@ -2,7 +2,7 @@
 using System.Linq;
 using UnityEngine;
 
-namespace LineWars.Controllers
+namespace LineWars
 {
     public static class LevelsInfo
     {

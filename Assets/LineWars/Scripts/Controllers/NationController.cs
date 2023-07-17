@@ -1,18 +1,16 @@
 
 
-namespace LineWars.Controllers
+namespace LineWars
 {
     public static class NationController
     {
         public static INation GetNation(NationType type)
         {
-            switch (type)
+            return type switch
             {
-                case NationType.Russia:
-                    return new Russia();
-                default:
-                    return new DefaultNation();
-            }
+                NationType.Russia => new Russia(),
+                _ => new DefaultNation()
+            };
         }
     }
 }

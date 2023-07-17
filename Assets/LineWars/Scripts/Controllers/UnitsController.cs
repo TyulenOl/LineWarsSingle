@@ -3,21 +3,20 @@ using System.Diagnostics.CodeAnalysis;
 using LineWars.Model;
 using UnityEngine;
 
-namespace LineWars.Controllers
+namespace LineWars
 {
-    
-    public class UnitsController: MonoBehaviour
+    public class UnitsController : MonoBehaviour
     {
         public static UnitsController Instance { get; private set; }
 
         private Invoker invoker;
-        
+
         private void Awake()
         {
             invoker = new Invoker();
             Instance = this;
         }
-        
+
         // public void SpawnUnit([NotNull] Point point, [NotNull] Player owner, UnitType unitType)
         // {
         //     if (point == null) throw new ArgumentNullException(nameof(point));
@@ -32,19 +31,27 @@ namespace LineWars.Controllers
         //     point.AddUnitToVacantPosition(unit);
         // }
         //
-        public void MoveOrAttackOrder([NotNull] Player owner, [NotNull] Unit unit, [NotNull] Node target)
+
+        public void Action([NotNull] Player owner, Owned executor, Owned target)
         {
-            if (owner.IsMyOwn(unit))
+            //максимально абстрактно
+            if (!owner.IsMyOwn(executor))
             {
-                if (owner.IsMyOwn(target))
-                    invoker.Execute(new MoveCommand(unit, target));
-                else
-                    invoker.Execute(new AttackCommand(unit, target));
+                return;
             }
-            else
+
+            switch (executor)
             {
-                Debug.LogError("Нельзя передвинуть юнита, потому что он вам не принадлежит!");
+                case IAttackerVisitor attacker
+                    when target is IAlive alive && attacker.IsCanAttack(alive):
+                    invoker.Execute(new AttackCommand(attacker, alive));
+                    break;
+                case IMovable movable 
+                     when target is Node node && movable.IsCanMoveTo(node):
+                    invoker.Execute(new MoveCommand(movable,movable.Node, node));
+                    break;
             }
         }
+        
     }
 }

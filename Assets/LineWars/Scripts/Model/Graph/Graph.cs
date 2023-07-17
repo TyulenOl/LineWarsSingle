@@ -11,7 +11,10 @@ namespace LineWars.Model
         private Edge[] allEdges;
         private Node[] spawnNodes;
         
-        public void Initialize(IEnumerable<Node> allNodes, IEnumerable<Edge> allEdges, IEnumerable<Node> spawnNodes)
+        public void Initialize(
+            IEnumerable<Node> allNodes,
+            IEnumerable<Edge> allEdges,
+            IEnumerable<Node> spawnNodes)
         {
             this.allNodes = allNodes.ToArray();
             this.allEdges = allEdges.ToArray();

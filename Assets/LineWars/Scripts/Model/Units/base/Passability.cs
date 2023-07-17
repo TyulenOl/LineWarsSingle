@@ -1,9 +1,7 @@
 ﻿namespace LineWars.Model
 {
-    public enum LineType
+    public enum Passability
     {
-        Visibility,
-        Firing,
         Scout,
         Infantry,
         Country,

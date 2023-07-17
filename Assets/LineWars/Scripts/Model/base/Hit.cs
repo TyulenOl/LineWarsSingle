@@ -1,14 +1,16 @@
-﻿namespace LineWars.Model
+﻿using System;
+
+namespace LineWars.Model
 {
     public struct Hit
     {
-        private int damage;
-
+        public int Damage { get; }
         public Hit(int damage)
         {
-            this.damage = damage;
+            if (damage < 0)
+                throw new ArgumentException(nameof(damage));
+            this.Damage = damage;
         }
         
-        public int Damage => damage;
     }
 }

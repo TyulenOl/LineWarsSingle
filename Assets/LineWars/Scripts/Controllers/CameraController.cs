@@ -1,9 +1,11 @@
 using UnityEngine;
 
-
-public class CameraController : MonoBehaviour
+namespace LineWars
 {
-    private void Awake()
+    public class CameraController : MonoBehaviour
     {
+        private void Awake()
+        {
+        }
     }
 }

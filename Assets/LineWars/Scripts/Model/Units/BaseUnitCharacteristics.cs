@@ -5,31 +5,31 @@ namespace LineWars.Model
     // Структура необходимая для сохранения текущих характеристик юнита
     public struct BaseUnitCharacteristics
     {
-        public int Hp;
-        public int Armor;
+        public int CurrentHp;
+        public int CurrentArmor;
         public int MeleeDamage;
-        public int Speed;
+        public int CurrentSpeedPoints;
         public UnitSize UnitSize;
-        public LineType MovingLineType;
+        public Passability Passability;
 
         public BaseUnitCharacteristics(InitialBaseUnitCharacteristics characteristics)
         {
-            Hp = characteristics.MaxHp;
-            Armor = characteristics.MaxArmor;
+            CurrentHp = characteristics.InitialHp;
+            CurrentArmor = characteristics.InitialArmor;
             MeleeDamage = characteristics.MeleeDamage;
-            Speed = characteristics.Speed;
+            CurrentSpeedPoints = characteristics.Speed;
             UnitSize = characteristics.UnitSize;
-            MovingLineType = characteristics.MovingLineType;
+            Passability = characteristics.Passability;
         }
 
         private BaseUnitCharacteristics(BaseUnitCharacteristics other)
         {
-            Hp = other.Hp;
-            Armor = other.Armor;
+            CurrentHp = other.CurrentHp;
+            CurrentArmor = other.CurrentArmor;
             MeleeDamage = other.MeleeDamage;
-            Speed = other.Speed;
+            CurrentSpeedPoints = other.CurrentSpeedPoints;
             UnitSize = other.UnitSize;
-            MovingLineType = other.MovingLineType;
+            Passability = other.Passability;
         }
 
         public BaseUnitCharacteristics CreateCopy() => new BaseUnitCharacteristics(this);

@@ -16,59 +16,66 @@ public class GraphEditor : Editor
     private DirectoryInfo assetsDirectory => LevelsInfo.AssetsDirectory;
     private DirectoryInfo graphDirectory => LevelsInfo.GraphDirectory;
     private Graph Graph => (Graph) target;
-
-    private bool canSave;
-    private bool isDraw;
+    
+    private bool isLoaded;
 
     private GraphData graphData;
 
     private void OnEnable()
     {
-        canSave = true;
-        isDraw = FindObjectsOfType<Node>() != null || FindObjectsOfType<Edge>() != null;
-        if (graphDirectory == null)
-        { canSave = false; }
+        isLoaded = FindObjectsOfType<Node>().Length != 0 || FindObjectsOfType<Edge>().Length != 0;
     }
 
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
 
-        graphData = (GraphData)EditorGUILayout.ObjectField(
+        graphData = (GraphData) EditorGUILayout.ObjectField(
             "Add GraphData",
             graphData,
             typeof(GraphData),
             false
         );
-
-        GUILayout.BeginHorizontal();
-        if (GUILayout.Button("Save"))
+        if (graphDirectory != null)
         {
-            if (!canSave) return;
-            SaveGraph();
-        }
+            GUILayout.BeginHorizontal();
+            
+            if (GUILayout.Button("SaveNew"))
+                SaveGraph();
 
-        if (GUILayout.Button("Draw"))
-        {
-            DrawGraph();
-        }
+            EditorGUI.BeginDisabledGroup(graphData == null);
+            if (GUILayout.Button("Replace"))
+                ReplaceGraph();
+            EditorGUI.EndDisabledGroup();
 
-        if (GUILayout.Button("Delete"))
-        {
-            DeleteGraph();
+            EditorGUI.BeginDisabledGroup(isLoaded || graphData == null);
+            if (GUILayout.Button("Load"))
+                LoadGraph();
+            EditorGUI.EndDisabledGroup();
+
+            EditorGUI.BeginDisabledGroup(!isLoaded);
+            if (GUILayout.Button("Delete"))
+                UnLoadGraph();
+            
+            EditorGUI.EndDisabledGroup();
+
+            GUILayout.EndHorizontal();
         }
-        GUILayout.EndHorizontal();
+        else
+        {
+            EditorGUILayout.LabelField("No Graph Directory");
+        }
     }
 
-    private void DrawGraph()
+    private void LoadGraph()
     {
-        if (isDraw) return;
-        
+        if (isLoaded) return;
+
         if (graphData != null)
         {
             var drawer = new GraphBuilder();
             drawer.BuildGraph(graphData);
-            isDraw = true;
+            isLoaded = true;
         }
         else
         {
@@ -76,29 +83,35 @@ public class GraphEditor : Editor
         }
     }
 
-    private void DeleteGraph()
+    private void UnLoadGraph()
     {
         foreach (var node in FindObjectsOfType<Node>())
             DestroyImmediate(node.gameObject);
         foreach (var edge in FindObjectsOfType<Edge>())
             DestroyImmediate(edge.gameObject);
-        isDraw = false;
+        isLoaded = false;
     }
 
     private void SaveGraph()
     {
-        var allNodes = FindObjectsOfType<Node>().ToArray();
-        if (allNodes.Length == 0) return;
-
-        var graphData = CreateInstance<GraphData>();
+        var newGraphData = GetNewGraphData();
+        if (newGraphData == null)
+            return;
         
-        graphData.Initialize(allNodes);
-
         var uniqueAssetFileName = GetUniqueRelativePath();
-
-        AssetDatabase.CreateAsset(graphData, uniqueAssetFileName);
+        AssetDatabase.CreateAsset(newGraphData, uniqueAssetFileName);
     }
-    
+
+    private void ReplaceGraph()
+    {
+        var newGraphData = GetNewGraphData();
+        if (newGraphData == null)
+            return;
+        
+        graphData.RefreshFrom(newGraphData);
+        EditorUtility.SetDirty(graphData);
+    }
+
     private string GetUniqueRelativePath()
     {
         var relativePath = Path.GetRelativePath(assetsDirectory.Parent.FullName, graphDirectory.FullName);
@@ -112,7 +125,18 @@ public class GraphEditor : Editor
             index++;
             uniqueAssetFileName = $"{assetFileName}{index}.asset";
         }
-        
+
         return uniqueAssetFileName;
+    }
+
+    private GraphData GetNewGraphData()
+    {
+        var allNodes = FindObjectsOfType<Node>().ToArray();
+        if (allNodes.Length == 0) return null;
+
+        var newGraphData = CreateInstance<GraphData>();
+        newGraphData.Initialize(allNodes);
+
+        return newGraphData;
     }
 }

@@ -17,11 +17,13 @@ namespace LineWars
         
         void Awake()
         {
+            LocalPlayer = this;
+            nation = NationController.GetNation(nationType);
         }
 
         private void Start()
         {
-            LocalPlayer = this;
+            
         }
        
         public bool IsMyOwn(Owned owned) => myOwned.Contains(owned);

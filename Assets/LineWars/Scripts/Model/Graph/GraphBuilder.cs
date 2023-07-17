@@ -91,16 +91,15 @@ namespace LineWars
             edge.transform.SetParent(graph.transform);
 
             var edgeData = graphData.Edges[edge.Index];
+            var additionalData = graphData.EdgeAdditionalDatas[edge.Index];
 
             var node1 = allNodes[edgeData.Item1];
             var node2 = allNodes[edgeData.Item2];
 
-            edge.Initialize(node1, node2);
+            edge.Initialize(node1, node2, additionalData.LineType);
             node1.AddEdge(edge);
             node2.AddEdge(edge);
 
-            var additionalData = graphData.EdgeAdditionalDatas[edge.Index];
-            edge.LineType = additionalData.LineType;
         }
         
         private bool IsSpawn(Node node) => graphData.SpawnNodeIndexes.Contains(node.Index);

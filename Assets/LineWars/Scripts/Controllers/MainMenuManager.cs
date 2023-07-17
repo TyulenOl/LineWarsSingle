@@ -3,18 +3,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MainMenuManager : MonoBehaviour
+namespace LineWars
 {
-    public MainMenuManager Instance { get; private set; }
-
-    private void Awake()
+    public class MainMenuManager : MonoBehaviour
     {
-        Instance = this;
+        public MainMenuManager Instance { get; private set; }
+
+        private void Awake()
+        {
+            Instance = this;
+        }
+
+
+        public void LoadSingleGame()
+        {
+            SceneTransition.LoadScene(SceneName.SingleGame);
+        }
     }
 
-
-    public void LoadSingleGame()
-    {
-        SceneTransition.LoadScene(SceneName.SingleGame);
-    }
 }

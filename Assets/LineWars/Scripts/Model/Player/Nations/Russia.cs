@@ -8,7 +8,7 @@ public class Russia : INation
     {
         switch (type)
         {
-            case UnitType.Infrantry:
+            case UnitType.Infantry:
                 return Resources.Load<GameObject>("Russia/Infrantry");
             default:
                 return Resources.Load<GameObject>("DefaultUnits/BaseInfrantry");

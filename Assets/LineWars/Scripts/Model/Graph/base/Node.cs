@@ -10,29 +10,28 @@ using UnityEngine.Serialization;
 
 namespace LineWars.Model
 {
-    public class Node : Owned,
-        IHitHandler,
-        IHitCreator,
-        IPointerClickHandler
+    public class Node : Owned
     {
         [SerializeField, ReadOnlyInspector] private int index;
+        [SerializeField] [HideInInspector] private List<Edge> edges;
+        
         
         [SerializeField, ReadOnlyInspector] private Unit leftUnit;
         [SerializeField, ReadOnlyInspector] private Unit rightUnit;
-
-        [SerializeField] [HideInInspector] private List<Edge> edges;
-        
         [SerializeField] private bool isSpawn;
+
         [SerializeField] [HideInInspector] private SpriteRenderer spriteRenderer;
         [SerializeField] [HideInInspector] private Outline2D outline;
         
-        private Unit selectedUnit;
+        //private Unit selectedUnit;
         private Camera mainCamera;
         
         public Vector2 Position => transform.position;
         public IReadOnlyCollection<Edge> Edges => edges;
         public bool LeftIsFree => LeftUnit == null;
         public bool RightIsFree => RightUnit == null;
+
+        public int Hp => (LeftUnit ? LeftUnit.Hp : 0) + (RightUnit ? RightUnit.Hp : 0); 
 
         public int Index
         {
@@ -53,13 +52,21 @@ namespace LineWars.Model
         public Unit LeftUnit
         {
             get => leftUnit;
-            set => leftUnit = value;
+            set
+            {
+                //selectedUnit = null;
+                leftUnit = value;
+            }
         }
 
         public Unit RightUnit
         {
             get => rightUnit;
-            set => rightUnit = value;
+            set
+            {
+                //selectedUnit = null;
+                rightUnit = value;
+            }
         }
 
         private void Awake()
@@ -122,28 +129,20 @@ namespace LineWars.Model
 
         public bool RemoveEdge(Edge edge) => edges.Remove(edge);
 
+        public bool ContainsEdge(Edge edge) => edges.Contains(edge);
+
         public void SetActiveOutline(bool value) => outline.SetActiveOutline(value);
-
-        public void Accept(Hit hit)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public Hit GenerateHit()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void OnPointerClick(PointerEventData eventData)
-        {
-            var mousePos = mainCamera.ScreenToWorldPoint(eventData.position);
-            var relativeMousePos = mousePos - transform.position;
-
-            if (relativeMousePos.x < 0)
-                selectedUnit = leftUnit;
-            else
-                selectedUnit = rightUnit;
-        }
+        
+        // public void OnPointerClick(PointerEventData eventData)
+        // {
+        //     var mousePos = mainCamera.ScreenToWorldPoint(eventData.position);
+        //     var relativeMousePos = mousePos - transform.position;
+        //
+        //     if (relativeMousePos.x < 0)
+        //         selectedUnit = leftUnit;
+        //     else
+        //         selectedUnit = rightUnit;
+        // }
 
         public IEnumerable<Node> GetNeighbors()
         {

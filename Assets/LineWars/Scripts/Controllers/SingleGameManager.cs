@@ -2,7 +2,7 @@
 using LineWars.Extensions.Attributes;
 using UnityEngine;
 
-namespace LineWars.Controllers
+namespace LineWars
 {
     public class SingleGameManager: MonoBehaviour
     {

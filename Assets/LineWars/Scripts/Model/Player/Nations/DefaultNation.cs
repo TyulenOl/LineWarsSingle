@@ -9,7 +9,7 @@ public class DefaultNation : INation
     {
         switch (type)
         {
-            case UnitType.Infrantry:
+            case UnitType.Infantry:
                 return Resources.Load<GameObject>("DefaultUnits/BaseInfrantry");
             default:
                 return Resources.Load<GameObject>("DefaultUnits/BaseInfrantry");

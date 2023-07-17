@@ -6,7 +6,7 @@ using LineWars.Model;
 using UnityEngine;
 
 
-namespace LineWars.Controllers
+namespace LineWars
 {
     public class LevelsManager : MonoBehaviour
     {
@@ -46,12 +46,12 @@ namespace LineWars.Controllers
             if (mapData.GraphData == null)
             {
                 Debug.LogError($"У карты {mapName} нет графа");
+                return;
             }
 
             var drawer = new GraphBuilder();
             var graph = drawer.BuildGraph(graphData);
             spawnPointStack = graph.SpawnNodes
-                .GetComponentMany<Node>()
                 .ToStack();
         }
     }

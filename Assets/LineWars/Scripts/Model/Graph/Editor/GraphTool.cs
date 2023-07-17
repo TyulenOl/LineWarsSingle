@@ -45,7 +45,7 @@ public class GraphTool : EditorTool
 
         nodeListener = new SelectionListener<Node>();
 
-        Debug.Log("CreateGraph is Activated!");
+        //Debug.Log("CreateGraph is Activated!");
     }
 
 
@@ -54,7 +54,7 @@ public class GraphTool : EditorTool
         base.OnWillBeDeactivated();
         OnDisable();
 
-        Debug.Log("CreateGraph is Deactivated!");
+        //Debug.Log("CreateGraph is Deactivated!");
     }
 
     private void OnDisable()

@@ -5,7 +5,7 @@
     {
         public void Execute(ICommand command)
         {
-            if (command.CanExecute())
+            //if (command.CanExecute())
                 command.Execute();
         }
     }
