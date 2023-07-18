@@ -3,6 +3,6 @@
     public enum UnitSize
     {
         Little,
-        Lage
+        Large
     }
 }

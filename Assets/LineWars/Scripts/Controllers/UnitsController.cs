@@ -32,8 +32,11 @@ namespace LineWars
         // }
         //
 
-        public void Action([NotNull] Player owner, Owned executor, Owned target)
+        public void Action([NotNull] Player owner, IExecutor executor, ITarget target)
         {
+            Debug.Log(executor);
+            Debug.Log(target);
+            /*
             //максимально абстрактно
             if (!owner.IsMyOwn(executor))
             {
@@ -42,6 +45,7 @@ namespace LineWars
 
             switch (executor)
             {
+                
                 case IAttackerVisitor attacker
                     when target is IAlive alive && attacker.IsCanAttack(alive):
                     invoker.Execute(new AttackCommand(attacker, alive));
@@ -51,6 +55,7 @@ namespace LineWars
                     invoker.Execute(new MoveCommand(movable,movable.Node, node));
                     break;
             }
+            */
         }
         
     }

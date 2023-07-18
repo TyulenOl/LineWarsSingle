@@ -12,7 +12,7 @@ using LineWars.Controllers;
 namespace LineWars.Model
 {
     
-    public class Node : Owned
+    public class Node : Owned, ITarget
     {
         [SerializeField, ReadOnlyInspector] private int index;
         [SerializeField] [HideInInspector] private List<Edge> edges;
@@ -84,6 +84,7 @@ namespace LineWars.Model
 
         private void OnEnable() 
         {
+            if(selectable2D == null) return;
             selectable2D.PointerClicked += OnPointerClicked;
         }
 
@@ -115,6 +116,7 @@ namespace LineWars.Model
             spriteRenderer = GetComponent<SpriteRenderer>();
             outline = GetComponent<Outline2D>();
             selectable2D = GetComponent<Selectable2D>();
+            selectable2D.PointerClicked += OnPointerClicked;
         }
 
         public void BeforeDestroy(out List<Edge> deletedEdges, out List<Node> neighbors)
@@ -124,7 +126,7 @@ namespace LineWars.Model
 
             foreach (var edge in edges)
             {
-                var first = edge.FirsNode;
+                var first = edge.FirstNode;
                 var second = edge.SecondNode;
                 if (first.Equals(this))
                 {
@@ -168,10 +170,10 @@ namespace LineWars.Model
         {
             foreach (var edge in Edges)
             {
-                if (edge.FirsNode.Equals(this))
+                if (edge.FirstNode.Equals(this))
                     yield return edge.SecondNode;
                 else
-                    yield return edge.FirsNode;
+                    yield return edge.FirstNode;
             }
         }
     }

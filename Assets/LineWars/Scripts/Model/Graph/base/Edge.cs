@@ -5,7 +5,7 @@ using UnityEngine.Events;
 
 namespace LineWars.Model
 {
-    public class Edge : MonoBehaviour, IAlive
+    public class Edge : MonoBehaviour, IAlive, ITarget
     {
         [Header("Graph Settings")]
         [SerializeField, ReadOnlyInspector] private int index;
@@ -28,7 +28,7 @@ namespace LineWars.Model
             get => index;
             set => index = value;
         }
-        public Node FirsNode => firstNode;
+        public Node FirstNode => firstNode;
         public Node SecondNode => secondNode;
         public LineDrawer Drawer => drawer;
         
@@ -60,7 +60,7 @@ namespace LineWars.Model
                 LineTypeChanged.Invoke(before, lineType);
             }
         }
-
+        
         protected void OnValidate()
         {
             hp = maxHp;
@@ -83,10 +83,10 @@ namespace LineWars.Model
 
         public Node GetOther(Node node)
         {
-            if (FirsNode.Equals(node))
+            if (FirstNode.Equals(node))
                 return SecondNode;
             else
-                return FirsNode;
+                return FirstNode;
         }
     }
 }
