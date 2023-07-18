@@ -74,7 +74,7 @@ public class GraphEditor : Editor
         if (graphData != null)
         {
             var drawer = new GraphBuilder();
-            drawer.BuildGraph(graphData);
+            drawer.BuildGraph(graphData, true);
             isLoaded = true;
         }
         else

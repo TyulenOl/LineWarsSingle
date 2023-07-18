@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using LineWars.Scripts.Model.Graph;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -9,65 +10,126 @@ namespace LineWars.Model
     [Serializable]
     public class AdditionalEdgeData
     {
-        [SerializeField] public LineType lineType;
+        [SerializeField] private LineType lineType;
         public LineType LineType => lineType;
 
+        public AdditionalEdgeData()
+        {
+            this.lineType = LineType.InfantryRoad;
+        }
+        
         public AdditionalEdgeData(LineType lineType)
         {
             this.lineType = lineType;
         }
     }
 
+    [Serializable]
+    public class AdditionalNodeData
+    {
+        [SerializeField] private int ownedIndex;
+        [SerializeField] private bool isSpawn;
+        [SerializeField] private Unit leftUnitPrefab;
+        [SerializeField] private Unit rightUnitPrefab;
+
+        public bool HasOwner => ownedIndex != -1;
+        
+        public AdditionalNodeData()
+        {
+            ownedIndex = -1;
+            isSpawn = false;
+            leftUnitPrefab = null;
+            rightUnitPrefab = null;
+        }
+        public AdditionalNodeData(int ownedIndex, bool isSpawn, Unit leftUnitPrefab, Unit rightUnitPrefab)
+        {
+            this.ownedIndex = ownedIndex;
+            this.isSpawn = isSpawn;
+            this.leftUnitPrefab = leftUnitPrefab;
+            this.rightUnitPrefab = rightUnitPrefab;
+        }
+        
+        public int OwnedIndex => ownedIndex;
+        public bool IsSpawn => isSpawn;
+        public Unit LeftUnitPrefab => leftUnitPrefab;
+        public Unit RightUnitPrefab => rightUnitPrefab;
+    }
+
     public class GraphData : ScriptableObject
     {
         [SerializeField] [HideInInspector] private Vector2[] nodes;
         [SerializeField] [HideInInspector] private Vector2Int[] edges;
-        [SerializeField] [HideInInspector] private List<int> spawnNodeIndexes;
 
-        [FormerlySerializedAs("edgeDatas")] [SerializeField] [HideInInspector] private AdditionalEdgeData[] edgeAdditionalDatas;
+        [FormerlySerializedAs("edgeDatas")]
+        [SerializeField] [HideInInspector] private List<AdditionalEdgeData> additionalEdgeDatas;
+        
+        [FormerlySerializedAs("nodeDatas")]
+        [SerializeField] [HideInInspector] private List<AdditionalNodeData> additionalNodeDatas;
 
+        //служебные поля
         private int currentNodeIndex;
         private int currentEdgeIndex;
-        private List<Node> graph;
-        private HashSet<Node> spawnNodes;
+
+        private List<Node> allNodes;
+        private List<Edge> allEdges;
+
+        private List<Node> tempCopyNodes;
+
+        private Dictionary<NodeInitialInfo, int> pairNodeInfoAndSpawnIndex;
 
         public int EdgesCount => edges.Length;
         public int NodesCount => nodes.Length;
-        public int SpawnCount => spawnNodeIndexes.Count;
+        public int SpawnCount => additionalNodeDatas.Count(x=> x.IsSpawn);
 
         public Vector2[] NodesPositions => nodes.ToArray();
 
         public (int, int)[] Edges => edges
             .Select(vector2Int => (vector2Int.x, vector2Int.y))
             .ToArray();
-
-        public IReadOnlyList<int> SpawnNodeIndexes => spawnNodeIndexes;
-        public IReadOnlyList<AdditionalEdgeData> EdgeAdditionalDatas => edgeAdditionalDatas;
+        public AdditionalEdgeData GetAdditionalEdgeData(int index)
+        {
+            if (
+                additionalEdgeDatas != null
+                && 0 < index && index < additionalEdgeDatas.Count
+            )
+                return additionalEdgeDatas[index];
+            return new AdditionalEdgeData();
+        }
+        
+        public AdditionalNodeData GetAdditionalNodeData(int index)
+        {
+            if (
+                additionalNodeDatas != null
+                && 0 < index && index < additionalNodeDatas.Count
+            )
+                return additionalNodeDatas[index];
+            return new AdditionalNodeData();
+        }
 
         public void Initialize(IReadOnlyCollection<Node> graph)
         {
-            var nodesCount = graph.Count;
-            nodes = new Vector2[nodesCount];
-
-
-            var edgesCount = graph
+            allNodes = graph.ToList();
+            allEdges = graph
                 .SelectMany(x => x.Edges)
                 .Distinct()
-                .Count();
+                .ToList();
+            
+            InitializeBaseDada();
+            InitializeAdditionalData();
+        }
 
-            edges = new Vector2Int[edgesCount];
-            edgeAdditionalDatas = new AdditionalEdgeData[edgesCount];
+        private void InitializeBaseDada()
+        {
+            currentNodeIndex = 0;
+            currentEdgeIndex = 0;
+            nodes = new Vector2[allNodes.Count];
+            edges = new Vector2Int[allEdges.Count];
 
-            this.graph = graph.ToList();
-            this.spawnNodes = graph
-                .Where(x => x.IsSpawn)
-                .ToHashSet();
-
-            spawnNodeIndexes = new List<int>();
-
-            while (this.graph.Count > 0)
+            tempCopyNodes = allNodes.ToList();
+            
+            while (tempCopyNodes.Count > 0)
             {
-                WidthTraversal(this.graph.First());
+                WidthTraversal(tempCopyNodes.First());
             }
         }
 
@@ -83,11 +145,8 @@ namespace LineWars.Model
             while (queue.Count > 0)
             {
                 var currentNode = queue.Dequeue();
-                graph.Remove(currentNode);
-
-                if (spawnNodes.Contains(currentNode))
-                    spawnNodeIndexes.Add(currentNodeIndex);
-
+                tempCopyNodes.Remove(currentNode);
+                
                 nodes[currentNodeIndex] = currentNode.Position;
 
                 nodeRegister.Add(currentNode, currentNodeIndex);
@@ -107,7 +166,6 @@ namespace LineWars.Model
                     {
                         var otherNodeIndex = nodeRegister[otherNode];
                         edges[currentEdgeIndex] = new Vector2Int(otherNodeIndex, currentNodeIndex);
-                        edgeAdditionalDatas[currentEdgeIndex] = GetAdditionalEdgeData(edge);
                         currentEdgeIndex++;
                     }
                 }
@@ -116,9 +174,57 @@ namespace LineWars.Model
             }
         }
 
+        private void InitializeAdditionalData()
+        {
+            additionalNodeDatas = new List<AdditionalNodeData>(allNodes.Count);
+            additionalEdgeDatas = new List<AdditionalEdgeData>(allEdges.Count);
+
+            FindAllSpawns();
+            
+            foreach (var node in allNodes)
+                additionalNodeDatas.Add(GetAdditionalNodeData(node));
+
+            foreach (var edge in allEdges)
+                additionalEdgeDatas.Add(GetAdditionalEdgeData(edge));
+        }
+
+        private void FindAllSpawns()
+        {
+            pairNodeInfoAndSpawnIndex = new Dictionary<NodeInitialInfo, int>();
+            var spawnIndex = 0;
+            foreach (var node in allNodes)
+            {
+                if (node.TryGetComponent<NodeInitialInfo>(out var info) && info.IsSpawn)
+                {
+                    pairNodeInfoAndSpawnIndex.Add(info, spawnIndex);
+                    spawnIndex++;
+                }
+            }
+        }
+        
         private AdditionalEdgeData GetAdditionalEdgeData(Edge edge)
         {
             return new AdditionalEdgeData(edge.LineType);
+        }
+
+        private AdditionalNodeData GetAdditionalNodeData(Node node)
+        {
+            if (node.TryGetComponent<NodeInitialInfo>(out var info) 
+                && (info.IsSpawn || info.ReferenceToSpawn != null))
+            {
+                var ownedIndex = info.IsSpawn
+                    ? pairNodeInfoAndSpawnIndex[info]
+                    : pairNodeInfoAndSpawnIndex[info.ReferenceToSpawn];
+                return new AdditionalNodeData
+                (
+                    ownedIndex,
+                    info.IsSpawn,
+                    info.LeftUnitPrefab,
+                    info.RightUnitPrefab
+                );
+            }
+
+            return new AdditionalNodeData();
         }
 
         public void RefreshFrom(GraphData graphData)
@@ -127,8 +233,8 @@ namespace LineWars.Model
                 return;
             nodes = graphData.nodes;
             edges = graphData.edges;
-            edgeAdditionalDatas = graphData.edgeAdditionalDatas;
-            spawnNodeIndexes = graphData.spawnNodeIndexes;
+            additionalEdgeDatas = graphData.additionalEdgeDatas;
+            additionalNodeDatas = graphData.additionalNodeDatas;
         }
     }
 }

@@ -11,7 +11,6 @@ namespace LineWars.Controllers
         Preparing, // на этом этапе должны отображаться объекты для взаимодействия, и должен выбраться то на что действует приказ
         Ready //на этом этапе происходит непосредственное выполнение приказа 
     }
-    
     // Client
     public class CommandsManager: MonoBehaviour
     {
@@ -21,7 +20,7 @@ namespace LineWars.Controllers
         [SerializeField] private bool isActive;
         
         private CommandsState currentState;
-
+        
         private void Awake()
         {
             Instance = this;

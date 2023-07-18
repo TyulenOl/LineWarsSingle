@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using LineWars.Extensions;
 using LineWars.Extensions.Attributes;
 using LineWars.Interface;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.Serialization;
 
 namespace LineWars.Model
 {
@@ -18,9 +14,8 @@ namespace LineWars.Model
         
         [SerializeField, ReadOnlyInspector] private Unit leftUnit;
         [SerializeField, ReadOnlyInspector] private Unit rightUnit;
-        [SerializeField] private bool isSpawn;
-
-        [SerializeField] [HideInInspector] private SpriteRenderer spriteRenderer;
+        //[SerializeField] private bool isSpawn;
+        
         [SerializeField] [HideInInspector] private Outline2D outline;
         
         //private Unit selectedUnit;
@@ -38,17 +33,7 @@ namespace LineWars.Model
             get => index;
             set => index = value;
         }
-
-        public bool IsSpawn
-        {
-            get => isSpawn;
-            set
-            {
-                isSpawn = value;
-                RedrawColor();
-            }
-        }
-
+        
         public Unit LeftUnit
         {
             get => leftUnit;
@@ -76,13 +61,12 @@ namespace LineWars.Model
 
         private void OnValidate()
         {
-            RedrawColor();
+            //RedrawColor();
         }
 
         public void Initialize()
         {
             edges = new List<Edge>();
-            spriteRenderer = GetComponent<SpriteRenderer>();
             outline = GetComponent<Outline2D>();
         }
 
@@ -109,17 +93,7 @@ namespace LineWars.Model
 
             edges = null;
         }
-
-        private void RedrawColor()
-        {
-            if (isSpawn)
-                spriteRenderer.color = Color.green;
-            else
-            {
-                spriteRenderer.color = Color.white;
-            }
-        }
-
+        
         public void AddEdge(Edge edge)
         {
             if (edge == null || edges.Contains(edge))

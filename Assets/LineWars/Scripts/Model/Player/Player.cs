@@ -9,12 +9,19 @@ namespace LineWars
     public class Player : MonoBehaviour
     {
         public static Player LocalPlayer { get; private set; }
+        [SerializeField, ReadOnlyInspector] private int index;
         [SerializeField, ReadOnlyInspector] private NationType nationType;
 
         private HashSet<Owned> myOwned = new();
 
         private INation nation;
-        
+
+        public int Index
+        {
+            get => index;
+            set => index = value;
+        }
+
         void Awake()
         {
             LocalPlayer = this;

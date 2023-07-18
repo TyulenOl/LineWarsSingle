@@ -5,21 +5,6 @@ namespace LineWars.Controllers
 {
     public class UnitBackgroundDrawer : MonoBehaviour
     {
-        private class Save
-        {
-            public Sprite MaskSprite;
-            public SpriteMaskInteraction BackgroundMaskInteraction;
-            public SpriteMaskInteraction UnitMaskInteraction;
-
-            public int BackgroundSortingOrder;
-            public int UnitSortingOrder;
-
-            public Vector3 BackgroundScale;
-            public Vector3 UnitScale;
-
-            public Vector3 UnitPosition;
-        }
-
 
         [SerializeField] private Sprite nodeSprite;
 
@@ -31,23 +16,20 @@ namespace LineWars.Controllers
         private Sprite leftPart;
         private Sprite rightPart;
 
-        private Save save;
+
+        public SpriteMask Mask => mask;
+        public SpriteRenderer UnitSpriteRenderer => unitSpriteRenderer;
+        public SpriteRenderer BackgroundSpriteRenderer => backgroundSpriteRenderer;
 
         private Sprite unitSprite => unitSpriteRenderer.sprite;
 
         public void Initialize()
         {
-            CreateSave();
+         
             Texture2D nodeTexture = nodeSprite.texture;
             float width = nodeTexture.width;
             float height = nodeTexture.height;
-
-            //var leftTexture = new Texture2D(width, height, nodeTexture.format, true);
-            //var rightTexture = new Texture2D(width, height, nodeTexture.format, true);
-
-            //Graphics.CopyTexture(nodeTexture, 0, 0, 0, 0, width / 2, height, leftTexture, 0, 0, 0, 0);
-            //Graphics.CopyTexture(nodeTexture, 0, 0, width / 2, 0, width / 2, height, rightTexture, 0, 0, width / 2, 0);
-
+            
             leftPart = Sprite.Create(nodeTexture, new Rect(0, 0, width / 2, height), new Vector2(1, 0.5f));
             rightPart = Sprite.Create(nodeTexture, new Rect(width / 2, 0, width / 2, height), new Vector2(0, 0.5f));
 
@@ -57,43 +39,8 @@ namespace LineWars.Controllers
             unitSpriteRenderer.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
             unitSpriteRenderer.sortingOrder = 1;
         }
-
-        public void Disable()
-        {
-            mask.sprite = save.MaskSprite;
-
-            backgroundSpriteRenderer.maskInteraction = save.BackgroundMaskInteraction;
-            backgroundSpriteRenderer.sortingOrder = save.BackgroundSortingOrder;
-
-            unitSpriteRenderer.maskInteraction = save.UnitMaskInteraction;
-            unitSpriteRenderer.sortingOrder = save.UnitSortingOrder;
-
-            backgroundSpriteRenderer.transform.localScale = save.BackgroundScale;
-            unitSpriteRenderer.transform.localScale = save.UnitScale;
-
-            unitSpriteRenderer.transform.position = save.UnitPosition;
-        }
-
-        private void CreateSave()
-        {
-            save = new Save()
-            {
-                MaskSprite = mask.sprite,
-
-                BackgroundMaskInteraction = backgroundSpriteRenderer.maskInteraction,
-                BackgroundSortingOrder = backgroundSpriteRenderer.sortingOrder,
-
-                UnitMaskInteraction = unitSpriteRenderer.maskInteraction,
-                UnitSortingOrder = unitSpriteRenderer.sortingOrder,
-
-                BackgroundScale = backgroundSpriteRenderer.transform.localScale,
-                UnitScale = unitSpriteRenderer.transform.localScale,
-                
-                UnitPosition = unitSpriteRenderer.transform.position
-            };
-        }
-
-
+        
+        
         private void ScaleForNode(float width, float height, SpriteRenderer renderer)
         {
             var rect = renderer.sprite.rect;

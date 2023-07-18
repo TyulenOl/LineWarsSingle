@@ -51,8 +51,8 @@ namespace LineWars
 
             var drawer = new GraphBuilder();
             var graph = drawer.BuildGraph(graphData);
-            spawnPointStack = graph.SpawnNodes
-                .ToStack();
+            // spawnPointStack = graph.SpawnNodes
+            //     .ToStack();
         }
     }
 }
