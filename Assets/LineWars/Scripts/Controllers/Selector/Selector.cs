@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace LineWars.Controllers
 {
-    public class Selector : MonoBehaviour
+    public class Selector : MonoBehaviour // Отвечает за Input
     {
         private static Selector instance;
         private GameObject selectedObject;

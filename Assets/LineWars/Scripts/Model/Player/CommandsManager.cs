@@ -7,9 +7,9 @@ namespace LineWars.Controllers
 {
     public enum CommandsState
     {
-        Before, //на этом этапе должен выбраться приказ из возможных, и должен взяться исполнитель приказа
-        Preparing, // на этом этапе должны отображаться объекты для взаимодействия, и должен выбраться то на что действует приказ
-        Ready //на этом этапе происходит непосредственное выполнение приказа 
+        Before, //на этом этапе должен выбраться приказ из возможных, и должен взяться исполнитель приказа (выбирается испонитель)
+        Preparing, // на этом этапе должны отображаться объекты для взаимодействия, и должен выбраться то на что действует приказ (выбирается цель)
+        Ready //на этом этапе происходит непосредственное выполнение приказа (исполнение)
     }
     
     // Client
@@ -31,6 +31,11 @@ namespace LineWars.Controllers
         private void OnEnable()
         {
             Selector.SelectedObjectsChanged += SelectorOnSelectedObjectsChanged;
+        }
+
+        private void OnDisable() 
+        {
+            Selector.SelectedObjectsChanged -= SelectorOnSelectedObjectsChanged;
         }
 
         private void SelectorOnSelectedObjectsChanged(GameObject before, GameObject after)
