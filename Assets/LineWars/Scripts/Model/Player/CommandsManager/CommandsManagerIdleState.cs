@@ -1,21 +1,21 @@
-public class CommandsManagerIdleState : IState
+public class CommandsManagerIdleState : State
 {
-    public void OnEnter()
+    public override void OnEnter()
     {
         
     }
 
-    public void OnExit()
+    public override void OnExit()
     {
         
     }
 
-    public void OnLogic()
+    public override void OnLogic()
     {
         
     }
 
-    public void OnPhysics()
+    public override void OnPhysics()
     {
 
     }

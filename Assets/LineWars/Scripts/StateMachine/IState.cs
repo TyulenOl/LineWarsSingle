@@ -1,7 +1,21 @@
-﻿public interface IState
+﻿public class State
 {
-    public void OnLogic();
-    public void OnPhysics();
-    public void OnEnter();
-    public void OnExit();
+    public virtual void OnLogic()
+    {
+
+    }
+
+    public virtual void OnPhysics()
+    {
+
+    }
+
+    public virtual void OnEnter() 
+    {
+
+    }
+    public virtual void OnExit()
+    {
+         
+    }
 }

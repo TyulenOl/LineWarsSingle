@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace LineWars.Controllers
 {
-    public class CommandsManagerTargetState : IState
+    public class CommandsManagerTargetState : State
     {
         private CommandsManager manager;
         private Action<ITarget> setTarget;
@@ -15,25 +15,21 @@ namespace LineWars.Controllers
             this.setTarget = setTarget;
         }
 
-        public void OnEnter()
+        public override void OnEnter()
+        {
+            Selector.SelectedObjectsChanged += OnSelectedObjectChanged;
+        }
+
+        public override void OnExit()
+        {
+            Selector.SelectedObjectsChanged -= OnSelectedObjectChanged;
+        }
+
+        public override void OnLogic()
         {
             
         }
 
-        public void OnExit()
-        {
-            
-        }
-
-        public void OnLogic()
-        {
-            
-        }
-
-        public void OnPhysics()
-        {
-            
-        }
 
         private void OnSelectedObjectChanged(GameObject lastObject, GameObject newObject)
         {

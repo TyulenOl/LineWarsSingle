@@ -22,9 +22,9 @@ namespace LineWars.Model
         [SerializeField, ReadOnlyInspector] private Unit rightUnit;
         [SerializeField] private bool isSpawn;
 
-        [SerializeField] [HideInInspector] private SpriteRenderer spriteRenderer;
-        [SerializeField] [HideInInspector] private Outline2D outline;
-        [SerializeField] [HideInInspector] private Selectable2D selectable2D;
+        [SerializeField] private SpriteRenderer spriteRenderer;
+        [SerializeField] private Outline2D outline;
+        [SerializeField] private Selectable2D selectable2D;
         
         //private Unit selectedUnit;
         private Camera mainCamera;
@@ -84,7 +84,6 @@ namespace LineWars.Model
 
         private void OnEnable() 
         {
-            if(selectable2D == null) return;
             selectable2D.PointerClicked += OnPointerClicked;
         }
 
@@ -113,10 +112,6 @@ namespace LineWars.Model
         public void Initialize()
         {
             edges = new List<Edge>();
-            spriteRenderer = GetComponent<SpriteRenderer>();
-            outline = GetComponent<Outline2D>();
-            selectable2D = GetComponent<Selectable2D>();
-            selectable2D.PointerClicked += OnPointerClicked;
         }
 
         public void BeforeDestroy(out List<Edge> deletedEdges, out List<Node> neighbors)

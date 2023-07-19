@@ -5,7 +5,7 @@ using System;
 
 namespace LineWars.Controllers
 {
-    public class CommandsManagerExecutorState : IState
+    public class CommandsManagerExecutorState : State
     {
         private CommandsManager manager;
         private Action<IExecutor> setExecutor;
@@ -15,24 +15,14 @@ namespace LineWars.Controllers
             this.setExecutor = setExecutor;
         }
 
-        public void OnEnter()
+        public override void OnEnter()
         {
             Selector.SelectedObjectsChanged += OnSelectedObjectChanged;
         }
 
-        public void OnExit()
+        public override void OnExit()
         {
             Selector.SelectedObjectsChanged -= OnSelectedObjectChanged;
-        }
-
-        public void OnLogic()
-        {
-
-        }
-
-        public void OnPhysics()
-        {
-
         }
 
         private void OnSelectedObjectChanged(GameObject previousObject, GameObject newObject)
