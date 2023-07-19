@@ -9,7 +9,9 @@ namespace LineWars.Model
     public class Unit: Owned,
         IAttackerVisitor,
         IAlive,
-        IMovable
+        IMovable,
+        ITarget,
+        IExecutor
     { 
         [SerializeField] private InitialBaseUnitCharacteristics initStats;
 
@@ -111,7 +113,7 @@ namespace LineWars.Model
             bool SizeCondition()
             {
                 return Size == UnitSize.Little && (target.LeftIsFree || target.RightIsFree)
-                       || Size == UnitSize.Lage && (target.LeftIsFree && target.RightIsFree);
+                       || Size == UnitSize.Large && (target.LeftIsFree && target.RightIsFree);
             }
 
             bool LineCondition()

@@ -26,7 +26,7 @@ namespace LineWars
                     Owned.Connect(player, leftUnit);
                     leftUnit.transform.SetParent(player.transform);
                     
-                    if (leftUnit.Size == UnitSize.Lage)
+                    if (leftUnit.Size == UnitSize.Large)
                         node.RightUnit = leftUnit;
                 }
 
@@ -34,7 +34,7 @@ namespace LineWars
                 {
                     if (nodeInfo.RightUnitPrefab.Size == UnitSize.Little && node.RightIsFree
                         ||
-                        nodeInfo.RightUnitPrefab.Size == UnitSize.Lage && node.LeftIsFree && node.RightIsFree)
+                        nodeInfo.RightUnitPrefab.Size == UnitSize.Large && node.LeftIsFree && node.RightIsFree)
                     {
                         var rightUnit = Instantiate(nodeInfo.RightUnitPrefab);
                         rightUnit.Initialize(node);
@@ -44,7 +44,7 @@ namespace LineWars
                         Owned.Connect(player, rightUnit);
                         rightUnit.transform.SetParent(player.transform);
                     
-                        if (rightUnit.Size == UnitSize.Lage)
+                        if (rightUnit.Size == UnitSize.Large)
                             node.LeftUnit = rightUnit;
                     }
                 }
