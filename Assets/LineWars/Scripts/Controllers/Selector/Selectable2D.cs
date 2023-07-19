@@ -1,12 +1,30 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace LineWars.Controllers
 {
-    public class Selectable2D: MonoBehaviour
+    public class Selectable2D: MonoBehaviour, IPointerClickHandler
     {
-        private void OnMouseDown()
+        ///<summary>
+        /// Вызывается, когда на объект нажимают мышкой. Использовать для того, чтобы изменить присвоение селектора.
+        ///<param name = "Selected Object"> Объект Selectable2D.</param>
+        ///<param name = "Pointer Event Data">  </param>
+        ///<returns> Возвращаемое значение: Объект, выбранный Selector </returns>
+        ///</summary>
+        public event Func<GameObject, PointerEventData, GameObject> PointerClicked; 
+        public void OnPointerClick(PointerEventData eventData)
         {
-            Selector.SelectedObject = gameObject;
+            if(PointerClicked != null)
+            {
+                Selector.SelectedObject = PointerClicked.Invoke(this.gameObject, eventData);
+            }
+            else
+            {
+                Selector.SelectedObject = gameObject;
+            }
         }
+
+
     }
 }

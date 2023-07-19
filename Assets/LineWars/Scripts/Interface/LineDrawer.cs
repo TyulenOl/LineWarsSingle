@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace LineWars.Interface
 {
@@ -10,6 +11,7 @@ namespace LineWars.Interface
         [SerializeField] [HideInInspector] private Transform firstTransform;
         [SerializeField] [HideInInspector] private Transform secondTransform;
         public SpriteRenderer LineSpriteRenderer => lineSpriteRenderer;
+        public UnityEvent LineDrawn;
         
         public void Initialise(Transform first, Transform second)
         {
@@ -30,6 +32,7 @@ namespace LineWars.Interface
             var radian = Mathf.Atan2(newSecondNodePosition.y , newSecondNodePosition.x) * 180 / Math.PI;
             lineSpriteRenderer.transform.rotation = Quaternion.Euler(0,0,(float)radian);
             lineSpriteRenderer.transform.position = (positionFirst + positionSecond) / 2;
+            LineDrawn.Invoke();
         }
     }
 }

@@ -7,10 +7,12 @@ using LineWars.Interface;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
+using LineWars.Controllers;
 
 namespace LineWars.Model
 {
-    public class Node : Owned
+    
+    public class Node : Owned, ITarget
     {
         [SerializeField, ReadOnlyInspector] private int index;
         [SerializeField] [HideInInspector] private List<Edge> edges;
@@ -20,8 +22,9 @@ namespace LineWars.Model
         [SerializeField, ReadOnlyInspector] private Unit rightUnit;
         [SerializeField] private bool isSpawn;
 
-        [SerializeField] [HideInInspector] private SpriteRenderer spriteRenderer;
-        [SerializeField] [HideInInspector] private Outline2D outline;
+        [SerializeField] private SpriteRenderer spriteRenderer;
+        [SerializeField] private Outline2D outline;
+        [SerializeField] private Selectable2D selectable2D;
         
         //private Unit selectedUnit;
         private Camera mainCamera;
@@ -79,11 +82,36 @@ namespace LineWars.Model
             RedrawColor();
         }
 
+        private void OnEnable() 
+        {
+            selectable2D.PointerClicked += OnPointerClicked;
+        }
+
+        private void OnDisable() 
+        {
+            selectable2D.PointerClicked -= OnPointerClicked;
+        }
+
+        private GameObject OnPointerClicked(GameObject obj, PointerEventData eventData)
+        {   
+    
+            var absolutePosition = mainCamera.ScreenToWorldPoint(eventData.position);
+            var relativePosition = absolutePosition - transform.position;
+
+            if(relativePosition.x > 0 && rightUnit != null)
+            {
+                return rightUnit.gameObject;
+            }
+            else if(leftUnit != null)
+            {
+                return leftUnit.gameObject;
+            }
+            return this.gameObject;
+        }
+
         public void Initialize()
         {
             edges = new List<Edge>();
-            spriteRenderer = GetComponent<SpriteRenderer>();
-            outline = GetComponent<Outline2D>();
         }
 
         public void BeforeDestroy(out List<Edge> deletedEdges, out List<Node> neighbors)
@@ -93,7 +121,7 @@ namespace LineWars.Model
 
             foreach (var edge in edges)
             {
-                var first = edge.FirsNode;
+                var first = edge.FirstNode;
                 var second = edge.SecondNode;
                 if (first.Equals(this))
                 {
@@ -132,26 +160,15 @@ namespace LineWars.Model
         public bool ContainsEdge(Edge edge) => edges.Contains(edge);
 
         public void SetActiveOutline(bool value) => outline.SetActiveOutline(value);
-        
-        // public void OnPointerClick(PointerEventData eventData)
-        // {
-        //     var mousePos = mainCamera.ScreenToWorldPoint(eventData.position);
-        //     var relativeMousePos = mousePos - transform.position;
-        //
-        //     if (relativeMousePos.x < 0)
-        //         selectedUnit = leftUnit;
-        //     else
-        //         selectedUnit = rightUnit;
-        // }
 
         public IEnumerable<Node> GetNeighbors()
         {
             foreach (var edge in Edges)
             {
-                if (edge.FirsNode.Equals(this))
+                if (edge.FirstNode.Equals(this))
                     yield return edge.SecondNode;
                 else
-                    yield return edge.FirsNode;
+                    yield return edge.FirstNode;
             }
         }
     }
