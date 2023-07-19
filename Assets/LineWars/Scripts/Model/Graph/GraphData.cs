@@ -90,7 +90,7 @@ namespace LineWars.Model
         {
             if (
                 additionalEdgeDatas != null
-                && 0 < index && index < additionalEdgeDatas.Count
+                && 0 <= index && index < additionalEdgeDatas.Count
             )
                 return additionalEdgeDatas[index];
             return new AdditionalEdgeData();
@@ -100,7 +100,7 @@ namespace LineWars.Model
         {
             if (
                 additionalNodeDatas != null
-                && 0 < index && index < additionalNodeDatas.Count
+                && 0 <= index && index < additionalNodeDatas.Count
             )
                 return additionalNodeDatas[index];
             return new AdditionalNodeData();

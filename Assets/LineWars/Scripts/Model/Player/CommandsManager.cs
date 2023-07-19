@@ -3,7 +3,7 @@ using System.Collections;
 using LineWars.Model;
 using UnityEngine;
 
-namespace LineWars.Controllers
+namespace LineWars
 {
     public enum CommandsState
     {
@@ -29,7 +29,7 @@ namespace LineWars.Controllers
 
         private void OnEnable()
         {
-            Selector.SelectedObjectsChanged += SelectorOnSelectedObjectsChanged;
+            //Selector.SelectedObjectsChanged += SelectorOnSelectedObjectsChanged;
         }
 
         private void SelectorOnSelectedObjectsChanged(GameObject before, GameObject after)

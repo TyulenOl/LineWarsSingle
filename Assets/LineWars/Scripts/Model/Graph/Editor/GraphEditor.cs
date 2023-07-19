@@ -131,8 +131,9 @@ public class GraphEditor : Editor
 
     private GraphData GetNewGraphData()
     {
-        var allNodes = FindObjectsOfType<Node>().ToArray();
-        if (allNodes.Length == 0) return null;
+        var allNodes = FindObjectsOfType<Node>().ToList();
+        allNodes.Reverse();
+        if (allNodes.Count == 0) return null;
 
         var newGraphData = CreateInstance<GraphData>();
         newGraphData.Initialize(allNodes);
