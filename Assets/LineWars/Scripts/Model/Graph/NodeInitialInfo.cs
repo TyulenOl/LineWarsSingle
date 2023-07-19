@@ -19,6 +19,7 @@ namespace LineWars.Scripts.Model.Graph
         public NodeInitialInfo ReferenceToSpawn => referenceToSpawn;
         public Unit LeftUnitPrefab => leftUnitPrefab;
         public Unit RightUnitPrefab => rightUnitPrefab;
+        
 
 #if UNITY_EDITOR
         public void Initialize

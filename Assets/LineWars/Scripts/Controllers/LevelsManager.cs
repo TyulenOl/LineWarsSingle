@@ -14,7 +14,7 @@ namespace LineWars
         
         private MapData mapData;
         private GraphData graphData => mapData.GraphData;
-        private Stack<Node> spawnPointStack;
+        private Stack<SpawnInfo> spawnPointStack;
 
         private void Awake()
         {
@@ -24,10 +24,10 @@ namespace LineWars
         public static bool ExistenceMap(string mapName) => Instance._ExistenceMap(mapName);
         public static void LoadMap(string mapName) => Instance._LoadMap(mapName);
         public static bool HasSpawnPoint() => Instance._HasSpawnPoint();
-        public static Node GetSpawnPoint() => Instance._GetSpawnPoint();
+        public static SpawnInfo GetSpawnPoint() => Instance._GetSpawnPoint();
 
         
-        private Node _GetSpawnPoint() => spawnPointStack.Pop();
+        private SpawnInfo _GetSpawnPoint() => spawnPointStack.Pop();
         private bool _HasSpawnPoint() => spawnPointStack.Count != 0;
         private bool _ExistenceMap(string mapName)
         {
@@ -51,8 +51,10 @@ namespace LineWars
 
             var drawer = new GraphBuilder();
             var graph = drawer.BuildGraph(graphData);
-            // spawnPointStack = graph.SpawnNodes
-            //     .ToStack();
+            var spawnNodes = graph.SpawnInfos.ToList();
+            spawnNodes.Reverse();
+            spawnPointStack = spawnNodes
+                .ToStack();
         }
     }
 }

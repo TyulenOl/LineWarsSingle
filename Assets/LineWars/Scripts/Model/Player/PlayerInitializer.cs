@@ -1,0 +1,57 @@
+﻿using LineWars.Model;
+using UnityEngine;
+
+namespace LineWars
+{
+    public class PlayerInitializer: MonoBehaviour
+    {
+        [SerializeField] private Player playerPrefab;
+        
+        public Player Initialize(SpawnInfo spawnInfo)
+        {
+            var player = Instantiate(playerPrefab);
+            player.Index = spawnInfo.PlayerIndex;
+            foreach (var nodeInfo in spawnInfo.NodeInfos)
+            {
+                var node = nodeInfo.ReferenceToNode;
+                Owned.Connect(player, node);
+                
+                if (nodeInfo.LeftUnitPrefab != null)
+                {
+                    var leftUnit = Instantiate(nodeInfo.LeftUnitPrefab);
+                    leftUnit.Initialize(node);
+                    leftUnit.UnitDirection = UnitDirection.Left;
+                    node.LeftUnit = leftUnit;
+                    leftUnit.transform.position = node.transform.position;
+                    Owned.Connect(player, leftUnit);
+                    leftUnit.transform.SetParent(player.transform);
+                    
+                    if (leftUnit.Size == UnitSize.Lage)
+                        node.RightUnit = leftUnit;
+                }
+
+                if (nodeInfo.RightUnitPrefab != null)
+                {
+                    if (nodeInfo.RightUnitPrefab.Size == UnitSize.Little && node.RightIsFree
+                        ||
+                        nodeInfo.RightUnitPrefab.Size == UnitSize.Lage && node.LeftIsFree && node.RightIsFree)
+                    {
+                        var rightUnit = Instantiate(nodeInfo.RightUnitPrefab);
+                        rightUnit.Initialize(node);
+                        rightUnit.UnitDirection = UnitDirection.Right;
+                        node.RightUnit = rightUnit;
+                        rightUnit.transform.position = node.transform.position;
+                        Owned.Connect(player, rightUnit);
+                        rightUnit.transform.SetParent(player.transform);
+                    
+                        if (rightUnit.Size == UnitSize.Lage)
+                            node.LeftUnit = rightUnit;
+                    }
+                }
+            }
+
+            return player;
+        }
+        
+    }
+}

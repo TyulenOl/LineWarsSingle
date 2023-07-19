@@ -22,7 +22,7 @@ namespace LineWars
         private GraphData graphData;
 
         private bool isEditor;
-        
+
         public GraphBuilder()
         {
             nodePrefab = Resources.Load<GameObject>("Prefabs/Node");
@@ -32,10 +32,10 @@ namespace LineWars
         public Graph BuildGraph([NotNull] GraphData graphData, bool isEditor = false)
         {
             if (graphData == null) throw new ArgumentNullException(nameof(graphData));
-            
+
             this.graphData = graphData;
             this.isEditor = isEditor;
-            
+
             graph = Object.FindObjectOfType<Graph>();
             if (graph == null)
             {
@@ -49,10 +49,10 @@ namespace LineWars
             BuildNodes(graphData);
             BuildEdges(graphData);
 
-            if (isEditor)
-                ForEditorBuild();
-
-            graph.Initialize(allNodes, allEdges);
+            var spawnInfos = GetSpawnInfos();
+            ForEditorBuild();
+            
+            graph.Initialize(allNodes, allEdges, spawnInfos);
             return graph;
         }
 
@@ -69,6 +69,7 @@ namespace LineWars
                 nodeIndex++;
             }
         }
+
         private void BuildEdges(GraphData graphData)
         {
             var edgeIndex = 0;
@@ -90,10 +91,11 @@ namespace LineWars
 
             var nodeData = graphData.NodesPositions[node.Index];
             var additionalNodeData = graphData.GetAdditionalNodeData(node.Index);
-                
+
             node.transform.SetParent(graph.transform);
             node.transform.position = nodeData;
         }
+
         private void BuildEdge(Edge edge)
         {
             edge.transform.SetParent(graph.transform);
@@ -129,8 +131,50 @@ namespace LineWars
                 var additionalInfo = GetAdditionalNodeData(noSpawn);
 
                 var referenceToSpawn = spawnsInitialInfosRegister[additionalInfo.OwnedIndex];
-                initialInfo.Initialize(false, referenceToSpawn, additionalInfo.LeftUnitPrefab, additionalInfo.RightUnitPrefab);
+                initialInfo.Initialize(false, referenceToSpawn, additionalInfo.LeftUnitPrefab,
+                    additionalInfo.RightUnitPrefab);
             }
+        }
+
+        private SpawnInfo[] GetSpawnInfos()
+        {
+            var spawnInfoRegister = new Dictionary<int, SpawnInfo>();
+            var spawns = GetSpawns();
+            var noSpawns = GetNoSpawns();
+
+            foreach (var spawn in spawns)
+            {
+                var additionalInfo = GetAdditionalNodeData(spawn);
+
+                var nodeInfo = new NodeInfo
+                (
+                    spawn,
+                    additionalInfo.LeftUnitPrefab,
+                    additionalInfo.RightUnitPrefab
+                );
+                var spawnInfo = new SpawnInfo
+                (
+                    additionalInfo.OwnedIndex,
+                    nodeInfo,
+                    new List<NodeInfo>() {nodeInfo}
+                );
+                
+                spawnInfoRegister.Add(additionalInfo.OwnedIndex, spawnInfo);
+            }
+
+            foreach (var noSpawn in noSpawns)
+            {
+                var additionalInfo = GetAdditionalNodeData(noSpawn);
+                var nodeInfo = new NodeInfo
+                (
+                    noSpawn,
+                    additionalInfo.LeftUnitPrefab,
+                    additionalInfo.RightUnitPrefab
+                );
+                spawnInfoRegister[additionalInfo.OwnedIndex].NodeInfos.Add(nodeInfo);
+            }
+
+            return spawnInfoRegister.Values.ToArray();
         }
 
         private List<Node> GetNoSpawns()
@@ -154,7 +198,7 @@ namespace LineWars
                 })
                 .ToList();
         }
-        
+
         private AdditionalNodeData GetAdditionalNodeData(Node node) => graphData.GetAdditionalNodeData(node.Index);
     }
 }

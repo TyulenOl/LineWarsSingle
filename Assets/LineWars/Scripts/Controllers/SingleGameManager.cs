@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using LineWars.Extensions.Attributes;
 using UnityEngine;
 
@@ -7,9 +8,11 @@ namespace LineWars
     public class SingleGameManager: MonoBehaviour
     {
         public SingleGameManager Instance { get; private set; }
+        [SerializeField] private PlayerInitializer playerInitializer;
         [SerializeField, ReadOnlyInspector] private string mapToLoad;
-        [SerializeField] private Player playerPrefab;
-        
+
+        [SerializeField, ReadOnlyInspector] private List<Player> players;
+
         private void Awake()
         {
             Instance = this;
@@ -29,12 +32,11 @@ namespace LineWars
         
         private void InitializePlayer()
         {
-            // можно перенести в класс PlayerBuilder
             if (LevelsManager.HasSpawnPoint())
             {
                 var spawnPoint = LevelsManager.GetSpawnPoint();
-                var player = Instantiate(playerPrefab);
-                Owned.Connect(player, spawnPoint);
+                var player = playerInitializer.Initialize(spawnPoint);
+                players.Add(player);
             }
             else
             {

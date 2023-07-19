@@ -1,8 +1,10 @@
 ﻿using System;
+using LineWars.Model;
 using UnityEngine;
 
 namespace LineWars.Controllers
 {
+    [RequireComponent(typeof(Unit))]
     public class UnitBackgroundDrawer : MonoBehaviour
     {
 
@@ -16,6 +18,7 @@ namespace LineWars.Controllers
         private Sprite leftPart;
         private Sprite rightPart;
 
+        private Unit unit;
 
         public SpriteMask Mask => mask;
         public SpriteRenderer UnitSpriteRenderer => unitSpriteRenderer;
@@ -23,9 +26,34 @@ namespace LineWars.Controllers
 
         private Sprite unitSprite => unitSpriteRenderer.sprite;
 
+        private void Awake()
+        {
+            Initialize();
+            unit = GetComponent<Unit>();
+        }
+
+        private void OnEnable()
+        {
+            unit.UnitDirectionChance.AddListener(OnUnitDirectionChance);
+        }
+
+        private void OnDisable()
+        {
+            unit.UnitDirectionChance.RemoveListener(OnUnitDirectionChance);
+        }
+
+        private void OnUnitDirectionChance(UnitSize size, UnitDirection direction)
+        {
+            if (size == UnitSize.Little && direction == UnitDirection.Left)
+                DrawLeft();
+            else if (size == UnitSize.Little && direction == UnitDirection.Right)
+                DrawRight();
+            else
+                DrawCenter();
+        }
+
         public void Initialize()
         {
-         
             Texture2D nodeTexture = nodeSprite.texture;
             float width = nodeTexture.width;
             float height = nodeTexture.height;
@@ -33,11 +61,7 @@ namespace LineWars.Controllers
             leftPart = Sprite.Create(nodeTexture, new Rect(0, 0, width / 2, height), new Vector2(1, 0.5f));
             rightPart = Sprite.Create(nodeTexture, new Rect(width / 2, 0, width / 2, height), new Vector2(0, 0.5f));
 
-            backgroundSpriteRenderer.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
-            backgroundSpriteRenderer.sortingOrder = 0;
-
-            unitSpriteRenderer.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
-            unitSpriteRenderer.sortingOrder = 1;
+            mask.isCustomRangeActive = true;
         }
         
         
@@ -53,6 +77,9 @@ namespace LineWars.Controllers
 
             localScale = Vector3.one * scaleFactor;
             renderer.transform.localScale = localScale;
+            
+            backgroundSpriteRenderer.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
+            unitSpriteRenderer.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
         }
 
 
@@ -61,15 +88,23 @@ namespace LineWars.Controllers
             ScaleForNode(nodeSprite.rect.width / 2, nodeSprite.rect.height, unitSpriteRenderer);
             mask.sprite = leftPart;
             
+            backgroundSpriteRenderer.sortingOrder = 1;
+            unitSpriteRenderer.sortingOrder = 2;
+            mask.frontSortingOrder = 2;
+            mask.backSortingOrder = 0;
+            
             unitSpriteRenderer.transform.localPosition =
-                Vector3.left * unitSprite.rect.width / 4 / unitSprite.pixelsPerUnit;
+                Vector3.left * unitSprite.rect.width / 2 / unitSprite.pixelsPerUnit;
         }
 
         public void DrawCenter()
         {
             ScaleForNode(nodeSprite.rect.width, nodeSprite.rect.height, unitSpriteRenderer);
-            
             mask.sprite = nodeSprite;
+            
+            backgroundSpriteRenderer.sortingOrder = 0;
+            unitSpriteRenderer.sortingOrder = 1;
+            
             unitSpriteRenderer.transform.localPosition = Vector3.zero;
         }
 
@@ -78,8 +113,14 @@ namespace LineWars.Controllers
             ScaleForNode(nodeSprite.rect.width / 2, nodeSprite.rect.height, unitSpriteRenderer);
 
             mask.sprite = rightPart;
+
+            backgroundSpriteRenderer.sortingOrder = 3;
+            unitSpriteRenderer.sortingOrder = 4;
+            mask.frontSortingOrder = 5;
+            mask.backSortingOrder = 2;
+            
             unitSpriteRenderer.transform.localPosition =
-                Vector3.right * unitSprite.rect.width / 4 / unitSprite.pixelsPerUnit;
+                Vector3.right * unitSprite.rect.width / 2 / unitSprite.pixelsPerUnit;
         }
     }
 }
