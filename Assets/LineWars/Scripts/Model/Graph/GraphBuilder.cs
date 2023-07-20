@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using LineWars.Model;
-using LineWars.Scripts.Model.Graph;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace LineWars
+namespace LineWars.Model
 {
     public class GraphBuilder
     {

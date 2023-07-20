@@ -1,6 +1,6 @@
 ﻿using LineWars.Model;
 
-namespace LineWars
+namespace LineWars.Model
 {
     //команды нужны, чтобы сохранять контекст,
     //реализация ее должна находиться на уровне ниже

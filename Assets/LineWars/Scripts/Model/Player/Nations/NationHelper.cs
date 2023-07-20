@@ -1,8 +1,8 @@
 
 
-namespace LineWars
+namespace LineWars.Model
 {
-    public static class NationController
+    public static class NationHelper
     {
         public static INation GetNation(NationType type)
         {

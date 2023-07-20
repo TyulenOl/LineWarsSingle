@@ -3,8 +3,9 @@ using System.Diagnostics.CodeAnalysis;
 using LineWars.Model;
 using UnityEngine;
 
-namespace LineWars
+namespace LineWars.Controllers
 {
+    // класс только для сервера
     public class UnitsController : MonoBehaviour
     {
         public static UnitsController Instance { get; private set; }

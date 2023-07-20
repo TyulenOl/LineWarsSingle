@@ -1,9 +1,9 @@
-
-using LineWars.Model;
 using UnityEngine;
 
-
-public interface INation
+namespace LineWars.Model
 {
-    public GameObject GetUnitPrefab(UnitType type);
+    public interface INation
+    {
+        public GameObject GetUnitPrefab(UnitType type);
+    }
 }

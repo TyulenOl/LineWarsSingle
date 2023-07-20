@@ -2,17 +2,19 @@
 using LineWars.Model;
 using UnityEngine;
 
-
-public class DefaultNation : INation
+namespace LineWars.Model
 {
-    public GameObject GetUnitPrefab(UnitType type)
+    public class DefaultNation : INation
     {
-        switch (type)
+        public GameObject GetUnitPrefab(UnitType type)
         {
-            case UnitType.Infantry:
-                return Resources.Load<GameObject>("DefaultUnits/BaseInfrantry");
-            default:
-                return Resources.Load<GameObject>("DefaultUnits/BaseInfrantry");
+            switch (type)
+            {
+                case UnitType.Infantry:
+                    return Resources.Load<GameObject>("DefaultUnits/BaseInfrantry");
+                default:
+                    return Resources.Load<GameObject>("DefaultUnits/BaseInfrantry");
+            }
         }
     }
 }

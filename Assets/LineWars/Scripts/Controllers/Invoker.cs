@@ -1,4 +1,6 @@
-﻿namespace LineWars
+﻿using LineWars.Model;
+
+namespace LineWars
 {
     // нужен, если мы захотим ввести систему логгирования
     public class Invoker

@@ -1,6 +1,6 @@
 ﻿using LineWars.Model;
 
-namespace LineWars
+namespace LineWars.Model
 {
     public class MoveCommand: ICommand
     {

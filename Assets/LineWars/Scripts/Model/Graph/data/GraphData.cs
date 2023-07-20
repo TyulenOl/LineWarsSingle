@@ -1,60 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using LineWars.Scripts.Model.Graph;
 using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace LineWars.Model
 {
-    [Serializable]
-    public class AdditionalEdgeData
-    {
-        [SerializeField] private LineType lineType;
-        public LineType LineType => lineType;
-
-        public AdditionalEdgeData()
-        {
-            this.lineType = LineType.InfantryRoad;
-        }
-        
-        public AdditionalEdgeData(LineType lineType)
-        {
-            this.lineType = lineType;
-        }
-    }
-
-    [Serializable]
-    public class AdditionalNodeData
-    {
-        [SerializeField] private int ownedIndex;
-        [SerializeField] private bool isSpawn;
-        [SerializeField] private Unit leftUnitPrefab;
-        [SerializeField] private Unit rightUnitPrefab;
-
-        public bool HasOwner => ownedIndex != -1;
-        
-        public AdditionalNodeData()
-        {
-            ownedIndex = -1;
-            isSpawn = false;
-            leftUnitPrefab = null;
-            rightUnitPrefab = null;
-        }
-        public AdditionalNodeData(int ownedIndex, bool isSpawn, Unit leftUnitPrefab, Unit rightUnitPrefab)
-        {
-            this.ownedIndex = ownedIndex;
-            this.isSpawn = isSpawn;
-            this.leftUnitPrefab = leftUnitPrefab;
-            this.rightUnitPrefab = rightUnitPrefab;
-        }
-        
-        public int OwnedIndex => ownedIndex;
-        public bool IsSpawn => isSpawn;
-        public Unit LeftUnitPrefab => leftUnitPrefab;
-        public Unit RightUnitPrefab => rightUnitPrefab;
-    }
-
     public class GraphData : ScriptableObject
     {
         [SerializeField] [HideInInspector] private Vector2[] nodes;

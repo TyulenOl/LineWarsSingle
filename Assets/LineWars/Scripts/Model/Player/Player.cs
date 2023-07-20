@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using LineWars;
 using LineWars.Extensions.Attributes;
 using LineWars.Model;
 using UnityEngine;
@@ -25,7 +24,7 @@ namespace LineWars
         void Awake()
         {
             LocalPlayer = this;
-            nation = NationController.GetNation(nationType);
+            nation = NationHelper.GetNation(nationType);
         }
 
         private void Start()

@@ -1,4 +1,4 @@
-﻿using LineWars.Scripts.Model.Graph;
+﻿using LineWars.Model;
 using UnityEditor;
 using UnityEngine;
 

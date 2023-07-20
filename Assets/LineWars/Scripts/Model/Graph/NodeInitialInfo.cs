@@ -3,7 +3,7 @@ using LineWars.Extensions.Attributes;
 using LineWars.Model;
 using UnityEngine;
 
-namespace LineWars.Scripts.Model.Graph
+namespace LineWars.Model
 {
     [RequireComponent(typeof(Node))]
     public class NodeInitialInfo : MonoBehaviour
