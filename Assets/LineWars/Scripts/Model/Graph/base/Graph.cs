@@ -1,15 +1,29 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using DataStructures.PriorityQueue;
 using UnityEngine;
 
 namespace LineWars.Model
 {
     public class Graph: MonoBehaviour
     {
+        public static Graph Instance { get; private set; }
         private Node[] allNodes;
         private Edge[] allEdges;
         private SpawnInfo[] spawnInfos;
- 
+
+        private void Awake()
+        {
+            if (Instance == null)
+                Instance = this;
+            else
+            {
+                Debug.LogError("Более одного графа!");
+                Destroy(gameObject);
+            }
+        }
+
         public void Initialize(
             IEnumerable<Node> allNodes,
             IEnumerable<Edge> allEdges,
@@ -20,8 +34,46 @@ namespace LineWars.Model
             this.spawnInfos = spawnInfos.ToArray();
         }
 
-        public IReadOnlyCollection<Node> AllNodes => allNodes;
-        public IReadOnlyCollection<Edge> AllEdges => allEdges;
-        public IReadOnlyCollection<SpawnInfo> SpawnInfos => spawnInfos;
+        public IReadOnlyList<Node> AllNodes => allNodes;
+        public IReadOnlyList<Edge> AllEdges => allEdges;
+        public IReadOnlyList<SpawnInfo> SpawnInfos => spawnInfos;
+        
+        
+        public bool[] GetVisibilityInfo(Player player)
+        {
+            var result = new bool[AllNodes.Count];
+
+            var ownedNodes = player.OwnedObjects.OfType<Node>().ToArray();
+            
+            foreach (var visibilityNode in GetVisibilityNodes(ownedNodes))
+            {
+                result[visibilityNode.Index] = true;
+            }
+
+            return result;
+        }
+
+        private IEnumerable<Node> GetVisibilityNodes(Node[] ownedNodes)
+        {
+            var closedNodes = new HashSet<Node>();
+            var priorityQueue = new PriorityQueue<(Node, int), int>(0);
+            foreach (var ownedNode in ownedNodes)
+                priorityQueue.Insert((ownedNode, ownedNode.Visibility), ownedNode.Visibility);
+
+            while (priorityQueue.Count != 0)
+            {
+                var (node, currentVisibility) = priorityQueue.Pop();
+                closedNodes.Add(node);
+                yield return node;
+                if (currentVisibility == 0) continue;
+                foreach (var neighbor in node.GetNeighbors())
+                {
+                    if (closedNodes.Contains(neighbor))
+                        continue;
+                    var nextVisibility = currentVisibility - 1 - neighbor.ValueOfHidden;
+                    priorityQueue.Insert((neighbor, nextVisibility), nextVisibility);
+                }
+            }
+        }
     }
 }

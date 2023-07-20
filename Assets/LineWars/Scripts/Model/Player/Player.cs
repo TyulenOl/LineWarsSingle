@@ -21,6 +21,8 @@ namespace LineWars
             set => index = value;
         }
 
+        public IReadOnlyCollection<Owned> OwnedObjects => myOwned;
+
         void Awake()
         {
             LocalPlayer = this;

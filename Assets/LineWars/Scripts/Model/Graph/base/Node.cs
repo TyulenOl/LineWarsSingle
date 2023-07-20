@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using LineWars.Extensions.Attributes;
 using LineWars.Interface;
@@ -9,55 +10,53 @@ using LineWars.Controllers;
 
 namespace LineWars.Model
 {
-    
     public class Node : Owned, ITarget
     {
         [SerializeField, ReadOnlyInspector] private int index;
         [SerializeField] [HideInInspector] private List<Edge> edges;
-        
-        
+
+        [SerializeField] [Min(0)] private int visibility;
+        [SerializeField] [Min(0)] private int valueOfHidden;
+
         [SerializeField, ReadOnlyInspector] private Unit leftUnit;
         [SerializeField, ReadOnlyInspector] private Unit rightUnit;
-        [SerializeField] private bool isSpawn;
 
-        [SerializeField] private SpriteRenderer spriteRenderer;
         [SerializeField] private Outline2D outline;
         [SerializeField] private Selectable2D selectable2D;
-        
-        //private Unit selectedUnit;
+
         private Camera mainCamera;
-        
+
         public Vector2 Position => transform.position;
         public IReadOnlyCollection<Edge> Edges => edges;
         public bool LeftIsFree => LeftUnit == null;
         public bool RightIsFree => RightUnit == null;
-
-        public int Hp => (LeftUnit ? LeftUnit.Hp : 0) + (RightUnit ? RightUnit.Hp : 0); 
 
         public int Index
         {
             get => index;
             set => index = value;
         }
-        
+
+        public int Visibility =>
+            Math.Max(visibility,
+                Math.Max(
+                    LeftUnit != null ? LeftUnit.Visibility : 0,
+                    RightUnit != null ? RightUnit.Visibility : 0
+                )
+            );
+
+        public int ValueOfHidden => valueOfHidden;
+
         public Unit LeftUnit
         {
             get => leftUnit;
-            set
-            {
-                //selectedUnit = null;
-                leftUnit = value;
-            }
+            set { leftUnit = value; }
         }
 
         public Unit RightUnit
         {
             get => rightUnit;
-            set
-            {
-                //selectedUnit = null;
-                rightUnit = value;
-            }
+            set { rightUnit = value; }
         }
 
         private void Awake()
@@ -65,35 +64,31 @@ namespace LineWars.Model
             mainCamera = Camera.main;
         }
 
-        private void OnValidate()
-        {
-            //RedrawColor();
-        }
 
-        private void OnEnable() 
+        private void OnEnable()
         {
             selectable2D.PointerClicked += OnPointerClicked;
         }
 
-        private void OnDisable() 
+        private void OnDisable()
         {
             selectable2D.PointerClicked -= OnPointerClicked;
         }
 
         private GameObject OnPointerClicked(GameObject obj, PointerEventData eventData)
-        {   
-    
+        {
             var absolutePosition = mainCamera.ScreenToWorldPoint(eventData.position);
             var relativePosition = absolutePosition - transform.position;
 
-            if(relativePosition.x > 0 && rightUnit != null)
+            if (relativePosition.x > 0 && rightUnit != null)
             {
                 return rightUnit.gameObject;
             }
-            else if(leftUnit != null)
+            else if (leftUnit != null)
             {
                 return leftUnit.gameObject;
             }
+
             return this.gameObject;
         }
 
@@ -125,7 +120,7 @@ namespace LineWars.Model
 
             edges = null;
         }
-        
+
         public void AddEdge(Edge edge)
         {
             if (edge == null || edges.Contains(edge))

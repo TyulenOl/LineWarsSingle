@@ -6,78 +6,82 @@ using UnityEngine.Serialization;
 
 namespace LineWars.Model
 {
-    public class Unit: Owned,
+    public class Unit : Owned,
         IAttackerVisitor,
         IAlive,
         IMovable,
         ITarget,
         IExecutor
-    { 
-        [SerializeField] private InitialBaseUnitCharacteristics initStats;
+    {
+        [SerializeField] [Min(1)] private int currentHp;
+        [SerializeField] [Min(0)] private int currentArmor;
+        [SerializeField] [Min(0)] private int meleeDamage;
+        [SerializeField] [Min(0)] private int currentSpeedPoints;
+        [SerializeField] [Min(0)] private int visibility; 
+        [SerializeField] private UnitSize unitSize;
+        [SerializeField] private Passability passability;
+        [SerializeField] private UnitDirection unitDirection;
 
-        private BaseUnitCharacteristics stats;
+
         private UnitMovementLogic movementLogic;
-        private Node node; 
-        private UnitDirection unitDirection;
-        
+        private Node node;
 
-        [Header("Events")]
-        public UnityEvent<UnitSize, UnitDirection> UnitDirectionChance;
+
+        [Header("Events")] public UnityEvent<UnitSize, UnitDirection> UnitDirectionChance;
         public UnityEvent<int, int> HpChanged;
         public UnityEvent<int, int> ArmorChanged;
 
         public int Hp
         {
-            get => stats.CurrentHp;
+            get => currentHp;
             private set
             {
-                var before = stats.CurrentHp;
-                stats.CurrentHp = Math.Max(0, value);
-                HpChanged.Invoke(before, stats.CurrentHp);
+                var before = currentHp;
+                currentHp = Math.Max(0, value);
+                HpChanged.Invoke(before, currentHp);
             }
         }
 
         public int Armor
         {
-            get => stats.CurrentArmor;
+            get => currentArmor;
             private set
             {
-                var before = stats.CurrentArmor;
-                stats.CurrentArmor = Math.Max(0, value);
-                ArmorChanged.Invoke(before, stats.CurrentArmor);
+                var before = currentArmor;
+                currentArmor = Math.Max(0, value);
+                ArmorChanged.Invoke(before, currentArmor);
             }
         }
 
-        public int MeleeDamage => stats.MeleeDamage;
+        public int MeleeDamage => meleeDamage;
+
         public int CurrentSpeedPoints
         {
-            get => stats.CurrentSpeedPoints;
-            private set
-            {
-                stats.CurrentSpeedPoints = Math.Max(0, value);
-            }
+            get => currentSpeedPoints;
+            private set { currentSpeedPoints = Math.Max(0, value); }
         }
 
-        public UnitSize Size => stats.UnitSize;
-        public Passability Passability => stats.Passability;
+        public int Visibility => visibility;
+
+        public UnitSize Size => unitSize;
+        public Passability Passability => passability;
         public Node Node => node;
-        
+
         public UnitDirection UnitDirection
         {
             get => unitDirection;
             set
             {
                 unitDirection = value;
-                UnitDirectionChance?.Invoke(stats.UnitSize, unitDirection);
+                UnitDirectionChance?.Invoke(unitSize, unitDirection);
             }
         }
 
         private void Awake()
         {
-            stats = new BaseUnitCharacteristics(initStats);
             movementLogic = GetComponent<UnitMovementLogic>();
         }
-        
+
         protected void OnValidate()
         {
             if (GetComponent<UnitMovementLogic>() == null)
@@ -100,10 +104,10 @@ namespace LineWars.Model
         {
             this.node = node;
         }
-        
+
         public void MoveTo([NotNull] Node target)
         {
-            movementLogic.MoveTo(target.transform); 
+            movementLogic.MoveTo(target.transform);
         }
 
         public bool IsCanMoveTo([NotNull] Node target)
@@ -136,17 +140,17 @@ namespace LineWars.Model
             var blockedDamage = Math.Min(hit.Damage, Armor);
             if (blockedDamage != 0)
                 Armor -= blockedDamage;
-            
+
             var notBlockedDamage = hit.Damage - blockedDamage;
             if (notBlockedDamage != 0)
-                stats.CurrentHp -= notBlockedDamage;
+                currentHp -= notBlockedDamage;
         }
 
         public void Attack([NotNull] Edge edge)
         {
             _Attack(edge);
         }
-        
+
         public void Attack([NotNull] Unit unit)
         {
             _Attack(unit);
@@ -163,7 +167,7 @@ namespace LineWars.Model
             return line != null
                    && line.LineType >= LineType.Firing;
         }
-        
+
         public bool IsCanAttack([NotNull] Edge edge)
         {
             return edge.LineType >= LineType.CountryRoad

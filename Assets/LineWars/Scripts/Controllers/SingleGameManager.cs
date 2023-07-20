@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using LineWars.Extensions.Attributes;
+using LineWars.Model;
 using UnityEngine;
 
 namespace LineWars
@@ -23,6 +24,17 @@ namespace LineWars
             mapToLoad = "TestMap";
             InitializeMap();
             InitializePlayer();
+
+            // var visibilityInfo = Graph.Instance.GetVisibilityInfo(Player.LocalPlayer);
+            // for (int i = 0; i < Graph.Instance.AllNodes.Count; i++)
+            // {
+            //     var isVisible = visibilityInfo[i];
+            //     var node = Graph.Instance.AllNodes[i];
+            //     if (isVisible)
+            //     {
+            //         node.GetComponent<SpriteRenderer>().color = Color.yellow;
+            //     }
+            // }
         }
 
         private void InitializeMap()
