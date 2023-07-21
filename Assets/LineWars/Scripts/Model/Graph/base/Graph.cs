@@ -56,13 +56,13 @@ namespace LineWars.Model
         private IEnumerable<Node> GetVisibilityNodes(Node[] ownedNodes)
         {
             var closedNodes = new HashSet<Node>();
-            var priorityQueue = new PriorityQueue<(Node, int), int>(0);
+            var priorityQueue = new PriorityQueue<Node, int>(0);
             foreach (var ownedNode in ownedNodes)
-                priorityQueue.Insert((ownedNode, ownedNode.Visibility), ownedNode.Visibility);
+                priorityQueue.Enqueue(ownedNode, ownedNode.Visibility);
 
             while (priorityQueue.Count != 0)
             {
-                var (node, currentVisibility) = priorityQueue.Pop();
+                var (node, currentVisibility) = priorityQueue.Dequeue();
                 closedNodes.Add(node);
                 yield return node;
                 if (currentVisibility == 0) continue;
@@ -71,7 +71,7 @@ namespace LineWars.Model
                     if (closedNodes.Contains(neighbor))
                         continue;
                     var nextVisibility = currentVisibility - 1 - neighbor.ValueOfHidden;
-                    priorityQueue.Insert((neighbor, nextVisibility), nextVisibility);
+                    priorityQueue.Enqueue(neighbor, nextVisibility);
                 }
             }
         }
