@@ -170,7 +170,8 @@ namespace LineWars.Model
                     ownedIndex,
                     info.IsSpawn,
                     info.LeftUnitPrefab,
-                    info.RightUnitPrefab
+                    info.RightUnitPrefab,
+                    info.GroupColor
                 );
             }
 

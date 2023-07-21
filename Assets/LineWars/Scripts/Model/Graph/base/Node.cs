@@ -10,6 +10,8 @@ using LineWars.Controllers;
 
 namespace LineWars.Model
 {
+    [RequireComponent(typeof(Outline2D))]
+    [RequireComponent(typeof(Selectable2D))]
     public class Node : Owned, ITarget
     {
         [SerializeField, ReadOnlyInspector] private int index;

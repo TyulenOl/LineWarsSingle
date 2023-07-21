@@ -120,7 +120,12 @@ namespace LineWars.Model
                 var initialInfo = spawn.gameObject.AddComponent<NodeInitialInfo>();
                 var additionalInfo = GetAdditionalNodeData(spawn);
                 spawnsInitialInfosRegister.Add(additionalInfo.OwnedIndex, initialInfo);
-                initialInfo.Initialize(true, null, additionalInfo.LeftUnitPrefab, additionalInfo.RightUnitPrefab);
+                initialInfo.Initialize(
+                    true, 
+                    null,
+                    additionalInfo.LeftUnitPrefab,
+                    additionalInfo.RightUnitPrefab,
+                    additionalInfo.GroupColor);
             }
 
             foreach (var noSpawn in noSpawns)
@@ -129,8 +134,12 @@ namespace LineWars.Model
                 var additionalInfo = GetAdditionalNodeData(noSpawn);
 
                 var referenceToSpawn = spawnsInitialInfosRegister[additionalInfo.OwnedIndex];
-                initialInfo.Initialize(false, referenceToSpawn, additionalInfo.LeftUnitPrefab,
-                    additionalInfo.RightUnitPrefab);
+                initialInfo.Initialize(
+                    false,
+                    referenceToSpawn,
+                    additionalInfo.LeftUnitPrefab,
+                    additionalInfo.RightUnitPrefab,
+                    additionalInfo.GroupColor);
             }
         }
 
