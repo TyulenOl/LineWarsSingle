@@ -171,6 +171,7 @@ namespace LineWars.Model
                     info.IsSpawn,
                     info.LeftUnitPrefab,
                     info.RightUnitPrefab,
+                    info.GroupName,
                     info.GroupColor
                 );
             }

@@ -19,9 +19,10 @@ namespace LineWars.Model
 
         [SerializeField] [HideInInspector] private LineDrawer drawer;
 
-        [Header("Events")] 
-        public UnityEvent<int, int> HpChanged;
-        public UnityEvent<LineType, LineType> LineTypeChanged;
+        [field:Header("Events")] 
+        [field: SerializeField] public UnityEvent<int, int> HpChanged { get; private set; }
+        [field: SerializeField] public UnityEvent<LineType, LineType> LineTypeChanged { get; private set; }
+        [field: SerializeField] public UnityEvent<Unit> Died { get; private set; }
 
         public int Index
         {
@@ -32,7 +33,7 @@ namespace LineWars.Model
         public Node SecondNode => secondNode;
         public LineDrawer Drawer => drawer;
         
-        public int Hp
+        public int CurrentHp
         {
             get => hp;
             private set
@@ -49,7 +50,7 @@ namespace LineWars.Model
                 HpChanged.Invoke(before, hp);
             }
         }
-
+        public bool IsDied => CurrentHp <= 0;
         public LineType LineType
         {
             get => lineType;

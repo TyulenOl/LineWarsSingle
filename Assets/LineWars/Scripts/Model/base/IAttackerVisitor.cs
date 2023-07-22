@@ -30,7 +30,7 @@ namespace LineWars.Model
             return false;
         }
 
-        public void Attack(Unit unit);
+        public void Attack(Unit enemy);
         public bool IsCanAttack(Unit unit);
         
         public void Attack(Edge edge);

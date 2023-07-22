@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using LineWars.Controllers;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Serialization;
 
 namespace LineWars.Model
 {
@@ -11,27 +11,32 @@ namespace LineWars.Model
         IAlive,
         IMovable,
         ITarget,
-        IExecutor
+        IExecutor,
+        ITurnEndAction
     {
-        [SerializeField] [Min(1)] private int currentHp;
-        [SerializeField] [Min(0)] private int currentArmor;
+        [SerializeField] [Min(0)] private int initialHp;
+        [SerializeField] [Min(0)] private int initialArmor;
         [SerializeField] [Min(0)] private int meleeDamage;
-        [SerializeField] [Min(0)] private int currentSpeedPoints;
+        [SerializeField] [Min(0)] private int initialSpeedPoints;
         [SerializeField] [Min(0)] private int visibility; 
         [SerializeField] private UnitSize unitSize;
         [SerializeField] private Passability passability;
-        [SerializeField] private UnitDirection unitDirection;
-
+        
+        private int currentHp;
+        private int currentArmor;
+        private int currentSpeedPoints;
 
         private UnitMovementLogic movementLogic;
         private Node node;
 
 
-        [Header("Events")] public UnityEvent<UnitSize, UnitDirection> UnitDirectionChance;
-        public UnityEvent<int, int> HpChanged;
-        public UnityEvent<int, int> ArmorChanged;
+        [field: Header("Events")] 
+        [field: SerializeField] public UnityEvent<UnitSize, UnitDirection> UnitDirectionChance { get; private set; }
+        [field: SerializeField] public UnityEvent<int, int> HpChanged { get; private set; }
+        [field: SerializeField] public UnityEvent<int, int> ArmorChanged { get; private set; }
+        [field: SerializeField] public UnityEvent<Unit> Died { get; private set; }
 
-        public int Hp
+        public int CurrentHp
         {
             get => currentHp;
             private set
@@ -39,10 +44,17 @@ namespace LineWars.Model
                 var before = currentHp;
                 currentHp = Math.Max(0, value);
                 HpChanged.Invoke(before, currentHp);
+                if (currentHp == 0)
+                {
+                    Died.Invoke(this);
+                    OnDied();
+                }
             }
         }
 
-        public int Armor
+        public bool IsDied => CurrentHp <= 0;
+
+        public int CurrentArmor
         {
             get => currentArmor;
             private set
@@ -62,23 +74,18 @@ namespace LineWars.Model
         }
 
         public int Visibility => visibility;
-
         public UnitSize Size => unitSize;
         public Passability Passability => passability;
         public Node Node => node;
 
-        public UnitDirection UnitDirection
-        {
-            get => unitDirection;
-            set
-            {
-                unitDirection = value;
-                UnitDirectionChance?.Invoke(unitSize, unitDirection);
-            }
-        }
+        public UnitDirection UnitDirection => node.LeftUnit == this ? UnitDirection.Left : UnitDirection.Right;
 
         private void Awake()
         {
+            currentHp = initialHp;
+            currentSpeedPoints = initialSpeedPoints;
+            currentArmor = initialArmor;
+            
             movementLogic = GetComponent<UnitMovementLogic>();
         }
 
@@ -95,14 +102,37 @@ namespace LineWars.Model
             movementLogic.TargetChanced += MovementLogicOnTargetChanced;
         }
 
-        private void MovementLogicOnTargetChanced(Transform arg1, Transform arg2)
+        private void OnDisable()
         {
-            node = arg2.GetComponent<Node>();
+            movementLogic.TargetChanced -= MovementLogicOnTargetChanced;
         }
 
-        public void Initialize(Node node)
+        private void MovementLogicOnTargetChanced(Transform arg1, Transform arg2)
+        {
+            CurrentSpeedPoints--;
+            
+            node = arg2.GetComponent<Node>();
+            if (Size == UnitSize.Large)
+            {
+                node.LeftUnit = this;
+                node.RightUnit = this;
+            }
+            else if (node.LeftIsFree)
+            {
+                node.LeftUnit = this;
+                UnitDirectionChance?.Invoke(unitSize, UnitDirection.Left);
+            }
+            else
+            {
+                node.RightUnit = this;
+                UnitDirectionChance?.Invoke(unitSize, UnitDirection.Right);
+            }
+        }
+
+        public void Initialize(Node node, UnitDirection direction)
         {
             this.node = node;
+            UnitDirectionChance?.Invoke(unitSize, direction);
         }
 
         public void MoveTo([NotNull] Node target)
@@ -137,9 +167,9 @@ namespace LineWars.Model
 
         public void DealDamage(Hit hit)
         {
-            var blockedDamage = Math.Min(hit.Damage, Armor);
+            var blockedDamage = Math.Min(hit.Damage, CurrentArmor);
             if (blockedDamage != 0)
-                Armor -= blockedDamage;
+                CurrentArmor -= blockedDamage;
 
             var notBlockedDamage = hit.Damage - blockedDamage;
             if (notBlockedDamage != 0)
@@ -151,27 +181,57 @@ namespace LineWars.Model
             _Attack(edge);
         }
 
-        public void Attack([NotNull] Unit unit)
+        public void Attack([NotNull] Unit enemy)
         {
-            _Attack(unit);
+            var enemyNode = enemy.node;
+            _Attack(enemy);
+            
+            if (enemy.IsDied)
+                UnitsController.ExecuteCommand(new MoveCommand(this, node, enemyNode));
         }
 
         private void _Attack(IAlive target)
         {
             target.DealDamage(new Hit(MeleeDamage));
+            
         }
 
         public bool IsCanAttack([NotNull] Unit unit)
         {
             var line = node.GetLine(unit.node);
-            return line != null
-                   && line.LineType >= LineType.Firing;
+            return unit.owner != owner 
+                   && line != null
+                   && (int) Passability >= (int) line.LineType;
         }
 
         public bool IsCanAttack([NotNull] Edge edge)
         {
             return edge.LineType >= LineType.CountryRoad
                    && node.ContainsEdge(edge);
+        }
+
+        private void OnDied()
+        {
+            if (unitSize == UnitSize.Large)
+            {
+                node.LeftUnit = null;
+                node.RightUnit = null;
+            }
+            else if (UnitDirection == UnitDirection.Left)
+            {
+                node.LeftUnit = null;
+            }
+            else
+            {
+                node.RightUnit = null;
+            }
+        }
+
+        public void OnTurnEnd()
+        {
+            CurrentHp = initialHp;
+            CurrentArmor = initialArmor;
+            CurrentSpeedPoints = initialSpeedPoints;
         }
     }
 }

@@ -6,7 +6,7 @@ using UnityEngine;
 namespace LineWars.Controllers
 {
     // класс только для сервера
-    public class UnitsController : MonoBehaviour
+    public class  UnitsController : MonoBehaviour
     {
         public static UnitsController Instance { get; private set; }
 
@@ -18,45 +18,14 @@ namespace LineWars.Controllers
             Instance = this;
         }
 
-        // public void SpawnUnit([NotNull] Point point, [NotNull] Player owner, UnitType unitType)
-        // {
-        //     if (point == null) throw new ArgumentNullException(nameof(point));
-        //     if (owner == null) throw new ArgumentNullException(nameof(owner));
-        //     
-        //     var prefab = owner.GetUnitPrefab(unitType);
-        //     var instance = Instantiate(prefab);
-        //     
-        //
-        //     
-        //     var unit = instance.GetComponent<Unit>();
-        //     point.AddUnitToVacantPosition(unit);
-        // }
-        //
-
+        public static void ExecuteCommand(ICommand command)
+        {
+            if (Instance != null)
+                Instance.invoker.Execute(command);
+        }
+        
         public void Action([NotNull] Player owner, IExecutor executor, ITarget target)
         {
-            Debug.Log(executor);
-            Debug.Log(target);
-            /*
-            //максимально абстрактно
-            if (!owner.IsMyOwn(executor))
-            {
-                return;
-            }
-
-            switch (executor)
-            {
-                
-                case IAttackerVisitor attacker
-                    when target is IAlive alive && attacker.IsCanAttack(alive):
-                    invoker.Execute(new AttackCommand(attacker, alive));
-                    break;
-                case IMovable movable 
-                     when target is Node node && movable.IsCanMoveTo(node):
-                    invoker.Execute(new MoveCommand(movable,movable.Node, node));
-                    break;
-            }
-            */
         }
         
     }

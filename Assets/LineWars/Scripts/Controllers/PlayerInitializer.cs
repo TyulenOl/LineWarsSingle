@@ -19,8 +19,7 @@ namespace LineWars
                 if (nodeInfo.LeftUnitPrefab != null)
                 {
                     var leftUnit = Instantiate(nodeInfo.LeftUnitPrefab);
-                    leftUnit.Initialize(node);
-                    leftUnit.UnitDirection = UnitDirection.Left;
+                    leftUnit.Initialize(node, UnitDirection.Left);
                     node.LeftUnit = leftUnit;
                     leftUnit.transform.position = node.transform.position;
                     Owned.Connect(player, leftUnit);
@@ -37,8 +36,7 @@ namespace LineWars
                         nodeInfo.RightUnitPrefab.Size == UnitSize.Large && node.LeftIsFree && node.RightIsFree)
                     {
                         var rightUnit = Instantiate(nodeInfo.RightUnitPrefab);
-                        rightUnit.Initialize(node);
-                        rightUnit.UnitDirection = UnitDirection.Right;
+                        rightUnit.Initialize(node, UnitDirection.Right);
                         node.RightUnit = rightUnit;
                         rightUnit.transform.position = node.transform.position;
                         Owned.Connect(player, rightUnit);
