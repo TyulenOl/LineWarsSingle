@@ -9,6 +9,7 @@ namespace LineWars.Controllers
     {
         private CommandsManager manager;
         private Action<ITarget> setTarget;
+    
         public CommandsManagerTargetState(CommandsManager manager, Action<ITarget> setTarget)
         {
             this.manager = manager;
@@ -18,6 +19,7 @@ namespace LineWars.Controllers
         public override void OnEnter()
         {
             Selector.SelectedObjectsChanged += OnSelectedObjectChanged;
+            //Debug.Log("Starting");
         }
 
         public override void OnExit()

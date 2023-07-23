@@ -2,7 +2,7 @@
 
 namespace LineWars.Model
 {
-    public class AttackCommand: ICommand
+    public class AttackCommand : ICommand
     {
         private readonly IAttackerVisitor attackerVisitor;
         private readonly IAlive alive;

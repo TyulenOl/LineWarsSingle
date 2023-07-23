@@ -26,6 +26,7 @@ namespace LineWars.Controllers
         
         public void Action([NotNull] Player owner, IExecutor executor, ITarget target)
         {
+            Debug.Log("ACTION");
         }
         
     }
