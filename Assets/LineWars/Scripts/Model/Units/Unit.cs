@@ -21,6 +21,7 @@ namespace LineWars.Model
         [SerializeField] [Min(0)] private int visibility; 
         [SerializeField] private UnitSize unitSize;
         [SerializeField] private Passability passability;
+        [SerializeField] private CommandPriorityData priorityData;
         
         private int currentHp;
         private int currentArmor;
@@ -31,7 +32,7 @@ namespace LineWars.Model
 
 
         [field: Header("Events")] 
-        [field: SerializeField] public UnityEvent<UnitSize, UnitDirection> UnitDirectionChance { get; private set; }
+        [field: SerializeField] public UnityEvent<UnitSize, UnitDirection> UnitDirectionChange { get; private set; }
         [field: SerializeField] public UnityEvent<int, int> HpChanged { get; private set; }
         [field: SerializeField] public UnityEvent<int, int> ArmorChanged { get; private set; }
         [field: SerializeField] public UnityEvent<Unit> Died { get; private set; }
@@ -77,6 +78,7 @@ namespace LineWars.Model
         public UnitSize Size => unitSize;
         public Passability Passability => passability;
         public Node Node => node;
+        public CommandPriorityData CommandPriorityData => priorityData;
 
         public UnitDirection UnitDirection => node.LeftUnit == this ? UnitDirection.Left : UnitDirection.Right;
 
@@ -99,18 +101,18 @@ namespace LineWars.Model
 
         private void OnEnable()
         {
-            movementLogic.TargetChanced += MovementLogicOnTargetChanced;
+            movementLogic.TargetChanged += MovementLogicOnTargetChanged;
         }
 
         private void OnDisable()
         {
-            movementLogic.TargetChanced -= MovementLogicOnTargetChanced;
+            movementLogic.TargetChanged -= MovementLogicOnTargetChanged;
         }
 
-        private void MovementLogicOnTargetChanced(Transform arg1, Transform arg2)
+        private void MovementLogicOnTargetChanged(Transform arg1, Transform arg2)
         {
             CurrentSpeedPoints--;
-            
+
             node = arg2.GetComponent<Node>();
             if (Size == UnitSize.Large)
             {
@@ -120,23 +122,32 @@ namespace LineWars.Model
             else if (node.LeftIsFree)
             {
                 node.LeftUnit = this;
-                UnitDirectionChance?.Invoke(unitSize, UnitDirection.Left);
+                UnitDirectionChange?.Invoke(unitSize, UnitDirection.Left);
             }
             else
             {
                 node.RightUnit = this;
-                UnitDirectionChance?.Invoke(unitSize, UnitDirection.Right);
+                UnitDirectionChange?.Invoke(unitSize, UnitDirection.Right);
             }
         }
 
         public void Initialize(Node node, UnitDirection direction)
         {
             this.node = node;
-            UnitDirectionChance?.Invoke(unitSize, direction);
+            UnitDirectionChange?.Invoke(unitSize, direction);
         }
 
         public void MoveTo([NotNull] Node target)
         {
+            if(node.LeftUnit == this)
+            {
+                node.LeftUnit = null;
+            }
+            if(node.RightUnit == this)
+            {
+                node.RightUnit = null;
+            }
+
             movementLogic.MoveTo(target.transform);
         }
 

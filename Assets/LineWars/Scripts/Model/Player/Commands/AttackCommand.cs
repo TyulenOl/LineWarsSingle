@@ -20,7 +20,8 @@ namespace LineWars.Model
 
         public bool CanExecute()
         {
-            return attackerVisitor.IsCanAttack(alive);
+            return attackerVisitor.CanAttack(alive);
         }
+
     }
 }

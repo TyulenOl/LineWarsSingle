@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using LineWars.Model;
 
 namespace LineWars.Controllers
 {
@@ -19,7 +20,6 @@ namespace LineWars.Controllers
         public override void OnEnter()
         {
             Selector.SelectedObjectsChanged += OnSelectedObjectChanged;
-            //Debug.Log("Starting");
         }
 
         public override void OnExit()

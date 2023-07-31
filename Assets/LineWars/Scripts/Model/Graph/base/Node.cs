@@ -25,6 +25,7 @@ namespace LineWars.Model
 
         [SerializeField] private Outline2D outline;
         [SerializeField] private Selectable2D selectable2D;
+        [SerializeField] private CommandPriorityData priorityData;
 
         private Camera mainCamera;
 
@@ -60,6 +61,7 @@ namespace LineWars.Model
             get => rightUnit;
             set { rightUnit = value; }
         }
+        public CommandPriorityData CommandPriorityData => priorityData;
 
         private void Awake()
         {
@@ -82,9 +84,10 @@ namespace LineWars.Model
             var absolutePosition = mainCamera.ScreenToWorldPoint(eventData.position);
             var relativePosition = absolutePosition - transform.position;
 
-            if (relativePosition.x > 0 && rightUnit != null)
+            if (relativePosition.x > 0)
             {
-                return rightUnit.gameObject;
+                if(rightUnit != null)
+                    return rightUnit.gameObject;
             }
             else if (leftUnit != null)
             {

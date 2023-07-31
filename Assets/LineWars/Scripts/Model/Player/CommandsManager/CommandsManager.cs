@@ -63,7 +63,7 @@ namespace LineWars.Controllers
             this.executor = executor;
             ExecutorChanged.Invoke();
 
-            Debug.Log("Exec!");
+            Debug.Log(executor);
 
             stateMachine.SetState(targetState);
         }

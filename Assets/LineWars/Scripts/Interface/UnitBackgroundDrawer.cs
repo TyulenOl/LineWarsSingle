@@ -34,12 +34,12 @@ namespace LineWars.Controllers
 
         private void OnEnable()
         {
-            unit.UnitDirectionChance.AddListener(OnUnitDirectionChance);
+            unit.UnitDirectionChange.AddListener(OnUnitDirectionChance);
         }
 
         private void OnDisable()
         {
-            unit.UnitDirectionChance.RemoveListener(OnUnitDirectionChance);
+            unit.UnitDirectionChange.RemoveListener(OnUnitDirectionChance);
         }
 
         private void OnUnitDirectionChance(UnitSize size, UnitDirection direction)
