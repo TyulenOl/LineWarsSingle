@@ -14,7 +14,7 @@ namespace LineWars.Model
         private Vector2 startPosition;
         private Transform currentTarget;
 
-        public event Action<Transform, Transform> TargetChanced;  
+        public event Action<Transform, Transform> TargetChanged;  
 
         private void Awake()
         {
@@ -28,7 +28,7 @@ namespace LineWars.Model
                 startPosition = transform.position;
                 var oldTarget = currentTarget;
                 currentTarget = targetsQueue.Dequeue();
-                TargetChanced?.Invoke(oldTarget, currentTarget);
+                TargetChanged?.Invoke(oldTarget, currentTarget);
                 movementProgress = 0;
                 isMoving = true;
             }

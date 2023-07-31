@@ -17,7 +17,12 @@ namespace LineWars.Model
         [SerializeField] [ReadOnlyInspector] private int hp;
         [SerializeField] private LineType lineType;
 
+        [Header("Commands Settings")]
+        [SerializeField] private CommandPriorityData priorityData;
+
+
         [SerializeField] [HideInInspector] private LineDrawer drawer;
+
 
         [field:Header("Events")] 
         [field: SerializeField] public UnityEvent<int, int> HpChanged { get; private set; }
@@ -61,6 +66,8 @@ namespace LineWars.Model
                 LineTypeChanged.Invoke(before, lineType);
             }
         }
+
+        public CommandPriorityData CommandPriorityData => priorityData;
         
         protected void OnValidate()
         {
