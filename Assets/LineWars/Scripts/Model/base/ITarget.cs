@@ -1,6 +1,11 @@
 using UnityEngine;
+using System.Collections.Generic;
 
-public interface ITarget
+namespace LineWars.Model
 {
-    
+    public interface ITarget
+    {
+        public CommandPriorityData CommandPriorityData {get;}
+    }
 }
+

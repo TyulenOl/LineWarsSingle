@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using LineWars.Model;
 
 namespace LineWars.Controllers
 {
@@ -9,6 +10,7 @@ namespace LineWars.Controllers
     {
         private CommandsManager manager;
         private Action<ITarget> setTarget;
+    
         public CommandsManagerTargetState(CommandsManager manager, Action<ITarget> setTarget)
         {
             this.manager = manager;

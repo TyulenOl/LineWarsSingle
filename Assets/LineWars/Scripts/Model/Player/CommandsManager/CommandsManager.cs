@@ -10,7 +10,7 @@ namespace LineWars.Controllers
     // Client
     public class CommandsManager: MonoBehaviour
     {
-        public CommandsManager Instance { get; private set; }
+        public static CommandsManager Instance { get; private set; }
         
         [Header("Debug")]
         [SerializeField] private bool isActive;
@@ -62,6 +62,8 @@ namespace LineWars.Controllers
         {
             this.executor = executor;
             ExecutorChanged.Invoke();
+
+            Debug.Log(executor);
 
             stateMachine.SetState(targetState);
         }

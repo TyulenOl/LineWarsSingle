@@ -27,8 +27,10 @@ namespace LineWars.Controllers
 
         private void OnSelectedObjectChanged(GameObject previousObject, GameObject newObject)
         {
+            if(!(newObject.TryGetComponent<Owned>(out Owned owned))) return;
+            if(!Player.LocalPlayer.IsMyOwn(owned)) return;
             if(!(newObject.TryGetComponent<IExecutor>(out IExecutor executor))) return;
-
+    
             setExecutor(executor);
         }
     }

@@ -17,7 +17,7 @@ namespace LineWars.Model
             }
         }
 
-        public bool IsCanAttack(IAlive target)
+        public bool CanAttack(IAlive target)
         {
             switch (target)
             {
