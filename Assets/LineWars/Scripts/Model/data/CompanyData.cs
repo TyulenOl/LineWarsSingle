@@ -13,6 +13,7 @@ namespace LineWars
         [SerializeField] [TextArea(5,10)] private string companyDescription;
         [SerializeField] private Sprite companyImage;
         [SerializeField] private List<MissionData> missions;
+        [SerializeField] private MissionsMapUI missionsMapUIPrefab;
         [SerializeField] private NationType companyNation;
 
         private void OnEnable()
@@ -28,6 +29,11 @@ namespace LineWars
             {
                 Debug.LogWarning($"Missions is duplicated on {name}");
             }
+
+            if (missionsMapUIPrefab == null)
+                Debug.LogError($"{nameof(missionsMapUIPrefab)} is null on {name}");
+            else if (missionsMapUIPrefab.UIsCount != missions.Count)
+                Debug.LogError("The number of missions does not match the number of UI");
         }
 
         public string Name => companyName;
@@ -35,8 +41,9 @@ namespace LineWars
         public Sprite Image => companyImage;
         public IReadOnlyList<MissionData> Missions => missions;
         public NationType Nation => companyNation;
+        public MissionsMapUI MissionsMapUIPrefab => missionsMapUIPrefab;
 
-        
+
         public bool Equals(CompanyData other)
         {
             if (ReferenceEquals(null, other)) return false;
@@ -45,7 +52,8 @@ namespace LineWars
                    && companyDescription == other.companyDescription
                    && Equals(companyImage, other.companyImage) 
                    && Equals(missions, other.missions) 
-                   && companyNation == other.companyNation;
+                   && companyNation == other.companyNation
+                   && missionsMapUIPrefab == other.missionsMapUIPrefab;
         }
 
         public override bool Equals(object obj)
@@ -63,7 +71,8 @@ namespace LineWars
                 companyDescription,
                 companyImage,
                 missions,
-                (int) companyNation);
+                (int) companyNation,
+                missionsMapUIPrefab);
         }
     }
 }

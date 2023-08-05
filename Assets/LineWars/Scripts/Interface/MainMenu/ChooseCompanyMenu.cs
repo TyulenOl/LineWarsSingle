@@ -1,31 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace LineWars
 {
     public class ChooseCompanyMenu: UIStackElement
     {
-        [SerializeField] private CompanyElement companyElementPrefab;
+        public static ChooseCompanyMenu Instance { get; private set; }
+
+        [FormerlySerializedAs("companyElementPrefab")]
+        [SerializeField] private CompanyElementUI companyElementUIPrefab;
         [SerializeField] private Transform contentTransform;
         
-        private List<CompanyElement> companyElements;
+        private List<CompanyElementUI> companyElements;
         
 
         protected override void Awake()
         {
             base.Awake();
-            companyElements = new List<CompanyElement>();
+            if (Instance == null)
+                Instance = this;
+            else
+            {
+                Debug.LogError($"Dublicated {nameof(ChooseCompanyMenu)}");
+                Destroy(gameObject);
+            }
+
         }
 
         public void Start()
         {
+            companyElements = new List<CompanyElementUI>();
             Redraw();
         }
 
         public void Redraw()
         {
-            var companies = CompaniesDataBase.CompanyStates;
+            var companies = CompaniesDataBase.CurrenCompanyStates;
 
             foreach (var element in companyElements)
                 Destroy(element.gameObject);
@@ -33,9 +45,16 @@ namespace LineWars
 
             foreach (var companyState in companies)
             {
-                var companyElement = Instantiate(companyElementPrefab, contentTransform);
-                companyElement.Initialize(companyState);
+                var companyElement = Instantiate(companyElementUIPrefab, contentTransform);
+                companyElement.Initialize(companyState, OnCompanyButtonClick); 
+                companyElements.Add(companyElement);
             }
+        }
+
+        private void OnCompanyButtonClick(CompanyState companyState)
+        {
+            UIStack.Instance.PushElement(ChooseMissionMenu.Instance);
+            ChooseMissionMenu.Instance.Initialize(companyState);
         }
     }
 }

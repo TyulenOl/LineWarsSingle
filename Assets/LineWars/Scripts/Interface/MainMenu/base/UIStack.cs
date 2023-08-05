@@ -7,17 +7,31 @@ namespace LineWars
 {
     public class UIStack : MonoBehaviour
     {
+        public static UIStack Instance { get; private set; }
         [SerializeField] private UIStackElement initializeElement;
-        
+        [SerializeField] private List<UIStackElement> allElements;
+
         private Stack<UIStackElement> stackElements;
 
         private void Awake()
         {
-            stackElements = new Stack<UIStackElement>();
+            if (Instance == null)
+                Instance = this;
+            else
+            {
+                Debug.Log($"Dublicadet {nameof(UIStack)}");
+                Destroy(gameObject);
+            }
         }
 
         private void Start()
         {
+            foreach (var element in allElements)
+            {
+                if (element != null)
+                    element.gameObject.SetActive(true);
+            }
+            stackElements = new Stack<UIStackElement>();
             PushElement(initializeElement);
         }
 

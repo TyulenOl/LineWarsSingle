@@ -17,7 +17,7 @@ namespace LineWars
         private static DirectoryInfo companiesDirectory;
         private static List<CompanyState> companiesStates;
         
-        public static IReadOnlyList<CompanyState> CompanyStates => companiesStates;
+        public static IReadOnlyList<CompanyState> CurrenCompanyStates => companiesStates;
 
         [SerializeField] private List<CompanyData> companiesDatas;
         

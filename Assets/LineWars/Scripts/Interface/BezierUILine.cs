@@ -6,7 +6,7 @@ using UnityEngine.UI;
 namespace LineWars
 {
     [RequireComponent(typeof(CanvasRenderer))]
-    public class BezierUILine : Graphic
+    public class BezierUILine : MaskableGraphic
     {
         [SerializeField, HideInInspector] private Vector3[] verts;
         [SerializeField, HideInInspector] private int[] tris;
