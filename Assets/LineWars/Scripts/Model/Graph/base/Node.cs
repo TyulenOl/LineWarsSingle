@@ -12,9 +12,9 @@ namespace LineWars.Model
 {
     [RequireComponent(typeof(Outline2D))]
     [RequireComponent(typeof(Selectable2D))]
-    public class Node : Owned, ITarget
+    public class Node : Owned, ITarget, INumbered
     {
-        [SerializeField, ReadOnlyInspector] private int index;
+        [SerializeField] private int index;
         [SerializeField] [HideInInspector] private List<Edge> edges;
 
         [SerializeField] [Min(0)] private int visibility;

@@ -29,7 +29,10 @@ namespace LineWars
             foreach (var element in allElements)
             {
                 if (element != null)
+                {
                     element.gameObject.SetActive(true);
+                    element.gameObject.SetActive(false);
+                }
             }
             stackElements = new Stack<UIStackElement>();
             PushElement(initializeElement);
