@@ -47,6 +47,7 @@ namespace LineWars.Model
             
             actors = new List<IActor>();
             IntitializeStateMachine();
+            stateMachine.StateChanged += OnStateChanged;
         }
         private void Start() 
         {
@@ -85,6 +86,15 @@ namespace LineWars.Model
             stateMachine.AddTransition(artilleryState, fightState, () => artilleryState.AreActorsDone);
             stateMachine.AddTransition(fightState, scoutState, () => fightState.AreActorsDone);
             stateMachine.AddTransition(scoutState, buyState, () => scoutState.AreActorsDone);
+        }
+
+        private void OnStateChanged(State previousState, State currentState)
+        {
+            PhaseType previousPhase = PhaseType.Idle;
+            if(previousState != null)
+                previousPhase = ((Phase)previousState).Type;
+            
+            PhaseChanged?.Invoke(previousPhase, ((Phase)currentState).Type);
         }
 
         public void StartGame()
