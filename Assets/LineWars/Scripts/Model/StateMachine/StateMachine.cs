@@ -8,6 +8,8 @@ public class StateMachine
    private Dictionary<State, List<Transition>> _transitions = new Dictionary<State,List<Transition>>();
    private List<Transition> _currentTransitions = new List<Transition>();
    private List<Transition> _anyTransitions = new List<Transition>();
+
+   public event Action<State, State> StateChanged;
    
    private static List<Transition> EmptyTransitions = new List<Transition>(0);
 
@@ -30,6 +32,7 @@ public class StateMachine
       if (state == _currentState)
          return;
       
+      var previousState = _currentState;
       _currentState?.OnExit();
       _currentState = state;
       
@@ -38,6 +41,7 @@ public class StateMachine
          _currentTransitions = EmptyTransitions;
       
       _currentState.OnEnter();
+      StateChanged?.Invoke(previousState, _currentState);
    }
 
    public void AddTransition(State from, State to, Func<bool> predicate)

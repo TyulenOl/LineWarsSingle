@@ -35,14 +35,21 @@ namespace LineWars.Model
                 Debug.LogError($"{currentActor} is making a turn; {actor} is ended the turn instead!");
 
             if(PickNewActor())
-                currentActor.StartTurn(Type);
+                currentActor.ExecuteTurn(Type);
 
         }
 
         private void Begin()
         {
+            if(AreActorsDone) return;
             currentActorId = 0;
-            currentActor.StartTurn(Type);
+            if(!currentActor.CanExecuteTurn(Type))
+            {
+                PickNewActor();
+            }
+
+            currentActor.ExecuteTurn(Type);
+            
         }
 
         private bool PickNewActor()

@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    public class TestActor : MonoBehaviour, IActor
+    public class TestActor : MonoBehaviour//, IActor
     {
         private PhaseType currentPhase;
         private StateMachine stateMachine;
@@ -60,69 +60,7 @@ namespace LineWars.Model
 
         private void Start() 
         {
-            PhaseManager.Instance.RegisterActor(this);
-        }
-
-        public bool CanExecuteTurn(PhaseType phaseType)
-        {
-            switch(phaseType)
-            {
-                case PhaseType.Buy:
-                    return true;
-                case PhaseType.Artillery:
-                    return ArtilleryLeft > 0;
-                case PhaseType.Fight:
-                    return FightLeft > 0;
-                case PhaseType.Scout:
-                    return ScoutLeft > 0;
-                case PhaseType.Idle:
-                    return true;
-            }
-            return false;
-        }
-
-        public void StartTurn(PhaseType phaseType)
-        {
-            switch(phaseType)
-            {
-                case PhaseType.Buy:
-                    if(!CanExecuteTurn(phaseType)) Debug.LogError($"{this} can't execute Buy Turn");
-                    TurnStarted?.Invoke(phaseType);
-                    stateMachine.SetState(buyState);
-                    break;
-                case PhaseType.Artillery:
-                    if(!CanExecuteTurn(phaseType)) Debug.LogError($"{this} can't execute Artillery Turn");
-                    TurnStarted?.Invoke(phaseType);
-                    stateMachine.SetState(artilleryState);
-                    break;
-                case PhaseType.Fight:
-                    if(!CanExecuteTurn(phaseType)) Debug.LogError($"{this} can't execute Fight Turn");
-                    TurnStarted?.Invoke(phaseType);
-                    stateMachine.SetState(fightState);
-                    break;
-                case PhaseType.Scout:
-                    if(!CanExecuteTurn(phaseType)) Debug.LogError($"{this} can't execute Scouts Turn");
-                    TurnStarted?.Invoke(phaseType);
-                    stateMachine.SetState(scoutState);
-                    break;
-                case PhaseType.Idle:
-                    TurnStarted?.Invoke(phaseType);
-                    stateMachine.SetState(idleState);
-                    break;
-            }
-        }
-
-        public void EndTurn()
-        {
-            if(CurrentPhase == PhaseType.Idle)
-            {
-                Debug.LogWarning($"{this}: You can't end Idle Phase!");
-                return;
-            }
-            var previousPhase = CurrentPhase;
-
-            StartTurn(PhaseType.Idle);
-            TurnEnded?.Invoke(previousPhase);
+            //PhaseManager.Instance.RegisterActor(this);
         }
 
         private void IntitializeStateMachine()
@@ -140,6 +78,46 @@ namespace LineWars.Model
         private void SetNewPhase(PhaseType phaseType)
         {
             currentPhase = phaseType;
+        }
+
+        public void ExecuteBuy()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ExecuteArtillery()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ExecuteFight()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ExecuteScout()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool CanExecuteBuy()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool CanExecuteArtillery()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool CanExecuteFight()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool CanExecuteScout()
+        {
+            throw new NotImplementedException();
         }
     }
 }
