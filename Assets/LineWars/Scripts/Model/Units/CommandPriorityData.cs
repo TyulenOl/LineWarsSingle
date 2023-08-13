@@ -9,7 +9,7 @@ namespace LineWars.Model
     {
         [SerializeField] private List<CommandType> commandsPriority;
 
-        public IReadOnlyList<CommandType> Priority => commandsPriority.AsReadOnly();
+        public IReadOnlyList<CommandType> Priority => commandsPriority;
     }
 
     public enum CommandType

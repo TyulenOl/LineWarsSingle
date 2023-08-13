@@ -72,8 +72,8 @@ namespace LineWars.Controllers
         {
             this.target = target;
             TargetChanged.Invoke();
-
-            UnitsController.Instance.Action(Player.LocalPlayer, executor, target);
+            
+            UnitsController.Instance.Action(executor, target);
             NullifyObjects();
 
             stateMachine.SetState(executorState);

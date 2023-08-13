@@ -24,21 +24,22 @@ namespace LineWars.Controllers
                 Instance.invoker.Execute(command);
         }
         
-        public void Action([NotNull] Player owner, IExecutor executor, ITarget target)
+        public void Action(IExecutor executor, ITarget target)
         {
             Debug.Log("ACTION");
 
             foreach(var commandType in target.CommandPriorityData.Priority)
             {
-                if(commandType == CommandType.Attack && (executor is IAttackerVisitor && target is IAlive))
+                if(commandType == CommandType.Attack && 
+                (executor is IAttackerVisitor attacker && target is IAlive alive && attacker.CanAttack(alive)))
                 {
                     invoker.Execute(new AttackCommand((IAttackerVisitor) executor, (IAlive) target));
                     Debug.Log("Attack performed");
                     break;
                 }
-                else if(commandType == CommandType.Move && (executor is IMovable && target is Node))
+                else if(commandType == CommandType.Move && 
+                (executor is IMovable movable && target is Node node && movable.IsCanMoveTo(node)))
                 {
-                    var movable = (IMovable) executor;
                     invoker.Execute(new MoveCommand(movable, movable.Node, (Node) target));
                     Debug.Log("Movement Performed");
                     break;

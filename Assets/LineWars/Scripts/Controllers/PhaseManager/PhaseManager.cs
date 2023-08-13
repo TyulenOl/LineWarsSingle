@@ -2,24 +2,18 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using LineWars.Model;
 
-namespace LineWars.Model
+namespace LineWars.Controllers
 {  
-    public enum PhaseType
-    {
-        Idle,
-        Buy,
-        Artillery,
-        Fight,
-        Scout
-    }
-
     public class PhaseManager : MonoBehaviour
     {
         private List<IActor> actors;
 
-        public event Action<IActor, PhaseType> ActorTurnEnded;
+        public event Action<IActor, PhaseType, PhaseType> ActorTurnChanged;
         public event Action<PhaseType, PhaseType> PhaseChanged;
+
+        [SerializeField] private PhaseOrderData orderData;
 
         private StateMachine stateMachine;
         private Phase idleState;
@@ -27,8 +21,8 @@ namespace LineWars.Model
         private PhaseAlternatingState artilleryState;
         private PhaseAlternatingState fightState;
         private PhaseAlternatingState scoutState;
-        
-
+        private PhaseSimultaneousState replenishState;
+        private Dictionary<PhaseType, Phase> typeToPhase;
 
         public IReadOnlyList<IActor> Actors => actors.AsReadOnly();
         public PhaseType CurrentPhase => ((Phase)stateMachine.CurrentState).Type;
@@ -44,7 +38,6 @@ namespace LineWars.Model
             {
                 Debug.LogError("More than two PhaseManagers on the scene!");
             }
-            
             actors = new List<IActor>();
             IntitializeStateMachine();
             stateMachine.StateChanged += OnStateChanged;
@@ -68,7 +61,7 @@ namespace LineWars.Model
         {
             foreach(var actor in actors)
             {
-                actor.TurnEnded -= GetInvokingEndingTurn(actor);
+                actor.TurnChanged -= GetInvokingEndingTurn(actor);
             }
             stateMachine.SetState(idleState);
         }
@@ -81,11 +74,32 @@ namespace LineWars.Model
             artilleryState = new PhaseAlternatingState(PhaseType.Artillery, this);
             fightState = new PhaseAlternatingState(PhaseType.Fight, this);
             scoutState = new PhaseAlternatingState(PhaseType.Scout, this);
+            replenishState = new PhaseSimultaneousState(PhaseType.Replenish, this);
+            
+            typeToPhase = new Dictionary<PhaseType, Phase>()
+            {
+                {PhaseType.Buy, buyState},
+                {PhaseType.Artillery, artilleryState},
+                {PhaseType.Fight, fightState},
+                {PhaseType.Scout, scoutState},
+                {PhaseType.Replenish, replenishState}
+            };
 
-            stateMachine.AddTransition(buyState, artilleryState, () => buyState.AreActorsDone);
-            stateMachine.AddTransition(artilleryState, fightState, () => artilleryState.AreActorsDone);
-            stateMachine.AddTransition(fightState, scoutState, () => fightState.AreActorsDone);
-            stateMachine.AddTransition(scoutState, buyState, () => scoutState.AreActorsDone);
+            InitializeTransitions();
+        }
+
+        private void InitializeTransitions()
+        {
+            for(var i = 0; i < orderData.Order.Count - 1; i++)
+            {
+                var from = typeToPhase[orderData.Order[i]];
+                var to = typeToPhase[orderData.Order[i + 1]];
+                stateMachine.AddTransition(from, to, () => from.AreActorsDone);
+            }
+
+            var firstState = typeToPhase[orderData.Order[0]];
+            var lastState = typeToPhase[orderData.Order[orderData.Order.Count - 1]];
+            stateMachine.AddTransition(lastState, firstState, () => lastState.AreActorsDone);
         }
 
         private void OnStateChanged(State previousState, State currentState)
@@ -100,7 +114,7 @@ namespace LineWars.Model
         public void StartGame()
         {
             Debug.Log("Game Started!");
-            stateMachine.SetState(buyState);
+            stateMachine.SetState(typeToPhase[orderData.Order[0]]);
         }
 
         public void RegisterActor(IActor actor)
@@ -110,12 +124,12 @@ namespace LineWars.Model
                 Debug.LogError($"{actor} is already registered!");
             }
             actors.Add(actor);
-            actor.TurnEnded += GetInvokingEndingTurn(actor);
+            actor.TurnChanged += GetInvokingEndingTurn(actor);
         }
 
-        private Action<PhaseType> GetInvokingEndingTurn(IActor actor)
+        private Action<PhaseType, PhaseType> GetInvokingEndingTurn(IActor actor)
         {
-            return (phaseType) => ActorTurnEnded?.Invoke(actor, phaseType);
+            return (previousType, currentType) => ActorTurnChanged?.Invoke(actor, previousType, currentType);
         }
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using LineWars.Controllers;
 
 namespace LineWars.Model
 {
@@ -17,8 +18,7 @@ namespace LineWars.Model
         
         private HashSet<Owned> myOwned = new();
         
-        public event Action<PhaseType> TurnStarted;
-        public event Action<PhaseType> TurnEnded;
+        public event Action<PhaseType, PhaseType> TurnChanged;
         public IReadOnlyCollection<Owned> OwnedObjects => myOwned;
         public bool IsMyOwn(Owned owned) => myOwned.Contains(owned);
 
@@ -36,8 +36,15 @@ namespace LineWars.Model
 
         public void ExecuteTurn(PhaseType phaseType)
         {
+            var previousPhase = CurrentPhase;
             switch (phaseType)
             {
+                case PhaseType.Replenish:
+                    ExecuteReplenish();
+                    break;
+                case PhaseType.Idle:
+                    ExecuteIdle();
+                    break;
                 case PhaseType.Buy:
                     ExecuteBuy();
                     break;
@@ -55,6 +62,9 @@ namespace LineWars.Model
                                      + "Change IActor to acommodate for this phase!");
                     break;
             }
+
+            CurrentPhase = phaseType;
+            TurnChanged?.Invoke(previousPhase, CurrentPhase);
         }
 
         public bool CanExecuteTurn(PhaseType phaseType)
@@ -71,15 +81,14 @@ namespace LineWars.Model
                     return CanExecuteFight();
                 case PhaseType.Scout:
                     return CanExecuteScout();
+                case PhaseType.Replenish:
+                    return CanExecuteReplenish();
             }
 
             Debug.LogWarning
             ($"Phase.{phaseType} is not implemented in \"CanExecuteTurn\"! "
              + "Change IActor to acommodate for this phase!");
             return false;
-        }
-        public virtual void EndTurn()
-        {
         }
         
         #region Turns
@@ -96,6 +105,14 @@ namespace LineWars.Model
         }
 
         public virtual void ExecuteScout()
+        {
+        }
+
+        public virtual void ExecuteIdle()
+        {
+        }
+
+        public virtual void ExecuteReplenish()
         {
         }
         #endregion
@@ -117,6 +134,11 @@ namespace LineWars.Model
         }
 
         public virtual bool CanExecuteScout()
+        {
+            return false;
+        }
+        
+        public virtual bool CanExecuteReplenish()
         {
             return false;
         }

@@ -6,11 +6,11 @@ using LineWars.Controllers;
 
 namespace LineWars.Model
 {
-    public class TestActorBuyState : State
+    public class TestActorReplenishState : State
     {
         private readonly TestActor actor;
-        private Action<PhaseType> setNewPhase;
-        public TestActorBuyState(TestActor actor, Action<PhaseType> setNewPhase)
+        private readonly Action<PhaseType> setNewPhase;
+        public TestActorReplenishState(TestActor actor, Action<PhaseType> setNewPhase)
         {
             this.actor = actor;
             this.setNewPhase = setNewPhase;
@@ -18,27 +18,28 @@ namespace LineWars.Model
 
         public override void OnEnter()
         {
-            Debug.Log($"{actor}: starting BUY TURN!!");
-            setNewPhase(PhaseType.Buy);
-            actor.StartCoroutine(TimerCoroutine());
-
+            Debug.Log($"{actor} starting REPLENISH TURN");
+            setNewPhase(PhaseType.Replenish);
             actor.ArtilleryLeft = actor.ArtilleryUnits;
             actor.FightLeft = actor.FightUnits;
             actor.ScoutLeft = actor.ScoutUnits;
+            
+            actor.StartCoroutine(ReplenishCoroutine());
         }
 
         public override void OnExit()
         {
-            Debug.Log($"{actor}: ending BUY TURN!!!");
+            Debug.Log($"{actor} ending REPLENISH TURN");
             setNewPhase(PhaseType.Idle);
         }
 
-        private IEnumerator TimerCoroutine()
+        private IEnumerator ReplenishCoroutine()
         {
-            yield return new WaitForSeconds(UnityEngine.Random.Range(actor.MinBuyTime, actor.MaxBuyTime));
-            Debug.Log($"{actor} bought!");
+            yield return null;
             actor.ExecuteTurn(PhaseType.Idle);
         }
+
+
     }
 }
 

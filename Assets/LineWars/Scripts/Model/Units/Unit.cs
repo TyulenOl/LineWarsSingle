@@ -207,7 +207,7 @@ namespace LineWars.Model
             
         }
 
-        public bool IsCanAttack([NotNull] Unit unit)
+        public bool CanAttack([NotNull] Unit unit)
         {
             var line = node.GetLine(unit.node);
             return unit.basePlayer != basePlayer 
@@ -215,7 +215,7 @@ namespace LineWars.Model
                    && (int) Passability >= (int) line.LineType;
         }
 
-        public bool IsCanAttack([NotNull] Edge edge)
+        public bool CanAttack([NotNull] Edge edge)
         {
             return edge.LineType >= LineType.CountryRoad
                    && node.ContainsEdge(edge);
