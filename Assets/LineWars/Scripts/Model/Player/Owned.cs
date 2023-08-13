@@ -1,22 +1,23 @@
 ﻿using LineWars.Extensions.Attributes;
+using LineWars.Model;
 using UnityEngine;
 
 namespace LineWars
 {
     public abstract class Owned: MonoBehaviour
     {
-        [SerializeField] [ReadOnlyInspector] protected Player owner;
-        public Player Owner => owner;
+        [SerializeField] [ReadOnlyInspector] protected IOwner owner;
+        public IOwner Owner => owner;
 
-        public virtual void SetOwner(Player newOwner)
+        public virtual void SetOwner(IOwner newOwner)
         {
             owner = newOwner;
         }
 
-        public static void Connect(Player player, Owned owned)
+        public static void Connect(IOwner owner, Owned owned)
         {
-            player.AddOwned(owned);
-            owned.SetOwner(player);
+            owner.AddOwned(owned);
+            owned.SetOwner(owner);
         }
     }
 }
