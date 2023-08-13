@@ -3,13 +3,16 @@ using System.Linq;
 
 namespace LineWars.Model
 {
+    /// <summary>
+    /// Вся информация о изначальной принадлежности
+    /// </summary>
     public class SpawnInfo
     {
          public readonly int PlayerIndex;
-         public readonly NodeInitialInfo SpawnNode;
+         public readonly Spawn SpawnNode;
          public readonly List<NodeInitialInfo> NodeInfos;
 
-         public SpawnInfo(int playerIndex, NodeInitialInfo spawnNode, IEnumerable<NodeInitialInfo> nodeInfos)
+         public SpawnInfo(int playerIndex, Spawn spawnNode, IEnumerable<NodeInitialInfo> nodeInfos)
          {
              PlayerIndex = playerIndex;
              SpawnNode = spawnNode;

@@ -53,7 +53,7 @@ namespace LineWars.Model
                 var group = initialInfos
                     .Where(x => x.ReferenceToSpawn == spawn)
                     .ToArray();
-                var spawnInfo = new SpawnInfo(i, spawn.NodeInitialInfo, group);
+                var spawnInfo = new SpawnInfo(i, spawn, group);
                 spawnInfos.Add(spawnInfo);
                 spawnInfosStack.Push(spawnInfo);
             }

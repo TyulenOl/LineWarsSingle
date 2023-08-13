@@ -38,13 +38,15 @@ namespace LineWars
             {
                 var spawnPoint = Graph.GetSpawnPoint();
                 var player = playerInitializer.Initialize(spawnPoint);
-                players.Add(player);
+                players.Add((Player)player);
             }
             else
             {
                 Debug.LogError("Игрок не создался, потому что нет точек для его спавна");
             }
         }
+        
+        
 
         public void ToMainMenu()
         {

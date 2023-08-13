@@ -101,15 +101,15 @@ namespace LineWars.Model
 
         private void OnEnable()
         {
-            movementLogic.TargetChanged += MovementLogicOnTargetChanged;
+            movementLogic.MovementIsOver += MovementLogicOnMovementIsOver;
         }
 
         private void OnDisable()
         {
-            movementLogic.TargetChanged -= MovementLogicOnTargetChanged;
+            movementLogic.MovementIsOver -= MovementLogicOnMovementIsOver;
         }
 
-        private void MovementLogicOnTargetChanged(Transform arg1, Transform arg2)
+        private void MovementLogicOnMovementIsOver(Transform arg2)
         {
             CurrentSpeedPoints--;
 
@@ -129,6 +129,10 @@ namespace LineWars.Model
                 node.RightUnit = this;
                 UnitDirectionChange?.Invoke(unitSize, UnitDirection.Right);
             }
+
+            if (this.BasePlayer != node.BasePlayer)
+                node.SetOwner(BasePlayer);
+            
         }
 
         public void Initialize(Node node, UnitDirection direction)
@@ -140,14 +144,10 @@ namespace LineWars.Model
         public void MoveTo([NotNull] Node target)
         {
             if(node.LeftUnit == this)
-            {
                 node.LeftUnit = null;
-            }
             if(node.RightUnit == this)
-            {
                 node.RightUnit = null;
-            }
-
+            
             movementLogic.MoveTo(target.transform);
         }
 
@@ -210,7 +210,7 @@ namespace LineWars.Model
         public bool IsCanAttack([NotNull] Unit unit)
         {
             var line = node.GetLine(unit.node);
-            return unit.owner != owner 
+            return unit.basePlayer != basePlayer 
                    && line != null
                    && (int) Passability >= (int) line.LineType;
         }

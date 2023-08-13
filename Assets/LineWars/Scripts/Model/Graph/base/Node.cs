@@ -5,7 +5,6 @@ using LineWars.Extensions.Attributes;
 using LineWars.Interface;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.Serialization;
 using LineWars.Controllers;
 
 namespace LineWars.Model
@@ -149,5 +148,42 @@ namespace LineWars.Model
                     yield return edge.FirstNode;
             }
         }
+
+        protected override void OnSetOwner(BasePlayer oldPlayer, BasePlayer newPlayer)
+        {
+            if (newPlayer != null)
+                Redraw(newPlayer.SpawnInfo.SpawnNode);
+            else
+                DrawToDefault();
+        }
+
+        #region Debug
+        public void Redraw(Spawn spawn)
+        {
+            if (spawn == null)
+            {
+                DrawToDefault();
+            }
+            else if (GetComponent<Spawn>() != spawn)
+            {
+                gameObject.name = $"Node{Index} Group with {spawn.groupName}";
+                GetComponent<SpriteRenderer>().color = spawn.groupColor;
+            }
+            else
+            {
+                gameObject.name = $"Spawn {spawn.groupName}";
+                GetComponent<SpriteRenderer>().color = spawn.groupColor;
+                GetComponent<Outline2D>().SetActiveOutline(true);
+            }
+        }
+
+
+        public void DrawToDefault()
+        {
+            gameObject.name = $"Node{Index}";
+            GetComponent<SpriteRenderer>().color = Spawn.defaultColor;
+            GetComponent<Outline2D>().SetActiveOutline(false);
+        }
+        #endregion
     }
 }

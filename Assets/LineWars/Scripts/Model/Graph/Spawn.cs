@@ -9,8 +9,8 @@ namespace LineWars.Model
     [RequireComponent(typeof(NodeInitialInfo))]
     public class Spawn : MonoBehaviour
     {
-        private static readonly string defaultName = "";
-        private static readonly Color defaultColor = Color.white;
+        public static readonly string defaultName = "";
+        public static readonly Color defaultColor = Color.white;
 
         [field: SerializeField] public string groupName { get; set; } = defaultName;
         [field: SerializeField] public Color groupColor { get; set; } = defaultColor;
