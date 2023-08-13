@@ -10,8 +10,6 @@ namespace LineWars
     {
         public SingleGameManager Instance { get; private set; }
         [SerializeField] private PlayerInitializer playerInitializer;
-        [SerializeField, ReadOnlyInspector] private string mapToLoad;
-
         [SerializeField, ReadOnlyInspector] private List<Player> players;
 
         private void Awake()
@@ -21,8 +19,6 @@ namespace LineWars
 
         private void Start()
         {
-            mapToLoad = "TestMap";
-            InitializeMap();
             InitializePlayer();
 
             // var visibilityInfo = Graph.Instance.GetVisibilityInfo(Player.LocalPlayer);
@@ -36,17 +32,11 @@ namespace LineWars
             //     }
             // }
         }
-
-        private void InitializeMap()
-        {
-            LevelsManager.LoadMap(mapToLoad);
-        }
-        
         private void InitializePlayer()
         {
-            if (LevelsManager.HasSpawnPoint())
+            if (Graph.HasSpawnPoint())
             {
-                var spawnPoint = LevelsManager.GetSpawnPoint();
+                var spawnPoint = Graph.GetSpawnPoint();
                 var player = playerInitializer.Initialize(spawnPoint);
                 players.Add(player);
             }
