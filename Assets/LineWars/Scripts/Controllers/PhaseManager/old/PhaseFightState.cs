@@ -51,7 +51,7 @@ namespace LineWars.Model
                 if(manager.Actors[actorId].CanExecuteTurn(manager.CurrentPhase))
                 {
                     manager.Actors[actorId].TurnEnded += StartNewActorsTurn;
-                    manager.Actors[actorId].StartTurn(manager.CurrentPhase);
+                    manager.Actors[actorId].ExecuteTurn(manager.CurrentPhase);
                     break;
                 }
             }

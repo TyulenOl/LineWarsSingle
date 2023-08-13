@@ -27,7 +27,7 @@ namespace LineWars.Model
             foreach(var actor in manager.Actors)
             {
                 actorsReadiness[actor] = false;
-                actor.StartTurn(PhaseType.Buy);
+                actor.ExecuteTurn(PhaseType.Buy);
             }
 
             manager.ActorTurnEnded += OnActorTurnEnded;

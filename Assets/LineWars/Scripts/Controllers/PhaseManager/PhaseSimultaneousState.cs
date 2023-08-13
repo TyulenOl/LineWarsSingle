@@ -21,11 +21,12 @@ public class PhaseSimultaneousState : Phase
         manager.ActorTurnEnded += OnActorsTurnEnded;
         foreach(var actor in manager.Actors)
         {
-            actorsReadiness[actor] = false;
+            actorsReadiness[actor] = true;
             if(actor.CanExecuteTurn(Type))
             {
-                actor.StartTurn(Type);
+                actor.ExecuteTurn(Type);
                 actorsLeft++;
+                actorsReadiness[actor] = false;
             }
             
         }

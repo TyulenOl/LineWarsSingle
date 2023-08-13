@@ -1,4 +1,5 @@
 ﻿using System;
+using Newtonsoft.Json.Bson;
 
 namespace LineWars.Model
 {
@@ -35,5 +36,6 @@ namespace LineWars.Model
         
         public void Attack(Edge edge);
         public bool IsCanAttack(Edge edge);
+
     }
 }
