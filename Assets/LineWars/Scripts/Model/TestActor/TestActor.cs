@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    public class TestActor : MonoBehaviour//, IActor
+    public class TestActor : BasePlayer
     {
         private PhaseType currentPhase;
         private StateMachine stateMachine;
@@ -78,46 +78,6 @@ namespace LineWars.Model
         private void SetNewPhase(PhaseType phaseType)
         {
             currentPhase = phaseType;
-        }
-
-        public void ExecuteBuy()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ExecuteArtillery()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ExecuteFight()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ExecuteScout()
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool CanExecuteBuy()
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool CanExecuteArtillery()
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool CanExecuteFight()
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool CanExecuteScout()
-        {
-            throw new NotImplementedException();
         }
     }
 }
