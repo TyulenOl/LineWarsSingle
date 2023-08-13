@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace LineWars
 {
-    public class Player : MonoBehaviour
+    public class Player : MonoBehaviour, IOwner
     {
         public static Player LocalPlayer { get; private set; }
         [SerializeField, ReadOnlyInspector] private int index;
