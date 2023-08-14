@@ -24,7 +24,7 @@ namespace LineWars.Model
         public PhaseType CurrentPhase { get; private set; }
 
         private HashSet<Owned> myOwned;
-        private INation nation;
+        private Nation nation;
 
 
         public event Action<int, int> CurrentMoneyChanged;

@@ -6,7 +6,7 @@ using UnityEngine;
 namespace LineWars.Controllers
 {
     [RequireComponent(typeof(Unit))]
-    public class UnitBackgroundDrawer : MonoBehaviour
+    public class UnitDrawer : MonoBehaviour
     {
         [SerializeField] private GameObject leftPart;
         [SerializeField] private GameObject centerPart;

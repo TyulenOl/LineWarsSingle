@@ -4,12 +4,11 @@ using UnityEngine;
 
 namespace LineWars.Controllers
 {
-    [CustomEditor(typeof(UnitBackgroundDrawer))]
+    [CustomEditor(typeof(UnitDrawer))]
     public class UnitBackgroundDrawerEditor : Editor
     {
-        private UnitBackgroundDrawer drawer => (UnitBackgroundDrawer) target;
-        private bool needInitialize = true;
-        
+        private UnitDrawer drawer => (UnitDrawer) target;
+
 
         public override void OnInspectorGUI()
         {
