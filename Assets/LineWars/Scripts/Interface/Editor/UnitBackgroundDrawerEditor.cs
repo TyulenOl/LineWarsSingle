@@ -9,6 +9,8 @@ namespace LineWars.Controllers
     {
         private UnitBackgroundDrawer drawer => (UnitBackgroundDrawer) target;
         private bool needInitialize = true;
+        
+
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();

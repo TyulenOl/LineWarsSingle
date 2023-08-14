@@ -11,7 +11,7 @@ namespace LineWars.Model
         {
             switch (type)
             {
-                case UnitType.Infantry:
+                case UnitType.TheRifleMan:
                     return Resources.Load<Unit>("Units/DefaultUnits/BaseInfrantry");
                 default:
                     return null;

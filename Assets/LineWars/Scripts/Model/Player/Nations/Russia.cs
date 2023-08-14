@@ -11,8 +11,8 @@ namespace LineWars.Model
         {
             switch (type)
             {
-                case UnitType.Infantry:
-                    return Resources.Load<Unit>("Units/Russia/Infrantry");
+                case UnitType.TheRifleMan:
+                    return Resources.Load<Unit>("Nations/Russia/Units/Infrantry");
                 default:
                     return null;
             }
