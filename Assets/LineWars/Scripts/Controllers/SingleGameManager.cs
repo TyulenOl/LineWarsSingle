@@ -10,7 +10,7 @@ namespace LineWars
     {
         public SingleGameManager Instance { get; private set; }
         [SerializeField] private PlayerInitializer playerInitializer;
-        [SerializeField, ReadOnlyInspector] private List<Player> players;
+        [SerializeField, ReadOnlyInspector] private List<BasePlayer> players;
 
         private void Awake()
         {
@@ -20,32 +20,31 @@ namespace LineWars
         private void Start()
         {
             InitializePlayer();
-
-            // var visibilityInfo = Graph.Instance.GetVisibilityInfo(Player.LocalPlayer);
-            // for (int i = 0; i < Graph.Instance.AllNodes.Count; i++)
-            // {
-            //     var isVisible = visibilityInfo[i];
-            //     var node = Graph.Instance.AllNodes[i];
-            //     if (isVisible)
-            //     {
-            //         node.GetComponent<SpriteRenderer>().color = Color.yellow;
-            //     }
-            // }
+            InitializeAIs();
         }
         private void InitializePlayer()
         {
             if (Graph.HasSpawnPoint())
             {
                 var spawnPoint = Graph.GetSpawnPoint();
-                var player = playerInitializer.Initialize(spawnPoint);
-                players.Add((Player)player);
+                var player = playerInitializer.Initialize<Player>(spawnPoint);
+                players.Add(player);
             }
             else
             {
                 Debug.LogError("Игрок не создался, потому что нет точек для его спавна");
             }
         }
-        
+
+        private void InitializeAIs()
+        {
+            while (Graph.HasSpawnPoint())
+            {
+                var spawnPoint = Graph.GetSpawnPoint();
+                var player = playerInitializer.Initialize<AI>(spawnPoint);
+                players.Add(player);
+            }
+        }
         
 
         public void ToMainMenu()

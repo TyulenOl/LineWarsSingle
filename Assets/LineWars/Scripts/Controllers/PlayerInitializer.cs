@@ -3,54 +3,37 @@ using UnityEngine;
 
 namespace LineWars
 {
-    public class PlayerInitializer: MonoBehaviour
+    public class PlayerInitializer : MonoBehaviour
     {
-        [SerializeField] private Player playerPrefab;
-        
-        public BasePlayer Initialize(SpawnInfo spawnInfo)
+        public T Initialize<T>(SpawnInfo spawnInfo) where T : BasePlayer
         {
-            var player = Instantiate(playerPrefab);
-            player.Index = spawnInfo.PlayerIndex;
-            player.SpawnInfo = spawnInfo;
+            var player = new GameObject($"{typeof(T).Name}{spawnInfo.PlayerIndex}").AddComponent<T>();
             
+            player.Index = spawnInfo.PlayerIndex;
+            player.NationType = spawnInfo.SpawnNode.Nation;
+            player.SpawnInfo = spawnInfo;
+            player.CurrentMoney = spawnInfo.SpawnNode.StartMoney;
+            
+
             foreach (var nodeInfo in spawnInfo.NodeInfos)
             {
                 var node = nodeInfo.ReferenceToNode;
                 Owned.Connect(player, node);
-                
-                if (nodeInfo.LeftUnitPrefab != null)
+
+                var leftUnitPrefab = player.GetUnitPrefab(nodeInfo.LeftUnitType);
+                if (BasePlayerUtility.CanSpawnUnit(node, leftUnitPrefab, UnitDirection.Left))
                 {
-                    var leftUnit = Instantiate(nodeInfo.LeftUnitPrefab);
-                    leftUnit.Initialize(node, UnitDirection.Left);
-                    node.LeftUnit = leftUnit;
-                    leftUnit.transform.position = node.transform.position;
-                    Owned.Connect(player, leftUnit);
-                    leftUnit.transform.SetParent(player.transform);
-                    
-                    if (leftUnit.Size == UnitSize.Large)
-                        node.RightUnit = leftUnit;
+                    BasePlayerUtility.CreateUnitForPlayer(player, node, leftUnitPrefab, UnitDirection.Left);
                 }
 
-                if (nodeInfo.RightUnitPrefab != null)
+                var rightUnitPrefab = player.GetUnitPrefab(nodeInfo.RightUnitType);
+                if (BasePlayerUtility.CanSpawnUnit(node, rightUnitPrefab, UnitDirection.Right))
                 {
-                    if (nodeInfo.RightUnitPrefab.Size == UnitSize.Little && node.RightIsFree
-                        || nodeInfo.RightUnitPrefab.Size == UnitSize.Large && node.LeftIsFree && node.RightIsFree)
-                    {
-                        var rightUnit = Instantiate(nodeInfo.RightUnitPrefab);
-                        rightUnit.Initialize(node, UnitDirection.Right);
-                        node.RightUnit = rightUnit;
-                        rightUnit.transform.position = node.transform.position;
-                        Owned.Connect(player, rightUnit);
-                        rightUnit.transform.SetParent(player.transform);
-                    
-                        if (rightUnit.Size == UnitSize.Large)
-                            node.LeftUnit = rightUnit;
-                    }
+                    BasePlayerUtility.CreateUnitForPlayer(player, node, rightUnitPrefab, UnitDirection.Right);
                 }
             }
 
             return player;
         }
-        
     }
 }

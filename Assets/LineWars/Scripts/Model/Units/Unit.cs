@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using LineWars.Controllers;
+using LineWars.Extensions.Attributes;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -14,25 +15,32 @@ namespace LineWars.Model
         IExecutor,
         ITurnEndAction
     {
-        [SerializeField] [Min(0)] private int initialHp;
+        [Header("Units Settings")] [SerializeField] [Min(0)]
+        private int initialHp;
+
         [SerializeField] [Min(0)] private int initialArmor;
         [SerializeField] [Min(0)] private int meleeDamage;
         [SerializeField] [Min(0)] private int initialSpeedPoints;
-        [SerializeField] [Min(0)] private int visibility; 
+        [SerializeField] [Min(0)] private int visibility;
+        [SerializeField] [Min(0)] private int cost;
         [SerializeField] private UnitSize unitSize;
         [SerializeField] private Passability passability;
         [SerializeField] private CommandPriorityData priorityData;
-        
-        private int currentHp;
-        private int currentArmor;
-        private int currentSpeedPoints;
 
         private UnitMovementLogic movementLogic;
-        private Node node;
+
+        [Header("DEBUG")] [SerializeField] private bool debugMode;
+        [SerializeField, ReadOnlyInspector] private Node node;
+        [SerializeField, ReadOnlyInspector] private UnitDirection unitDirection;
+        [SerializeField, ReadOnlyInspector] private int currentHp;
+        [SerializeField, ReadOnlyInspector] private int currentArmor;
+        [SerializeField, ReadOnlyInspector] private int currentSpeedPoints;
 
 
-        [field: Header("Events")] 
-        [field: SerializeField] public UnityEvent<UnitSize, UnitDirection> UnitDirectionChange { get; private set; }
+        [field: Header("Events")]
+        [field: SerializeField]
+        public UnityEvent<UnitSize, UnitDirection> UnitDirectionChange { get; private set; }
+
         [field: SerializeField] public UnityEvent<int, int> HpChanged { get; private set; }
         [field: SerializeField] public UnityEvent<int, int> ArmorChanged { get; private set; }
         [field: SerializeField] public UnityEvent<Unit> Died { get; private set; }
@@ -74,20 +82,29 @@ namespace LineWars.Model
             private set { currentSpeedPoints = Math.Max(0, value); }
         }
 
+        private UnitDirection UnitDirection
+        {
+            get => unitDirection;
+            set
+            {
+                unitDirection = value;
+                UnitDirectionChange?.Invoke(Size, unitDirection);
+            }
+        }
+
         public int Visibility => visibility;
+        public int Cost => cost;
         public UnitSize Size => unitSize;
         public Passability Passability => passability;
         public Node Node => node;
         public CommandPriorityData CommandPriorityData => priorityData;
-
-        public UnitDirection UnitDirection => node.LeftUnit == this ? UnitDirection.Left : UnitDirection.Right;
 
         private void Awake()
         {
             currentHp = initialHp;
             currentSpeedPoints = initialSpeedPoints;
             currentArmor = initialArmor;
-            
+
             movementLogic = GetComponent<UnitMovementLogic>();
         }
 
@@ -119,46 +136,46 @@ namespace LineWars.Model
                 node.LeftUnit = this;
                 node.RightUnit = this;
             }
-            else if (node.LeftIsFree)
+            else if (node.LeftIsFree && (UnitDirection == UnitDirection.Left ||
+                                         UnitDirection == UnitDirection.Right && !node.RightIsFree))
             {
                 node.LeftUnit = this;
-                UnitDirectionChange?.Invoke(unitSize, UnitDirection.Left);
+                UnitDirection = UnitDirection.Left;
             }
             else
             {
                 node.RightUnit = this;
-                UnitDirectionChange?.Invoke(unitSize, UnitDirection.Right);
+                UnitDirection = UnitDirection.Right;
             }
 
-            if (this.BasePlayer != node.BasePlayer)
-                node.SetOwner(BasePlayer);
-            
+            if (this.Owner != node.Owner)
+                Owned.Connect(Owner, node);
         }
 
         public void Initialize(Node node, UnitDirection direction)
         {
             this.node = node;
-            UnitDirectionChange?.Invoke(unitSize, direction);
+            UnitDirection = direction;
         }
 
         public void MoveTo([NotNull] Node target)
         {
-            if(node.LeftUnit == this)
+            if (node.LeftUnit == this)
                 node.LeftUnit = null;
-            if(node.RightUnit == this)
+            if (node.RightUnit == this)
                 node.RightUnit = null;
-            
+
             movementLogic.MoveTo(target.transform);
         }
 
-        public bool IsCanMoveTo([NotNull] Node target)
+        public bool CanMoveTo([NotNull] Node target)
         {
-            return SizeCondition() && LineCondition() && SpeedConditional();
+            return OwnerCondition() && SizeCondition() && LineCondition() && SpeedCondition();
 
             bool SizeCondition()
             {
-                return Size == UnitSize.Little && (target.LeftIsFree || target.RightIsFree)
-                       || Size == UnitSize.Large && (target.LeftIsFree && target.RightIsFree);
+                return Size == UnitSize.Little && target.AnyIsFree
+                       || Size == UnitSize.Large && target.AllIsFree;
             }
 
             bool LineCondition()
@@ -170,9 +187,14 @@ namespace LineWars.Model
                        && (int) Passability >= (int) line.LineType;
             }
 
-            bool SpeedConditional()
+            bool SpeedCondition()
             {
-                return CurrentSpeedPoints > 0;
+                return CurrentSpeedPoints > 0 || debugMode;
+            }
+
+            bool OwnerCondition()
+            {
+                return target.Owner == null || target.Owner == Owner || target.Owner != Owner && target.AllIsFree;
             }
         }
 
@@ -184,7 +206,7 @@ namespace LineWars.Model
 
             var notBlockedDamage = hit.Damage - blockedDamage;
             if (notBlockedDamage != 0)
-                currentHp -= notBlockedDamage;
+                CurrentHp -= notBlockedDamage;
         }
 
         public void Attack([NotNull] Edge edge)
@@ -196,32 +218,31 @@ namespace LineWars.Model
         {
             var enemyNode = enemy.node;
             _Attack(enemy);
-            
-            if (enemy.IsDied)
+
+            if (enemy.IsDied && enemyNode.AllIsFree)
                 UnitsController.ExecuteCommand(new MoveCommand(this, node, enemyNode));
         }
 
         private void _Attack(IAlive target)
         {
             target.DealDamage(new Hit(MeleeDamage));
-            
         }
 
-        public bool IsCanAttack([NotNull] Unit unit)
+        public bool CanAttack([NotNull] Unit unit)
         {
             var line = node.GetLine(unit.node);
-            return unit.basePlayer != basePlayer 
+            return unit.basePlayer != basePlayer
                    && line != null
                    && (int) Passability >= (int) line.LineType;
         }
 
-        public bool IsCanAttack([NotNull] Edge edge)
+        public bool CanAttack([NotNull] Edge edge)
         {
             return edge.LineType >= LineType.CountryRoad
                    && node.ContainsEdge(edge);
         }
 
-        private void OnDied()
+        protected virtual void OnDied()
         {
             if (unitSize == UnitSize.Large)
             {
@@ -236,6 +257,8 @@ namespace LineWars.Model
             {
                 node.RightUnit = null;
             }
+
+            Destroy(gameObject);
         }
 
         public void OnTurnEnd()

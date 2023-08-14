@@ -12,6 +12,8 @@ namespace LineWars.Model
         public static readonly string defaultName = "";
         public static readonly Color defaultColor = Color.white;
 
+        [field: SerializeField] public NationType Nation { get; private set; }
+        [field: SerializeField] public int StartMoney { get; private set; }
         [field: SerializeField] public string groupName { get; set; } = defaultName;
         [field: SerializeField] public Color groupColor { get; set; } = defaultColor;
         
@@ -30,6 +32,8 @@ namespace LineWars.Model
             var referenceToSpawn = GetComponent<NodeInitialInfo>().ReferenceToSpawn;
             if (referenceToSpawn == null || referenceToSpawn != this)
                 GetComponent<NodeInitialInfo>().ReferenceToSpawn = this;
+            if (!GetComponent<Node>().IsBase)
+                GetComponent<Node>().IsBase = true;
         }
 
         private void AssignFields()

@@ -21,7 +21,7 @@ namespace LineWars.Model
         };
 
 
-        public static INation GetNation(NationType type)
+        public static INation GetNationByType(NationType type)
         {
             return type switch
             {

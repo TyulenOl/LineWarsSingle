@@ -1,4 +1,5 @@
 
+using System;
 using LineWars.Model;
 using UnityEngine;
 
@@ -6,14 +7,14 @@ namespace LineWars.Model
 {
     public class DefaultNation : INation
     {
-        public GameObject GetUnitPrefab(UnitType type)
+        public Unit GetUnitPrefab(UnitType type)
         {
             switch (type)
             {
                 case UnitType.Infantry:
-                    return Resources.Load<GameObject>("DefaultUnits/BaseInfrantry");
+                    return Resources.Load<Unit>("Units/DefaultUnits/BaseInfrantry");
                 default:
-                    return Resources.Load<GameObject>("DefaultUnits/BaseInfrantry");
+                    return null;
             }
         }
     }

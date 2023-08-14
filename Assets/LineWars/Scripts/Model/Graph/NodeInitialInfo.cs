@@ -9,8 +9,8 @@ namespace LineWars.Model
         [field: SerializeField] public Spawn ReferenceToSpawn { get; set; }
 
         [field: Header("Настройки юнитов. Внимание! Левый юнит будет создаваться в приоритете")]
-        [field: SerializeField] public Unit LeftUnitPrefab { get; set; }
-        [field: SerializeField] public Unit RightUnitPrefab { get; set; }
+        [field: SerializeField] public UnitType LeftUnitType { get; set; }
+        [field: SerializeField] public UnitType RightUnitType { get; set; }
         [field:SerializeField, HideInInspector] public Node ReferenceToNode { get; private set; }
 
 

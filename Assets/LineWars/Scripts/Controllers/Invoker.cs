@@ -7,8 +7,7 @@ namespace LineWars
     {
         public void Execute(ICommand command)
         {
-            //if (command.CanExecute())
-                command.Execute();
+            command.Execute();
         }
     }
 }

@@ -4,6 +4,6 @@ namespace LineWars.Model
 {
     public interface INation
     {
-        public GameObject GetUnitPrefab(UnitType type);
+        public Unit GetUnitPrefab(UnitType type);
     }
 }

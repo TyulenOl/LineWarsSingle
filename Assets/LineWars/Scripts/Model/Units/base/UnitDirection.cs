@@ -2,6 +2,7 @@
 {
     public enum UnitDirection
     {
+        Any,
         Left,
         Right
     }

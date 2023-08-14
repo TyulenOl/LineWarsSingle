@@ -3,27 +3,16 @@ using LineWars.Extensions.Attributes;
 using LineWars.Model;
 using UnityEngine;
 
-namespace LineWars
+namespace LineWars.Model
 {
     public class Player : BasePlayer
     {
         public static Player LocalPlayer { get; private set; }
-        [SerializeField, ReadOnlyInspector] private int index;
-        [SerializeField, ReadOnlyInspector] private NationType nationType;
-        
-        private INation nation;
 
-        public int Index
+        protected override void Awake()
         {
-            get => index;
-            set => index = value;
-        }
-        
-        void Awake()
-        {
+            base.Awake();
             LocalPlayer = this;
-            nation = NationHelper.GetNation(nationType);
         }
-        public GameObject GetUnitPrefab(UnitType unitType) => nation.GetUnitPrefab(unitType);
     }
 }

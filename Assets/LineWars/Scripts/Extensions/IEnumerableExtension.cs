@@ -6,10 +6,14 @@ namespace LineWars.Extensions
 {
     public static class IEnumerableExtension
     {
-        public static Stack<T> ToStack<T>(this IEnumerable<T> enumerable)
+        public static Stack<T> ToStack<T>(this IEnumerable<T> enumerable, bool useReverse = false)
         {
+            var tempList = enumerable.ToList();
+            if (useReverse)
+                tempList.Reverse();
+            
             var result = new Stack<T>();
-            foreach (var element in enumerable)
+            foreach (var element in tempList)
             {
                 result.Push(element);
             }
