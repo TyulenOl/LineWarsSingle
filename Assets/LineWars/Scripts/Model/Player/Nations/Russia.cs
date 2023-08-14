@@ -1,4 +1,4 @@
-
+﻿
 using System;
 using LineWars.Model;
 using UnityEngine;
@@ -12,10 +12,9 @@ namespace LineWars.Model
             switch (type)
             {
                 case UnitType.TheRifleMan:
-                    return Resources.Load<Unit>("Nations/Russia/Units/Infrantry");
+                    return Resources.Load<Unit>("Nations/Russia/Units/TheRifleMan");
                 default:
                     return null;
             }
         }
-    }
-}
+    } }

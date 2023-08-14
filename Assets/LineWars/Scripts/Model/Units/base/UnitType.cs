@@ -11,6 +11,7 @@ namespace LineWars.Model
         Engineer,
         Cavalry,
         Artillery,
+        Doctor,
         Tank
     }
     

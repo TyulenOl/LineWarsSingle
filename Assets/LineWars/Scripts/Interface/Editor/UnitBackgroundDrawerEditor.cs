@@ -18,31 +18,19 @@ namespace LineWars.Controllers
             EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button("DrawLeft"))
             {
-                Initialize();
                 drawer.DrawLeft();
             }
 
             if (GUILayout.Button("DrawCenter"))
             {
-                Initialize();
                 drawer.DrawCenter();
             }
 
             if (GUILayout.Button("DrawRight"))
             {
-                Initialize();
                 drawer.DrawRight();
             }
             EditorGUILayout.EndHorizontal();
-        }
-
-        private void Initialize()
-        {
-            if (needInitialize)
-            {
-                needInitialize = false;
-                drawer.Initialize();
-            }
         }
     }
 }
