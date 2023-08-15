@@ -1,5 +1,6 @@
 ﻿
 using System;
+using LineWars.Interface;
 using LineWars.Model;
 using UnityEngine;
 
@@ -8,28 +9,53 @@ namespace LineWars.Controllers
     [RequireComponent(typeof(Unit))]
     public class UnitDrawer : MonoBehaviour
     {
-        [SerializeField] private GameObject leftPart;
-        [SerializeField] private GameObject centerPart;
-        [SerializeField] private GameObject rightPart;
+        [Header("Animate Settings")]
+        [SerializeField] private Vector2 offset;
+        [SerializeField] private Color damageColor = Color.red;
+        [SerializeField] private Color armorDamageColor = Color.blue;
+        
+        [Header("Reference")]
+        [SerializeField] private UnitPartDrawer leftPart;
+        [SerializeField] private UnitPartDrawer centerPart;
+        [SerializeField] private UnitPartDrawer rightPart;
         
         private Unit unit;
         
         private void Awake()
         {
             unit = GetComponent<Unit>();
+
+            if (leftPart != null)
+            {
+                leftPart.offset = offset;
+            }
+            
+            if (centerPart != null)
+            {
+                centerPart.offset = offset;
+            }
+            
+            if (rightPart != null)
+            {
+                rightPart.offset = offset;
+            }
         }
 
         private void OnEnable()
         {
-            unit.UnitDirectionChange.AddListener(OnUnitDirectionChance);
+            unit.UnitDirectionChange.AddListener(OnUnitDirectionChange);
+            unit.ArmorChanged.AddListener(OnUnitArmorChange);
+            unit.HpChanged.AddListener(OnUnitHpChange);
         }
 
         private void OnDisable()
         {
-            unit.UnitDirectionChange.RemoveListener(OnUnitDirectionChance);
+            unit.UnitDirectionChange.RemoveListener(OnUnitDirectionChange);
+            unit.ArmorChanged.RemoveListener(OnUnitArmorChange);
+            unit.HpChanged.RemoveListener(OnUnitHpChange);
         }
 
-        private void OnUnitDirectionChance(UnitSize size, UnitDirection direction)
+        private void OnUnitDirectionChange(UnitSize size, UnitDirection direction)
         {
             if (size == UnitSize.Little && direction == UnitDirection.Left)
                 DrawLeft();
@@ -38,35 +64,60 @@ namespace LineWars.Controllers
             else
                 DrawCenter();
         }
+
+        private void OnUnitArmorChange(int before, int after)
+        {
+            if (leftPart != null && leftPart.gameObject.activeSelf)
+                leftPart.AnimateDamageText((after - before).ToString(), armorDamageColor);
+            
+            if (centerPart != null && centerPart.gameObject.activeSelf)
+                centerPart.AnimateDamageText((after - before).ToString(), armorDamageColor);
+            
+            if (rightPart != null && rightPart.gameObject.activeSelf)
+                rightPart.AnimateDamageText((after - before).ToString(), armorDamageColor);
+        }
+        
+        private void OnUnitHpChange(int before, int after)
+        {
+            if (leftPart != null && leftPart.gameObject.activeSelf)
+                leftPart.AnimateDamageText((after - before).ToString(), damageColor);
+            
+            if (centerPart != null && centerPart.gameObject.activeSelf)
+                centerPart.AnimateDamageText((after - before).ToString(), damageColor);
+            
+            if (rightPart != null && rightPart.gameObject.activeSelf)
+                rightPart.AnimateDamageText((after - before).ToString(), damageColor);
+        }
+        
         
         public void DrawLeft()
         {
             if (leftPart != null)
-                leftPart.SetActive(true);
+                leftPart.gameObject.SetActive(true);
             if (centerPart != null)
-                centerPart.SetActive(false);
+                centerPart.gameObject.SetActive(false);
             if (rightPart != null)
-                rightPart.SetActive(false);
+                rightPart.gameObject.SetActive(false);
         }
 
         public void DrawCenter()
         {
             if (leftPart != null)
-                leftPart.SetActive(false);
+                leftPart.gameObject.SetActive(false);
             if (centerPart != null)
-                centerPart.SetActive(true);
+                centerPart.gameObject.SetActive(true);
             if (rightPart != null)
-                rightPart.SetActive(false);
+                rightPart.gameObject.SetActive(false);
         }
 
         public void DrawRight()
         {
             if (leftPart != null)
-                leftPart.SetActive(false);
+                leftPart.gameObject.SetActive(false);
             if (centerPart != null)
-                centerPart.SetActive(false);
+                centerPart.gameObject.SetActive(false);
             if (rightPart != null)
-                rightPart.SetActive(true);
+                rightPart.gameObject.SetActive(true);
         }
     }
 }
