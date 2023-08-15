@@ -23,6 +23,7 @@ namespace LineWars.Model
         [SerializeField] [Min(0)] private int initialSpeedPoints;
         [SerializeField] [Min(0)] private int visibility;
         [SerializeField] [Min(0)] private int cost;
+        [field: SerializeField] public bool AttackLocked { get; set; }
         [SerializeField] private UnitSize unitSize;
         [SerializeField] private Passability passability;
         [SerializeField] private CommandPriorityData priorityData;
@@ -51,7 +52,7 @@ namespace LineWars.Model
             private set
             {
                 var before = currentHp;
-                currentHp = Math.Max(0, value);
+                currentHp = Math.Min(Math.Max(0, value), initialHp);
                 HpChanged.Invoke(before, currentHp);
                 if (currentHp == 0)
                 {
@@ -170,7 +171,10 @@ namespace LineWars.Model
 
         public bool CanMoveTo([NotNull] Node target)
         {
-            return OwnerCondition() && SizeCondition() && LineCondition() && SpeedCondition();
+            return OwnerCondition()
+                   && SizeCondition()
+                   && LineCondition()
+                   && SpeedCondition();
 
             bool SizeCondition()
             {
@@ -198,7 +202,7 @@ namespace LineWars.Model
             }
         }
 
-        public void DealDamage(Hit hit)
+        public void TakeDamage(Hit hit)
         {
             var blockedDamage = Math.Min(hit.Damage, CurrentArmor);
             if (blockedDamage != 0)
@@ -207,6 +211,13 @@ namespace LineWars.Model
             var notBlockedDamage = hit.Damage - blockedDamage;
             if (notBlockedDamage != 0)
                 CurrentHp -= notBlockedDamage;
+        }
+
+        public void Heal(int healAmount)
+        {
+            if (healAmount < 0)
+                throw new ArgumentException($"{nameof(healAmount)} > 0 !");
+            CurrentHp += healAmount;
         }
 
         public void Attack([NotNull] Edge edge)
@@ -225,20 +236,22 @@ namespace LineWars.Model
 
         private void _Attack(IAlive target)
         {
-            target.DealDamage(new Hit(MeleeDamage));
+            target.TakeDamage(new Hit(MeleeDamage));
         }
 
         public bool CanAttack([NotNull] Unit unit)
         {
             var line = node.GetLine(unit.node);
-            return unit.basePlayer != basePlayer
+            return !AttackLocked &&
+                   unit.basePlayer != basePlayer
                    && line != null
                    && (int) Passability >= (int) line.LineType;
         }
 
         public bool CanAttack([NotNull] Edge edge)
         {
-            return edge.LineType >= LineType.CountryRoad
+            return !AttackLocked &&
+                   edge.LineType >= LineType.CountryRoad
                    && node.ContainsEdge(edge);
         }
 
@@ -265,6 +278,33 @@ namespace LineWars.Model
         {
             CurrentArmor = initialArmor;
             CurrentSpeedPoints = initialSpeedPoints;
+        }
+
+
+        public bool TryGetNeighbour([NotNullWhen(true)] out Unit neighbour)
+        {
+            neighbour = null;
+            if (Size == UnitSize.Large)
+                return false;
+            if (node.LeftUnit == this && node.RightUnit != null)
+            {
+                neighbour = node.RightUnit;
+                return true;
+            }
+
+            if (node.RightUnit == this && node.LeftUnit != null)
+            {
+                neighbour = node.LeftUnit;
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool IsNeighbour(Unit unit)
+        {
+            return node.LeftUnit == this && node.RightUnit == unit
+                   || node.RightUnit == this && node.LeftUnit == unit;
         }
     }
 }
