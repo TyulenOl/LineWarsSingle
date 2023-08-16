@@ -278,8 +278,8 @@ namespace LineWars.Model
 
         public void OnTurnEnd()
         {
-            CurrentArmor = initialArmor;
-            CurrentSpeedPoints = initialSpeedPoints;
+            currentArmor = initialArmor;
+            currentSpeedPoints = initialSpeedPoints;
         }
 
 

@@ -3,16 +3,18 @@ using System.Collections.Generic;
 using LineWars.Controllers;
 using LineWars.Model;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace LineWars
 {
-    public class Player : BasePlayer
+    public partial class Player : BasePlayer
     {
         public static Player LocalPlayer { get; private set; }
         [SerializeField] private PhaseExecutorsData phaseExecutorsData;
 
         private IReadOnlyCollection<UnitType> potentialExecutors;
-        private Dictionary<Unit, bool> isUnitUsed;
+        private Dictionary<Unit, bool> unitUsage;
+        private bool isTurnMade = false;
 
         private StateMachine stateMachine;
         private PlayerPhase idlePhase;
@@ -21,9 +23,20 @@ namespace LineWars
         private PlayerPhase scoutPhase;
         private PlayerBuyPhase buyPhase;
         private PlayerReplenishPhase replenishPhase;
-
+        
+        [field: SerializeField] public UnityEvent TurnMade {get; private set;}
         public IReadOnlyCollection<UnitType> PotentialExecutors => potentialExecutors;
-        public IReadOnlyDictionary<Unit, bool> IsUnitUsed => isUnitUsed;
+        public IReadOnlyDictionary<Unit, bool> UnitUsage => unitUsage;
+        public bool IsTurnMade
+        {
+            get => isTurnMade;
+            private set
+            {
+                isTurnMade = value;
+                if(value)
+                    TurnMade.Invoke();
+            }
+        }
 
 
         protected override void Awake()
@@ -34,7 +47,7 @@ namespace LineWars
             else
                 LocalPlayer = this;
 
-            isUnitUsed = new Dictionary<Unit, bool>();
+            unitUsage = new Dictionary<Unit, bool>();
             InitializeStateMachine();
         }
 
@@ -55,24 +68,19 @@ namespace LineWars
         private void InitializeStateMachine()
         {
             stateMachine = new StateMachine();
-            idlePhase = new PlayerPhase(this, PhaseType.Idle, SetExecutors, SetUnitUsed);
-            buyPhase = new PlayerBuyPhase(this, PhaseType.Buy, SetExecutors, SetUnitUsed);
-            artilleryPhase = new PlayerPhase(this, PhaseType.Artillery, SetExecutors, SetUnitUsed);
-            fightPhase = new PlayerPhase(this, PhaseType.Fight, SetExecutors, SetUnitUsed);
-            scoutPhase = new PlayerPhase(this, PhaseType.Scout, SetExecutors, SetUnitUsed);
-            replenishPhase = new PlayerReplenishPhase(this, PhaseType.Replenish, SetExecutors, SetUnitUsed);
-        }
-
-        private void SetExecutors(PhaseType phaseType)
-        {
-            potentialExecutors = phaseExecutorsData.PhaseToUnits[phaseType];
+            idlePhase = new PlayerPhase(this, PhaseType.Idle);
+            buyPhase = new PlayerBuyPhase(this, PhaseType.Buy);
+            artilleryPhase = new PlayerPhase(this, PhaseType.Artillery);
+            fightPhase = new PlayerPhase(this, PhaseType.Fight);
+            scoutPhase = new PlayerPhase(this, PhaseType.Scout);
+            replenishPhase = new PlayerReplenishPhase(this, PhaseType.Replenish);
         }
 
         private void OnOwnedAdded(Owned owned)
         {
             if (owned is Unit unit)
             {
-                isUnitUsed[unit] = false;
+                unitUsage[unit] = false;
             }
         }
 
@@ -80,18 +88,17 @@ namespace LineWars
         {
             if (owned is Unit unit)
             {
-                isUnitUsed.Remove(unit);
+                unitUsage.Remove(unit);
             }
         }
 
-        private void SetUnitUsed(Unit unit, bool value)
+        public void FinishTurn()
         {
-            isUnitUsed[unit] = value;
+            if(!IsTurnMade) return;
+            ExecuteTurn(PhaseType.Idle);
         }
 
-
         #region Turns
-
         public override void ExecuteBuy()
         {
             stateMachine.SetState(buyPhase);
@@ -140,7 +147,7 @@ namespace LineWars
         {
             var phaseExecutors = phaseExecutorsData.PhaseToUnits[phaseType];
 
-            foreach (var unitData in isUnitUsed)
+            foreach (var unitData in unitUsage)
             {
                 if (!unitData.Value && phaseExecutors.Contains(unitData.Key.Type))
                 {

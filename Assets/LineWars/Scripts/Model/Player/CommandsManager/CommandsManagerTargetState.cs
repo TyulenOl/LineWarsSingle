@@ -6,38 +6,60 @@ using LineWars.Model;
 
 namespace LineWars.Controllers
 {
-    public class CommandsManagerTargetState : State
+    public partial class CommandsManager
     {
-        private CommandsManager manager;
-        private Action<ITarget> setTarget;
-    
-        public CommandsManagerTargetState(CommandsManager manager, Action<ITarget> setTarget)
+        public class CommandsManagerTargetState : State
         {
-            this.manager = manager;
-            this.setTarget = setTarget;
-        }
+            private CommandsManager manager;
+        
+            public CommandsManagerTargetState(CommandsManager manager)
+            {
+                this.manager = manager;
+            }
 
-        public override void OnEnter()
-        {
-            Selector.SelectedObjectsChanged += OnSelectedObjectChanged;
-        }
+            public override void OnEnter()
+            {
+                Selector.SelectedObjectsChanged += OnSelectedObjectChanged;
+            }
 
-        public override void OnExit()
-        {
-            Selector.SelectedObjectsChanged -= OnSelectedObjectChanged;
-        }
+            public override void OnExit()
+            {
+                Selector.SelectedObjectsChanged -= OnSelectedObjectChanged;
+            }
 
-        public override void OnLogic()
-        {
-            
-        }
+            private void OnSelectedObjectChanged(GameObject lastObject, GameObject newObject)
+            {
+                if(newObject.TryGetComponent<IExecutor>(out IExecutor executor) &&
+                executor == manager.executor)
+                {
+                   CancelExecutor();
+                   return;
+                }
+                if(!newObject.TryGetComponent<ITarget>(out ITarget target)) return;
 
+                SetTarget(target);
+            }
 
-        private void OnSelectedObjectChanged(GameObject lastObject, GameObject newObject)
-        {
-            if(!(newObject.TryGetComponent<ITarget>(out ITarget target))) return;
+            private void SetTarget(ITarget target)
+            {
+                manager.Target = target;
+                
+                var isCommandExecuted = UnitsController.Instance.Action(manager.executor, target);
 
-            setTarget(target);
+                manager.stateMachine.SetState(manager.executorState);
+                if(isCommandExecuted)
+                    manager.CommandExecuted.Invoke(manager.executor, manager.target);
+                manager.Target = null;
+                manager.Executor = null;
+            }
+
+            private void CancelExecutor()
+            {
+                manager.Executor = null;
+                Debug.Log("EXECUTOR CANCELED");
+
+                manager.stateMachine.SetState(manager.executorState);
+            }
         }
     }
 }

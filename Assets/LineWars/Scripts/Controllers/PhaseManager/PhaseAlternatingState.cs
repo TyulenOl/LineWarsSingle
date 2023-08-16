@@ -6,71 +6,76 @@ using LineWars.Model;
 
 namespace LineWars.Controllers
 {
-    public class PhaseAlternatingState : Phase
+    public partial class PhaseManager
     {
-        private int currentActorId;
-        private IActor currentActor => manager.Actors[currentActorId];
-    
-        public PhaseAlternatingState(PhaseType phase, PhaseManager manager) : base(phase, manager)
+        public class PhaseAlternatingState : Phase
         {
-            
-        }
-
-        public override void OnEnter()
-        {
-            if(AreActorsDone) return;
-            manager.ActorTurnChanged += OnActorsTurnChanged;
-            Begin();
-        }
-
-        public override void OnExit()
-        {
-            manager.ActorTurnChanged -= OnActorsTurnChanged;
-        }
-
-        private void OnActorsTurnChanged(IActor actor, PhaseType previousPhase, PhaseType currentPhase)
-        {
-            if(previousPhase != Type)
+            private int currentActorId;
+            private IActor currentActor => manager.Actors[currentActorId];
+        
+            public PhaseAlternatingState(PhaseType phase, PhaseManager manager) : base(phase, manager)
             {
-                if(previousPhase != PhaseType.Idle)
+                
+            }
+
+            public override void OnEnter()
+            {
+                base.OnEnter();
+                if(AreActorsDone) return;
+                manager.ActorTurnChanged += OnActorsTurnChanged;
+                Begin();
+            }
+
+            public override void OnExit()
+            {
+                base.OnExit();
+                manager.ActorTurnChanged -= OnActorsTurnChanged;
+            }
+
+            private void OnActorsTurnChanged(IActor actor, PhaseType previousPhase, PhaseType currentPhase)
+            {
+                if(previousPhase != Type)
                 {
-                    Debug.LogError($"{actor} ended turn {previousPhase}; Phase {Type} is parsing it instead!");
+                    if(previousPhase != PhaseType.Idle)
+                    {
+                        Debug.LogError($"{actor} ended turn {previousPhase}; Phase {Type} is parsing it instead!");
+                    }
+                    return;
                 }
-                return;
-            }
-            if(actor != currentActor)
-                Debug.LogError($"{currentActor} is making a turn; {actor} is ended the turn instead!");
+                if(actor != currentActor)
+                    Debug.LogError($"{currentActor} is making a turn; {actor} is ended the turn instead!");
 
-            if(PickNewActor())
-                currentActor.ExecuteTurn(Type);
+                if(PickNewActor())
+                    currentActor.ExecuteTurn(Type);
 
-        }
-
-        private void Begin()
-        {
-            if(AreActorsDone) return;
-            currentActorId = 0;
-            if(!currentActor.CanExecuteTurn(Type))
-            {
-                PickNewActor();
             }
 
-            currentActor.ExecuteTurn(Type);
-            
-        }
-
-        private bool PickNewActor()
-        {
-            if(AreActorsDone) return false;
-
-            var potentialActorId = currentActorId;
-            while(true)
+            private void Begin()
             {
-                potentialActorId = (potentialActorId + 1) % manager.Actors.Count;
-                if(manager.Actors[potentialActorId].CanExecuteTurn(Type))
+                if(AreActorsDone) return;
+                currentActorId = 0;
+                if(!currentActor.CanExecuteTurn(Type))
                 {
-                    currentActorId = potentialActorId;
-                    return true;
+                    PickNewActor();
+                }
+
+                currentActor.ExecuteTurn(Type);
+                
+            }
+
+            private bool PickNewActor()
+            {
+                if(AreActorsDone) return false;
+
+                var potentialActorId = currentActorId;
+                while(true)
+                {
+                    potentialActorId = (potentialActorId + 1) % manager.Actors.Count;
+                    if(manager.Actors[potentialActorId].CanExecuteTurn(Type))
+                    {
+                        currentActorId = potentialActorId;
+                        return true;
+                    }
                 }
             }
         }

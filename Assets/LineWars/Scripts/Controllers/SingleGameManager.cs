@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using LineWars.Controllers;
 using LineWars.Extensions.Attributes;
 using LineWars.Model;
 using UnityEngine;
@@ -21,6 +23,12 @@ namespace LineWars
         {
             InitializePlayer();
             InitializeAIs();
+            StartCoroutine(StartGameCoroutine());
+            IEnumerator StartGameCoroutine()
+            {
+                yield return null;
+                PhaseManager.Instance.StartGame();
+            }
         }
         private void InitializePlayer()
         {
@@ -41,7 +49,7 @@ namespace LineWars
             while (Graph.HasSpawnPoint())
             {
                 var spawnPoint = Graph.GetSpawnPoint();
-                var player = playerInitializer.Initialize<AI>(spawnPoint);
+                var player = playerInitializer.Initialize<TestActor>(spawnPoint);
                 players.Add(player);
             }
         }

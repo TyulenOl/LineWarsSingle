@@ -1,13 +1,16 @@
-﻿using LineWars.Model;
+﻿using System.Collections.Generic;
+using LineWars.Model;
 using UnityEngine;
+using System.Linq;
 
 namespace LineWars
 {
     public class PlayerInitializer : MonoBehaviour
     {
+        [SerializeField] private List<BasePlayer> playersPrefabs;
         public T Initialize<T>(SpawnInfo spawnInfo) where T : BasePlayer
         {
-            var player = new GameObject($"{typeof(T).Name}{spawnInfo.PlayerIndex}").AddComponent<T>();
+            var player = Instantiate(playersPrefabs.OfType<T>().First());
             
             player.Index = spawnInfo.PlayerIndex;
             player.NationType = spawnInfo.SpawnNode.Nation;

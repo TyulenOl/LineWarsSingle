@@ -7,40 +7,42 @@ using UnityEngine;
 
 namespace LineWars
 {
-    public class PlayerPhase : State
+    public partial class Player
     {
-        protected readonly Player player;
-        protected readonly PhaseType phaseType;
-        protected readonly Action<Unit, bool> setUnitUsed;
-        private readonly Action<PhaseType> setExecutors;
-
-        public PlayerPhase(Player player, PhaseType phase, Action<PhaseType> setExecutors, Action<Unit, bool> setUnitUsed)
+        public class PlayerPhase : State
         {
-            this.player = player;
-            phaseType = phase;
-            this.setExecutors = setExecutors;
-            this.setUnitUsed = setUnitUsed;
-        }
+            protected readonly Player player;
+            protected readonly PhaseType phaseType;
 
-        public override void OnEnter()
-        {
-            setExecutors(phaseType);
-            CommandsManager.Instance.CommandExecuted.AddListener(OnCommandExecuted);
-        }
-
-        public override void OnExit()
-        {
-            CommandsManager.Instance.CommandExecuted.RemoveListener(OnCommandExecuted);
-        }
-
-        private void OnCommandExecuted(IExecutor executor, ITarget target)
-        {
-            if(executor is Unit unit)
+            public PlayerPhase(Player player, PhaseType phase)
             {
-                setUnitUsed(unit, true);
+                this.player = player;
+                phaseType = phase;
             }
-            player.ExecuteTurn(PhaseType.Idle);
 
+            public override void OnEnter()
+            {
+                Debug.Log($"Player entered {phaseType}");
+                player.potentialExecutors = player.phaseExecutorsData.PhaseToUnits[phaseType];
+                CommandsManager.Instance.CommandExecuted.AddListener(OnCommandExecuted);
+                player.IsTurnMade = false;
+            }
+
+            public override void OnExit()
+            {
+                Debug.Log($"Player exited {phaseType}");
+                CommandsManager.Instance.CommandExecuted.RemoveListener(OnCommandExecuted);
+            }
+
+            private void OnCommandExecuted(IExecutor executor, ITarget target)
+            {
+                if(executor is Unit unit)
+                {
+                    player.unitUsage[unit] = true;
+                }
+                player.IsTurnMade = true;
+
+            }
         }
     }
 }

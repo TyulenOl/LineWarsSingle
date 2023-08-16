@@ -11,10 +11,10 @@ namespace LineWars
     public class ExecutorsForPhase
     {
         [SerializeField] private PhaseType phase;
-        [SerializeField] private List<UnitType> targets;
+        [SerializeField] private List<UnitType> executors;
 
         public PhaseType Phase => phase;
-        public IReadOnlyCollection<UnitType> Targets => targets;
+        public IReadOnlyCollection<UnitType> Executors => executors;
     } 
 
     [CreateAssetMenu(fileName = "New Phase Executors", menuName = "Phase Executors Data")]
@@ -29,7 +29,7 @@ namespace LineWars
             CheckValidity();
             PhaseToUnits = new Dictionary<PhaseType, IReadOnlyCollection<UnitType>>();
             
-            PhaseToUnits = executorsForPhases.ToDictionary((obj) => obj.Phase, (obj) => obj.Targets);
+            PhaseToUnits = executorsForPhases.ToDictionary((obj) => obj.Phase, (obj) => obj.Executors);
         }
 
         private void CheckValidity() {
