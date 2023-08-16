@@ -1,83 +1,42 @@
 ﻿using System;
-using System.Linq;
-using LineWars.Extensions.Attributes;
 using LineWars.Interface;
-using LineWars.Model;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace LineWars.Model
 {
-    [RequireComponent(typeof(SpriteRenderer))]
-    [RequireComponent(typeof(Outline2D))]
-    [RequireComponent(typeof(Node))]
-    public class NodeInitialInfo : MonoBehaviour
+    public class NodeInitialInfo: MonoBehaviour
     {
-        [Header("Настройки принадлежности")] [SerializeField]
-        private bool isSpawn;
-        //or
-        [SerializeField] private NodeInitialInfo referenceToSpawn;
+        [field: SerializeField] public Spawn ReferenceToSpawn { get; set; }
 
-        [Header("Настройки юнитов. Внимание! Левый юнит будет создаваться в приоритете")] [SerializeField]
-        private Unit leftUnitPrefab;
+        [field: Header("Настройки юнитов. Внимание! Левый юнит будет создаваться в приоритете")]
+        [field: SerializeField] public Unit LeftUnitPrefab { get; set; }
+        [field: SerializeField] public Unit RightUnitPrefab { get; set; }
+        [field:SerializeField, HideInInspector] public Node ReferenceToNode { get; private set; }
 
-        [SerializeField] private Unit rightUnitPrefab;
-        
-        [Header("Debug")] 
-        [SerializeField] private string groupName;
-        [SerializeField] private Color groupColor = Color.white;
 
-        public bool IsSpawn => isSpawn;
-        public NodeInitialInfo ReferenceToSpawn => referenceToSpawn;
-        public Unit LeftUnitPrefab => leftUnitPrefab;
-        public Unit RightUnitPrefab => rightUnitPrefab;
-        public string GroupName => groupName;
-        public Color GroupColor => groupColor;
-
-        public void Initialize
-        (
-            bool isSpawn,
-            NodeInitialInfo referenceToSpawn,
-            Unit leftUnitPrefab,
-            Unit rightUnitPrefab,
-            Color groupColor
-        )
+        private void Awake()
         {
-            this.isSpawn = isSpawn;
-            this.referenceToSpawn = referenceToSpawn;
-            this.leftUnitPrefab = leftUnitPrefab;
-            this.rightUnitPrefab = rightUnitPrefab;
-            this.groupColor = groupColor;
-            
-            if (isSpawn)
-                RedrawForSpawn();
+            if (ReferenceToSpawn == null)
+            {
+                Debug.Log($"{nameof(ReferenceToSpawn)} in null on {gameObject.name}");
+                Destroy(this);
+            }
         }
 
         private void OnValidate()
         {
-            if (isSpawn)
-                RedrawForSpawn();
+            AssignFields();
+            Redraw(ReferenceToSpawn);
         }
 
-        private void RedrawForSpawn()
+        private void AssignFields()
         {
-            gameObject.name = $"Spawn {groupName}";
-
-            GetComponent<Outline2D>().SetActiveOutline(true);
-            GetComponent<SpriteRenderer>().color = groupColor;
-            foreach (var nodeInitialInfo in FindObjectsOfType<NodeInitialInfo>()
-                         .Where(x => x.ReferenceToSpawn == this))
-            {
-                nodeInitialInfo.RedrawForGroupWithoutSpawn();
-            }
+            if (ReferenceToNode == null)
+                ReferenceToNode = GetComponent<Node>();
         }
-
-        private void RedrawForGroupWithoutSpawn()
+        public void Redraw(Spawn referenceToSpawn)
         {
-            gameObject.name = $"Group with {referenceToSpawn.groupName}";
-                    
-            GetComponent<Outline2D>().SetActiveOutline(false);
-            GetComponent<SpriteRenderer>().color = referenceToSpawn.GroupColor;
+            ReferenceToNode.Redraw(referenceToSpawn);
         }
     }
 }

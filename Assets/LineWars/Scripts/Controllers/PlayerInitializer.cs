@@ -7,10 +7,12 @@ namespace LineWars
     {
         [SerializeField] private Player playerPrefab;
         
-        public Player Initialize(SpawnInfo spawnInfo)
+        public BasePlayer Initialize(SpawnInfo spawnInfo)
         {
             var player = Instantiate(playerPrefab);
             player.Index = spawnInfo.PlayerIndex;
+            player.SpawnInfo = spawnInfo;
+            
             foreach (var nodeInfo in spawnInfo.NodeInfos)
             {
                 var node = nodeInfo.ReferenceToNode;
@@ -32,8 +34,7 @@ namespace LineWars
                 if (nodeInfo.RightUnitPrefab != null)
                 {
                     if (nodeInfo.RightUnitPrefab.Size == UnitSize.Little && node.RightIsFree
-                        ||
-                        nodeInfo.RightUnitPrefab.Size == UnitSize.Large && node.LeftIsFree && node.RightIsFree)
+                        || nodeInfo.RightUnitPrefab.Size == UnitSize.Large && node.LeftIsFree && node.RightIsFree)
                     {
                         var rightUnit = Instantiate(nodeInfo.RightUnitPrefab);
                         rightUnit.Initialize(node, UnitDirection.Right);

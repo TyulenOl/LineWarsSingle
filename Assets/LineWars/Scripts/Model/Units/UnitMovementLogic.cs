@@ -14,7 +14,8 @@ namespace LineWars.Model
         private Vector2 startPosition;
         private Transform currentTarget;
 
-        public event Action<Transform, Transform> TargetChanged;  
+        public event Action<Transform, Transform> TargetChanged;
+        public event Action<Transform> MovementIsOver;
 
         private void Awake()
         {
@@ -41,6 +42,7 @@ namespace LineWars.Model
                 else
                 {
                     transform.position = currentTarget.position;
+                    MovementIsOver?.Invoke(currentTarget);
                     isMoving = false;
                 }
             }

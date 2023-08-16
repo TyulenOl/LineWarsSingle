@@ -14,6 +14,7 @@ namespace LineWars.Model
         IExecutor,
         ITurnEndAction
     {
+        [SerializeField] private UnitType unitType;
         [SerializeField] [Min(0)] private int initialHp;
         [SerializeField] [Min(0)] private int initialArmor;
         [SerializeField] [Min(0)] private int meleeDamage;
@@ -67,19 +68,18 @@ namespace LineWars.Model
         }
 
         public int MeleeDamage => meleeDamage;
-
         public int CurrentSpeedPoints
         {
             get => currentSpeedPoints;
             private set { currentSpeedPoints = Math.Max(0, value); }
         }
 
+        public UnitType Type => unitType;
         public int Visibility => visibility;
         public UnitSize Size => unitSize;
         public Passability Passability => passability;
         public Node Node => node;
         public CommandPriorityData CommandPriorityData => priorityData;
-
         public UnitDirection UnitDirection => node.LeftUnit == this ? UnitDirection.Left : UnitDirection.Right;
 
         private void Awake()
@@ -101,15 +101,15 @@ namespace LineWars.Model
 
         private void OnEnable()
         {
-            movementLogic.TargetChanged += MovementLogicOnTargetChanged;
+            movementLogic.MovementIsOver += MovementLogicOnMovementIsOver;
         }
 
         private void OnDisable()
         {
-            movementLogic.TargetChanged -= MovementLogicOnTargetChanged;
+            movementLogic.MovementIsOver -= MovementLogicOnMovementIsOver;
         }
 
-        private void MovementLogicOnTargetChanged(Transform arg1, Transform arg2)
+        private void MovementLogicOnMovementIsOver(Transform arg2)
         {
             CurrentSpeedPoints--;
 
@@ -129,6 +129,10 @@ namespace LineWars.Model
                 node.RightUnit = this;
                 UnitDirectionChange?.Invoke(unitSize, UnitDirection.Right);
             }
+
+            if (this.BasePlayer != node.BasePlayer)
+                node.SetOwner(BasePlayer);
+            
         }
 
         public void Initialize(Node node, UnitDirection direction)
@@ -140,14 +144,10 @@ namespace LineWars.Model
         public void MoveTo([NotNull] Node target)
         {
             if(node.LeftUnit == this)
-            {
                 node.LeftUnit = null;
-            }
             if(node.RightUnit == this)
-            {
                 node.RightUnit = null;
-            }
-
+            
             movementLogic.MoveTo(target.transform);
         }
 
@@ -204,18 +204,17 @@ namespace LineWars.Model
         private void _Attack(IAlive target)
         {
             target.DealDamage(new Hit(MeleeDamage));
-            
         }
 
-        public bool IsCanAttack([NotNull] Unit unit)
+        public bool CanAttack([NotNull] Unit unit)
         {
             var line = node.GetLine(unit.node);
-            return unit.owner != owner 
+            return unit.basePlayer != basePlayer 
                    && line != null
                    && (int) Passability >= (int) line.LineType;
         }
 
-        public bool IsCanAttack([NotNull] Edge edge)
+        public bool CanAttack([NotNull] Edge edge)
         {
             return edge.LineType >= LineType.CountryRoad
                    && node.ContainsEdge(edge);
@@ -240,7 +239,6 @@ namespace LineWars.Model
 
         public void OnTurnEnd()
         {
-            CurrentHp = initialHp;
             CurrentArmor = initialArmor;
             CurrentSpeedPoints = initialSpeedPoints;
         }

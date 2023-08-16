@@ -1,4 +1,5 @@
 ﻿using System;
+using Newtonsoft.Json.Bson;
 
 namespace LineWars.Model
 {
@@ -22,18 +23,19 @@ namespace LineWars.Model
             switch (target)
             {
                 case Edge edge:
-                    return IsCanAttack(edge);
+                    return CanAttack(edge);
                 case Unit unit:
-                    return IsCanAttack(unit);
+                    return CanAttack(unit);
             }
 
             return false;
         }
 
         public void Attack(Unit enemy);
-        public bool IsCanAttack(Unit unit);
+        public bool CanAttack(Unit unit);
         
         public void Attack(Edge edge);
-        public bool IsCanAttack(Edge edge);
+        public bool CanAttack(Edge edge);
+
     }
 }

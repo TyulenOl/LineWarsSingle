@@ -5,10 +5,10 @@ using UnityEngine.Events;
 
 namespace LineWars.Model
 {
-    public class Edge : MonoBehaviour, IAlive, ITarget
+    public class Edge : MonoBehaviour, IAlive, ITarget, INumbered
     {
         [Header("Graph Settings")]
-        [SerializeField, ReadOnlyInspector] private int index;
+        [SerializeField] private int index;
         [SerializeField] [ReadOnlyInspector] private Node firstNode;
         [SerializeField] [ReadOnlyInspector] private Node secondNode;
 

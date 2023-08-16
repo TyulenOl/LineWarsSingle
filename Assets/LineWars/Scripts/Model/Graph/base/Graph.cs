@@ -6,13 +6,21 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    public class Graph: MonoBehaviour
+    public class Graph : MonoBehaviour
     {
-        public static Graph Instance { get; private set; }
+        private static Graph Instance { get; set; }
+        
+        [field: SerializeField] public GameObject NodesParent { get; set; }
+        [field: SerializeField] public GameObject EdgesParent { get; set; }
+        
         private Node[] allNodes;
         private Edge[] allEdges;
-        private SpawnInfo[] spawnInfos;
+        private List<SpawnInfo> spawnInfos;
+        private Stack<SpawnInfo> spawnInfosStack;
 
+        public static IReadOnlyList<Node> AllNodes => Instance != null ? Instance.allNodes : Array.Empty<Node>();
+        public static IReadOnlyList<Edge> AllEdges => Instance != null ? Instance.allEdges : Array.Empty<Edge>();
+        
         private void Awake()
         {
             if (Instance == null)
@@ -24,28 +32,59 @@ namespace LineWars.Model
             }
         }
 
-        public void Initialize(
-            IEnumerable<Node> allNodes,
-            IEnumerable<Edge> allEdges,
-            IEnumerable<SpawnInfo> spawnInfos)
+        private void Start()
         {
-            this.allNodes = allNodes.ToArray();
-            this.allEdges = allEdges.ToArray();
-            this.spawnInfos = spawnInfos.ToArray();
+            allNodes = FindObjectsOfType<Node>();
+            allEdges = FindObjectsOfType<Edge>();
+            GenerateSpawnInfo();
         }
 
-        public IReadOnlyList<Node> AllNodes => allNodes;
-        public IReadOnlyList<Edge> AllEdges => allEdges;
-        public IReadOnlyList<SpawnInfo> SpawnInfos => spawnInfos;
-        
-        
-        public bool[] GetVisibilityInfo(Player player)
+        private void GenerateSpawnInfo()
         {
-            var result = new bool[AllNodes.Count];
+            var spawns = FindObjectsOfType<Spawn>();
+            var initialInfos = FindObjectsOfType<NodeInitialInfo>();
+
+            spawnInfos = new List<SpawnInfo>(spawns.Length);
+            spawnInfosStack = new Stack<SpawnInfo>(spawns.Length);
+
+            for (var i = 0; i < spawns.Length; i++)
+            {
+                var spawn = spawns[i];
+                var group = initialInfos
+                    .Where(x => x.ReferenceToSpawn == spawn)
+                    .ToArray();
+                var spawnInfo = new SpawnInfo(i, spawn, group);
+                spawnInfos.Add(spawnInfo);
+                spawnInfosStack.Push(spawnInfo);
+            }
+        }
+
+        public static bool HasSpawnPoint() =>
+            Instance != null
+                ? Instance._HasSpawnPoint()
+                : throw new NullReferenceException("Graph is not Instance!");
+
+        private bool _HasSpawnPoint() => spawnInfosStack.Count != 0;
+
+        public static SpawnInfo GetSpawnPoint() =>
+            Instance != null
+                ? Instance._GetSpawnPoint()
+                : throw new NullReferenceException("Graph is not Instance!");
+
+        private SpawnInfo _GetSpawnPoint() => spawnInfosStack.Pop();
+
+        public static bool[] GetVisibilityInfo(Player player) =>
+            Instance != null
+                ? Instance._GetVisibilityInfo(player)
+                : throw new NullReferenceException("Graph is not Instance!");
+        
+        private bool[] _GetVisibilityInfo(Player player)
+        {
+            var result = new bool[allNodes.Length];
 
             var ownedNodes = player.OwnedObjects.OfType<Node>().ToArray();
-            
-            foreach (var visibilityNode in GetVisibilityNodes(ownedNodes))
+
+            foreach (var visibilityNode in _GetVisibilityNodes(ownedNodes))
             {
                 result[visibilityNode.Index] = true;
             }
@@ -53,7 +92,7 @@ namespace LineWars.Model
             return result;
         }
 
-        private IEnumerable<Node> GetVisibilityNodes(Node[] ownedNodes)
+        private IEnumerable<Node> _GetVisibilityNodes(Node[] ownedNodes)
         {
             var closedNodes = new HashSet<Node>();
             var priorityQueue = new PriorityQueue<Node, int>(0);

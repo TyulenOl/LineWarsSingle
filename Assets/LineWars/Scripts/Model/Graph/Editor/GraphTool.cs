@@ -6,6 +6,7 @@ using LineWars.Model;
 using UnityEditor;
 using UnityEditor.EditorTools;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 
 [EditorTool("CreateGraph")]
@@ -15,11 +16,6 @@ public class GraphTool : EditorTool
     private Node nodePrefab;
     private Graph graph;
 
-    private Type[] graphTypes = new[]
-    {
-        typeof(Node),
-        typeof(Edge)
-    };
 
     private SelectionListener<Node> nodeListener;
 
@@ -30,9 +26,7 @@ public class GraphTool : EditorTool
         edgePrefab = Resources.Load<Edge>("Prefabs/Line");
         nodePrefab = Resources.Load<Node>("Prefabs/Node");
 
-        var graphObj = GameObject.Find("Graph") ?? new GameObject("Graph");
-        graph = graphObj.GetComponent<Graph>() ??
-                graphObj.AddComponent<Graph>();
+        AssignGraph();
 
         foreach (var gameObject in FindObjectsOfType<GameObject>())
             SceneVisibilityManager.instance.DisablePicking(gameObject, false);
@@ -75,6 +69,24 @@ public class GraphTool : EditorTool
         }
     }
 
+    private void AssignGraph()
+    {
+        var graphObj = GameObject.Find("Graph") ?? new GameObject("Graph");
+        graph = graphObj.GetComponent<Graph>() ??
+                graphObj.AddComponent<Graph>();
+
+        if (graph.NodesParent == null)
+        {
+            graph.NodesParent = new GameObject("Nodes");
+            graph.NodesParent.transform.SetParent(graph.transform);
+        }
+
+        if (graph.EdgesParent == null)
+        {
+            graph.EdgesParent = new GameObject("Edges");
+            graph.EdgesParent.transform.SetParent(graph.transform);
+        }
+    }
 
     private void DrawOutlineForActiveNodes()
     {
@@ -142,7 +154,8 @@ public class GraphTool : EditorTool
 
     private Edge CreateEdge()
     {
-        var edge = Instantiate(edgePrefab, graph.transform);
+        var edge = (Edge) PrefabUtility.InstantiatePrefab(edgePrefab, graph.EdgesParent.transform);
+        edge.Index = GetNextIndex(edge);
         Undo.RegisterCreatedObjectUndo(edge.gameObject, "CreateEdge");
         SceneVisibilityManager.instance.DisablePicking(edge.gameObject, false);
         return edge;
@@ -175,8 +188,10 @@ public class GraphTool : EditorTool
     {
         Undo.IncrementCurrentGroup();
 
-        var node = Instantiate(nodePrefab, GetMousePosition2D(), Quaternion.identity, graph.transform);
+        var node = (Node) PrefabUtility.InstantiatePrefab(nodePrefab, graph.NodesParent.transform);
+        node.transform.position = GetMousePosition2D();
         node.Initialize();
+        node.Index = GetNextIndex(node);
         Selection.activeObject = node.gameObject;
 
         Undo.RegisterCreatedObjectUndo(node.gameObject, "CreateNode");
@@ -231,16 +246,6 @@ public class GraphTool : EditorTool
         }
     }
 
-    private bool CheckGameObjectForExistAnyComponents(GameObject o, params Type[] components)
-    {
-        foreach (var component in components)
-        {
-            if (o.GetComponent(component) != null)
-                return true;
-        }
-
-        return false;
-    }
 
     private List<Edge> GetIntersectEdges(Node firstNode, Node secondNode)
     {
@@ -256,5 +261,22 @@ public class GraphTool : EditorTool
         var mouseY = SceneView.currentDrawingSceneView.camera.pixelHeight - mousePos.y;
         var coord = SceneView.currentDrawingSceneView.camera.ScreenToWorldPoint(new Vector3(mouseX, mouseY, 0));
         return coord;
+    }
+
+    private int GetNextIndex<T>(T obj)
+        where T : Object, INumbered
+    {
+        var objects = FindObjectsOfType<T>()
+            .Where(x => x != obj)
+            .OrderBy(x => x.Index);
+        var nextIndex = 0;
+        foreach (var o in objects)
+        {
+            if (o.Index == nextIndex)
+                nextIndex++;
+            else
+                return nextIndex;
+        }
+        return nextIndex;
     }
 }
