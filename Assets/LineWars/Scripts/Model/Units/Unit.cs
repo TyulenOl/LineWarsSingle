@@ -15,9 +15,9 @@ namespace LineWars.Model
         IExecutor,
         ITurnEndAction
     {
-        [Header("Units Settings")] [SerializeField] [Min(0)]
-        private int initialHp;
-
+        [Header("Units Settings")] 
+        [SerializeField] [Min(0)] private int initialHp;
+        [SerializeField] private UnitType unitType;
         [SerializeField] [Min(0)] private int initialArmor;
         [SerializeField] [Min(0)] private int meleeDamage;
         [SerializeField] [Min(0)] private int initialSpeedPoints;
@@ -30,7 +30,8 @@ namespace LineWars.Model
 
         private UnitMovementLogic movementLogic;
 
-        [Header("DEBUG")] [SerializeField] private bool debugMode;
+        [Header("DEBUG")] 
+        [SerializeField] private bool debugMode;
         [SerializeField, ReadOnlyInspector] private Node node;
         [SerializeField, ReadOnlyInspector] private UnitDirection unitDirection;
         [SerializeField, ReadOnlyInspector] private int currentHp;
@@ -83,6 +84,7 @@ namespace LineWars.Model
             private set { currentSpeedPoints = Math.Max(0, value); }
         }
 
+        public UnitType Type => unitType;
         private UnitDirection UnitDirection
         {
             get => unitDirection;

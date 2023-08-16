@@ -1,14 +1,15 @@
-﻿using System;
+using System.Linq;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 using LineWars;
 using LineWars.Model;
+using System.Collections.Generic;
 
 namespace LineWars.Controllers
 {
     // Client
-    public class CommandsManager: MonoBehaviour
+    public class CommandsManager : MonoBehaviour
     {
         public static CommandsManager Instance { get; private set; }
         
@@ -23,8 +24,10 @@ namespace LineWars.Controllers
         private CommandsManagerTargetState targetState;
         private CommandsManagerIdleState idleState;
 
-        public UnityEvent TargetChanged;
-        public UnityEvent ExecutorChanged;
+
+        public UnityEvent<ITarget, ITarget> TargetChanged;
+        public UnityEvent<IExecutor, IExecutor> ExecutorChanged;
+        public UnityEvent<IExecutor, ITarget> CommandExecuted;
 
         #region Attributes
         public ITarget Target => target;
@@ -60,8 +63,18 @@ namespace LineWars.Controllers
 
         private void SetExecutor(IExecutor executor)
         {
+            if(executor is Owned owned
+            && !Player.LocalPlayer.OwnedObjects.Contains(owned))
+                return;
+            if(executor is Unit unit 
+            && !Player.LocalPlayer.PotentialExecutors.Contains(unit.Type)) 
+                return;
+            if(executor is Unit thisUnit && Player.LocalPlayer.IsUnitUsed[thisUnit])
+                return;
+            
+            var previousExecutor = this.executor;
             this.executor = executor;
-            ExecutorChanged.Invoke();
+            ExecutorChanged.Invoke(previousExecutor, this.executor);
 
             Debug.Log(executor);
 
@@ -70,22 +83,27 @@ namespace LineWars.Controllers
 
         private void SetTarget(ITarget target)
         {
+            var previousTarget = this.target;
             this.target = target;
-            TargetChanged.Invoke();
+            TargetChanged.Invoke(previousTarget, this.target);
+            
+            var isCommandExecuted = UnitsController.Instance.Action(executor, target);
+            if(isCommandExecuted)
+                CommandExecuted.Invoke(executor, this.target);
 
-            UnitsController.Instance.Action(executor, target);
             NullifyObjects();
-
             stateMachine.SetState(executorState);
         }
 
         private void NullifyObjects()
         {
+            var previousExecutor = executor;
             executor = null;
-            ExecutorChanged.Invoke();
+            ExecutorChanged.Invoke(previousExecutor, executor);
 
+            var previousTarget = target;
             target = null;
-            TargetChanged.Invoke();
+            TargetChanged.Invoke(previousTarget, target);
         }
 
     }

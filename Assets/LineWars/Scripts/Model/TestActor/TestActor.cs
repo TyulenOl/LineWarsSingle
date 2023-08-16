@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using LineWars.Extensions.Attributes;
 using UnityEngine;
+using LineWars.Controllers;
 
 namespace LineWars.Model
 {
@@ -15,15 +17,16 @@ namespace LineWars.Model
         private TestActorArtilleryState artilleryState;
         private TestActorFightState fightState;
         private TestActorScoutState scoutState;
+        private TestActorReplenishState replenishState;
         
-
         [SerializeField] private int artilleryUnits;
         [SerializeField] private int fightUnits;
         [SerializeField] private int scoutUnits;
 
-        public int ArtilleryLeft;
-        public int FightLeft;
-        public int ScoutLeft;
+        [Header("Units Left")]
+        [ReadOnlyInspector] public int ArtilleryLeft;
+        [ReadOnlyInspector] public int FightLeft;
+        [ReadOnlyInspector] public int ScoutLeft;
 
         [Header("Buy Options")]
         [SerializeField] private float minBuyTime;
@@ -35,12 +38,7 @@ namespace LineWars.Model
         [SerializeField] private int minUnitNum;
         [SerializeField] private int maxUnitNum;
 
-        public event Action<PhaseType> TurnEnded;
-        public event Action<PhaseType> TurnStarted;
-
         #region Attributes
-        public PhaseType CurrentPhase => currentPhase;
-        public bool IsInTurn => CurrentPhase != PhaseType.Idle;
         public float MinBuyTime => minBuyTime;
         public float MaxBuyTime => maxBuyTime;
         public float MinOtherTime => minOtherTime;
@@ -52,15 +50,10 @@ namespace LineWars.Model
         public int ScoutUnits => scoutUnits;
         #endregion
 
-        private void Awake() 
+        protected override void Awake() 
         {
-        
+            base.Awake();
             IntitializeStateMachine();
-        }
-
-        private void Start() 
-        {
-            //PhaseManager.Instance.RegisterActor(this);
         }
 
         private void IntitializeStateMachine()
@@ -72,6 +65,7 @@ namespace LineWars.Model
             artilleryState = new TestActorArtilleryState(this, SetNewPhase);
             fightState = new TestActorFightState(this, SetNewPhase);
             scoutState = new TestActorScoutState(this, SetNewPhase);
+            replenishState = new TestActorReplenishState(this, SetNewPhase);
 
         }
 
@@ -79,5 +73,48 @@ namespace LineWars.Model
         {
             currentPhase = phaseType;
         }
+        
+        #region Turns
+        public override void ExecuteBuy()
+        {
+            stateMachine.SetState(buyState);
+        }
+
+        public override void ExecuteArtillery()
+        {
+            stateMachine.SetState(artilleryState);
+        }
+
+        public override void ExecuteFight()
+        {
+            stateMachine.SetState(fightState);
+        }
+
+        public override void ExecuteScout()
+        {
+            stateMachine.SetState(scoutState);
+        }
+        
+        public override void ExecuteIdle()
+        {
+            stateMachine.SetState(idleState);
+        }
+
+        public override void ExecuteReplenish()
+        {
+            stateMachine.SetState(replenishState);
+        }
+        #endregion
+        
+        #region Check Turns
+        public override bool CanExecuteBuy() => true;
+
+        public override bool CanExecuteArtillery() => ArtilleryLeft > 0;
+    
+        public override bool CanExecuteFight() => FightLeft > 0;
+
+        public override bool CanExecuteScout() => ScoutLeft > 0;
+        public override bool CanExecuteReplenish() => true;
+        #endregion
     }
 }
