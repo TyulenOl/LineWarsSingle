@@ -14,6 +14,7 @@ namespace LineWars.Model
         IExecutor,
         ITurnEndAction
     {
+        [SerializeField] private UnitType unitType;
         [SerializeField] [Min(0)] private int initialHp;
         [SerializeField] [Min(0)] private int initialArmor;
         [SerializeField] [Min(0)] private int meleeDamage;
@@ -67,19 +68,18 @@ namespace LineWars.Model
         }
 
         public int MeleeDamage => meleeDamage;
-
         public int CurrentSpeedPoints
         {
             get => currentSpeedPoints;
             private set { currentSpeedPoints = Math.Max(0, value); }
         }
 
+        public UnitType Type => unitType;
         public int Visibility => visibility;
         public UnitSize Size => unitSize;
         public Passability Passability => passability;
         public Node Node => node;
         public CommandPriorityData CommandPriorityData => priorityData;
-
         public UnitDirection UnitDirection => node.LeftUnit == this ? UnitDirection.Left : UnitDirection.Right;
 
         private void Awake()
@@ -204,7 +204,6 @@ namespace LineWars.Model
         private void _Attack(IAlive target)
         {
             target.DealDamage(new Hit(MeleeDamage));
-            
         }
 
         public bool CanAttack([NotNull] Unit unit)

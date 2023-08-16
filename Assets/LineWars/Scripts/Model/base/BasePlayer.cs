@@ -2,7 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using LineWars.Controllers;
+
 
 namespace LineWars.Model
 {
@@ -19,20 +21,32 @@ namespace LineWars.Model
         private HashSet<Owned> myOwned = new();
         
         public event Action<PhaseType, PhaseType> TurnChanged;
+        public UnityEvent<Owned> OwnedAdded;
+        public UnityEvent<Owned> OwnedRemoved;
         public IReadOnlyCollection<Owned> OwnedObjects => myOwned;
         public bool IsMyOwn(Owned owned) => myOwned.Contains(owned);
 
+        public virtual void Start() 
+        {
+            if(PhaseManager.Instance != null)
+            {
+                PhaseManager.Instance.RegisterActor(this);
+            }
+        }
         public void AddOwned(Owned owned)
         {
-            if (owned != null)
-                myOwned.Add(owned);
+            if (owned == null) return;
+            if (myOwned.Contains(owned)) return;
+            myOwned.Add(owned);
+            OwnedAdded.Invoke(owned);
         }
 
         public void RemoveOwned(Owned owned)
         {
+            if (!myOwned.Contains(owned)) return;
             myOwned.Remove(owned);
+            OwnedRemoved.Invoke(owned);
         }
-        
 
         public void ExecuteTurn(PhaseType phaseType)
         {

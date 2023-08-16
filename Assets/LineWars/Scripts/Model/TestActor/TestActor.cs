@@ -55,11 +55,6 @@ namespace LineWars.Model
             IntitializeStateMachine();
         }
 
-        private void Start() 
-        {
-            PhaseManager.Instance.RegisterActor(this);
-        }
-
         private void IntitializeStateMachine()
         {
             stateMachine = new StateMachine();

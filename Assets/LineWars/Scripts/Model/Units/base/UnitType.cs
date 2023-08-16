@@ -3,7 +3,8 @@ namespace LineWars.Model
     public enum UnitType
     {
         Scout,
-        Infantry
+        Infantry,
+        Artillery
     }
     
 }

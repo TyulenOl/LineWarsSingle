@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using LineWars.Model;
+using UnityEngine.Events;
 
 namespace LineWars.Controllers
 {  
@@ -10,10 +11,11 @@ namespace LineWars.Controllers
     {
         private List<IActor> actors;
 
-        public event Action<IActor, PhaseType, PhaseType> ActorTurnChanged;
-        public event Action<PhaseType, PhaseType> PhaseChanged;
-
         [SerializeField] private PhaseOrderData orderData;
+        
+        public event Action<IActor, PhaseType, PhaseType> ActorTurnChanged;
+
+        public UnityEvent<PhaseType, PhaseType> PhaseChanged;
 
         private StateMachine stateMachine;
         private Phase idleState;
@@ -108,7 +110,7 @@ namespace LineWars.Controllers
             if(previousState != null)
                 previousPhase = ((Phase)previousState).Type;
             
-            PhaseChanged?.Invoke(previousPhase, ((Phase)currentState).Type);
+            PhaseChanged.Invoke(previousPhase, ((Phase)currentState).Type);
         }
 
         public void StartGame()
