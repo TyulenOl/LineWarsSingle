@@ -1,11 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using LineWars.Extensions.Attributes;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Serialization;
+using LineWars.Controllers;
 
 namespace LineWars.Model
 {
@@ -25,11 +23,7 @@ namespace LineWars.Model
 
         private HashSet<Owned> myOwned;
         private Nation nation;
-
-
         public event Action<int, int> CurrentMoneyChanged;
-        public event Action<PhaseType> TurnStarted;
-        public event Action<PhaseType> TurnEnded;
 
         public NationType NationType
         {
@@ -41,6 +35,9 @@ namespace LineWars.Model
             }
         }
 
+        public event Action<PhaseType, PhaseType> TurnChanged;
+        public event Action<Owned> OwnedAdded;
+        public event Action<Owned> OwnedRemoved;
         public IReadOnlyCollection<Owned> OwnedObjects => myOwned;
         public bool IsMyOwn(Owned owned) => myOwned.Contains(owned);
 
@@ -54,12 +51,31 @@ namespace LineWars.Model
 
                 if (before != money)
                     CurrentMoneyChanged?.Invoke(before, money);
+                
             }
         }
 
         protected virtual void Awake()
         {
             myOwned = new HashSet<Owned>();
+        }
+
+        protected virtual void Start()
+        {
+            if (PhaseManager.Instance != null)
+            {
+                PhaseManager.Instance.RegisterActor(this);
+            }
+        }
+
+        protected virtual void OnEnable()
+        {
+            
+        }
+        
+        protected virtual void OnDisable()
+        {
+            
         }
 
         public bool CanSpawnUnit(Node node, UnitType unitType)
@@ -87,6 +103,7 @@ namespace LineWars.Model
             CurrentMoney -= unit.Cost;
         }
 
+
         public void AddOwned(Owned owned)
         {
             if (owned == null) return;
@@ -96,25 +113,36 @@ namespace LineWars.Model
                 {
                     owned.Owner.RemoveOwned(owned);
                     myOwned.Add(owned);
+                    OwnedAdded?.Invoke(owned);
                 }
             }
             else
             {
                 myOwned.Add(owned);
+                OwnedAdded?.Invoke(owned);
             }
         }
 
         public void RemoveOwned(Owned owned)
         {
+            if (!myOwned.Contains(owned)) return;
             myOwned.Remove(owned);
+            OwnedRemoved?.Invoke(owned);
         }
 
         public Unit GetUnitPrefab(UnitType unitType) => nation.GetUnitPrefab(unitType);
 
         public void ExecuteTurn(PhaseType phaseType)
         {
+            var previousPhase = CurrentPhase;
             switch (phaseType)
             {
+                case PhaseType.Replenish:
+                    ExecuteReplenish();
+                    break;
+                case PhaseType.Idle:
+                    ExecuteIdle();
+                    break;
                 case PhaseType.Buy:
                     ExecuteBuy();
                     break;
@@ -132,6 +160,9 @@ namespace LineWars.Model
                                      + "Change IActor to acommodate for this phase!");
                     break;
             }
+
+            CurrentPhase = phaseType;
+            TurnChanged?.Invoke(previousPhase, CurrentPhase);
         }
 
         public bool CanExecuteTurn(PhaseType phaseType)
@@ -148,16 +179,14 @@ namespace LineWars.Model
                     return CanExecuteFight();
                 case PhaseType.Scout:
                     return CanExecuteScout();
+                case PhaseType.Replenish:
+                    return CanExecuteReplenish();
             }
 
             Debug.LogWarning
             ($"Phase.{phaseType} is not implemented in \"CanExecuteTurn\"! "
              + "Change IActor to acommodate for this phase!");
             return false;
-        }
-
-        public virtual void EndTurn()
-        {
         }
 
         #region Turns
@@ -175,6 +204,15 @@ namespace LineWars.Model
         }
 
         public virtual void ExecuteScout()
+        {
+        }
+
+
+        public virtual void ExecuteIdle()
+        {
+        }
+
+        public virtual void ExecuteReplenish()
         {
         }
 
@@ -198,6 +236,11 @@ namespace LineWars.Model
         }
 
         public virtual bool CanExecuteScout()
+        {
+            return false;
+        }
+
+        public virtual bool CanExecuteReplenish()
         {
             return false;
         }

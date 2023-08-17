@@ -5,6 +5,8 @@ namespace LineWars.Model
 {
     public interface IAttackerVisitor
     {
+        public bool AttackLocked { get; set; }
+
         public void Attack(IAlive target)
         {
             switch (target)

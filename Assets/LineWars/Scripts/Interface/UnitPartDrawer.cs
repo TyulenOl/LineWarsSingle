@@ -9,10 +9,21 @@ namespace LineWars.Interface
 {
     public class UnitPartDrawer : MonoBehaviour
     {
-        [HideInInspector] public Vector2 offset;
-
+        public Vector2 offset;
+        [SerializeField] private float animationThreshold = 0.5f;
+        
         [Header("Reference")]
         [SerializeField] private TMP_Text damageText;
+
+        private int currentCoroutineIndex = -1;
+        private float globalProgress = 1;
+
+        private bool CanStartAnimation => globalProgress > animationThreshold;
+        public float AnimationThreshold
+        {
+            get => animationThreshold;
+            set => animationThreshold = Math.Min(Math.Max(0,value), 1);
+        }
 
         private void Awake()
         {
@@ -21,29 +32,42 @@ namespace LineWars.Interface
 
         public void AnimateDamageText(string text, Color textColor)
         {
-            damageText.text = text;
-            damageText.color = textColor;
-            StartCoroutine(AnimateDamageTextCoroutine());
-            Debug.Log(offset);
+            StartCoroutine(WaitAnimateDamageCoroutine(text, textColor));
         }
-        
-        private IEnumerator AnimateDamageTextCoroutine()
+
+        private IEnumerator WaitAnimateDamageCoroutine(string text, Color textColor)
         {
-            float progress = 0;
-
-            var text = Instantiate(damageText, transform, true);
-            text.gameObject.SetActive(true);
-            Vector2 startPos = text.transform.position;
-
-            while (progress < 1)
+            while (!CanStartAnimation)
             {
-                progress += Time.deltaTime;
-                text.gameObject.transform.position = startPos + offset * progress;
-                text.color = text.color.WithAlpha(Mathf.Pow(1 - progress, 0.5f));
                 yield return null;
             }
-            
-            Destroy(text.gameObject);
+
+            StartCoroutine(AnimateDamageTextCoroutine(text, textColor));
+        }
+        
+        private IEnumerator AnimateDamageTextCoroutine(string text, Color textColor)
+        {
+            var myIndex = ++currentCoroutineIndex;
+            float localProgress = globalProgress = 0;
+
+            var instantiate = Instantiate(damageText, transform, true);
+            instantiate.text = text;
+            instantiate.color = textColor;
+            instantiate.gameObject.SetActive(true);
+            Vector2 startPos = instantiate.transform.position;
+
+            while (localProgress < 1)
+            {
+                localProgress += Time.deltaTime;
+                instantiate.gameObject.transform.position = startPos + offset * localProgress;
+                instantiate.color = instantiate.color.WithAlpha(Mathf.Pow(1 - localProgress, 0.5f));
+
+                if (currentCoroutineIndex == myIndex)
+                    globalProgress = localProgress;
+                
+                yield return null;
+            }
+            Destroy(instantiate.gameObject);
         }
     }
 }

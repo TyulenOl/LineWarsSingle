@@ -13,6 +13,7 @@ namespace LineWars.Controllers
         [SerializeField] private Vector2 offset;
         [SerializeField] private Color damageColor = Color.red;
         [SerializeField] private Color armorDamageColor = Color.blue;
+        [SerializeField] private Color healColor = Color.green;
         
         [Header("Reference")]
         [SerializeField] private UnitPartDrawer leftPart;
@@ -79,14 +80,17 @@ namespace LineWars.Controllers
         
         private void OnUnitHpChange(int before, int after)
         {
+            var diff = after - before;
+            var color = diff > 0 ? healColor : damageColor; 
+            
             if (leftPart != null && leftPart.gameObject.activeSelf)
-                leftPart.AnimateDamageText((after - before).ToString(), damageColor);
+                leftPart.AnimateDamageText((diff).ToString(), color);
             
             if (centerPart != null && centerPart.gameObject.activeSelf)
-                centerPart.AnimateDamageText((after - before).ToString(), damageColor);
+                centerPart.AnimateDamageText((diff).ToString(), color);
             
             if (rightPart != null && rightPart.gameObject.activeSelf)
-                rightPart.AnimateDamageText((after - before).ToString(), damageColor);
+                rightPart.AnimateDamageText((diff).ToString(), color);
         }
         
         

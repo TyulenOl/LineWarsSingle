@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using LineWars.Controllers;
 
 namespace LineWars.Model
 {
@@ -33,7 +34,7 @@ namespace LineWars.Model
             yield return new WaitForSeconds(UnityEngine.Random.Range(actor.MinOtherTime, actor.MaxOtherTime));
             actor.ArtilleryLeft--;
             Debug.Log($"{actor} artilled!");
-            actor.EndTurn();
+            actor.ExecuteTurn(PhaseType.Idle);
         }
     }
 }

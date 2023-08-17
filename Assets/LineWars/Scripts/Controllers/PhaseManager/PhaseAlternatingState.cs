@@ -2,8 +2,9 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using LineWars.Model;
 
-namespace LineWars.Model
+namespace LineWars.Controllers
 {
     public class PhaseAlternatingState : Phase
     {
@@ -18,19 +19,25 @@ namespace LineWars.Model
         public override void OnEnter()
         {
             if(AreActorsDone) return;
-            manager.ActorTurnEnded += OnActorsTurnEnded;
+            manager.ActorTurnChanged += OnActorsTurnChanged;
             Begin();
         }
 
         public override void OnExit()
         {
-            manager.ActorTurnEnded -= OnActorsTurnEnded;
+            manager.ActorTurnChanged -= OnActorsTurnChanged;
         }
 
-        private void OnActorsTurnEnded(IActor actor, PhaseType phase)
+        private void OnActorsTurnChanged(IActor actor, PhaseType previousPhase, PhaseType currentPhase)
         {
-            if(phase != Type)
-                Debug.LogError($"{actor} ended turn {phase}; Phase {Type} is parsing it instead!");
+            if(previousPhase != Type)
+            {
+                if(previousPhase != PhaseType.Idle)
+                {
+                    Debug.LogError($"{actor} ended turn {previousPhase}; Phase {Type} is parsing it instead!");
+                }
+                return;
+            }
             if(actor != currentActor)
                 Debug.LogError($"{currentActor} is making a turn; {actor} is ended the turn instead!");
 
