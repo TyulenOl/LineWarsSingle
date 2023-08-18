@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using DataStructures.PriorityQueue;
+using LineWars.Extensions;
 using UnityEngine;
 
 namespace LineWars.Model
@@ -42,10 +43,11 @@ namespace LineWars.Model
         private void GenerateSpawnInfo()
         {
             var spawns = FindObjectsOfType<Spawn>();
+
             var initialInfos = FindObjectsOfType<NodeInitialInfo>();
 
+
             spawnInfos = new List<SpawnInfo>(spawns.Length);
-            spawnInfosStack = new Stack<SpawnInfo>(spawns.Length);
 
             for (var i = 0; i < spawns.Length; i++)
             {
@@ -55,8 +57,9 @@ namespace LineWars.Model
                     .ToArray();
                 var spawnInfo = new SpawnInfo(i, spawn, group);
                 spawnInfos.Add(spawnInfo);
-                spawnInfosStack.Push(spawnInfo);
             }
+
+            spawnInfosStack = spawnInfos.ToStack(true);
         }
 
         public static bool HasSpawnPoint() =>

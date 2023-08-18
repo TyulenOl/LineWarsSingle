@@ -7,7 +7,7 @@ using UnityEngine.Events;
 
 namespace LineWars.Controllers
 {  
-    public class PhaseManager : MonoBehaviour
+    public partial class PhaseManager : MonoBehaviour
     {
         private List<IActor> actors;
 
@@ -43,10 +43,6 @@ namespace LineWars.Controllers
             actors = new List<IActor>();
             IntitializeStateMachine();
             stateMachine.StateChanged += OnStateChanged;
-        }
-        private void Start() 
-        {
-            Invoke("StartGame", 3f);
         }
 
         private void Update() 

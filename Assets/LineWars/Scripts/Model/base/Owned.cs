@@ -10,8 +10,9 @@ namespace LineWars.Model
     /// </summary>
     public abstract class Owned: MonoBehaviour
     {
+        [Header("Accessory settings")]
         [SerializeField] [ReadOnlyInspector] protected BasePlayer basePlayer;
-        public BasePlayer BasePlayer => basePlayer;
+        public BasePlayer Owner => basePlayer;
 
         public void SetOwner(BasePlayer newBasePlayer)
         {

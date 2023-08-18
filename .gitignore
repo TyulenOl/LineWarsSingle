@@ -64,7 +64,7 @@ crashlytics-build.properties
 .idea
 .vscode
 .vsconfig
-
+UserSettings
 
 
 # Never ignore DLLs in the FMOD subfolder.

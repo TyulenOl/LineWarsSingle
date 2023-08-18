@@ -50,8 +50,9 @@ namespace LineWars.Model
         public int ScoutUnits => scoutUnits;
         #endregion
 
-        private void Awake() 
+        protected override void Awake() 
         {
+            base.Awake();
             IntitializeStateMachine();
         }
 

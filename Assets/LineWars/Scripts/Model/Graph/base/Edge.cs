@@ -1,4 +1,5 @@
-﻿using LineWars.Extensions.Attributes;
+﻿using System;
+using LineWars.Extensions.Attributes;
 using LineWars.Interface;
 using UnityEngine;
 using UnityEngine.Events;
@@ -7,25 +8,29 @@ namespace LineWars.Model
 {
     public class Edge : MonoBehaviour, IAlive, ITarget, INumbered
     {
-        [Header("Graph Settings")]
-        [SerializeField] private int index;
+        [Header("Graph Settings")] [SerializeField]
+        private int index;
+
         [SerializeField] [ReadOnlyInspector] private Node firstNode;
         [SerializeField] [ReadOnlyInspector] private Node secondNode;
 
-        [Header("Logical Settings")]
-        [SerializeField] [Min(1)] private int maxHp = 2;
+        [Header("Logical Settings")] [SerializeField] [Min(1)]
+        private int maxHp = 2;
+
         [SerializeField] [ReadOnlyInspector] private int hp;
         [SerializeField] private LineType lineType;
 
-        [Header("Commands Settings")]
-        [SerializeField] private CommandPriorityData priorityData;
+        [Header("Commands Settings")] [SerializeField]
+        private CommandPriorityData priorityData;
 
 
         [SerializeField] [HideInInspector] private LineDrawer drawer;
 
 
-        [field:Header("Events")] 
-        [field: SerializeField] public UnityEvent<int, int> HpChanged { get; private set; }
+        [field: Header("Events")]
+        [field: SerializeField]
+        public UnityEvent<int, int> HpChanged { get; private set; }
+
         [field: SerializeField] public UnityEvent<LineType, LineType> LineTypeChanged { get; private set; }
         [field: SerializeField] public UnityEvent<Unit> Died { get; private set; }
 
@@ -34,10 +39,11 @@ namespace LineWars.Model
             get => index;
             set => index = value;
         }
+
         public Node FirstNode => firstNode;
         public Node SecondNode => secondNode;
         public LineDrawer Drawer => drawer;
-        
+
         public int CurrentHp
         {
             get => hp;
@@ -50,12 +56,15 @@ namespace LineWars.Model
                     LineType = LineTypeHelper.Down(LineType);
                     hp = maxHp;
                 }
-                else 
-                    hp = value;
+                else
+                    hp = Math.Min(value, maxHp);
+
                 HpChanged.Invoke(before, hp);
             }
         }
+
         public bool IsDied => CurrentHp <= 0;
+
         public LineType LineType
         {
             get => lineType;
@@ -68,7 +77,7 @@ namespace LineWars.Model
         }
 
         public CommandPriorityData CommandPriorityData => priorityData;
-        
+
         protected void OnValidate()
         {
             hp = maxHp;
@@ -81,12 +90,19 @@ namespace LineWars.Model
             drawer = GetComponent<LineDrawer>();
             drawer.Initialise(firstNode.transform, secondNode.transform);
         }
-        
-        public void DealDamage(Hit hit)
+
+        public void TakeDamage(Hit hit)
         {
             throw new System.NotImplementedException();
         }
-        
+
+        public void Heal(int healAmount)
+        {
+            if (healAmount < 0)
+                throw new ArgumentException($"{nameof(healAmount)} > 0 !");
+            CurrentHp += healAmount;
+        }
+
         public void ReDraw() => drawer.DrawLine();
 
         public Node GetOther(Node node)

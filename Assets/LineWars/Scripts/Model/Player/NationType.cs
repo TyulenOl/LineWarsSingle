@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace LineWars.Model
 {
@@ -21,12 +23,12 @@ namespace LineWars.Model
         };
 
 
-        public static INation GetNation(NationType type)
+        public static Nation GetNationByType(NationType type)
         {
             return type switch
             {
-                NationType.Russia => new Russia(),
-                _ => new DefaultNation()
+                NationType.Russia => Resources.Load<Nation>("Nations/Russia/Units/Russia"),
+                _ => Resources.Load<Nation>("Nations/Default/DefaulNation")
             };
         }
 

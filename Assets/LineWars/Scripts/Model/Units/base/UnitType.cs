@@ -2,9 +2,17 @@ namespace LineWars.Model
 {
     public enum UnitType
     {
+        None,
+        TheRifleMan,
+        SubmachineGunner,
+        MachineGunner,
         Scout,
-        Infantry,
-        Artillery
+        Sniper,
+        Engineer,
+        Cavalry,
+        Artillery,
+        Doctor,
+        Tank
     }
     
 }

@@ -26,12 +26,16 @@ namespace LineWars.Model
         [SerializeField] private Selectable2D selectable2D;
         [SerializeField] private CommandPriorityData priorityData;
 
+        [field: SerializeField] public bool IsBase { get; set; }
+
         private Camera mainCamera;
 
         public Vector2 Position => transform.position;
         public IReadOnlyCollection<Edge> Edges => edges;
         public bool LeftIsFree => LeftUnit == null;
         public bool RightIsFree => RightUnit == null;
+        public bool AnyIsFree => LeftIsFree || RightIsFree;
+        public bool AllIsFree => LeftIsFree && RightIsFree;
 
         public int Index
         {

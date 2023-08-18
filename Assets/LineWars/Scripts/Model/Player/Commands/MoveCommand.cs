@@ -20,7 +20,7 @@
 
         public bool CanExecute()
         {
-            return unit.IsCanMoveTo(end);
+            return unit.CanMoveTo(end);
         }
     }
 }

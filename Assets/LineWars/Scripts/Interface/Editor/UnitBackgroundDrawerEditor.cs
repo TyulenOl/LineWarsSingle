@@ -4,11 +4,12 @@ using UnityEngine;
 
 namespace LineWars.Controllers
 {
-    [CustomEditor(typeof(UnitBackgroundDrawer))]
+    [CustomEditor(typeof(UnitDrawer))]
     public class UnitBackgroundDrawerEditor : Editor
     {
-        private UnitBackgroundDrawer drawer => (UnitBackgroundDrawer) target;
-        private bool needInitialize = true;
+        private UnitDrawer drawer => (UnitDrawer) target;
+
+
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
@@ -16,31 +17,19 @@ namespace LineWars.Controllers
             EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button("DrawLeft"))
             {
-                Initialize();
                 drawer.DrawLeft();
             }
 
             if (GUILayout.Button("DrawCenter"))
             {
-                Initialize();
                 drawer.DrawCenter();
             }
 
             if (GUILayout.Button("DrawRight"))
             {
-                Initialize();
                 drawer.DrawRight();
             }
             EditorGUILayout.EndHorizontal();
-        }
-
-        private void Initialize()
-        {
-            if (needInitialize)
-            {
-                needInitialize = false;
-                drawer.Initialize();
-            }
         }
     }
 }

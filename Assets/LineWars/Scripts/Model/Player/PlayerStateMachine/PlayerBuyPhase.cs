@@ -7,23 +7,19 @@ using UnityEngine;
 
 namespace LineWars
 {
-    public class PlayerBuyPhase : PlayerPhase
+    public partial class Player 
     {
-        public PlayerBuyPhase(Player player, PhaseType phase,
-                                 Action<PhaseType> setExecutors, Action<Unit, bool> setUnitUsed) 
-        : base(player, phase, setExecutors, setUnitUsed)
+        public class PlayerBuyPhase : PlayerPhase
         {
-        }
-
-        public override void OnEnter()
-        {
-            base.OnEnter();
-            Debug.Log("PLAYER do be shopping *devil emoji*");
-            player.StartCoroutine(IdleCroroutine());
-            IEnumerator IdleCroroutine()
+            public PlayerBuyPhase(Player player, PhaseType phase) : base(player, phase)
             {
-                yield return null;
-                player.ExecuteTurn(PhaseType.Idle);
+            }
+
+            public override void OnEnter()
+            {
+                base.OnEnter();
+                Debug.Log("PLAYER do be shopping *devil emoji*");
+                player.IsTurnMade = true;
             }
         }
     }

@@ -7,7 +7,7 @@ namespace LineWars.Controllers
 {
     // что ты тут делаешь это..
     // класс только для сервера
-    public class  UnitsController : MonoBehaviour
+    public class UnitsController : MonoBehaviour
     {
         public static UnitsController Instance { get; private set; }
 
@@ -19,9 +19,9 @@ namespace LineWars.Controllers
             Instance = this;
         }
 
-        public static void ExecuteCommand(ICommand command)
+        public static void ExecuteCommand(ICommand command, bool dontCheckExecute = true)
         {
-            if (Instance != null)
+            if (Instance != null && (dontCheckExecute || command.CanExecute()))
                 Instance.invoker.Execute(command);
         }
         
@@ -38,7 +38,7 @@ namespace LineWars.Controllers
                     return true;
                 }
                 else if(commandType == CommandType.Move && 
-                (executor is IMovable movable && target is Node node && movable.IsCanMoveTo(node)))
+                (executor is IMovable movable && target is Node node && movable.CanMoveTo(node)))
                 {
                     invoker.Execute(new MoveCommand(movable, movable.Node, (Node) target));
                     Debug.Log("Movement Performed");
@@ -48,6 +48,5 @@ namespace LineWars.Controllers
 
             return false;
         }
-        
     }
 }
