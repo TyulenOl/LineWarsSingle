@@ -11,6 +11,7 @@ namespace LineWars.Controllers
         public class CommandsManagerTargetState : State
         {
             private CommandsManager manager;
+            private bool isCancelable;
         
             public CommandsManagerTargetState(CommandsManager manager)
             {
@@ -20,6 +21,7 @@ namespace LineWars.Controllers
             public override void OnEnter()
             {
                 Selector.SelectedObjectsChanged += OnSelectedObjectChanged;
+                isCancelable = true;
             }
 
             public override void OnExit()
@@ -43,18 +45,19 @@ namespace LineWars.Controllers
             private void SetTarget(ITarget target)
             {
                 manager.Target = target;
-                
                 var isCommandExecuted = UnitsController.Instance.Action(manager.executor, target);
-
-                manager.stateMachine.SetState(manager.executorState);
                 if(isCommandExecuted)
+                {
                     manager.CommandExecuted.Invoke(manager.executor, manager.target);
+                    isCancelable = false;
+                }
+                    
                 manager.Target = null;
-                manager.Executor = null;
             }
 
             private void CancelExecutor()
             {
+                if(!isCancelable) return;
                 manager.Executor = null;
                 Debug.Log("EXECUTOR CANCELED");
 

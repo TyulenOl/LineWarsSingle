@@ -30,6 +30,11 @@ namespace LineWars.Controllers
             Debug.Log("ACTION");
             foreach(var commandType in target.CommandPriorityData.Priority)
             {
+                if(commandType == CommandType.Move)
+                {
+
+                    Debug.Log($"{executor is IMovable m} && {target is Node n} && ");
+                }
                 if(commandType == CommandType.Attack && 
                 (executor is IAttackerVisitor attacker && target is IAlive alive && attacker.CanAttack(alive)))
                 {
@@ -45,7 +50,7 @@ namespace LineWars.Controllers
                     return true;
                 }
             }
-
+            Debug.Log("ФАЛСЫЧ");
             return false;
         }
     }

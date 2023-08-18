@@ -9,6 +9,9 @@ namespace LineWars.Model
         [field: SerializeField, Min(0)] public int HealingAmount { get; private set; }
         [field: SerializeField] public bool HealLocked { get; set; }
 
+        [Header("Action Points Settings")]
+        [SerializeField] private ActionPointsModifier healPointModifier;
+
         public bool CanHeal([NotNull] Unit target)
         {
             return !HealLocked && OwnerCondition() && SpaceCondition();
@@ -30,6 +33,7 @@ namespace LineWars.Model
             target.Heal(HealingAmount);
             if (IsMassHeal && TryGetNeighbour(out var neighbour))
                 neighbour.Heal(HealingAmount);
+            CurrentActionPoints = healPointModifier.Modify(CurrentActionPoints);
         }
     }
 }

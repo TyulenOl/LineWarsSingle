@@ -32,24 +32,20 @@ namespace LineWars.Controllers
                 if(!Player.LocalPlayer.IsMyOwn(owned)) return;
                 if(!(newObject.TryGetComponent<IExecutor>(out IExecutor executor))) return;
         
-                SetExecutor(executor);
-            }
-
-            private void SetExecutor(IExecutor executor)
-            {
-                if(executor is Owned owned
-                && !Player.LocalPlayer.OwnedObjects.Contains(owned))
+                if(!Player.LocalPlayer.OwnedObjects.Contains(owned))
                     return;
                 if(executor is Unit unit 
                 && !Player.LocalPlayer.PotentialExecutors.Contains(unit.Type)) 
                     return;
-                if(executor is Unit thisUnit && Player.LocalPlayer.UnitUsage[thisUnit])
+                if(executor.CurrentActionPoints <= 0)
                     return;
                 
                 manager.Executor = executor;
 
                 manager.stateMachine.SetState(manager.targetState);
             }
+
+            
         }
     }
 }
