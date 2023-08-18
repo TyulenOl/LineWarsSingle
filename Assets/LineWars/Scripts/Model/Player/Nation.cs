@@ -1,17 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using LineWars.Scripts.Interface.UnitBuyLogic;
 using UnityEngine;
 
 namespace LineWars.Model
 {
     [CreateAssetMenu(fileName = "new Nation", menuName = "Data/Create Nation", order = 50)]
+    [System.Serializable]
     public class Nation: ScriptableObject, ISerializationCallbackReceiver
     {
         [SerializeField, HideInInspector] private List<UnitType> unitTypes = new();
         [SerializeField, HideInInspector] private List<Unit> units = new();
         public Dictionary<UnitType, Unit> UnitTypeUnitPairs { get; private set; } = new();
-
+        [SerializeField] private NationEconomicLogic nationEconomicLogic;
         private void OnEnable()
         {
             UpdateTypes();

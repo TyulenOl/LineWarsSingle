@@ -20,6 +20,11 @@ namespace LineWars.Controllers
         [SerializeField] private UnitPartDrawer centerPart;
         [SerializeField] private UnitPartDrawer rightPart;
         
+        [Header("CharacteristicsDrawers")]
+        [SerializeField] private UnitPartCharacteristicDrawer leftCharacteristicDrawer;
+        [SerializeField] private UnitPartCharacteristicDrawer rightCharacteristicDrawer;
+        [SerializeField] private UnitPartCharacteristicDrawer centerCharacteristicDrawer;
+        
         private Unit unit;
         
         private void Awake()
@@ -40,6 +45,10 @@ namespace LineWars.Controllers
             {
                 rightPart.offset = offset;
             }
+
+            leftCharacteristicDrawer.CurrentUnit = unit;
+            rightCharacteristicDrawer.CurrentUnit = unit;
+            //TODO центральный отрисовщик характеристик
         }
 
         private void OnEnable()
@@ -47,6 +56,7 @@ namespace LineWars.Controllers
             unit.UnitDirectionChange.AddListener(OnUnitDirectionChange);
             unit.ArmorChanged.AddListener(OnUnitArmorChange);
             unit.HpChanged.AddListener(OnUnitHpChange);
+            ReDrawCharacteristics();
         }
 
         private void OnDisable()
@@ -76,6 +86,8 @@ namespace LineWars.Controllers
             
             if (rightPart != null && rightPart.gameObject.activeSelf)
                 rightPart.AnimateDamageText((after - before).ToString(), armorDamageColor);
+            
+            ReDrawCharacteristics();
         }
         
         private void OnUnitHpChange(int before, int after)
@@ -91,6 +103,8 @@ namespace LineWars.Controllers
             
             if (rightPart != null && rightPart.gameObject.activeSelf)
                 rightPart.AnimateDamageText((diff).ToString(), color);
+            
+            ReDrawCharacteristics();
         }
         
         
@@ -122,6 +136,22 @@ namespace LineWars.Controllers
                 centerPart.gameObject.SetActive(false);
             if (rightPart != null)
                 rightPart.gameObject.SetActive(true);
+        }
+
+        private void ReDrawCharacteristics()
+        {
+            if(leftCharacteristicDrawer != null)
+            {
+                leftCharacteristicDrawer.ReDrawCharacteristics();
+            }
+            if(rightCharacteristicDrawer != null)
+            {
+                rightCharacteristicDrawer.ReDrawCharacteristics();
+            }
+            if(centerCharacteristicDrawer != null)
+            {
+                centerCharacteristicDrawer.ReDrawCharacteristics();
+            }
         }
     }
 }
