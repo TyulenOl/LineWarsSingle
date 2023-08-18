@@ -4,9 +4,11 @@ using LineWars.Controllers;
 using LineWars.Extensions.Attributes;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace LineWars.Model
 {
+    //TODO: отделить Unit от IAttackerVisitor, т.к. не все юниты умеют атаковать.
     public class Unit : Owned,
         IAttackerVisitor,
         IAlive,
@@ -16,14 +18,15 @@ namespace LineWars.Model
         ITurnEndAction
     {
         [Header("Units Settings")] 
-        [SerializeField] [Min(0)] private int initialHp;
-        [SerializeField] private UnitType unitType;
+        [FormerlySerializedAs("initialHp"), SerializeField, Min(0)] private int maxHp;
         [SerializeField] [Min(0)] private int initialArmor;
         [SerializeField] [Min(0)] private int meleeDamage;
         [SerializeField] [Min(0)] private int visibility;
         [SerializeField] [Min(0)] private int cost;
         
         [field: SerializeField] public bool AttackLocked { get; set; }
+        [field: SerializeField] public bool CanBlock { get; set; }
+        [SerializeField] private UnitType unitType;
         [SerializeField] private UnitSize unitSize;
         [SerializeField] private Passability passability;
         [SerializeField] private CommandPriorityData priorityData;
@@ -34,6 +37,7 @@ namespace LineWars.Model
         [SerializeField] private ActionPointsModifier movePointsModifier;
 
         private UnitMovementLogic movementLogic;
+        private IUnitBlockerSelector blockerSelector;
 
         [Header("DEBUG")] 
         [SerializeField] private bool debugMode;
@@ -65,13 +69,14 @@ namespace LineWars.Model
         [field: SerializeField] public UnityEvent<Unit> Died { get; private set; }
         [field: SerializeField] public UnityEvent<int, int> ActionPointChanged { get; private set; }
 
+        public int MaxHp => maxHp;
         public int CurrentHp
         {
             get => currentHp;
             private set
             {
                 var before = currentHp;
-                currentHp = Math.Min(Math.Max(0, value), initialHp);
+                currentHp = Math.Min(Math.Max(0, value), maxHp);
                 HpChanged.Invoke(before, currentHp);
                 if (currentHp == 0)
                 {
@@ -119,12 +124,14 @@ namespace LineWars.Model
             get => _currentActionPoints;
         }
 
-        private void Awake()
+        protected virtual void Awake()
         {
-            currentHp = initialHp;
+            currentHp = maxHp;
+            currentSpeedPoints = initialSpeedPoints;
             currentArmor = initialArmor;
             currentActionPoints = initialActionPoints;
             movementLogic = GetComponent<UnitMovementLogic>();
+            blockerSelector = new BaseUnitBlockerSelector();
         }
 
         protected void OnValidate()
@@ -216,12 +223,13 @@ namespace LineWars.Model
         public void TakeDamage(Hit hit)
         {
             var blockedDamage = Math.Min(hit.Damage, CurrentArmor);
-            if (blockedDamage != 0)
-                CurrentArmor -= blockedDamage;
+            // if (blockedDamage != 0)
+            //     CurrentArmor -= blockedDamage;
 
             var notBlockedDamage = hit.Damage - blockedDamage;
             if (notBlockedDamage != 0)
                 CurrentHp -= notBlockedDamage;
+            CanBlock = false;
         }
 
         public void Heal(int healAmount)
@@ -237,6 +245,22 @@ namespace LineWars.Model
         }
 
         public void Attack([NotNull] Unit enemy)
+        {
+            // если нет соседа, то тогда просто атаковать
+            if (!enemy.TryGetNeighbour(out var neighbour))
+             AttackUnitButIgnoreBlock(neighbour);
+            // иначе выбрать того, кто будет блокировать урон
+            else
+            {
+                var selectedUnit = blockerSelector.SelectBlocker(enemy, neighbour);
+                if (selectedUnit == enemy)
+                    AttackUnitButIgnoreBlock(enemy);
+                else
+                    UnitsController.ExecuteCommand(new BlockAttackCommand(this, selectedUnit));
+            }
+        }
+
+        public void AttackUnitButIgnoreBlock([NotNull] Unit enemy)
         {
             var enemyNode = enemy.node;
             _Attack(enemy);
@@ -288,8 +312,7 @@ namespace LineWars.Model
 
         public void OnTurnEndTo()
         {
-            currentArmor = initialArmor;
-            currentActionPoints = initialActionPoints;
+            currentSpeedPoints = initialSpeedPoints;
         }
 
 

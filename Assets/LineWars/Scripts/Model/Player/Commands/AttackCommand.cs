@@ -5,22 +5,22 @@ namespace LineWars.Model
     public class AttackCommand : ICommand
     {
         private readonly IAttackerVisitor attackerVisitor;
-        private readonly IAlive alive;
+        private readonly IAlive unit;
 
-        public AttackCommand(IAttackerVisitor attackerVisitor, IAlive alive)
+        public AttackCommand(IAttackerVisitor attackerVisitor, IAlive unit)
         {
             this.attackerVisitor = attackerVisitor;
-            this.alive = alive;
+            this.unit = unit;
         }
 
         public void Execute()
         {
-            attackerVisitor.Attack(alive);
+            attackerVisitor.Attack(unit);
         }
 
         public bool CanExecute()
         {
-            return attackerVisitor.CanAttack(alive);
+            return attackerVisitor.CanAttack(unit);
         }
 
     }

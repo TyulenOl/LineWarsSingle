@@ -27,7 +27,7 @@ namespace LineWars.Model
         {
             return type switch
             {
-                NationType.Russia => Resources.Load<Nation>("Nations/Russia/Units/Russia"),
+                NationType.Russia => Resources.Load<Nation>("Nations/Russia/Russia"),
                 _ => Resources.Load<Nation>("Nations/Default/DefaulNation")
             };
         }
