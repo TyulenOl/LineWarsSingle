@@ -32,8 +32,8 @@ namespace LineWars
             PhaseToUnits = executorsForPhases.ToDictionary((obj) => obj.Phase, (obj) => obj.Executors);
         }
 
-        private void CheckValidity() {
-            
+        private void CheckValidity()
+        {
             foreach(PhaseType phase in Enum.GetValues(typeof(PhaseType)))
             {
                 var phaseOccurrences = executorsForPhases.Count((obj) => obj.Phase == phase);
