@@ -20,10 +20,11 @@ namespace LineWars
             {
                 base.OnEnter();
 
-                foreach(var unit in player.UnitUsage.Keys.ToArray())
+                foreach(var owned in player.OwnedObjects)
                 {
-                    unit.OnTurnEnd();
-                    player.unitUsage[unit] = false;
+                    if(!(owned is Unit unit)) continue;
+                    unit.OnTurnEndTo();
+                    
                 }
 
                 player.StartCoroutine(IdleCroroutine());

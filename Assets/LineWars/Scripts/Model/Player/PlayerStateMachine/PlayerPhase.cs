@@ -36,11 +36,10 @@ namespace LineWars
 
             private void OnCommandExecuted(IExecutor executor, ITarget target)
             {
-                if(executor is Unit unit)
+                if(executor.CurrentActionPoints <= 0)
                 {
-                    player.unitUsage[unit] = true;
+                    player.IsTurnMade = true;
                 }
-                player.IsTurnMade = true;
 
             }
         }

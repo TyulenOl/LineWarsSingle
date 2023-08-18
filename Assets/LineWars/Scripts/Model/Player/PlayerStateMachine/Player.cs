@@ -13,7 +13,6 @@ namespace LineWars
         [SerializeField] private PhaseExecutorsData phaseExecutorsData;
 
         private IReadOnlyCollection<UnitType> potentialExecutors;
-        private Dictionary<Unit, bool> unitUsage;
         private bool isTurnMade = false;
 
         private StateMachine stateMachine;
@@ -26,7 +25,7 @@ namespace LineWars
         
         [field: SerializeField] public UnityEvent TurnMade {get; private set;}
         public IReadOnlyCollection<UnitType> PotentialExecutors => potentialExecutors;
-        public IReadOnlyDictionary<Unit, bool> UnitUsage => unitUsage;
+
         public bool IsTurnMade
         {
             get => isTurnMade;
@@ -47,7 +46,7 @@ namespace LineWars
             else
                 LocalPlayer = this;
 
-            unitUsage = new Dictionary<Unit, bool>();
+            
             InitializeStateMachine();
         }
 
@@ -78,18 +77,12 @@ namespace LineWars
 
         private void OnOwnedAdded(Owned owned)
         {
-            if (owned is Unit unit)
-            {
-                unitUsage[unit] = false;
-            }
+            
         }
 
         private void OnOwnerRemoved(Owned owned)
         {
-            if (owned is Unit unit)
-            {
-                unitUsage.Remove(unit);
-            }
+            
         }
 
         public void FinishTurn()
@@ -147,12 +140,11 @@ namespace LineWars
         {
             var phaseExecutors = phaseExecutorsData.PhaseToUnits[phaseType];
 
-            foreach (var unitData in unitUsage)
+            foreach (var owned in OwnedObjects)
             {
-                if (!unitData.Value && phaseExecutors.Contains(unitData.Key.Type))
-                {
+                if(!(owned is Unit unit)) continue;
+                if(phaseExecutors.Contains(unit.Type) && unit.CurrentActionPoints > 0)
                     return true;
-                }
             }
 
             return false;

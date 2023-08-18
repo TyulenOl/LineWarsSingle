@@ -20,13 +20,18 @@ namespace LineWars.Model
         [SerializeField] private UnitType unitType;
         [SerializeField] [Min(0)] private int initialArmor;
         [SerializeField] [Min(0)] private int meleeDamage;
-        [SerializeField] [Min(0)] private int initialSpeedPoints;
         [SerializeField] [Min(0)] private int visibility;
         [SerializeField] [Min(0)] private int cost;
+        
         [field: SerializeField] public bool AttackLocked { get; set; }
         [SerializeField] private UnitSize unitSize;
         [SerializeField] private Passability passability;
         [SerializeField] private CommandPriorityData priorityData;
+
+        [Header("Action Points Settings")]
+        [SerializeField] [Min(0)] protected int initialActionPoints;
+        [SerializeField] private ActionPointsModifier attackPointsModifier;
+        [SerializeField] private ActionPointsModifier movePointsModifier;
 
         private UnitMovementLogic movementLogic;
 
@@ -36,7 +41,19 @@ namespace LineWars.Model
         [SerializeField, ReadOnlyInspector] private UnitDirection unitDirection;
         [SerializeField, ReadOnlyInspector] private int currentHp;
         [SerializeField, ReadOnlyInspector] private int currentArmor;
-        [SerializeField, ReadOnlyInspector] private int currentSpeedPoints;
+        [SerializeField, ReadOnlyInspector] private int _currentActionPoints;
+
+        protected int currentActionPoints
+        {
+            get => _currentActionPoints;
+            set
+            {
+                if(value < 0) Debug.LogError("Action Points can't be less than zero!");
+                var previousValue = _currentActionPoints;
+                _currentActionPoints = value;
+                ActionPointChanged.Invoke(previousValue, value);
+            }
+        }
 
 
         [field: Header("Events")]
@@ -46,6 +63,7 @@ namespace LineWars.Model
         [field: SerializeField] public UnityEvent<int, int> HpChanged { get; private set; }
         [field: SerializeField] public UnityEvent<int, int> ArmorChanged { get; private set; }
         [field: SerializeField] public UnityEvent<Unit> Died { get; private set; }
+        [field: SerializeField] public UnityEvent<int, int> ActionPointChanged { get; private set; }
 
         public int CurrentHp
         {
@@ -78,11 +96,6 @@ namespace LineWars.Model
 
         public int MeleeDamage => meleeDamage;
 
-        public int CurrentSpeedPoints
-        {
-            get => currentSpeedPoints;
-            private set { currentSpeedPoints = Math.Max(0, value); }
-        }
 
         public UnitType Type => unitType;
         private UnitDirection UnitDirection
@@ -101,13 +114,16 @@ namespace LineWars.Model
         public Passability Passability => passability;
         public Node Node => node;
         public CommandPriorityData CommandPriorityData => priorityData;
+        public int CurrentActionPoints 
+        {
+            get => _currentActionPoints;
+        }
 
         private void Awake()
         {
             currentHp = initialHp;
-            currentSpeedPoints = initialSpeedPoints;
             currentArmor = initialArmor;
-
+            currentActionPoints = initialActionPoints;
             movementLogic = GetComponent<UnitMovementLogic>();
         }
 
@@ -131,8 +147,6 @@ namespace LineWars.Model
 
         private void MovementLogicOnMovementIsOver(Transform arg2)
         {
-            CurrentSpeedPoints--;
-
             node = arg2.GetComponent<Node>();
             if (Size == UnitSize.Large)
             {
@@ -169,14 +183,14 @@ namespace LineWars.Model
                 node.RightUnit = null;
 
             movementLogic.MoveTo(target.transform);
+            currentActionPoints = movePointsModifier.Modify(currentActionPoints);
         }
 
         public bool CanMoveTo([NotNull] Node target)
         {
             return OwnerCondition()
                    && SizeCondition()
-                   && LineCondition()
-                   && SpeedCondition();
+                   && LineCondition();
 
             bool SizeCondition()
             {
@@ -191,11 +205,6 @@ namespace LineWars.Model
                        && line.LineType != LineType.Visibility
                        && line.LineType != LineType.Firing
                        && (int) Passability >= (int) line.LineType;
-            }
-
-            bool SpeedCondition()
-            {
-                return CurrentSpeedPoints > 0 || debugMode;
             }
 
             bool OwnerCondition()
@@ -239,6 +248,7 @@ namespace LineWars.Model
         private void _Attack(IAlive target)
         {
             target.TakeDamage(new Hit(MeleeDamage));
+            currentActionPoints = attackPointsModifier.Modify(currentActionPoints);
         }
 
         public bool CanAttack([NotNull] Unit unit)
@@ -276,10 +286,10 @@ namespace LineWars.Model
             Destroy(gameObject);
         }
 
-        public void OnTurnEnd()
+        public void OnTurnEndTo()
         {
             currentArmor = initialArmor;
-            currentSpeedPoints = initialSpeedPoints;
+            currentActionPoints = initialActionPoints;
         }
 
 
