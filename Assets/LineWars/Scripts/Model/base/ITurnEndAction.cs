@@ -2,6 +2,6 @@
 {
     public interface ITurnEndAction
     {
-        public void OnTurnEndTo();
+        public void OnReplenish();
     }
 }

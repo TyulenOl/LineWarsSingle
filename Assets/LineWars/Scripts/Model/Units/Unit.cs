@@ -45,16 +45,16 @@ namespace LineWars.Model
         [SerializeField, ReadOnlyInspector] private UnitDirection unitDirection;
         [SerializeField, ReadOnlyInspector] private int currentHp;
         [SerializeField, ReadOnlyInspector] private int currentArmor;
-        [SerializeField, ReadOnlyInspector] private int _currentActionPoints;
+        [SerializeField, ReadOnlyInspector] private int currentActionPoints;
 
-        protected int currentActionPoints
+        public int CurrentActionPoints
         {
-            get => _currentActionPoints;
-            set
+            get => currentActionPoints;
+            protected set
             {
                 if(value < 0) Debug.LogError("Action Points can't be less than zero!");
-                var previousValue = _currentActionPoints;
-                _currentActionPoints = value;
+                var previousValue = currentActionPoints;
+                currentActionPoints = value;
                 ActionPointChanged.Invoke(previousValue, value);
             }
         }
@@ -119,17 +119,12 @@ namespace LineWars.Model
         public Passability Passability => passability;
         public Node Node => node;
         public CommandPriorityData CommandPriorityData => priorityData;
-        public int CurrentActionPoints 
-        {
-            get => _currentActionPoints;
-        }
 
         protected virtual void Awake()
         {
             currentHp = maxHp;
-            currentSpeedPoints = initialSpeedPoints;
             currentArmor = initialArmor;
-            currentActionPoints = initialActionPoints;
+            CurrentActionPoints = initialActionPoints;
             movementLogic = GetComponent<UnitMovementLogic>();
             blockerSelector = new BaseUnitBlockerSelector();
         }
@@ -190,7 +185,7 @@ namespace LineWars.Model
                 node.RightUnit = null;
 
             movementLogic.MoveTo(target.transform);
-            currentActionPoints = movePointsModifier.Modify(currentActionPoints);
+            CurrentActionPoints = movePointsModifier.Modify(CurrentActionPoints);
         }
 
         public bool CanMoveTo([NotNull] Node target)
@@ -272,7 +267,7 @@ namespace LineWars.Model
         private void _Attack(IAlive target)
         {
             target.TakeDamage(new Hit(MeleeDamage));
-            currentActionPoints = attackPointsModifier.Modify(currentActionPoints);
+            CurrentActionPoints = attackPointsModifier.Modify(CurrentActionPoints);
         }
 
         public bool CanAttack([NotNull] Unit unit)
@@ -310,9 +305,9 @@ namespace LineWars.Model
             Destroy(gameObject);
         }
 
-        public void OnTurnEndTo()
+        public void OnReplenish()
         {
-            currentSpeedPoints = initialSpeedPoints;
+            
         }
 
 

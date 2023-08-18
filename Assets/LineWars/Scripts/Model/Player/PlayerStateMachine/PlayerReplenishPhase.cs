@@ -23,7 +23,7 @@ namespace LineWars
                 foreach(var owned in player.OwnedObjects)
                 {
                     if(!(owned is Unit unit)) continue;
-                    unit.OnTurnEndTo();
+                    unit.OnReplenish();
                     
                 }
 
