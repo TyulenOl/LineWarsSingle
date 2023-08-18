@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using LineWars.Model;
@@ -7,29 +8,30 @@ using UnityEngine;
 
 namespace LineWars
 {
-    public class PlayerReplenishPhase : PlayerPhase
+    public partial class Player
     {
-        public PlayerReplenishPhase(Player player, PhaseType phase,
-                                 Action<PhaseType> setExecutors, Action<Unit, bool> setUnitUsed) 
-        : base(player, phase, setExecutors, setUnitUsed)
+        public class PlayerReplenishPhase : PlayerPhase
         {
-        }
-
-        public override void OnEnter()
-        {
-            base.OnEnter();
-    
-            foreach(var unitData in player.IsUnitUsed)
+            public PlayerReplenishPhase(Player player, PhaseType phase) : base(player, phase)
             {
-                unitData.Key.OnTurnEnd();
-                setUnitUsed(unitData.Key, false);
             }
 
-            player.StartCoroutine(IdleCroroutine());
-            IEnumerator IdleCroroutine()
+            public override void OnEnter()
             {
-                yield return null;
-                player.ExecuteTurn(PhaseType.Idle);
+                base.OnEnter();
+
+                foreach(var unit in player.UnitUsage.Keys.ToArray())
+                {
+                    unit.OnTurnEnd();
+                    player.unitUsage[unit] = false;
+                }
+
+                player.StartCoroutine(IdleCroroutine());
+                IEnumerator IdleCroroutine()
+                {
+                    yield return null;
+                    player.ExecuteTurn(PhaseType.Idle);
+                }
             }
         }
     }

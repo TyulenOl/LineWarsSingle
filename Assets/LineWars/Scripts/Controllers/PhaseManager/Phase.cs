@@ -5,18 +5,32 @@ using UnityEngine;
 
 namespace LineWars.Controllers
 {
-    public class Phase : State
+    public partial class PhaseManager
     {
-        private readonly PhaseType _type;
-        public PhaseType Type => _type;
-        protected readonly PhaseManager manager;
-        public virtual bool AreActorsDone => manager.Actors.All((actor) => !actor.CanExecuteTurn(Type));
-
-        public Phase(PhaseType phase, PhaseManager phaseManager)
+        public class Phase : State
         {
-            _type = phase;
-            manager = phaseManager;
+            private readonly PhaseType type;
+            public PhaseType Type => type;
+            protected readonly PhaseManager manager;
+            public virtual bool AreActorsDone => manager.Actors.All((actor) => !actor.CanExecuteTurn(Type));
+
+            public Phase(PhaseType phase, PhaseManager phaseManager)
+            {
+                type = phase;
+                manager = phaseManager;
+            }
+
+            public override void OnEnter()
+            {
+                Debug.Log($"STARTED {Type}");
+            }
+
+            public override void OnExit()
+            {
+                Debug.Log($"ENDED {Type}");
+            }
         }
     }
+    
 }
 

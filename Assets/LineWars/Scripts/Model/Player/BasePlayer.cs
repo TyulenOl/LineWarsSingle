@@ -16,7 +16,7 @@ namespace LineWars.Model
         public int Index { get; set; }
 
         [SerializeField, ReadOnlyInspector] private NationType nationType;
-        [SerializeField, Min(0)] private int money;
+        [SerializeField, ReadOnlyInspector] private int money;
 
         public SpawnInfo SpawnInfo { get; set; }
         public PhaseType CurrentPhase { get; private set; }
@@ -65,6 +65,7 @@ namespace LineWars.Model
             if (PhaseManager.Instance != null)
             {
                 PhaseManager.Instance.RegisterActor(this);
+                Debug.Log($"{name} registered");
             }
         }
 

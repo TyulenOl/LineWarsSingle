@@ -5,53 +5,58 @@ using UnityEngine;
 
 namespace LineWars.Controllers
 {
-    public class PhaseSimultaneousState : Phase
+    public partial class PhaseManager
     {
-        private int actorsLeft;
-        private readonly Dictionary<IActor, bool> actorsReadiness;
-        public override bool AreActorsDone => actorsLeft <= 0;
-
-        public PhaseSimultaneousState(PhaseType phase, PhaseManager phaseManager) : base(phase, phaseManager)
+        public class PhaseSimultaneousState : Phase
         {
-            actorsReadiness = new Dictionary<IActor, bool>();
-            actorsLeft = manager.Actors.Count;
-        }
+            private int actorsLeft;
+            private readonly Dictionary<IActor, bool> actorsReadiness;
+            public override bool AreActorsDone => actorsLeft <= 0;
 
-        public override void OnEnter()
-        {
-            actorsLeft = 0;
-            manager.ActorTurnChanged += OnActorsTurnChanged;
-            foreach(var actor in manager.Actors)
+            public PhaseSimultaneousState(PhaseType phase, PhaseManager phaseManager) : base(phase, phaseManager)
             {
-                actorsReadiness[actor] = true;
-                if(actor.CanExecuteTurn(Type))
+                actorsReadiness = new Dictionary<IActor, bool>();
+                actorsLeft = manager.Actors.Count;
+            }
+
+            public override void OnEnter()
+            {
+                base.OnEnter();
+                actorsLeft = 0;
+                manager.ActorTurnChanged += OnActorsTurnChanged;
+                foreach(var actor in manager.Actors)
                 {
-                    actorsReadiness[actor] = false;
-                    actorsLeft++;
-                    actor.ExecuteTurn(Type);
+                    actorsReadiness[actor] = true;
+                    if(actor.CanExecuteTurn(Type))
+                    {
+                        actorsReadiness[actor] = false;
+                        actorsLeft++;
+                        actor.ExecuteTurn(Type);
+                    }
+                    
                 }
-                
             }
-        }
 
-        public override void OnExit()
-        {
-            manager.ActorTurnChanged -= OnActorsTurnChanged;
-        }
-
-        private void OnActorsTurnChanged(IActor actor, PhaseType previousPhase, PhaseType currentPhase)
-        {
-            if(previousPhase != Type)
+            public override void OnExit()
             {
-                if(previousPhase != PhaseType.Idle)
-                    Debug.LogError($"{actor} ended turn {previousPhase}; He ended {Type} earlier!");
-                return;
+                base.OnExit();
+                manager.ActorTurnChanged -= OnActorsTurnChanged;
             }
-            if(actorsReadiness[actor] == true)
-                Debug.LogError($"{actor} ended turn {previousPhase}; He ended {Type} earlier!");
 
-            actorsLeft--;
-            actorsReadiness[actor] = true;
+            private void OnActorsTurnChanged(IActor actor, PhaseType previousPhase, PhaseType currentPhase)
+            {
+                if(previousPhase != Type)
+                {
+                    if(previousPhase != PhaseType.Idle)
+                        Debug.LogError($"{actor} ended turn {previousPhase}; He ended {Type} earlier!");
+                    return;
+                }
+                if(actorsReadiness[actor] == true)
+                    Debug.LogError($"{actor} ended turn {previousPhase}; He ended {Type} earlier!");
+
+                actorsLeft--;
+                actorsReadiness[actor] = true;
+            }
         }
     }
 }
