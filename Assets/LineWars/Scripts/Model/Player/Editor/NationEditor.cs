@@ -14,6 +14,8 @@ namespace LineWars.Model
 
         public override void OnInspectorGUI()
         {
+            base.OnInspectorGUI();
+            
             var newUnits = new List<(UnitType, Unit)>();
             var needUpdate = false;
 

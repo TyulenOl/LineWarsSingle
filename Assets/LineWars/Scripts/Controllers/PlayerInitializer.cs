@@ -16,7 +16,7 @@ namespace LineWars
             player.NationType = spawnInfo.SpawnNode.Nation;
             player.SpawnInfo = spawnInfo;
             player.CurrentMoney = spawnInfo.SpawnNode.StartMoney;
-            
+            player.Base = spawnInfo.SpawnNode.Node;
 
             foreach (var nodeInfo in spawnInfo.NodeInfos)
             {
