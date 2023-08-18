@@ -17,12 +17,13 @@ namespace LineWars.Model
 
         [SerializeField, ReadOnlyInspector] private NationType nationType;
         [SerializeField, ReadOnlyInspector] private int money;
-
+        [field: SerializeField, ReadOnlyInspector] public Node Base { get; set; }
         public SpawnInfo SpawnInfo { get; set; }
         public PhaseType CurrentPhase { get; private set; }
 
         private HashSet<Owned> myOwned;
         private Nation nation;
+
         public event Action<int, int> CurrentMoneyChanged;
 
         public NationType NationType
@@ -79,31 +80,34 @@ namespace LineWars.Model
             
         }
 
-        public bool CanSpawnUnit(Node node, UnitType unitType)
+        public bool CanSpawnUnit(Node node, UnitBuyPreset preset)
         {
-            if (unitType == UnitType.None) return false;
-
-            var unit = GetUnitPrefab(unitType);
-            return NodeConditional() && MoneyConditional() && BasePlayerUtility.CanSpawnUnit(node, unit);
+            return NodeConditional() && MoneyConditional();
 
             bool NodeConditional()
             {
-                return node.IsBase;
+                return node.IsBase && node.AllIsFree;
             }
 
             bool MoneyConditional()
             {
-                return CurrentMoney - unit.Cost > 0;
+                return CurrentMoney - preset.Cost >= 0;
             }
         }
 
         public void SpawnUnit(Node node, UnitType unitType)
         {
+            if(unitType == UnitType.None) return;
             var unitPrefab = GetUnitPrefab(unitType);
-            var unit = BasePlayerUtility.CreateUnitForPlayer(this, node, unitPrefab);
-            CurrentMoney -= unit.Cost;
+            BasePlayerUtility.CreateUnitForPlayer(this, node, unitPrefab);
         }
 
+        public void SpawnPreset(Node node, UnitBuyPreset unitPreset)
+        {
+            SpawnUnit(node,unitPreset.FirstUnitType);
+            SpawnUnit(node,unitPreset.SecondUnitType);
+            CurrentMoney -= unitPreset.Cost;
+        }
 
         public void AddOwned(Owned owned)
         {

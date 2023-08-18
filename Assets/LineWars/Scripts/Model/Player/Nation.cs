@@ -12,8 +12,11 @@ namespace LineWars.Model
     {
         [SerializeField, HideInInspector] private List<UnitType> unitTypes = new();
         [SerializeField, HideInInspector] private List<Unit> units = new();
-        public Dictionary<UnitType, Unit> UnitTypeUnitPairs { get; private set; } = new();
         [SerializeField] private NationEconomicLogic nationEconomicLogic;
+
+        public NationEconomicLogic NationEconomicLogic => nationEconomicLogic;
+
+        public Dictionary<UnitType, Unit> UnitTypeUnitPairs { get; private set; } = new();
         private void OnEnable()
         {
             UpdateTypes();

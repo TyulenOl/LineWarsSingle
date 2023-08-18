@@ -1,18 +1,31 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UnitBuyPresetDrawer : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField] private TMP_Text cost;
+    [SerializeField] private Image image;
+    [SerializeField] private Button button;
+
+    public Button Button => button;
+
+    private UnitBuyPreset unitBuyPreset;
+    public UnitBuyPreset UnitBuyPreset
     {
-        
+        get => unitBuyPreset;
+        set
+        {
+            unitBuyPreset = value;
+            Init();
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Init()
     {
-        
+        image.sprite = unitBuyPreset.Image;
+        cost.text = unitBuyPreset.Cost.ToString();
     }
 }
