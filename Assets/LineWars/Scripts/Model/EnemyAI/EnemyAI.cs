@@ -10,6 +10,7 @@ namespace LineWars.Model
     {
         [SerializeField] private PhaseExecutorsData executorsData;
         [SerializeField] private EnemyPhaseActions enemyPhaseActions;
+        [SerializeField] private EnemyDifficulty difficulty;
 
         public IReadOnlyCollection<UnitType> PotentialExecutors => executorsData.PhaseToUnits[CurrentPhase];
         
@@ -43,7 +44,26 @@ namespace LineWars.Model
 
         private void ExecutePhase(PhaseType phase)
         {
-                
+            IExecutor executor;
+            var actions = new List<EnemyAction>();
+            var possibleActionData = enemyPhaseActions.PhasesToActions[phase];
+            var unitTypes = executorsData.PhaseToUnits[phase];
+            foreach (var owned in OwnedObjects) 
+                if (owned is Unit unit && unitTypes.Contains(unit.Type))
+                {
+                    foreach (var actionData in possibleActionData)
+                    {
+                        actionData.AddAllPossibleActions(actions, this, unit);
+                    }
+                }
+            
+            actions.Sort();
+            
+            
+            
+    
+
+
         }
 
         #endregion

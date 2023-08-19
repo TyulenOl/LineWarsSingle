@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using LineWars.Model;
@@ -7,25 +8,31 @@ namespace  LineWars.Model
 {
     public abstract class EnemyActionData : ScriptableObject
     {
-        public abstract bool IsCriteriaMet(EnemyAI enemy, Unit unit);
-        public abstract void GetScore(EnemyAI enemy, Unit unit);
-        public abstract int GetRequiredActionPoints(EnemyAI enemy, Unit unit);
-        public abstract EnemyAction GetAction(EnemyAI enemy, Unit unit);
+        public abstract void AddAllPossibleActions(List<EnemyAction> list, EnemyAI enemy, IExecutor executor);
     }
 
-    public abstract class EnemyAction
+    public abstract class EnemyAction : IComparable
     {
         private readonly EnemyAI enemy;
-        private readonly Unit unit;
-        public EnemyAction(EnemyAI enemy, Unit unit)
+        private readonly IExecutor executor;
+        private readonly float score;
+        public IExecutor Executor => executor;
+        public float Score => score;
+        public EnemyAction(EnemyAI enemy, IExecutor executor)
         {
             this.enemy = enemy;
-            this.unit = unit;
+            this.executor = executor;
+            score = GetScore();
         }
 
         public abstract void Execute();
-        public abstract void GetScore();
-        public abstract int GetRequiredActionPoints();
+        protected abstract float GetScore();
+        public int CompareTo(object obj)
+        {
+            if (obj == null) return 1;
+            if (!(obj is EnemyAction enemyAction)) throw new ArgumentException("Object is not EnemyAction");
+            return score.CompareTo(enemyAction.Score);
+        }
     }
 }
 
