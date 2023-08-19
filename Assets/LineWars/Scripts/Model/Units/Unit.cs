@@ -307,7 +307,7 @@ namespace LineWars.Model
 
         public void OnReplenish()
         {
-            
+            CurrentActionPoints = initialActionPoints;
         }
 
 
