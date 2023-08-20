@@ -44,26 +44,34 @@ namespace LineWars.Model
 
         private void ExecutePhase(PhaseType phase)
         {
-            IExecutor executor;
-            var actions = new List<EnemyAction>();
-            var possibleActionData = enemyPhaseActions.PhasesToActions[phase];
+            //IExecutor executor;
+            
+            //собрать всевозможные действия от всевозможных экзекьюторов и найти наилучший, используя кривую сложности
+            var actionList = new List<EnemyAction>();
+            foreach (var owned in OwnedObjects)
+            {
+                if (!(owned is IExecutor executor)) continue;
+                
+                
+            }
+            
+            
+            //если у прошлого экзекьютора остались очки действия, собрать всевозможные действия для него и выбрать наилучший
+            //повторять, пока у экзекьютора есть очки
+            
+            //actions.Sort();
+        }
+
+        private void AddActionsForExecutor(List<EnemyAction> actions, IExecutor executor, PhaseType phase)
+        {
             var unitTypes = executorsData.PhaseToUnits[phase];
-            foreach (var owned in OwnedObjects) 
-                if (owned is Unit unit && unitTypes.Contains(unit.Type))
-                {
-                    foreach (var actionData in possibleActionData)
-                    {
-                        actionData.AddAllPossibleActions(actions, this, unit);
-                    }
-                }
+            if (executor is Unit unit && !unitTypes.Contains(unit.Type)) return;
             
-            actions.Sort();
-            
-            
-            
-    
-
-
+            var possibleActionData = enemyPhaseActions.PhasesToActions[phase];
+            foreach (var actionData in possibleActionData)
+            {
+                actionData.AddAllPossibleActions(actions, this, executor);
+            }
         }
 
         #endregion

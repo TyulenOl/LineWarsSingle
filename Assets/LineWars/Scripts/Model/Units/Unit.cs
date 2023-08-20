@@ -311,6 +311,7 @@ namespace LineWars.Model
         public void Block()
         {
             IsBlocked = true;
+            
         }
         
         protected virtual void OnDied()
