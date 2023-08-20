@@ -159,7 +159,32 @@ namespace LineWars.Model
 
         private void MovementLogicOnMovementIsOver(Transform arg2)
         {
-            node = arg2.GetComponent<Node>();
+            
+        }
+
+        public void Initialize(Node node, UnitDirection direction)
+        {
+            this.node = node;
+            UnitDirection = direction;
+        }
+
+        #region MoveCommand
+
+        public void MoveTo([NotNull] Node target)
+        {
+            if (node.LeftUnit == this)
+                node.LeftUnit = null;
+            if (node.RightUnit == this)
+                node.RightUnit = null;
+            AssignNewNode(target);
+
+            movementLogic.MoveTo(target.transform);
+            CurrentActionPoints = movePointsModifier.Modify(CurrentActionPoints);
+        }
+
+        private void AssignNewNode(Node target)
+        {
+            node = target;
             if (Size == UnitSize.Large)
             {
                 node.LeftUnit = this;
@@ -179,25 +204,6 @@ namespace LineWars.Model
 
             if (this.Owner != node.Owner)
                 Owned.Connect(Owner, node);
-        }
-
-        public void Initialize(Node node, UnitDirection direction)
-        {
-            this.node = node;
-            UnitDirection = direction;
-        }
-
-        #region MoveCommand
-
-        public void MoveTo([NotNull] Node target)
-        {
-            if (node.LeftUnit == this)
-                node.LeftUnit = null;
-            if (node.RightUnit == this)
-                node.RightUnit = null;
-
-            movementLogic.MoveTo(target.transform);
-            CurrentActionPoints = movePointsModifier.Modify(CurrentActionPoints);
         }
 
         public bool CanMoveTo([NotNull] Node target)

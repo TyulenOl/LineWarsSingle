@@ -19,7 +19,7 @@ namespace LineWars.Model
         public static Unit CreateUnitForPlayer(BasePlayer player, Node node, Unit unitPrefab,
             UnitDirection unitDirection = UnitDirection.Any)
         {
-            var unit = Object.Instantiate(unitPrefab, player.transform);
+             var unit = Object.Instantiate(unitPrefab, player.transform);
             unit.transform.position = node.transform.position;
 
             if (unit.Size == UnitSize.Large)
