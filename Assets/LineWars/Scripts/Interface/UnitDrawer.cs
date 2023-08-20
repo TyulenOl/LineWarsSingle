@@ -31,6 +31,8 @@ namespace LineWars.Controllers
         {
             unit = GetComponent<Unit>();
 
+            unit.ActionPointChanged.AddListener(OnActionPointsChanged);
+            
             if (leftPart != null)
             {
                 leftPart.offset = offset;
@@ -151,6 +153,24 @@ namespace LineWars.Controllers
             if(centerCharacteristicDrawer != null)
             {
                 centerCharacteristicDrawer.ReDrawCharacteristics();
+            }
+        }
+            
+        private void OnActionPointsChanged(int oldValue, int newValue)
+        {
+            var isActive = newValue != 0;
+            
+            if(leftCharacteristicDrawer != null)
+            {
+                leftCharacteristicDrawer.ReDrawActivity(isActive);
+            }
+            if(rightCharacteristicDrawer != null)
+            {
+                rightCharacteristicDrawer.ReDrawActivity(isActive);
+            }
+            if(centerCharacteristicDrawer != null)
+            {
+                centerCharacteristicDrawer.ReDrawActivity(isActive);
             }
         }
     }

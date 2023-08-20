@@ -10,6 +10,7 @@ public class UnitPartCharacteristicDrawer : MonoBehaviour
     [SerializeField] private CharacteristicDrawer CharacteristicDrawerPrefab;
     [SerializeField] private LayoutGroup CharacteristicsLayoutGroup;
     [SerializeField] private TMP_Text UnitName;
+    [SerializeField] private SpriteRenderer ifInactivePanel;
 
     private CharacteristicDrawer MeleeAttackDrawer;
     private CharacteristicDrawer FarAttackDrawer;
@@ -46,6 +47,11 @@ public class UnitPartCharacteristicDrawer : MonoBehaviour
     }
 
 
+    public void ReDrawActivity(bool isActive)
+    {
+        ifInactivePanel.gameObject.SetActive(!isActive);
+    }
+    
     public void ReDrawCharacteristics()
     {
         if( MeleeAttackDrawer != null)
