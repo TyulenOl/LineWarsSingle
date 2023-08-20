@@ -2,6 +2,7 @@
 
 namespace LineWars.Model
 {
+    [CreateAssetMenu(fileName = "New Divide", menuName = "IntModifier/Divide", order = 52)]
     public class DivideIntModifier: IntModifier
     {
         [SerializeField] private int divideValue;

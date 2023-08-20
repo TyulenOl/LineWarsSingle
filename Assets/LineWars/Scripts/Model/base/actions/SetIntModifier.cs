@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    [CreateAssetMenu(fileName = "New Set", menuName = "Action Points Modifier/Set")]
+    [CreateAssetMenu(fileName = "New Set", menuName = "IntModifier/Set", order = 52)]
     public class SetIntModifier : IntModifier
     {
         [SerializeField] private int value;
