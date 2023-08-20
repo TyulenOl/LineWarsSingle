@@ -4,6 +4,7 @@ using LineWars.Controllers;
 using LineWars.Extensions.Attributes;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Rendering;
 using UnityEngine.Serialization;
 
 namespace LineWars.Model
@@ -25,7 +26,7 @@ namespace LineWars.Model
         [SerializeField] [Min(0)] private int cost;
         
         [field: SerializeField] public bool AttackLocked { get; set; }
-        [field: SerializeField] public bool CanBlock { get; set; }
+
         [SerializeField] private UnitType unitType;
         [SerializeField] private UnitSize unitSize;
         [SerializeField] private Passability passability;
@@ -35,6 +36,7 @@ namespace LineWars.Model
         [SerializeField] [Min(0)] protected int initialActionPoints;
         [SerializeField] private ActionPointsModifier attackPointsModifier;
         [SerializeField] private ActionPointsModifier movePointsModifier;
+        [SerializeField] private ActionPointsModifier blockPointsModifier;
 
         private UnitMovementLogic movementLogic;
         private IUnitBlockerSelector blockerSelector;
@@ -46,7 +48,7 @@ namespace LineWars.Model
         [SerializeField, ReadOnlyInspector] private int currentHp;
         [SerializeField, ReadOnlyInspector] private int currentArmor;
         [SerializeField, ReadOnlyInspector] private int currentActionPoints;
-
+        [SerializeField, ReadOnlyInspector] private bool isBlocked;
         public int CurrentActionPoints
         {
             get => currentActionPoints;
@@ -68,6 +70,7 @@ namespace LineWars.Model
         [field: SerializeField] public UnityEvent<int, int> ArmorChanged { get; private set; }
         [field: SerializeField] public UnityEvent<Unit> Died { get; private set; }
         [field: SerializeField] public UnityEvent<int, int> ActionPointChanged { get; private set; }
+        [field: SerializeField] public UnityEvent<bool, bool> CanBlockChanged { get; private set; }
 
         public int MaxHp => maxHp;
         public int CurrentHp
@@ -99,9 +102,20 @@ namespace LineWars.Model
             }
         }
 
+        public bool IsBlocked
+        {
+            get => isBlocked;
+            private set
+            {
+                var before = isBlocked;
+                isBlocked = value;
+                if (value)
+                    CurrentActionPoints = blockPointsModifier ? blockPointsModifier.Modify(CurrentActionPoints) : CurrentActionPoints = 0;
+                CanBlockChanged.Invoke(before, isBlocked);
+            }
+        }
         public int MeleeDamage => meleeDamage;
-
-
+        
         public UnitType Type => unitType;
         private UnitDirection UnitDirection
         {
@@ -192,8 +206,9 @@ namespace LineWars.Model
         {
             return OwnerCondition()
                    && SizeCondition()
-                   && LineCondition();
-
+                   && LineCondition()
+                   && ActionPointsCondition(movePointsModifier, CurrentActionPoints);
+            
             bool SizeCondition()
             {
                 return Size == UnitSize.Little && target.AnyIsFree
@@ -224,7 +239,7 @@ namespace LineWars.Model
             var notBlockedDamage = hit.Damage - blockedDamage;
             if (notBlockedDamage != 0)
                 CurrentHp -= notBlockedDamage;
-            CanBlock = false;
+            IsBlocked = false;
         }
 
         public void Heal(int healAmount)
@@ -276,16 +291,28 @@ namespace LineWars.Model
             return !AttackLocked &&
                    unit.basePlayer != basePlayer
                    && line != null
-                   && (int) Passability >= (int) line.LineType;
+                   && (int) Passability >= (int) line.LineType
+                   && ActionPointsCondition(attackPointsModifier, CurrentActionPoints);
         }
 
         public bool CanAttack([NotNull] Edge edge)
         {
             return !AttackLocked &&
                    edge.LineType >= LineType.CountryRoad
-                   && node.ContainsEdge(edge);
+                   && node.ContainsEdge(edge)
+                   && ActionPointsCondition(attackPointsModifier, CurrentActionPoints);
         }
 
+        public bool CanBlock()
+        {
+            return ActionPointsCondition(blockPointsModifier, CurrentActionPoints);
+        }
+        
+        public void Block()
+        {
+            IsBlocked = true;
+        }
+        
         protected virtual void OnDied()
         {
             if (unitSize == UnitSize.Large)
@@ -335,6 +362,11 @@ namespace LineWars.Model
         {
             return node.LeftUnit == this && node.RightUnit == unit
                    || node.RightUnit == this && node.LeftUnit == unit;
+        }
+        
+        private static bool ActionPointsCondition(ActionPointsModifier modifier, int actionPoints)
+        {
+            return actionPoints > 0 && modifier != null && modifier.Modify(actionPoints) >= 0;
         }
     }
 }

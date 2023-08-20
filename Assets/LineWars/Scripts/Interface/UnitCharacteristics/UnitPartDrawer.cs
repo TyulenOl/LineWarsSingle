@@ -5,11 +5,14 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UnitPartCharacteristicDrawer : MonoBehaviour
+public class UnitPartDrawer : MonoBehaviour
 {
     [SerializeField] private CharacteristicDrawer CharacteristicDrawerPrefab;
     [SerializeField] private LayoutGroup CharacteristicsLayoutGroup;
     [SerializeField] private TMP_Text UnitName;
+    [SerializeField] private SpriteRenderer ifInactivePanel;
+    [SerializeField] private Image unitIsExecutorImage;
+    [SerializeField] private SpriteRenderer canBlockSprite;
 
     private CharacteristicDrawer MeleeAttackDrawer;
     private CharacteristicDrawer FarAttackDrawer;
@@ -45,7 +48,25 @@ public class UnitPartCharacteristicDrawer : MonoBehaviour
         UnitName.text = DrawHelper.GetNameByUnitType(unitToInit.Type);
     }
 
+    public void SetUnitAsExecutor(bool isExecutor)
+    {
+        unitIsExecutorImage.gameObject.SetActive(isExecutor);
+    }
 
+    public void ReDrawActivity(bool isActive)
+    {
+        ifInactivePanel.gameObject.SetActive(!isActive);
+        if (!isActive)
+        {
+            SetUnitAsExecutor(false);
+        }
+    }
+
+    public void ReDrawCanBlock(bool canBlock)
+    {
+        canBlockSprite.gameObject.SetActive(canBlock);
+    }
+    
     public void ReDrawCharacteristics()
     {
         if( MeleeAttackDrawer != null)

@@ -1,7 +1,10 @@
 ﻿
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using LineWars.Interface;
 using LineWars.Model;
+using UnityEditor.U2D.Path;
 using UnityEngine;
 
 namespace LineWars.Controllers
@@ -16,21 +19,26 @@ namespace LineWars.Controllers
         [SerializeField] private Color healColor = Color.green;
         
         [Header("Reference")]
-        [SerializeField] private UnitPartDrawer leftPart;
-        [SerializeField] private UnitPartDrawer centerPart;
-        [SerializeField] private UnitPartDrawer rightPart;
+        [SerializeField] private Interface.UnitPartDrawer leftPart;
+        [SerializeField] private Interface.UnitPartDrawer centerPart;
+        [SerializeField] private Interface.UnitPartDrawer rightPart;
         
         [Header("CharacteristicsDrawers")]
-        [SerializeField] private UnitPartCharacteristicDrawer leftCharacteristicDrawer;
-        [SerializeField] private UnitPartCharacteristicDrawer rightCharacteristicDrawer;
-        [SerializeField] private UnitPartCharacteristicDrawer centerCharacteristicDrawer;
+        [SerializeField] private UnitPartDrawer leftDrawer;
+        [SerializeField] private UnitPartDrawer rightDrawer;
+        [SerializeField] private UnitPartDrawer centerDrawer;
+        
         
         private Unit unit;
-        
+        private List<UnitPartDrawer> allDrawers;
+
         private void Awake()
         {
             unit = GetComponent<Unit>();
 
+            unit.ActionPointChanged.AddListener((_,newValue) => ExecuteForAllDrawers(drawer => drawer.ReDrawActivity(newValue != 0)));
+            unit.CanBlockChanged.AddListener((_,newBool) => ExecuteForAllDrawers(drawer => drawer.ReDrawCanBlock(newBool)));
+            
             if (leftPart != null)
             {
                 leftPart.offset = offset;
@@ -46,8 +54,14 @@ namespace LineWars.Controllers
                 rightPart.offset = offset;
             }
 
-            leftCharacteristicDrawer.CurrentUnit = unit;
-            rightCharacteristicDrawer.CurrentUnit = unit;
+            allDrawers = new List<UnitPartDrawer>
+            { leftDrawer, rightDrawer, centerDrawer }
+                .Where(x => x is not null)
+                .ToList();
+            
+            
+            leftDrawer.CurrentUnit = unit;
+            rightDrawer.CurrentUnit = unit;
             //TODO центральный отрисовщик характеристик
         }
 
@@ -86,7 +100,6 @@ namespace LineWars.Controllers
             
             if (rightPart != null && rightPart.gameObject.activeSelf)
                 rightPart.AnimateDamageText((after - before).ToString(), armorDamageColor);
-            
             ReDrawCharacteristics();
         }
         
@@ -140,17 +153,25 @@ namespace LineWars.Controllers
 
         private void ReDrawCharacteristics()
         {
-            if(leftCharacteristicDrawer != null)
+            foreach (var drawer in allDrawers)
             {
-                leftCharacteristicDrawer.ReDrawCharacteristics();
+                drawer.ReDrawCharacteristics();
             }
-            if(rightCharacteristicDrawer != null)
+        }
+
+        public void SetUnitAsExecutor(bool isExecutor)
+        {
+            foreach (var drawer in allDrawers)
             {
-                rightCharacteristicDrawer.ReDrawCharacteristics();
+                drawer.SetUnitAsExecutor(isExecutor);
             }
-            if(centerCharacteristicDrawer != null)
+        }
+
+        private void ExecuteForAllDrawers(Action<UnitPartDrawer> action)
+        {
+            foreach (var drawer in allDrawers)
             {
-                centerCharacteristicDrawer.ReDrawCharacteristics();
+                action.Invoke(drawer);
             }
         }
     }
