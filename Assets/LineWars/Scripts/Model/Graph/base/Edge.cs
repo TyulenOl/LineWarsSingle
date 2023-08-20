@@ -5,7 +5,6 @@ using LineWars.Extensions.Attributes;
 using LineWars.Interface;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Serialization;
 
 namespace LineWars.Model
 {
@@ -104,12 +103,13 @@ namespace LineWars.Model
             hp = MaxHp;
         }
 
-        public void Initialize(Node firstNode, Node secondNode, LineType lineType = LineType.ScoutRoad)
+        public void Initialize(Node firstNode, Node secondNode, LineType lineType = LineType.InfantryRoad)
         {
             this.firstNode = firstNode;
             this.secondNode = secondNode;
             drawer = GetComponent<LineDrawer>();
             drawer.Initialise(firstNode.transform, secondNode.transform);
+            this.lineType = lineType;
         }
 
         public void TakeDamage(Hit hit)

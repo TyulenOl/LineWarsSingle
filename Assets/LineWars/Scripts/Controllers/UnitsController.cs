@@ -58,8 +58,6 @@ namespace LineWars
                          when executor is Engineer engineer && target is Edge edge && engineer.CanUpRoad(edge):
                         _ExecuteCommand(new UpRoadCommand(engineer, edge));
                         break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
                 }
             }
 

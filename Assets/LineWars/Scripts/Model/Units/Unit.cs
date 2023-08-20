@@ -219,7 +219,7 @@ namespace LineWars.Model
                 return line != null
                        && line.LineType != LineType.Visibility
                        && line.LineType != LineType.Firing
-                       && (int) Passability >= (int) line.LineType;
+                       && (int) Passability <= (int) line.LineType;
             }
 
             bool OwnerCondition()
@@ -263,7 +263,7 @@ namespace LineWars.Model
             return !AttackLocked &&
                    unit.basePlayer != basePlayer
                    && line != null
-                   && (int) Passability >= (int) line.LineType
+                   && (int) Passability <= (int) line.LineType
                    && ActionPointsCondition(attackPointsModifier, CurrentActionPoints);
         }
 
