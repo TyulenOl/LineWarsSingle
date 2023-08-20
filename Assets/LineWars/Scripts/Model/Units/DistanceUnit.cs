@@ -34,6 +34,8 @@ namespace LineWars.Model
 
         public override void Attack(Unit enemy)
         {
+            if (enemy.TryGetNeighbour(out var neighbour)) 
+                DistanceAttack(neighbour);
             DistanceAttack(enemy);
         }
 

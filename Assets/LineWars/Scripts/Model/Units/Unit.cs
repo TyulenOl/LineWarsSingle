@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using LineWars.Controllers;
 using LineWars.Extensions.Attributes;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Rendering;
-using UnityEngine.Serialization;
 
 namespace LineWars.Model
 {
@@ -208,7 +205,8 @@ namespace LineWars.Model
 
         public bool CanMoveTo([NotNull] Node target)
         {
-            return OwnerCondition()
+            return Node != target
+                   && OwnerCondition()
                    && SizeCondition()
                    && LineCondition()
                    && ActionPointsCondition(movePointsModifier, CurrentActionPoints);
@@ -265,6 +263,7 @@ namespace LineWars.Model
         #region AttackCommand
         public virtual bool CanAttack([NotNull] Unit unit)
         {
+            if (unit == null) throw new ArgumentNullException(nameof(unit));
             var line = node.GetLine(unit.node);
             return !AttackLocked &&
                    unit.basePlayer != basePlayer
@@ -275,9 +274,11 @@ namespace LineWars.Model
 
         public virtual void Attack([NotNull] Unit enemy)
         {
+            if (enemy == null) throw new ArgumentNullException(nameof(enemy));
+
             // если нет соседа, то тогда просто атаковать
             if (!enemy.TryGetNeighbour(out var neighbour))
-                AttackUnitButIgnoreBlock(neighbour);
+                AttackUnitButIgnoreBlock(enemy);
             // иначе выбрать того, кто будет блокировать урон
             else
             {
@@ -293,6 +294,7 @@ namespace LineWars.Model
 
         public void AttackUnitButIgnoreBlock([NotNull] Unit enemy)
         {
+            if (enemy == null) throw new ArgumentNullException(nameof(enemy));
             var enemyNode = enemy.node;
             MeleeAttack(enemy);
 
@@ -313,12 +315,14 @@ namespace LineWars.Model
         
         public virtual bool CanContrAttack([NotNull] Unit enemy)
         {
+            if (enemy == null) throw new ArgumentNullException(nameof(enemy));
             return CanAttack(enemy)
                    && MeleeDamage > 0;
         }
         
         public virtual void ContrAttack([NotNull] Unit enemy)
         {
+            if (enemy == null) throw new ArgumentNullException(nameof(enemy));
             var contrAttackDamage = contrAttackDamageModifier
                 ? contrAttackDamageModifier.Modify(MeleeDamage)
                 : MeleeDamage;
