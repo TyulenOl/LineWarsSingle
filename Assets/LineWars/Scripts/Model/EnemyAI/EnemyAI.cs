@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using DataStructures;
 using LineWars.Controllers;
 using UnityEngine;
 
@@ -11,55 +12,46 @@ namespace LineWars.Model
         [SerializeField] private PhaseExecutorsData executorsData;
         [SerializeField] private EnemyPhaseActions enemyPhaseActions;
         [SerializeField] private EnemyDifficulty difficulty;
+        [SerializeField] private float actionCooldown;
 
         public IReadOnlyCollection<UnitType> PotentialExecutors => executorsData.PhaseToUnits[CurrentPhase];
         
         #region Turns
-        public override void ExecuteBuy()
-        {
-            
-        }
-
-        public override void ExecuteArtillery()
-        {
-        }
-
-        public override void ExecuteFight()
-        {
-        }
-
-        public override void ExecuteScout()
-        {
-        }
-
-
-        public override void ExecuteIdle()
-        {
-            
-        }
-
-        public override void ExecuteReplenish()
-        {
-        }
-
+        public override void ExecuteBuy() => ExecutePhase(PhaseType.Buy);
+        public override void ExecuteArtillery() => ExecutePhase(PhaseType.Artillery);
+        public override void ExecuteFight() => ExecutePhase(PhaseType.Fight);
+        public override void ExecuteScout() => ExecutePhase(PhaseType.Scout);
         private void ExecutePhase(PhaseType phase)
         {
-            //IExecutor executor;
+            StartCoroutine(ExecuteCoroutine());
             
-            //собрать всевозможные действия от всевозможных экзекьюторов и найти наилучший, используя кривую сложности
-            var actionList = new List<EnemyAction>();
-            foreach (var owned in OwnedObjects)
+
+            IEnumerator ExecuteCoroutine()
             {
-                if (!(owned is IExecutor executor)) continue;
+                var actions = new List<EnemyAction>();
+                foreach (var owned in OwnedObjects)
+                {
+                    if (!(owned is IExecutor executor)) continue;
                 
+                    AddActionsForExecutor(actions, executor, phase);
+                }
+
+                var chosenAction = PickAction(actions);
+                var chosenExecutor = chosenAction.Executor;
+                chosenAction.Execute();
+                yield return new WaitForSeconds(actionCooldown);
                 
+                while (chosenExecutor.CurrentActionPoints > 0)
+                {
+                    var chosenExecutorsActions = new List<EnemyAction>();
+                    AddActionsForExecutor(chosenExecutorsActions, chosenExecutor, phase);
+                    var newAction = PickAction(chosenExecutorsActions);
+                    newAction.Execute();
+                    yield return new WaitForSeconds(actionCooldown);
+                }
+                
+                ExecutePhase(PhaseType.Idle);
             }
-            
-            
-            //если у прошлого экзекьютора остались очки действия, собрать всевозможные действия для него и выбрать наилучший
-            //повторять, пока у экзекьютора есть очки
-            
-            //actions.Sort();
         }
 
         private void AddActionsForExecutor(List<EnemyAction> actions, IExecutor executor, PhaseType phase)
@@ -72,6 +64,21 @@ namespace LineWars.Model
             {
                 actionData.AddAllPossibleActions(actions, this, executor);
             }
+        }
+
+        private EnemyAction PickAction(List<EnemyAction> actions)
+        {
+            var sortedList = new List<EnemyAction>(actions);
+            sortedList.Sort();
+            var randomList = new RandomChanceList<EnemyAction>();
+            for (var i = 0; i < sortedList.Count; i++)
+            {
+                var currentAction = sortedList[i];
+                randomList.Add(currentAction, 
+                    currentAction.Score * difficulty.Curve.Evaluate((float) i/ sortedList.Count));
+            }
+
+            return randomList.PickRandomObject();
         }
 
         #endregion

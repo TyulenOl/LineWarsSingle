@@ -59,9 +59,12 @@ namespace LineWars.Controllers
                 .Where(x => x is not null)
                 .ToList();
             
-            
-            leftDrawer.CurrentUnit = unit;
-            rightDrawer.CurrentUnit = unit;
+            if(leftDrawer != null)
+                leftDrawer.CurrentUnit = unit;
+            if(rightDrawer != null)
+                rightDrawer.CurrentUnit = unit;
+            if (centerDrawer != null)
+                centerDrawer.CurrentUnit = unit;
             //TODO центральный отрисовщик характеристик
         }
 

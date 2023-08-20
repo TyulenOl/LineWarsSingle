@@ -8,9 +8,9 @@ namespace DataStructures
     public class RandomChanceList<T> //TODO: Придумать другое название?
     {
         private readonly List<ChanceItem<T>> list = new List<ChanceItem<T>>();
-        private int sumChance;
+        private float sumChance;
 
-        public void Add(T obj, int chance)
+        public void Add(T obj, float chance)
         {
             list.Add(new ChanceItem<T>(obj, sumChance, sumChance + chance));
             sumChance += chance;
@@ -18,10 +18,14 @@ namespace DataStructures
 
         public T PickRandomObject()
         {
+            if (list.Count == 0)
+            {
+                throw new InvalidOperationException("List is empty!");
+            }
             var randomValue = Random.Range(0, sumChance);
             foreach (var item in list)
             {
-                if (randomValue >= item.MinChance && randomValue < item.MaxChance)
+                if (randomValue >= item.MinChance && randomValue <= item.MaxChance)
                     return item.Object;
             }
 
@@ -31,10 +35,10 @@ namespace DataStructures
         private class ChanceItem<T1>
         {
             public readonly T1 Object;
-            public readonly int MinChance;
-            public readonly int MaxChance; //?можно обойтись без этой переменной?
+            public readonly float MinChance;
+            public readonly float MaxChance; //?можно обойтись без этой переменной?
 
-            public ChanceItem(T1 obj, int minChance, int maxChance)
+            public ChanceItem(T1 obj, float minChance, float maxChance)
             {
                 this.Object = obj;
                 this.MinChance = minChance;
