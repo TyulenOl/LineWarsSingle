@@ -13,18 +13,28 @@
 
     public static class LineTypeHelper
     {
+        public static bool CanUp(LineType lineType)
+        {
+            return lineType is LineType.InfantryRoad or LineType.CountryRoad;
+        }
+
+        public static bool CanDown(LineType lineType)
+        {
+            return lineType is LineType.Highway or LineType.CountryRoad;
+        }
+        
         public static LineType Up(LineType lineType)
         {
-            if (lineType < LineType.InfantryRoad || lineType == LineType.Highway)
-                return lineType;
-            return ++lineType;
+            if (CanUp(lineType))
+                return ++lineType;
+            return lineType;
         }
         
         public static LineType Down(LineType lineType)
         {
-            if (lineType <= LineType.InfantryRoad)
-                return lineType;
-            return --lineType;
+            if (CanDown(lineType))
+                return --lineType;
+            return lineType;
         }
     }
 }

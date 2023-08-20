@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
+    [ExecuteInEditMode]
     public class NodeInitialInfo: MonoBehaviour
     {
         [field: SerializeField] public Spawn ReferenceToSpawn { get; set; }
@@ -21,6 +22,11 @@ namespace LineWars.Model
                 Debug.Log($"{nameof(ReferenceToSpawn)} in null on {gameObject.name}");
                 Destroy(this);
             }
+        }
+
+        private void OnDisable()
+        {
+            Redraw(null);
         }
 
         private void OnValidate()

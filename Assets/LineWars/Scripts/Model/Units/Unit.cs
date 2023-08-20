@@ -219,7 +219,7 @@ namespace LineWars.Model
                 return line != null
                        && line.LineType != LineType.Visibility
                        && line.LineType != LineType.Firing
-                       && (int) Passability >= (int) line.LineType;
+                       && (int) Passability <= (int) line.LineType;
             }
 
             bool OwnerCondition()
@@ -235,7 +235,7 @@ namespace LineWars.Model
         {
             var blockedDamage = Math.Min(hit.Damage, CurrentArmor);
 
-            var notBlockedDamage = hit.Damage - blockedDamage;
+            var notBlockedDamage = hit.IsPenetrating ? hit.Damage : hit.Damage - blockedDamage;
             if (notBlockedDamage != 0)
                 CurrentHp -= notBlockedDamage;
             if (IsBlocked)
@@ -243,7 +243,7 @@ namespace LineWars.Model
                 IsBlocked = false;
                 if (hit.Source is Unit enemy)
                 {
-                    UnitsController.ExecuteCommand(new ContrAttackCommand(this, enemy));
+                    UnitsController.ExecuteCommand(new ContrAttackCommand(this, enemy), false);
                 }
             }
         }
@@ -263,7 +263,7 @@ namespace LineWars.Model
             return !AttackLocked &&
                    unit.basePlayer != basePlayer
                    && line != null
-                   && (int) Passability >= (int) line.LineType
+                   && (int) Passability <= (int) line.LineType
                    && ActionPointsCondition(attackPointsModifier, CurrentActionPoints);
         }
 
@@ -307,14 +307,15 @@ namespace LineWars.Model
         
         public virtual bool CanContrAttack([NotNull] Unit enemy)
         {
-            return CanAttack(enemy);
+            return CanAttack(enemy)
+                   && MeleeDamage > 0;
         }
         
         public virtual void ContrAttack([NotNull] Unit enemy)
         {
             var contrAttackDamage = contrAttackDamageModifier
                 ? contrAttackDamageModifier.Modify(MeleeDamage)
-                : MeleeDamage / 2;
+                : MeleeDamage;
             enemy.TakeDamage(new Hit(contrAttackDamage, this, enemy));
         }
 
