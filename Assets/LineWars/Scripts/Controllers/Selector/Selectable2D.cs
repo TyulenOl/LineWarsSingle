@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace LineWars.Controllers
+namespace LineWars
 {
     public class Selectable2D: MonoBehaviour, IPointerClickHandler
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using LineWars.Model;
 using UnityEngine;
 
-namespace LineWars.Controllers
+namespace LineWars
 {
     public partial class PhaseManager
     {

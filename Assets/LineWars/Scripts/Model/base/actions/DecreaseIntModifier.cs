@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    [CreateAssetMenu(fileName = "New Decrease", menuName = "Action Points Modifier/Decrease")]
-    public class DecreasePointsModifier : ActionPointsModifier
+    [CreateAssetMenu(fileName = "New Decrease", menuName = "IntModifier/Decrease", order = 52)]
+    public class DecreaseIntModifier : IntModifier
     {
         [SerializeField] private int decreaseValue;
         public override int Modify(int points)

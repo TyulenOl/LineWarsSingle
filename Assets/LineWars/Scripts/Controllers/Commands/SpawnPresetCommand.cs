@@ -21,5 +21,10 @@
         {
             return player.CanSpawnUnit(node, unitPreset);
         }
+
+        public string GetLog()
+        {
+            return $"Игрок {player.gameObject.name} заспавнил в ноде {node.gameObject.name} пресет юнитов {unitPreset.Name}";
+        }
     }
 }
