@@ -17,8 +17,7 @@ namespace LineWars.Model
         Attack,
         Heal,
         Move,
-        Build,
-        Curse
+        UpRoad
     }
 }   
 

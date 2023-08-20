@@ -8,6 +8,7 @@ namespace LineWars.Model
         [field: Header("ArtillerySettings")]
         [field: SerializeField, Min(0)] public int DistanceDamage { get; private set; }
         [field: SerializeField, Min(0)] public int Distance { get; private set; }
+        [field: SerializeField] public bool IsPenetrating { get; private set; }
         [SerializeField] private IntModifier distanceAttackPointsModifier;
 
 
@@ -38,12 +39,13 @@ namespace LineWars.Model
 
         private void DistanceAttack(IAlive alive)
         {
-            alive.TakeDamage(new Hit(DistanceDamage, this, alive));
+            alive.TakeDamage(new Hit(DistanceDamage, this, alive, IsPenetrating));
             CurrentActionPoints = distanceAttackPointsModifier
                 ? distanceAttackPointsModifier.Modify(CurrentActionPoints)
                 : 0;
         }
 
+        //ЭТО ДЛЯ ВИЗУАЛИЗАЦИИ, чтобы можно было подсвечивать
         public IEnumerable<Node> GetNodeInMyDistance()
         {
             return Graph.GetNodesInRange(Node, (uint)Distance);

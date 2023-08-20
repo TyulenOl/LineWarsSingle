@@ -16,6 +16,5 @@ namespace LineWars.Model
         public UnityEvent<Unit> Died { get; }
 
         public void TakeDamage(Hit hit);
-        public void HealMe(int healAmount);
     }
 }

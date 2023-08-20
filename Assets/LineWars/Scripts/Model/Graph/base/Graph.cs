@@ -68,7 +68,7 @@ namespace LineWars.Model
                 ? Instance._HasSpawnPoint()
                 : throw new NullReferenceException("Graph is not Instance!");
 
-        private bool _HasSpawnPoint() => spawnInfosStack.Count != 0;
+        private bool _HasSpawnPoint() => spawnInfosStack.Count > 0;
 
         public static SpawnInfo GetSpawnPoint() =>
             Instance != null
