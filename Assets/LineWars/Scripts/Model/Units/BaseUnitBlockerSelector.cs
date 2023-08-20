@@ -8,7 +8,7 @@ namespace LineWars.Model
         {
             return
                 (new[] {targetUnit, neighborUnit})
-                .OrderByDescending(x => x.CanBlock) // Сперва берем того, кто блокирует
+                .OrderByDescending(x => x.IsBlocked) // Сперва берем того, кто блокирует
                 .ThenByDescending(x => x.MaxHp) // Потом того, у кого больше максимальное хп
                 .ThenBy(x=> x.CurrentHp) // Потом того, у кого меньше текущее хп
                 .First();

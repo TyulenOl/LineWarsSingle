@@ -9,12 +9,12 @@
         }
         public void Execute()
         {
-            unit.CanBlock = true;
+            unit.Block();
         }
 
         public bool CanExecute()
         {
-            return true;
+            return unit.CanBlock();
         }
     }
 }

@@ -1,7 +1,10 @@
 ﻿
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using LineWars.Interface;
 using LineWars.Model;
+using UnityEditor.U2D.Path;
 using UnityEngine;
 
 namespace LineWars.Controllers
@@ -16,22 +19,25 @@ namespace LineWars.Controllers
         [SerializeField] private Color healColor = Color.green;
         
         [Header("Reference")]
-        [SerializeField] private UnitPartDrawer leftPart;
-        [SerializeField] private UnitPartDrawer centerPart;
-        [SerializeField] private UnitPartDrawer rightPart;
+        [SerializeField] private Interface.UnitPartDrawer leftPart;
+        [SerializeField] private Interface.UnitPartDrawer centerPart;
+        [SerializeField] private Interface.UnitPartDrawer rightPart;
         
         [Header("CharacteristicsDrawers")]
-        [SerializeField] private UnitPartCharacteristicDrawer leftCharacteristicDrawer;
-        [SerializeField] private UnitPartCharacteristicDrawer rightCharacteristicDrawer;
-        [SerializeField] private UnitPartCharacteristicDrawer centerCharacteristicDrawer;
+        [SerializeField] private UnitPartDrawer leftDrawer;
+        [SerializeField] private UnitPartDrawer rightDrawer;
+        [SerializeField] private UnitPartDrawer centerDrawer;
+        
         
         private Unit unit;
-        
+        private List<UnitPartDrawer> allDrawers;
+
         private void Awake()
         {
             unit = GetComponent<Unit>();
 
-            unit.ActionPointChanged.AddListener(OnActionPointsChanged);
+            unit.ActionPointChanged.AddListener((_,newValue) => ExecuteForAllDrawers(drawer => drawer.ReDrawActivity(newValue != 0)));
+            unit.CanBlockChanged.AddListener((_,newBool) => ExecuteForAllDrawers(drawer => drawer.ReDrawCanBlock(newBool)));
             
             if (leftPart != null)
             {
@@ -48,8 +54,14 @@ namespace LineWars.Controllers
                 rightPart.offset = offset;
             }
 
-            leftCharacteristicDrawer.CurrentUnit = unit;
-            rightCharacteristicDrawer.CurrentUnit = unit;
+            allDrawers = new List<UnitPartDrawer>
+            { leftDrawer, rightDrawer, centerDrawer }
+                .Where(x => x is not null)
+                .ToList();
+            
+            
+            leftDrawer.CurrentUnit = unit;
+            rightDrawer.CurrentUnit = unit;
             //TODO центральный отрисовщик характеристик
         }
 
@@ -88,7 +100,6 @@ namespace LineWars.Controllers
             
             if (rightPart != null && rightPart.gameObject.activeSelf)
                 rightPart.AnimateDamageText((after - before).ToString(), armorDamageColor);
-            
             ReDrawCharacteristics();
         }
         
@@ -142,35 +153,25 @@ namespace LineWars.Controllers
 
         private void ReDrawCharacteristics()
         {
-            if(leftCharacteristicDrawer != null)
+            foreach (var drawer in allDrawers)
             {
-                leftCharacteristicDrawer.ReDrawCharacteristics();
-            }
-            if(rightCharacteristicDrawer != null)
-            {
-                rightCharacteristicDrawer.ReDrawCharacteristics();
-            }
-            if(centerCharacteristicDrawer != null)
-            {
-                centerCharacteristicDrawer.ReDrawCharacteristics();
+                drawer.ReDrawCharacteristics();
             }
         }
-            
-        private void OnActionPointsChanged(int oldValue, int newValue)
+
+        public void SetUnitAsExecutor(bool isExecutor)
         {
-            var isActive = newValue != 0;
-            
-            if(leftCharacteristicDrawer != null)
+            foreach (var drawer in allDrawers)
             {
-                leftCharacteristicDrawer.ReDrawActivity(isActive);
+                drawer.SetUnitAsExecutor(isExecutor);
             }
-            if(rightCharacteristicDrawer != null)
+        }
+
+        private void ExecuteForAllDrawers(Action<UnitPartDrawer> action)
+        {
+            foreach (var drawer in allDrawers)
             {
-                rightCharacteristicDrawer.ReDrawActivity(isActive);
-            }
-            if(centerCharacteristicDrawer != null)
-            {
-                centerCharacteristicDrawer.ReDrawActivity(isActive);
+                action.Invoke(drawer);
             }
         }
     }
