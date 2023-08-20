@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    public abstract class ActionPointsModifier : ScriptableObject
+    public abstract class IntModifier : ScriptableObject
     {
         public abstract int Modify(int points);
     }

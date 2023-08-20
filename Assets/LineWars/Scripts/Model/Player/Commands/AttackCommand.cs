@@ -1,4 +1,5 @@
-﻿using LineWars.Model;
+﻿using System.Diagnostics.CodeAnalysis;
+using LineWars.Model;
 
 namespace LineWars.Model
 {
@@ -7,7 +8,7 @@ namespace LineWars.Model
         private readonly IAttackerVisitor attackerVisitor;
         private readonly IAlive unit;
 
-        public AttackCommand(IAttackerVisitor attackerVisitor, IAlive unit)
+        public AttackCommand([NotNull] IAttackerVisitor attackerVisitor, [NotNull] IAlive unit)
         {
             this.attackerVisitor = attackerVisitor;
             this.unit = unit;

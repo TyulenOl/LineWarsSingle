@@ -1,15 +1,17 @@
-﻿namespace LineWars.Model
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace LineWars.Model
 {
     public class EnableBlockCommand: ICommand
     {
         private Unit unit;
-        public EnableBlockCommand(Unit unit)
+        public EnableBlockCommand([NotNull] Unit unit)
         {
             this.unit = unit;
         }
         public void Execute()
         {
-            unit.Block();
+            unit.EnableBlock();
         }
 
         public bool CanExecute()

@@ -2,25 +2,25 @@
 
 namespace LineWars.Model
 {
-    public class BlockAttackCommand: ICommand
+    public class ContrAttackCommand: ICommand
     {
         private readonly Unit attacker;
         private readonly Unit blocker;
         
-        public BlockAttackCommand([NotNull] Unit attacker, [NotNull] Unit blocker)
+        public ContrAttackCommand([NotNull] Unit attacker, [NotNull] Unit blocker)
         {
             this.attacker = attacker;
             this.blocker = blocker;
         }
-
+        
         public void Execute()
         {
-            attacker.AttackUnitButIgnoreBlock(blocker);
+            attacker.ContrAttack(blocker);
         }
 
         public bool CanExecute()
         {
-            return attacker.CanAttack(blocker);
+            return attacker.CanContrAttack(blocker);
         }
     }
 }

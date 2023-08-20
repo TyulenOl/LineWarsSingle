@@ -9,23 +9,21 @@ using UnityEngine.Serialization;
 
 namespace LineWars.Model
 {
-    //TODO: отделить Unit от IAttackerVisitor, т.к. не все юниты умеют атаковать.
+    [RequireComponent(typeof(UnitMovementLogic))]
     public class Unit : Owned,
         IAttackerVisitor,
         IAlive,
         IMovable,
         ITarget,
-        IExecutor,
-        ITurnEndAction
+        IExecutor
     {
         [Header("Units Settings")] 
-        [FormerlySerializedAs("initialHp"), SerializeField, Min(0)] private int maxHp;
-        [SerializeField] [Min(0)] private int initialArmor;
-        [SerializeField] [Min(0)] private int meleeDamage;
-        [SerializeField] [Min(0)] private int visibility;
-        [SerializeField] [Min(0)] private int cost;
-        
-        [field: SerializeField] public bool AttackLocked { get; set; }
+        [SerializeField, Min(0)] private int maxHp;
+        [SerializeField, Min(0)] private int initialArmor;
+        [SerializeField, Min(0)] private int meleeDamage;
+        [SerializeField, Min(0)] private int visibility;
+        [SerializeField, Min(0)] private int cost;
+        [field: SerializeField] public bool AttackLocked { get; private set; }
 
         [SerializeField] private UnitType unitType;
         [SerializeField] private UnitSize unitSize;
@@ -34,15 +32,17 @@ namespace LineWars.Model
 
         [Header("Action Points Settings")]
         [SerializeField] [Min(0)] protected int initialActionPoints;
-        [SerializeField] private ActionPointsModifier attackPointsModifier;
-        [SerializeField] private ActionPointsModifier movePointsModifier;
-        [SerializeField] private ActionPointsModifier blockPointsModifier;
+        [SerializeField] private IntModifier attackPointsModifier;
+        [SerializeField] private IntModifier movePointsModifier;
+        [SerializeField] private IntModifier blockPointsModifier;
+
+        [Header("Other")] 
+        [SerializeField] private IntModifier contrAttackDamageModifier;
 
         private UnitMovementLogic movementLogic;
         private IUnitBlockerSelector blockerSelector;
 
-        [Header("DEBUG")] 
-        [SerializeField] private bool debugMode;
+        [Header("DEBUG")]
         [SerializeField, ReadOnlyInspector] private Node node;
         [SerializeField, ReadOnlyInspector] private UnitDirection unitDirection;
         [SerializeField, ReadOnlyInspector] private int currentHp;
@@ -63,9 +63,7 @@ namespace LineWars.Model
 
 
         [field: Header("Events")]
-        [field: SerializeField]
-        public UnityEvent<UnitSize, UnitDirection> UnitDirectionChange { get; private set; }
-
+        [field: SerializeField] public UnityEvent<UnitSize, UnitDirection> UnitDirectionChange { get; private set; }
         [field: SerializeField] public UnityEvent<int, int> HpChanged { get; private set; }
         [field: SerializeField] public UnityEvent<int, int> ArmorChanged { get; private set; }
         [field: SerializeField] public UnityEvent<Unit> Died { get; private set; }
@@ -109,8 +107,6 @@ namespace LineWars.Model
             {
                 var before = isBlocked;
                 isBlocked = value;
-                if (value)
-                    CurrentActionPoints = blockPointsModifier ? blockPointsModifier.Modify(CurrentActionPoints) : CurrentActionPoints = 0;
                 CanBlockChanged.Invoke(before, isBlocked);
             }
         }
@@ -138,19 +134,11 @@ namespace LineWars.Model
         {
             currentHp = maxHp;
             currentArmor = initialArmor;
-            CurrentActionPoints = initialActionPoints;
+            currentActionPoints = initialActionPoints;
             movementLogic = GetComponent<UnitMovementLogic>();
             blockerSelector = new BaseUnitBlockerSelector();
         }
-
-        protected void OnValidate()
-        {
-            if (GetComponent<UnitMovementLogic>() == null)
-            {
-                Debug.LogError($"у {name} не обнаружен компонент {nameof(UnitMovementLogic)}");
-            }
-        }
-
+        
         private void OnEnable()
         {
             movementLogic.MovementIsOver += MovementLogicOnMovementIsOver;
@@ -233,13 +221,18 @@ namespace LineWars.Model
         public void TakeDamage(Hit hit)
         {
             var blockedDamage = Math.Min(hit.Damage, CurrentArmor);
-            // if (blockedDamage != 0)
-            //     CurrentArmor -= blockedDamage;
 
             var notBlockedDamage = hit.Damage - blockedDamage;
             if (notBlockedDamage != 0)
                 CurrentHp -= notBlockedDamage;
-            IsBlocked = false;
+            if (IsBlocked)
+            {
+                IsBlocked = false;
+                if (hit.Source is Unit enemy)
+                {
+                    UnitsController.ExecuteCommand(new ContrAttackCommand(this, enemy));
+                }
+            }
         }
 
         public void Heal(int healAmount)
@@ -266,7 +259,9 @@ namespace LineWars.Model
                 if (selectedUnit == enemy)
                     AttackUnitButIgnoreBlock(enemy);
                 else
+                {
                     UnitsController.ExecuteCommand(new BlockAttackCommand(this, selectedUnit));
+                }
             }
         }
 
@@ -281,7 +276,7 @@ namespace LineWars.Model
 
         private void _Attack(IAlive target)
         {
-            target.TakeDamage(new Hit(MeleeDamage));
+            target.TakeDamage(new Hit(MeleeDamage, this, target));
             CurrentActionPoints = attackPointsModifier.Modify(CurrentActionPoints);
         }
 
@@ -302,15 +297,28 @@ namespace LineWars.Model
                    && node.ContainsEdge(edge)
                    && ActionPointsCondition(attackPointsModifier, CurrentActionPoints);
         }
+        
+        public bool CanContrAttack([NotNull] Unit enemy)
+        {
+            return CanAttack(enemy);
+        }
+        public void ContrAttack([NotNull] Unit enemy)
+        {
+            var contrAttackDamage = contrAttackDamageModifier
+                ? contrAttackDamageModifier.Modify(MeleeDamage)
+                : MeleeDamage / 2;
+            enemy.TakeDamage(new Hit(contrAttackDamage, this, enemy));
+        }
 
         public bool CanBlock()
         {
             return ActionPointsCondition(blockPointsModifier, CurrentActionPoints);
         }
         
-        public void Block()
+        public void EnableBlock()
         {
             IsBlocked = true;
+            CurrentActionPoints = blockPointsModifier ? blockPointsModifier.Modify(CurrentActionPoints) : CurrentActionPoints = 0;
         }
         
         protected virtual void OnDied()
@@ -364,7 +372,7 @@ namespace LineWars.Model
                    || node.RightUnit == this && node.LeftUnit == unit;
         }
         
-        private static bool ActionPointsCondition(ActionPointsModifier modifier, int actionPoints)
+        private static bool ActionPointsCondition(IntModifier modifier, int actionPoints)
         {
             return actionPoints > 0 && modifier != null && modifier.Modify(actionPoints) >= 0;
         }

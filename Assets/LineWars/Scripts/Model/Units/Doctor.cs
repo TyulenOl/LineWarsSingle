@@ -10,7 +10,7 @@ namespace LineWars.Model
         [field: SerializeField] public bool HealLocked { get; set; }
 
         [Header("Action Points Settings")]
-        [SerializeField] private ActionPointsModifier healPointModifier;
+        [SerializeField] private IntModifier healPointModifier;
 
         public bool CanHeal([NotNull] Unit target)
         {
