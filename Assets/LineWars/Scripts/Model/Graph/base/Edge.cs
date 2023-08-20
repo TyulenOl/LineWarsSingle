@@ -96,7 +96,7 @@ namespace LineWars.Model
             throw new System.NotImplementedException();
         }
 
-        public void Heal(int healAmount)
+        public void HealMe(int healAmount)
         {
             if (healAmount < 0)
                 throw new ArgumentException($"{nameof(healAmount)} > 0 !");

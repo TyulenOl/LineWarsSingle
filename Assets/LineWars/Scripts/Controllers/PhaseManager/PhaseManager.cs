@@ -5,7 +5,7 @@ using UnityEngine;
 using LineWars.Model;
 using UnityEngine.Events;
 
-namespace LineWars.Controllers
+namespace LineWars
 {  
     public partial class PhaseManager : MonoBehaviour
     {

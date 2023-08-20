@@ -18,5 +18,10 @@ namespace LineWars.Model
         {
             return unit.CanBlock();
         }
+
+        public string GetLog()
+        {
+            return $"Юнит {unit.gameObject.name} встал в защиту";
+        }
     }
 }

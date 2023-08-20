@@ -8,5 +8,6 @@ namespace LineWars.Model
     {
         public void Execute();
         public bool CanExecute();
+        public string GetLog();
     }
 }

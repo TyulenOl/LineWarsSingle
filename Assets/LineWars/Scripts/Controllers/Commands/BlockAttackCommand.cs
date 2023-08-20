@@ -22,5 +22,10 @@ namespace LineWars.Model
         {
             return attacker.CanAttack(blocker);
         }
+
+        public string GetLog()
+        {
+            return $"{blocker.gameObject.name} перехватил атаку от {attacker.gameObject.name}";
+        }
     }
 }
