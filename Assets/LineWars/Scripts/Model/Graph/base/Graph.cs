@@ -155,6 +155,44 @@ namespace LineWars.Model
             result.Reverse();
             return result;
         }
+        
+        public static List<Node> FindShortestPath([NotNull] Node start, [NotNull] Node end, Passability passability)
+        {
+            if (start == null) throw new ArgumentNullException(nameof(start));
+            if (end == null) throw new ArgumentNullException(nameof(end));
+
+            var queue = new Queue<Node>();
+            var track = new Dictionary<Node, Node>();
+            queue.Enqueue(start);
+            track[start] = null;
+            while (queue.Count != 0)
+            {
+                var node = queue.Dequeue();
+                foreach (var neighborhood in node.GetNeighbors())
+                {
+                    if((int)neighborhood.GetLine(node).LineType < (int) passability) continue;
+                    if (track.ContainsKey(neighborhood)) continue;
+                    track[neighborhood] = node;
+                    queue.Enqueue(neighborhood);
+                }
+
+                if (track.ContainsKey(end)) break;
+            }
+
+            if (!track.ContainsKey(end))
+                return new List<Node>();
+            
+            var pathItem = end;
+            var result = new List<Node>();
+            while (pathItem != null)
+            {
+                result.Add(pathItem);
+                pathItem = track[pathItem];
+            }
+
+            result.Reverse();
+            return result;
+        }
 
         public static IEnumerable<Node> GetNodesInRange(Node startNode, uint range)
         {
@@ -175,6 +213,30 @@ namespace LineWars.Model
                     
                     distanceMemory[neighborhood] = distanceForNextNode;
                     queue.Enqueue(neighborhood);
+                }
+            }
+        }
+
+        public static IEnumerable<Node> GetNodesInRange(Node startNode, uint range, Passability passability)
+        {
+            var queue = new Queue<Node>();
+            var distanceMemory = new Dictionary<Node, uint>();
+            
+            queue.Enqueue(startNode);
+            distanceMemory[startNode] = 0;
+            while (queue.Count != 0)
+            {
+                var node = queue.Dequeue();
+                yield return node;
+                foreach (var neighbor in node.GetNeighbors())
+                {
+                    if ((int) neighbor.GetLine(node).LineType < (int) passability) continue;
+                    if (distanceMemory.ContainsKey(neighbor)) continue;
+                    var distanceForNextNode = distanceMemory[node] + 1;
+                    if (distanceForNextNode >= range) continue;
+                    
+                    distanceMemory[neighbor] = distanceForNextNode;
+                    queue.Enqueue(neighbor);
                 }
             }
         }

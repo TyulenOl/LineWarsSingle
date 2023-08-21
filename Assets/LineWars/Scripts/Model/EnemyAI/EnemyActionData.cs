@@ -13,9 +13,9 @@ namespace  LineWars.Model
 
     public abstract class EnemyAction : IComparable
     {
-        private readonly EnemyAI enemy;
-        private readonly IExecutor executor;
-        private readonly float score;
+        protected readonly EnemyAI enemy;
+        protected readonly IExecutor executor;
+        protected readonly float score;
         public IExecutor Executor => executor;
         public float Score => score;
         public EnemyAction(EnemyAI enemy, IExecutor executor)

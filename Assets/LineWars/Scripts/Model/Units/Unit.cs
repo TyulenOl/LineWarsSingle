@@ -134,6 +134,9 @@ namespace LineWars.Model
         public Passability Passability => passability;
         public Node Node => node;
         public CommandPriorityData CommandPriorityData => priorityData;
+        public IntModifier BlockPointsModifier => blockPointsModifier;
+        public IntModifier AttackPointsModifier => attackPointsModifier;
+        public IntModifier MovePointsModifier => movePointsModifier;
 
         protected virtual void Awake()
         {

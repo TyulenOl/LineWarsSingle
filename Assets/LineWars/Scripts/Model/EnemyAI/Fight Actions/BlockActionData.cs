@@ -6,9 +6,22 @@ namespace LineWars.Model
 {
     public partial class EnemyAI
     {
+        [CreateAssetMenu(fileName = "New Block Action Data", menuName = "EnemyAI/Enemy Actions/Block")]
         public class BlockActionData : EnemyActionData
         {
-            //[SerializeField] private 
+            [SerializeField] private float baseScore;
+            [SerializeField] private float bonusPerPoint;
+            [SerializeField] private float bonusPerEnemy;
+            [SerializeField] private float bonusPerHp;
+            [SerializeField] private float bonusPerCost;
+            [SerializeField, Range(0, 1)] private float maxHpToAddCostBonus;
+            
+            public float BaseScore => baseScore;
+            public float BonusPerPoint => bonusPerPoint;
+            public float BonusPerEnemy => bonusPerEnemy;
+            public float BonusPerHp => bonusPerHp;
+            public float BonusPerCost => bonusPerCost;
+            public float MaxHpToAddCostBonus => maxHpToAddCostBonus;
             public override void AddAllPossibleActions(List<EnemyAction> list, EnemyAI enemy, IExecutor executor)
             {
                 if (!(executor is Unit unit))
@@ -21,6 +34,7 @@ namespace LineWars.Model
         public class BlockAction : EnemyAction
         {
             private readonly BlockActionData data;
+            private readonly Unit unit;
             public BlockAction(EnemyAI enemy, IExecutor executor, BlockActionData data) : base(enemy, executor)
             {
                 if(!(executor is Unit))
@@ -31,6 +45,7 @@ namespace LineWars.Model
                 }
 
                 this.data = data;
+                unit = (Unit) executor;
             }
 
             public override void Execute()
@@ -40,7 +55,15 @@ namespace LineWars.Model
 
             protected override float GetScore()
             {
-                return 1f;
+                var enemyCount = EnemyActionUtilities.FindAdjacentEnemies(unit.Node, enemy).Count;
+                var damagePercent = 1 - (unit.CurrentHp / unit.MaxHp);
+                var costBonus = damagePercent <= data.MaxHpToAddCostBonus ? unit.Cost * data.BonusPerCost : 0;
+                var pointsLeft = unit.BlockPointsModifier.Modify(unit.CurrentActionPoints);
+                return data.BaseScore 
+                       + enemyCount * data.BonusPerEnemy 
+                       + damagePercent * data.BonusPerHp
+                       + costBonus
+                       + pointsLeft * data.BonusPerPoint;
             }
         }
     }

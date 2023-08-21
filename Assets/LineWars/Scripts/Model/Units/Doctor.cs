@@ -13,6 +13,8 @@ namespace LineWars.Model
         [Header("Action Points Settings")]
         [SerializeField] private IntModifier healPointModifier;
 
+        public IntModifier HealPointModifier => healPointModifier;
+
         public bool CanHeal([NotNull] Unit target)
         {
             return !HealLocked && OwnerCondition() && SpaceCondition() 
