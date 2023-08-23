@@ -5,7 +5,7 @@ namespace LineWars.Extensions
 {
     public static class TransformExtension
     {
-        public static IEnumerable<Transform> GetChildes(this Transform transform)
+        public static IEnumerable<Transform> GetChildren(this Transform transform)
         {
             var childesCount = transform.childCount;
             for (int i = 0; i < childesCount; i++)

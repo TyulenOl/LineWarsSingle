@@ -8,25 +8,32 @@ namespace  LineWars.Model
 {
     public abstract class EnemyActionData : ScriptableObject
     {
-        public abstract void AddAllPossibleActions(List<EnemyAction> list, EnemyAI enemy, IExecutor executor);
+        public abstract void AddAllPossibleActions(List<EnemyAction> list, EnemyAI basePlayer, IExecutor executor);
     }
 
     public abstract class EnemyAction : IComparable
     {
-        protected readonly EnemyAI enemy;
+        protected readonly EnemyAI basePlayer;
         protected readonly IExecutor executor;
-        protected readonly float score;
+        protected float score;
+
+        public event Action<EnemyAction> ActionCompleted;
+        
         public IExecutor Executor => executor;
         public float Score => score;
-        public EnemyAction(EnemyAI enemy, IExecutor executor)
+        public EnemyAction(EnemyAI basePlayer, IExecutor executor)
         {
-            this.enemy = enemy;
+            this.basePlayer = basePlayer;
             this.executor = executor;
-            score = GetScore();
         }
 
         public abstract void Execute();
-        protected abstract float GetScore();
+
+        protected void InvokeActionCompleted()
+        {
+            ActionCompleted?.Invoke(this);    
+        }
+        
         public int CompareTo(object obj)
         {
             if (obj == null) return 1;

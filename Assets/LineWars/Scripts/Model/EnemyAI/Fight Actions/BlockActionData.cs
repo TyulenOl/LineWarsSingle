@@ -4,8 +4,7 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    public partial class EnemyAI
-    {
+   
         [CreateAssetMenu(fileName = "New Block Action Data", menuName = "EnemyAI/Enemy Actions/Block")]
         public class BlockActionData : EnemyActionData
         {
@@ -22,49 +21,57 @@ namespace LineWars.Model
             public float BonusPerHp => bonusPerHp;
             public float BonusPerCost => bonusPerCost;
             public float MaxHpToAddCostBonus => maxHpToAddCostBonus;
-            public override void AddAllPossibleActions(List<EnemyAction> list, EnemyAI enemy, IExecutor executor)
+            public override void AddAllPossibleActions(List<EnemyAction> list, EnemyAI basePlayer, IExecutor executor)
             {
                 if (!(executor is Unit unit))
                     return;
                 if(unit.CanBlock())
-                    list.Add(new BlockAction(enemy, executor, this));
+                    list.Add(new BlockAction(basePlayer, executor, this));
             }
+            
         }
 
         public class BlockAction : EnemyAction
         {
             private readonly BlockActionData data;
             private readonly Unit unit;
-            public BlockAction(EnemyAI enemy, IExecutor executor, BlockActionData data) : base(enemy, executor)
+            public BlockAction(EnemyAI basePlayer, IExecutor executor, BlockActionData data) : base(basePlayer, executor)
             {
-                if(!(executor is Unit))
+                if (!(executor is Unit unit))
+                {
                     Debug.LogError("Executor isn't a unit!");
+                    return;
+                }
+
                 if (!((Unit)executor).CanBlock())
                 {
                     Debug.LogError("Invalid Action: Can't execute this command!");
                 }
 
                 this.data = data;
-                unit = (Unit) executor;
+                this.unit = unit;
+                score = GetScore();
             }
 
             public override void Execute()
             {
                 UnitsController.ExecuteCommand(new EnableBlockCommand((Unit) Executor), false);
+                InvokeActionCompleted();
             }
 
-            protected override float GetScore()
+            private float GetScore()
             {
-                var enemyCount = EnemyActionUtilities.FindAdjacentEnemies(unit.Node, enemy).Count;
-                var damagePercent = 1 - (unit.CurrentHp / unit.MaxHp);
+                var enemyCount = EnemyActionUtilities.FindAdjacentEnemies(unit.Node, basePlayer).Count;
+                var damagePercent = (float) unit.CurrentHp / unit.MaxHp;
                 var costBonus = damagePercent <= data.MaxHpToAddCostBonus ? unit.Cost * data.BonusPerCost : 0;
                 var pointsLeft = unit.BlockPointsModifier.Modify(unit.CurrentActionPoints);
+                
                 return data.BaseScore 
                        + enemyCount * data.BonusPerEnemy 
-                       + damagePercent * data.BonusPerHp
+                       + (1 - damagePercent) * data.BonusPerHp
                        + costBonus
                        + pointsLeft * data.BonusPerPoint;
             }
         }
     }
-}
+

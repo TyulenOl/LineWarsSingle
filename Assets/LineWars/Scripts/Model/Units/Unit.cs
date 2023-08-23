@@ -176,8 +176,9 @@ namespace LineWars.Model
                 node.LeftUnit = null;
             if (node.RightUnit == this)
                 node.RightUnit = null;
+            
             AssignNewNode(target);
-
+            
             movementLogic.MoveTo(target.transform);
             CurrentActionPoints = movePointsModifier.Modify(CurrentActionPoints);
         }
@@ -367,6 +368,7 @@ namespace LineWars.Model
         public virtual void OnReplenish()
         {
             CurrentActionPoints = initialActionPoints;
+            IsBlocked = false;
         }
 
 

@@ -156,11 +156,11 @@ namespace LineWars.Model
             return result;
         }
         
-        public static List<Node> FindShortestPath([NotNull] Node start, [NotNull] Node end, Passability passability)
+        public static List<Node> FindShortestPath([NotNull] Node start, [NotNull] Node end, Unit unit)
         {
             if (start == null) throw new ArgumentNullException(nameof(start));
             if (end == null) throw new ArgumentNullException(nameof(end));
-
+            
             var queue = new Queue<Node>();
             var track = new Dictionary<Node, Node>();
             queue.Enqueue(start);
@@ -170,8 +170,10 @@ namespace LineWars.Model
                 var node = queue.Dequeue();
                 foreach (var neighborhood in node.GetNeighbors())
                 {
-                    if((int)neighborhood.GetLine(node).LineType < (int) passability) continue;
+                    if((int)neighborhood.GetLine(node).LineType < (int) unit.Passability) continue;
+                    if(neighborhood != end && !CheckNodeForWalkability(neighborhood, unit)) continue;
                     if (track.ContainsKey(neighborhood)) continue;
+                    
                     track[neighborhood] = node;
                     queue.Enqueue(neighborhood);
                 }
@@ -217,7 +219,8 @@ namespace LineWars.Model
             }
         }
 
-        public static IEnumerable<Node> GetNodesInRange(Node startNode, uint range, Passability passability)
+        public static IEnumerable<Node> GetNodesInRange(Node startNode, uint range, 
+           Unit unit)
         {
             var queue = new Queue<Node>();
             var distanceMemory = new Dictionary<Node, uint>();
@@ -230,8 +233,10 @@ namespace LineWars.Model
                 yield return node;
                 foreach (var neighbor in node.GetNeighbors())
                 {
-                    if ((int) neighbor.GetLine(node).LineType < (int) passability) continue;
+                    if ((int) neighbor.GetLine(node).LineType < (int) unit.Passability) continue;
+                    if(!CheckNodeForWalkability(neighbor, unit)) continue;
                     if (distanceMemory.ContainsKey(neighbor)) continue;
+                    
                     var distanceForNextNode = distanceMemory[node] + 1;
                     if (distanceForNextNode >= range) continue;
                     
@@ -240,5 +245,36 @@ namespace LineWars.Model
                 }
             }
         }
+
+        public static bool CheckNodeForWalkability(Node node, Unit unit)
+        {
+            if(unit.Size == UnitSize.Large && !(node.LeftUnit == null && node.RightUnit == null)) return false;
+            if (unit.Size == UnitSize.Little)
+            {
+                if (node.LeftUnit != null && node.RightUnit != null) return false;
+                if (node.LeftUnit != null && node.LeftUnit.Owner != unit.Owner) return false;
+                if (node.RightUnit != null && node.RightUnit.Owner != unit.Owner) return false;
+            }
+            
+            return true;
+        }
+
+        /*
+        public static List<Node> GetNodesInRangeAlt(Node node, Unit unit, int distance)
+        {
+            var list = new List<Node>();
+            var queue = new Queue<(Node, int)>();
+            queue.Enqueue((node, distance));
+            while (queue.Count > 0)
+            {
+                var currentNodeInfo = queue.Dequeue();
+                list.Add(currentNodeInfo.Item1);
+                if(currentNodeInfo.Item2 <= 0) continue;
+                foreach (var neighbor in currentNodeInfo.Item1.GetNeighbors())
+                {
+                    
+                }
+            }
+        }*/
     }
 }
