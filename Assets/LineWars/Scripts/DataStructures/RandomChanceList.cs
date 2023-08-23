@@ -2,10 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Random = UnityEngine.Random;
+using UnityEngine;
 
 namespace DataStructures
 {
-    public class RandomChanceList<T> //TODO: Придумать другое название?
+    public class RandomChanceList<T> //Придумать другое название?
     {
         private readonly List<ChanceItem<T>> list = new List<ChanceItem<T>>();
         private float sumChance;

@@ -14,7 +14,7 @@ namespace LineWars.Model
     public class Node : Owned, ITarget, INumbered
     {
         [SerializeField] private int index;
-        [SerializeField] [HideInInspector] private List<Edge> edges;
+        [SerializeField] private List<Edge> edges;
 
         [SerializeField] [Min(0)] private int visibility;
         [SerializeField] [Min(0)] private int valueOfHidden;

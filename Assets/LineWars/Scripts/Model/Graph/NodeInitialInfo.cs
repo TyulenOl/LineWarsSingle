@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    [ExecuteInEditMode]
     public class NodeInitialInfo: MonoBehaviour
     {
         [field: SerializeField] public Spawn ReferenceToSpawn { get; set; }

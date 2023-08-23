@@ -134,6 +134,9 @@ namespace LineWars.Model
         public Passability Passability => passability;
         public Node Node => node;
         public CommandPriorityData CommandPriorityData => priorityData;
+        public IntModifier BlockPointsModifier => blockPointsModifier;
+        public IntModifier AttackPointsModifier => attackPointsModifier;
+        public IntModifier MovePointsModifier => movePointsModifier;
 
         protected virtual void Awake()
         {
@@ -173,8 +176,9 @@ namespace LineWars.Model
                 node.LeftUnit = null;
             if (node.RightUnit == this)
                 node.RightUnit = null;
+            
             AssignNewNode(target);
-
+            
             movementLogic.MoveTo(target.transform);
             CurrentActionPoints = movePointsModifier.Modify(CurrentActionPoints);
         }
@@ -364,6 +368,7 @@ namespace LineWars.Model
         public virtual void OnReplenish()
         {
             CurrentActionPoints = initialActionPoints;
+            IsBlocked = false;
         }
 
 

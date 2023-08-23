@@ -12,6 +12,7 @@ namespace LineWars
     {
         public SingleGameManager Instance { get; private set; }
         [SerializeField] private PlayerInitializer playerInitializer;
+        [Header("Debug")] [SerializeField] private bool isAI;
         [SerializeField, ReadOnlyInspector] private List<BasePlayer> players;
 
         private void Awake()
@@ -49,8 +50,16 @@ namespace LineWars
             while (Graph.HasSpawnPoint())
             {
                 var spawnPoint = Graph.GetSpawnPoint();
-                var player = playerInitializer.Initialize<TestActor>(spawnPoint);
-                players.Add(player);
+                if (isAI)
+                {
+                    var player = playerInitializer.Initialize<EnemyAI>(spawnPoint);
+                    players.Add(player);
+                }
+                else
+                {
+                    var testActor = playerInitializer.Initialize<TestActor>(spawnPoint);
+                    players.Add(testActor);
+                }
             }
         }
         

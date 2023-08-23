@@ -48,10 +48,10 @@ namespace LineWars
                 if(previousPhase != Type)
                 {
                     if(previousPhase != PhaseType.Idle)
-                        Debug.LogError($"{actor} ended turn {previousPhase}; He ended {Type} earlier!");
+                        Debug.LogWarning($"{actor} ended turn {previousPhase};");
                     return;
                 }
-                if(actorsReadiness[actor] == true)
+                if(actorsReadiness[actor])
                     Debug.LogError($"{actor} ended turn {previousPhase}; He ended {Type} earlier!");
 
                 actorsLeft--;

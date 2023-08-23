@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,43 +15,76 @@ namespace LineWars.Model
         [SerializeField] private EnemyDifficulty difficulty;
         [SerializeField] private float actionCooldown;
 
+        private IExecutor currentExecutor;
         public IReadOnlyCollection<UnitType> PotentialExecutors => executorsData.PhaseToUnits[CurrentPhase];
         
         #region Turns
-        public override void ExecuteBuy() => ExecutePhase(PhaseType.Buy);
-        public override void ExecuteArtillery() => ExecutePhase(PhaseType.Artillery);
-        public override void ExecuteFight() => ExecutePhase(PhaseType.Fight);
-        public override void ExecuteScout() => ExecutePhase(PhaseType.Scout);
-        private void ExecutePhase(PhaseType phase)
-        {
-            StartCoroutine(ExecuteCoroutine());
-            
+        public override void ExecuteBuy() => ExecuteAITurn(PhaseType.Buy);
+        public override void ExecuteArtillery() => ExecuteAITurn(PhaseType.Artillery);
+        public override void ExecuteFight() => ExecuteAITurn(PhaseType.Fight);
+        public override void ExecuteScout() => ExecuteAITurn(PhaseType.Scout);
 
-            IEnumerator ExecuteCoroutine()
+        public override void ExecuteReplenish()
+        {
+            StartCoroutine(ReplenishCoroutine());
+            IEnumerator ReplenishCoroutine()
             {
-                var actions = new List<EnemyAction>();
                 foreach (var owned in OwnedObjects)
                 {
-                    if (!(owned is IExecutor executor)) continue;
-                
-                    AddActionsForExecutor(actions, executor, phase);
+                    if(owned is not Unit unit) continue;
+                    unit.OnReplenish();
                 }
+                
+                yield return null;
+                ExecuteTurn(PhaseType.Idle);
+            }
+        }
+        
+        private void ExecuteAITurn(PhaseType phase)
+        {
+            var actions = new List<EnemyAction>();
+            foreach (var owned in OwnedObjects)
+            {
+                
+                if (!(owned is IExecutor executor)) continue;
+                if(executor.CurrentActionPoints <= 0) continue;
+                AddActionsForExecutor(actions, executor, phase);
+            }
 
-                var chosenAction = PickAction(actions);
-                var chosenExecutor = chosenAction.Executor;
-                chosenAction.Execute();
+            var chosenAction = PickAction(actions);
+            currentExecutor = chosenAction.Executor;
+            chosenAction.ActionCompleted += GetActionOnActionCompleted(phase);
+            chosenAction.Execute();
+        }
+        
+        private Action<EnemyAction> GetActionOnActionCompleted(PhaseType phase)
+        {
+            return (action) => OnActionCompleted(action, phase);
+        }
+
+        private void OnActionCompleted(EnemyAction previousAction, PhaseType phaseType)
+        {
+            previousAction.ActionCompleted -= GetActionOnActionCompleted(phaseType);
+            StartCoroutine(NewActionCoroutine());
+            IEnumerator NewActionCoroutine()
+            {
                 yield return new WaitForSeconds(actionCooldown);
-                
-                while (chosenExecutor.CurrentActionPoints > 0)
+                if (currentExecutor.CurrentActionPoints > 0)
                 {
-                    var chosenExecutorsActions = new List<EnemyAction>();
-                    AddActionsForExecutor(chosenExecutorsActions, chosenExecutor, phase);
-                    var newAction = PickAction(chosenExecutorsActions);
-                    newAction.Execute();
                     yield return new WaitForSeconds(actionCooldown);
+                    var actions = new List<EnemyAction>();
+                    AddActionsForExecutor(actions, currentExecutor, phaseType);
+                    var newAction = PickAction(actions);
+                    newAction.ActionCompleted += GetActionOnActionCompleted(phaseType);
+                    newAction.Execute();
+
                 }
-                
-                ExecutePhase(PhaseType.Idle);
+                else
+                {
+                    Debug.Log("OKAY I AM DONE");
+                    currentExecutor = null;
+                    ExecuteTurn(PhaseType.Idle);
+                }
             }
         }
 
@@ -62,6 +96,7 @@ namespace LineWars.Model
             var possibleActionData = enemyPhaseActions.PhasesToActions[phase];
             foreach (var actionData in possibleActionData)
             {
+                Debug.Log(actionData);
                 actionData.AddAllPossibleActions(actions, this, executor);
             }
         }
@@ -74,8 +109,10 @@ namespace LineWars.Model
             for (var i = 0; i < sortedList.Count; i++)
             {
                 var currentAction = sortedList[i];
+                Debug.Log($"action - {currentAction}, score - {currentAction.Score}, i - {i}, count - {sortedList.Count}, " +
+                          $"time - {(float) i/ sortedList.Count}, evaluate - {difficulty.Curve.Evaluate((float) i/ sortedList.Count)}");
                 randomList.Add(currentAction, 
-                    currentAction.Score * difficulty.Curve.Evaluate((float) i/ sortedList.Count));
+                    difficulty.Curve.Evaluate((float) i/ sortedList.Count));
             }
 
             return randomList.PickRandomObject();
