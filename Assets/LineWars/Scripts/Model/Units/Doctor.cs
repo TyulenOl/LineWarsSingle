@@ -17,8 +17,12 @@ namespace LineWars.Model
 
         public bool CanHeal([NotNull] Unit target)
         {
-            return !HealLocked && OwnerCondition() && SpaceCondition() 
-                   && ActionPointsCondition(healPointModifier, CurrentActionPoints);
+            return !HealLocked 
+                   && OwnerCondition()
+                   && SpaceCondition() 
+                   && ActionPointsCondition(healPointModifier, CurrentActionPoints) 
+                   && target != this 
+                   && target.CurrentHp != target.MaxHp;
 
             bool SpaceCondition()
             {
@@ -38,6 +42,7 @@ namespace LineWars.Model
             if (IsMassHeal && TryGetNeighbour(out var neighbour))
                 neighbour.HealMe(HealingAmount);
             CurrentActionPoints = healPointModifier.Modify(CurrentActionPoints);
+            ActionCompleted.Invoke();
         }
     }
 }

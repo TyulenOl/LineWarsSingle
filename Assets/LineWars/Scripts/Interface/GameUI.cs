@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using LineWars.Controllers;
 using LineWars.Model;
 using TMPro;
@@ -10,35 +11,55 @@ namespace LineWars.Interface
     {
         [SerializeField] private TMP_Text currentMoneyText;
         [SerializeField] private TMP_Text currentPhaseText;
-
-        private List<TargetDrawer> currentTargets;
-
+        private IExecutor currentExecutor;
+        private List<TargetDrawer> currentDrawers;
         private void Start()
         {
             Player.LocalPlayer.CurrentMoneyChanged += (PlayerOnCurrenMoneyChanged);
             PhaseManager.Instance.PhaseChanged.AddListener(OnPhaseChanged);
             PlayerOnCurrenMoneyChanged(0, Player.LocalPlayer.CurrentMoney);
-            currentTargets = new List<TargetDrawer>();
+            CommandsManager.Instance.ExecutorChanged.AddListener(OnExecutorChanged);
+            currentDrawers = new List<TargetDrawer>();
         }
 
-        public void ReDrawTargetsIcons(List<(ITarget, CommandType)> targets)
+        private void OnExecutorChanged(IExecutor arg0, IExecutor arg1)
         {
-            foreach (var targetDrawer in currentTargets)
+            if (arg0 != null)
             {
-                targetDrawer.ReDraw(CommandType.None);
+                arg0.ActionCompleted.RemoveListener(ReDrawCurrentTargets);
             }
-            currentTargets = new List<TargetDrawer>();
+            currentExecutor = arg1;
+            ReDrawCurrentTargets();
+            if(currentExecutor == null) return;
+            currentExecutor.ActionCompleted.AddListener(ReDrawCurrentTargets);
+        }
+
+        private void ReDrawCurrentTargets()
+        {
+            foreach (var currentDrawer in currentDrawers)
+            {
+                currentDrawer.ReDraw(CommandType.None);
+            }
+            currentDrawers = new List<TargetDrawer>();
+            if (currentExecutor != null)
+            {
+                ReDrawTargetsIcons(currentExecutor.GetAllAvailableTargets().ToList());
+            }
+        }
+
+        private void ReDrawTargetsIcons(List<(ITarget, CommandType)> targets)
+        {
             foreach (var valueTuple in targets)
             {
                 var drawerScript = valueTuple.Item1 as MonoBehaviour;
                 if (drawerScript == null) continue;
                 var drawer = drawerScript.gameObject.GetComponent<TargetDrawer>();
                 if (drawer == null) continue;
+                currentDrawers.Add(drawer);
                 drawer.ReDraw(valueTuple.Item2);
-                currentTargets.Add(drawer);
             }
         }
-        
+
         private void OnDestroy()
         {
             Player.LocalPlayer.CurrentMoneyChanged -= (PlayerOnCurrenMoneyChanged);

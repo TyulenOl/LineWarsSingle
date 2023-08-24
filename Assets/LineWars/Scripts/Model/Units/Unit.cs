@@ -31,7 +31,8 @@ namespace LineWars.Model
         [SerializeField] protected UnitSize unitSize;
         [SerializeField] protected LineType movementLineType;
         [SerializeField] protected CommandPriorityData priorityData;
-
+        [field: SerializeField] public string UnitName { get; private set; }
+        
         [Header("Action Points Settings")] 
         [SerializeField] [Min(0)] protected int initialActionPoints;
 
@@ -60,8 +61,10 @@ namespace LineWars.Model
         [field: SerializeField] public UnityEvent<int, int> HpChanged { get; private set; }
         [field: SerializeField] public UnityEvent<int, int> ArmorChanged { get; private set; }
         [field: SerializeField] public UnityEvent<Unit> Died { get; private set; }
-        [field: SerializeField] public UnityEvent<int, int> ActionPointChanged { get; private set; }
+        [field: SerializeField] public UnityEvent<int, int> ActionPointsChanged { get; private set; }
         [field: SerializeField] public UnityEvent<bool, bool> CanBlockChanged { get; private set; }
+        
+        [field: SerializeField] public UnityEvent ActionCompleted { get; private set; }
         
         public int CurrentActionPoints
         {
@@ -70,7 +73,7 @@ namespace LineWars.Model
             {
                 var previousValue = currentActionPoints;
                 currentActionPoints = Math.Max(0, value);
-                ActionPointChanged.Invoke(previousValue, currentActionPoints);
+                ActionPointsChanged.Invoke(previousValue, currentActionPoints);
             }
         }
         public int MaxHp => maxHp;
@@ -184,6 +187,7 @@ namespace LineWars.Model
             
             movementLogic.MoveTo(target.transform);
             CurrentActionPoints = movePointsModifier.Modify(CurrentActionPoints);
+            ActionCompleted.Invoke();
         }
 
         private void AssignNewNode(Node target)
@@ -302,6 +306,7 @@ namespace LineWars.Model
         {
             target.TakeDamage(new Hit(MeleeDamage, this, target, isPenetratingMeleeAttack));
             CurrentActionPoints = attackPointsModifier.Modify(CurrentActionPoints);
+            ActionCompleted.Invoke();
         }
 
         public virtual bool CanAttack([NotNull] Edge edge) => false;
@@ -341,6 +346,7 @@ namespace LineWars.Model
             CurrentActionPoints = blockPointsModifier
                 ? blockPointsModifier.Modify(CurrentActionPoints)
                 : CurrentActionPoints = 0;
+            ActionCompleted.Invoke();
         }
         #endregion
         protected virtual void OnDied()
@@ -411,7 +417,7 @@ namespace LineWars.Model
         
         public virtual IEnumerable<(ITarget,CommandType)> GetAllAvailableTargets()
         {
-            return GetAllAvailableTargetsInRange((uint)currentActionPoints);
+            return GetAllAvailableTargetsInRange((uint)currentActionPoints + 1);
         }
 
         protected IEnumerable<(ITarget, CommandType)> GetAllAvailableTargetsInRange(uint range)

@@ -43,6 +43,7 @@ namespace LineWars.Model
                     DistanceAttack(neighbour);
                 DistanceAttack(enemy);
             };
+
         }
         
 
@@ -52,6 +53,7 @@ namespace LineWars.Model
             CurrentActionPoints = distanceAttackPointsModifier
                 ? distanceAttackPointsModifier.Modify(CurrentActionPoints)
                 : 0;
+            ActionCompleted.Invoke();
         }
 
         public override CommandType GetAttackTypeBy(IAlive target)
