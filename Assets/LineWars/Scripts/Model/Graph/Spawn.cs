@@ -7,6 +7,7 @@ namespace LineWars.Model
 {
     [RequireComponent(typeof(Node))]
     [RequireComponent(typeof(NodeInitialInfo))]
+    [ExecuteInEditMode]
     public class Spawn : MonoBehaviour
     {
         public static readonly string defaultName = "";
@@ -49,6 +50,15 @@ namespace LineWars.Model
             foreach (var info in FindObjectsOfType<NodeInitialInfo>()
                          .Where(x => x.ReferenceToSpawn == this))
                 info.Redraw(this);
+        }
+
+        private void OnDisable()
+        {
+            foreach (var info in FindObjectsOfType<NodeInitialInfo>()
+                         .Where(x=>x.ReferenceToSpawn == this))
+            {
+                info.Redraw(null);
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using DataStructures.PriorityQueue;
 using LineWars.Extensions;
@@ -10,10 +11,10 @@ namespace LineWars.Model
     public class Graph : MonoBehaviour
     {
         private static Graph Instance { get; set; }
-        
+
         [field: SerializeField] public GameObject NodesParent { get; set; }
         [field: SerializeField] public GameObject EdgesParent { get; set; }
-        
+
         private Node[] allNodes;
         private Edge[] allEdges;
         private List<SpawnInfo> spawnInfos;
@@ -21,7 +22,7 @@ namespace LineWars.Model
 
         public static IReadOnlyList<Node> AllNodes => Instance != null ? Instance.allNodes : Array.Empty<Node>();
         public static IReadOnlyList<Edge> AllEdges => Instance != null ? Instance.allEdges : Array.Empty<Edge>();
-        
+
         private void Awake()
         {
             if (Instance == null)
@@ -67,7 +68,7 @@ namespace LineWars.Model
                 ? Instance._HasSpawnPoint()
                 : throw new NullReferenceException("Graph is not Instance!");
 
-        private bool _HasSpawnPoint() => spawnInfosStack.Count != 0;
+        private bool _HasSpawnPoint() => spawnInfosStack.Count > 0;
 
         public static SpawnInfo GetSpawnPoint() =>
             Instance != null
@@ -80,7 +81,7 @@ namespace LineWars.Model
             Instance != null
                 ? Instance._GetVisibilityInfo(player)
                 : throw new NullReferenceException("Graph is not Instance!");
-        
+
         private bool[] _GetVisibilityInfo(Player player)
         {
             var result = new bool[allNodes.Length];
@@ -116,6 +117,145 @@ namespace LineWars.Model
                     priorityQueue.Enqueue(neighbor, nextVisibility);
                 }
             }
+        }
+
+        public static List<Node> FindShortestPath([NotNull] Node start, [NotNull] Node end)
+        {
+            if (start == null) throw new ArgumentNullException(nameof(start));
+            if (end == null) throw new ArgumentNullException(nameof(end));
+
+            var queue = new Queue<Node>();
+            var track = new Dictionary<Node, Node>();
+            queue.Enqueue(start);
+            track[start] = null;
+            while (queue.Count != 0)
+            {
+                var node = queue.Dequeue();
+                foreach (var neighborhood in node.GetNeighbors())
+                {
+                    if (track.ContainsKey(neighborhood)) continue;
+                    track[neighborhood] = node;
+                    queue.Enqueue(neighborhood);
+                }
+
+                if (track.ContainsKey(end)) break;
+            }
+
+            if (!track.ContainsKey(end))
+                return new List<Node>();
+            
+            var pathItem = end;
+            var result = new List<Node>();
+            while (pathItem != null)
+            {
+                result.Add(pathItem);
+                pathItem = track[pathItem];
+            }
+
+            result.Reverse();
+            return result;
+        }
+        
+        public static List<Node> FindShortestPath([NotNull] Node start, [NotNull] Node end, Unit unit)
+        {
+            if (start == null) throw new ArgumentNullException(nameof(start));
+            if (end == null) throw new ArgumentNullException(nameof(end));
+            
+            var queue = new Queue<Node>();
+            var track = new Dictionary<Node, Node>();
+            queue.Enqueue(start);
+            track[start] = null;
+            while (queue.Count != 0)
+            {
+                var node = queue.Dequeue();
+                foreach (var neighborhood in node.GetNeighbors())
+                {
+                    if(!unit.CanMoveOnLineWithType(neighborhood.GetLine(node).LineType)) continue;
+                    if(neighborhood != end && !CheckNodeForWalkability(neighborhood, unit)) continue;
+                    if (track.ContainsKey(neighborhood)) continue;
+                    
+                    track[neighborhood] = node;
+                    queue.Enqueue(neighborhood);
+                }
+
+                if (track.ContainsKey(end)) break;
+            }
+
+            if (!track.ContainsKey(end))
+                return new List<Node>();
+            
+            var pathItem = end;
+            var result = new List<Node>();
+            while (pathItem != null)
+            {
+                result.Add(pathItem);
+                pathItem = track[pathItem];
+            }
+
+            result.Reverse();
+            return result;
+        }
+
+        public static IEnumerable<Node> GetNodesInRange(Node startNode, uint range)
+        {
+            var queue = new Queue<Node>();
+            var distanceMemory = new Dictionary<Node, uint>();
+            
+            queue.Enqueue(startNode);
+            distanceMemory[startNode] = 0;
+            while (queue.Count != 0)
+            {
+                var node = queue.Dequeue();
+                yield return node;
+                foreach (var neighborhood in node.GetNeighbors())
+                {
+                    if (distanceMemory.ContainsKey(neighborhood)) continue;
+                    var distanceForNextNode = distanceMemory[node] + 1;
+                    if (distanceForNextNode >= range) continue;
+                    
+                    distanceMemory[neighborhood] = distanceForNextNode;
+                    queue.Enqueue(neighborhood);
+                }
+            }
+        }
+
+        public static IEnumerable<Node> GetNodesInRange(Node startNode, uint range, Unit unit)
+        {
+            var queue = new Queue<Node>();
+            var distanceMemory = new Dictionary<Node, uint>();
+            
+            queue.Enqueue(startNode);
+            distanceMemory[startNode] = 0;
+            while (queue.Count != 0)
+            {
+                var node = queue.Dequeue();
+                yield return node;
+                foreach (var neighbor in node.GetNeighbors())
+                {
+                    if(!unit.CanMoveOnLineWithType(neighbor.GetLine(node).LineType)) continue;
+                    if(!CheckNodeForWalkability(neighbor, unit)) continue;
+                    if (distanceMemory.ContainsKey(neighbor)) continue;
+                    
+                    var distanceForNextNode = distanceMemory[node] + 1;
+                    if (distanceForNextNode >= range) continue;
+                    
+                    distanceMemory[neighbor] = distanceForNextNode;
+                    queue.Enqueue(neighbor);
+                }
+            }
+        }
+
+        public static bool CheckNodeForWalkability(Node node, Unit unit)
+        {
+            if(unit.Size == UnitSize.Large && !(node.LeftUnit == null && node.RightUnit == null)) return false;
+            if (unit.Size == UnitSize.Little)
+            {
+                if (node.LeftUnit != null && node.RightUnit != null) return false;
+                if (node.LeftUnit != null && node.LeftUnit.Owner != unit.Owner) return false;
+                if (node.RightUnit != null && node.RightUnit.Owner != unit.Owner) return false;
+            }
+            
+            return true;
         }
     }
 }

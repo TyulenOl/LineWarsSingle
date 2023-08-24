@@ -13,7 +13,7 @@ namespace LineWars
         [SerializeField] private PhaseExecutorsData phaseExecutorsData;
 
         private IReadOnlyCollection<UnitType> potentialExecutors;
-        private bool isTurnMade = false;
+        private bool isTurnMade;
 
         private StateMachine stateMachine;
         private PlayerPhase idlePhase;
@@ -25,7 +25,6 @@ namespace LineWars
         
         [field: SerializeField] public UnityEvent TurnMade {get; private set;}
         public IReadOnlyCollection<UnitType> PotentialExecutors => potentialExecutors;
-
         public bool IsTurnMade
         {
             get => isTurnMade;
@@ -77,14 +76,22 @@ namespace LineWars
 
         private void OnOwnedAdded(Owned owned)
         {
-            
+            if(!(owned is Unit unit)) return;
+            unit.ActionPointChanged.AddListener(ProcessActionPointsChange);
         }
 
         private void OnOwnerRemoved(Owned owned)
         {
-            
+            if(!(owned is Unit unit)) return;
+            unit.ActionPointChanged.RemoveListener(ProcessActionPointsChange);
         }
 
+        private void ProcessActionPointsChange(int previousValue, int currentValue)
+        {
+            if (currentValue <= 0 && CurrentPhase != PhaseType.Idle)
+                IsTurnMade = true;
+        }
+        
         public void FinishTurn()
         {
             if(!IsTurnMade) return;

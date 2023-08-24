@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using LineWars.Model;
 
-namespace LineWars.Controllers
+namespace LineWars
 {
     public partial class PhaseManager
     {
@@ -12,7 +12,25 @@ namespace LineWars.Controllers
         {
             private int currentActorId;
             private IActor currentActor => manager.Actors[currentActorId];
-        
+
+            public override bool AreActorsDone
+            {
+                get
+                {
+                    var actorsAreFree = true;
+                    foreach (var actor in manager.actors)
+                    {
+                        if (actor.CurrentPhase == Type)
+                        {
+                            actorsAreFree = false;
+                            break;
+                        }
+                    }
+
+                    return base.AreActorsDone && actorsAreFree;
+                }
+            }
+
             public PhaseAlternatingState(PhaseType phase, PhaseManager manager) : base(phase, manager)
             {
                 
@@ -31,25 +49,7 @@ namespace LineWars.Controllers
                 base.OnExit();
                 manager.ActorTurnChanged -= OnActorsTurnChanged;
             }
-
-            private void OnActorsTurnChanged(IActor actor, PhaseType previousPhase, PhaseType currentPhase)
-            {
-                if(previousPhase != Type)
-                {
-                    if(previousPhase != PhaseType.Idle)
-                    {
-                        Debug.LogError($"{actor} ended turn {previousPhase}; Phase {Type} is parsing it instead!");
-                    }
-                    return;
-                }
-                if(actor != currentActor)
-                    Debug.LogError($"{currentActor} is making a turn; {actor} is ended the turn instead!");
-
-                if(PickNewActor())
-                    currentActor.ExecuteTurn(Type);
-
-            }
-
+            
             private void Begin()
             {
                 if(AreActorsDone) return;
@@ -60,9 +60,8 @@ namespace LineWars.Controllers
                 }
 
                 currentActor.ExecuteTurn(Type);
-                
             }
-
+            
             private bool PickNewActor()
             {
                 if(AreActorsDone) return false;
@@ -77,6 +76,27 @@ namespace LineWars.Controllers
                         return true;
                     }
                 }
+            }
+
+            private void OnActorsTurnChanged(IActor actor, PhaseType previousPhase, PhaseType currentPhase)
+            {
+                if(previousPhase != Type)
+                {
+                    if(previousPhase != PhaseType.Idle)
+                    {
+                        Debug.LogError($"{actor} ended turn {previousPhase}; Phase {Type} is parsing it instead!");
+                    }
+                    return;
+                }
+
+                if (actor != currentActor)
+                {
+                    Debug.LogError($"{currentActor} is making a turn; {actor} is ended the turn instead!");
+                    return;
+                }
+
+                if (PickNewActor())
+                    currentActor.ExecuteTurn(Type);
             }
         }
     }

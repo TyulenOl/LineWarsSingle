@@ -24,8 +24,8 @@ namespace LineWars.Controllers
         
         [Header("CharacteristicsDrawers")]
         [SerializeField] private UnitPartDrawer leftDrawer;
-        [SerializeField] private UnitPartDrawer rightDrawer;
         [SerializeField] private UnitPartDrawer centerDrawer;
+        [SerializeField] private UnitPartDrawer rightDrawer;
         
         
         private Unit unit;
@@ -58,9 +58,12 @@ namespace LineWars.Controllers
                 .Where(x => x is not null)
                 .ToList();
             
-            
-            leftDrawer.CurrentUnit = unit;
-            rightDrawer.CurrentUnit = unit;
+            if(leftDrawer != null)
+                leftDrawer.CurrentUnit = unit;
+            if(rightDrawer != null)
+                rightDrawer.CurrentUnit = unit;
+            if (centerDrawer != null)
+                centerDrawer.CurrentUnit = unit;
             //TODO центральный отрисовщик характеристик
         }
 

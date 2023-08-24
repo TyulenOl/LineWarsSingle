@@ -23,6 +23,11 @@ namespace LineWars.Model
             }
         }
 
+        private void OnDisable()
+        {
+            Redraw(null);
+        }
+
         private void OnValidate()
         {
             AssignFields();

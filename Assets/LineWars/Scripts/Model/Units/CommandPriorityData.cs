@@ -19,8 +19,7 @@ namespace LineWars.Model
         Explose,
         Fire,
         Move,
-        Build,
-        Curse
+        UpRoad
     }
 }   
 

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using LineWars.Extensions.Attributes;
 using LineWars.Interface;
 using UnityEngine;
@@ -6,39 +8,60 @@ using UnityEngine.Events;
 
 namespace LineWars.Model
 {
-    public class Edge : MonoBehaviour, IAlive, ITarget, INumbered
+    [Serializable]
+    public class LineTypeCharacteristics
     {
-        [Header("Graph Settings")] [SerializeField]
-        private int index;
+        [SerializeField] private LineType lineType;
+        [SerializeField, Min(0)] private int maxHp;
+
+        public LineType LineType => lineType;
+        public int MaxHp => maxHp;
+
+        public LineTypeCharacteristics(LineType type)
+        {
+            lineType = type;
+            maxHp = 0;
+        }
+    }
+
+    public class Edge : MonoBehaviour, IAlive, ITarget, INumbered, ISerializationCallbackReceiver
+    {
+        [Header("Graph Settings")] 
+        [SerializeField] private int index;
 
         [SerializeField] [ReadOnlyInspector] private Node firstNode;
         [SerializeField] [ReadOnlyInspector] private Node secondNode;
 
-        [Header("Logical Settings")] [SerializeField] [Min(1)]
-        private int maxHp = 2;
+        [Header("Line Settings")] [SerializeField]
+        private LineType lineType;
 
-        [SerializeField] [ReadOnlyInspector] private int hp;
-        [SerializeField] private LineType lineType;
+        [SerializeField, NamedArray("lineType")] private List<LineTypeCharacteristics> lineTypeCharacteristics;
 
         [Header("Commands Settings")] [SerializeField]
         private CommandPriorityData priorityData;
 
+        [Header("DEBUG")] 
+        [SerializeField] [ReadOnlyInspector] private int hp;
 
         [SerializeField] [HideInInspector] private LineDrawer drawer;
 
-
         [field: Header("Events")]
-        [field: SerializeField]
-        public UnityEvent<int, int> HpChanged { get; private set; }
+        [field: SerializeField] public UnityEvent<int, int> HpChanged { get; private set; }
 
         [field: SerializeField] public UnityEvent<LineType, LineType> LineTypeChanged { get; private set; }
         [field: SerializeField] public UnityEvent<Unit> Died { get; private set; }
+
+        private Dictionary<LineType, LineTypeCharacteristics> lineTypeCharacteristicsMap;
 
         public int Index
         {
             get => index;
             set => index = value;
         }
+
+        public int MaxHp => lineTypeCharacteristicsMap.ContainsKey(LineType)
+            ? lineTypeCharacteristicsMap[LineType].MaxHp
+            : 0;
 
         public Node FirstNode => firstNode;
         public Node SecondNode => secondNode;
@@ -54,10 +77,10 @@ namespace LineWars.Model
                 if (value < 0)
                 {
                     LineType = LineTypeHelper.Down(LineType);
-                    hp = maxHp;
+                    hp = MaxHp;
                 }
                 else
-                    hp = Math.Min(value, maxHp);
+                    hp = Math.Min(value, MaxHp);
 
                 HpChanged.Invoke(before, hp);
             }
@@ -73,6 +96,7 @@ namespace LineWars.Model
                 var before = lineType;
                 lineType = value;
                 LineTypeChanged.Invoke(before, lineType);
+                CurrentHp = MaxHp;
             }
         }
 
@@ -80,10 +104,10 @@ namespace LineWars.Model
 
         protected void OnValidate()
         {
-            hp = maxHp;
+            hp = MaxHp;
         }
 
-        public void Initialize(Node firstNode, Node secondNode, LineType lineType = LineType.ScoutRoad)
+        public void Initialize(Node firstNode, Node secondNode)
         {
             this.firstNode = firstNode;
             this.secondNode = secondNode;
@@ -93,14 +117,7 @@ namespace LineWars.Model
 
         public void TakeDamage(Hit hit)
         {
-            throw new System.NotImplementedException();
-        }
-
-        public void Heal(int healAmount)
-        {
-            if (healAmount < 0)
-                throw new ArgumentException($"{nameof(healAmount)} > 0 !");
-            CurrentHp += healAmount;
+            CurrentHp -= hit.Damage;
         }
 
         public void ReDraw() => drawer.DrawLine();
@@ -111,6 +128,34 @@ namespace LineWars.Model
                 return SecondNode;
             else
                 return FirstNode;
+        }
+
+        public void OnBeforeSerialize()
+        {
+        }
+
+        public void OnAfterDeserialize()
+        {
+            lineTypeCharacteristicsMap = new Dictionary<LineType, LineTypeCharacteristics>();
+
+            for (int i = 0; i != lineTypeCharacteristics.Count; i++)
+                lineTypeCharacteristicsMap.TryAdd(lineTypeCharacteristics[i].LineType, lineTypeCharacteristics[i]);
+
+            UpdateTypes();
+        }
+
+        private void UpdateTypes()
+        {
+            foreach (var value in Enum.GetValues(typeof(LineType)).OfType<LineType>())
+            {
+                if (!lineTypeCharacteristicsMap.ContainsKey(value))
+                    lineTypeCharacteristicsMap[value] = new LineTypeCharacteristics(value);
+            }
+        }
+
+        public void LevelUp()
+        {
+            LineType = LineTypeHelper.Up(LineType);
         }
     }
 }

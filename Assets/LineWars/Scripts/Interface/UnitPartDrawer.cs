@@ -9,7 +9,7 @@ namespace LineWars.Interface
 {
     public class UnitPartDrawer : MonoBehaviour
     {
-        public Vector2 offset;
+        [HideInInspector] public Vector2 offset;
         [SerializeField] private float animationThreshold = 0.5f;
         
         [Header("Reference")]

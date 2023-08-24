@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace LineWars.Controllers
+namespace LineWars
 {
     public class Selector : MonoBehaviour // Отвечает за Input
     {

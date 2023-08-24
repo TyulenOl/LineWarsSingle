@@ -1,4 +1,5 @@
-﻿using LineWars.Extensions.Attributes;
+﻿using System;
+using LineWars.Extensions.Attributes;
 using LineWars.Model;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -25,6 +26,12 @@ namespace LineWars.Model
         {
             basePlayer.AddOwned(owned);
             owned.SetOwner(basePlayer);
+        }
+
+        protected virtual void OnDisable()
+        {
+            if(Owner != null)
+                Owner.RemoveOwned(this);
         }
 
         protected virtual void OnSetOwner(BasePlayer oldPlayer, BasePlayer newPlayer) {}
