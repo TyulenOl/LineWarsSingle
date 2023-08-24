@@ -5,6 +5,7 @@ using LineWars.Extensions.Attributes;
 using LineWars.Interface;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace LineWars.Model
 {
@@ -13,9 +14,11 @@ namespace LineWars.Model
     {
         [SerializeField] private LineType lineType;
         [SerializeField, Min(0)] private int maxHp;
+        [SerializeField] private Sprite sprite;
 
         public LineType LineType => lineType;
         public int MaxHp => maxHp;
+        public Sprite Sprite => sprite;
 
         public LineTypeCharacteristics(LineType type)
         {
@@ -24,6 +27,8 @@ namespace LineWars.Model
         }
     }
 
+    [RequireComponent(typeof(SpriteRenderer))]
+    [RequireComponent(typeof(BoxCollider2D))]
     public class Edge : MonoBehaviour, IAlive, ITarget, INumbered, ISerializationCallbackReceiver
     {
         [Header("Graph Settings")] 
@@ -32,26 +37,24 @@ namespace LineWars.Model
         [SerializeField] [ReadOnlyInspector] private Node firstNode;
         [SerializeField] [ReadOnlyInspector] private Node secondNode;
 
-        [Header("Line Settings")] [SerializeField]
-        private LineType lineType;
+        [Header("Line Settings")]
+        [SerializeField] private LineType lineType;
 
         [SerializeField, NamedArray("lineType")] private List<LineTypeCharacteristics> lineTypeCharacteristics;
 
-        [Header("Commands Settings")] [SerializeField]
-        private CommandPriorityData priorityData;
+        [Header("Commands Settings")]
+        [SerializeField] private CommandPriorityData priorityData;
 
         [Header("DEBUG")] 
         [SerializeField] [ReadOnlyInspector] private int hp;
-
-        [SerializeField] [HideInInspector] private LineDrawer drawer;
-
+        
         [field: Header("Events")]
         [field: SerializeField] public UnityEvent<int, int> HpChanged { get; private set; }
-
         [field: SerializeField] public UnityEvent<LineType, LineType> LineTypeChanged { get; private set; }
-        [field: SerializeField] public UnityEvent<Unit> Died { get; private set; }
 
         private Dictionary<LineType, LineTypeCharacteristics> lineTypeCharacteristicsMap;
+        [SerializeField, HideInInspector] private SpriteRenderer spriteRenderer;
+        [SerializeField, HideInInspector] private BoxCollider2D boxCollider2D;
 
         public int Index
         {
@@ -65,7 +68,6 @@ namespace LineWars.Model
 
         public Node FirstNode => firstNode;
         public Node SecondNode => secondNode;
-        public LineDrawer Drawer => drawer;
 
         public int CurrentHp
         {
@@ -85,9 +87,7 @@ namespace LineWars.Model
                 HpChanged.Invoke(before, hp);
             }
         }
-
-        public bool IsDied => CurrentHp <= 0;
-
+        
         public LineType LineType
         {
             get => lineType;
@@ -101,27 +101,24 @@ namespace LineWars.Model
         }
 
         public CommandPriorityData CommandPriorityData => priorityData;
-
+        
         protected void OnValidate()
         {
             hp = MaxHp;
-        }
-
+            AssignFields();
+        }     
+        
         public void Initialize(Node firstNode, Node secondNode)
         {
             this.firstNode = firstNode;
             this.secondNode = secondNode;
-            drawer = GetComponent<LineDrawer>();
-            drawer.Initialise(firstNode.transform, secondNode.transform);
         }
 
         public void TakeDamage(Hit hit)
         {
             CurrentHp -= hit.Damage;
         }
-
-        public void ReDraw() => drawer.DrawLine();
-
+        
         public Node GetOther(Node node)
         {
             if (FirstNode.Equals(node))
@@ -156,6 +153,42 @@ namespace LineWars.Model
         public void LevelUp()
         {
             LineType = LineTypeHelper.Up(LineType);
+        }
+        
+        public void ReDraw()
+        {
+            RedrawLine();
+            AlineCollider();
+        }
+
+        private void RedrawLine()
+        {
+            var positionFirst = firstNode.Position;
+            var positionSecond = secondNode.Position;
+            var distance = Vector3.Distance(positionFirst, positionSecond);
+            spriteRenderer.size = new Vector2(distance,spriteRenderer.size.y);
+            var center = positionFirst;
+            var newSecondNodePosition = positionSecond - center;
+            var radian = Mathf.Atan2(newSecondNodePosition.y , newSecondNodePosition.x) * 180 / Math.PI;
+            spriteRenderer.transform.rotation = Quaternion.Euler(0,0,(float)radian);
+            spriteRenderer.transform.position = (positionFirst + positionSecond) / 2;
+
+            spriteRenderer.sprite = lineTypeCharacteristicsMap.TryGetValue(lineType, out var ch)
+                ? ch.Sprite
+                : Resources.Load<Sprite>("Sprites/Road");
+        }
+
+        public void AlineCollider()
+        {
+            boxCollider2D.size = spriteRenderer.size;
+        }
+
+        private void AssignFields()
+        {
+            if (spriteRenderer == null)
+                spriteRenderer = GetComponent<SpriteRenderer>();
+            if (boxCollider2D == null)
+                boxCollider2D = GetComponent<BoxCollider2D>();
         }
     }
 }

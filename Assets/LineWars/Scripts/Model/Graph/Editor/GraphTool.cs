@@ -39,6 +39,9 @@ public class GraphTool : EditorTool
 
         nodeListener = new SelectionListener<Node>();
 
+        foreach (var edge in FindObjectsOfType<Edge>())
+            edge.ReDraw();
+        
         //Debug.Log("CreateGraph is Activated!");
     }
 
@@ -240,8 +243,8 @@ public class GraphTool : EditorTool
     {
         foreach (var edge in node.Edges)
         {
-            Undo.RecordObject(edge.transform, "ReDrawEdge");
-            Undo.RecordObject(edge.Drawer.LineSpriteRenderer, "ReDrawEdge");
+            foreach (var o in edge.GetComponents<Object>())
+                Undo.RecordObject(o, "ReDrawEdge");
             edge.ReDraw();
         }
     }
