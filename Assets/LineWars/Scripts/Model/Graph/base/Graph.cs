@@ -18,11 +18,11 @@ namespace LineWars.Model
         private Node[] allNodes;
         private Edge[] allEdges;
         private List<SpawnInfo> spawnInfos;
-        private Stack<SpawnInfo> spawnInfosStack;
 
         public static IReadOnlyList<Node> AllNodes => Instance != null ? Instance.allNodes : Array.Empty<Node>();
         public static IReadOnlyList<Edge> AllEdges => Instance != null ? Instance.allEdges : Array.Empty<Edge>();
-
+        public static IReadOnlyList<SpawnInfo> Spawns => Instance != null ? Instance.spawnInfos : Array.Empty<SpawnInfo>();
+        
         private void Awake()
         {
             if (Instance == null)
@@ -59,23 +59,9 @@ namespace LineWars.Model
                 var spawnInfo = new SpawnInfo(i, spawn, group);
                 spawnInfos.Add(spawnInfo);
             }
-
-            spawnInfosStack = spawnInfos.ToStack(true);
         }
 
-        public static bool HasSpawnPoint() =>
-            Instance != null
-                ? Instance._HasSpawnPoint()
-                : throw new NullReferenceException("Graph is not Instance!");
 
-        private bool _HasSpawnPoint() => spawnInfosStack.Count > 0;
-
-        public static SpawnInfo GetSpawnPoint() =>
-            Instance != null
-                ? Instance._GetSpawnPoint()
-                : throw new NullReferenceException("Graph is not Instance!");
-
-        private SpawnInfo _GetSpawnPoint() => spawnInfosStack.Pop();
 
         public static bool[] GetVisibilityInfo(Player player) =>
             Instance != null
