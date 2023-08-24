@@ -14,12 +14,13 @@ namespace LineWars.Model
 
     public enum CommandType
     {
+        None,
         Attack,
         Heal,
-        Explose,
+        Explosion,
         Fire,
         Move,
-        UpRoad
+        Build
     }
 }   
 

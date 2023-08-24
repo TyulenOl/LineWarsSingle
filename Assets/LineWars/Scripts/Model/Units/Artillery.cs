@@ -54,10 +54,9 @@ namespace LineWars.Model
                 : 0;
         }
 
-        //ЭТО ДЛЯ ВИЗУАЛИЗАЦИИ, чтобы можно было подсвечивать
-        public IEnumerable<Node> GetNodeInMyDistance()
+        public override CommandType GetAttackTypeBy(IAlive target)
         {
-            return Graph.GetNodesInRange(Node, (uint)Distance);
+            return CommandType.Explosion;
         }
     }
 }

@@ -30,7 +30,7 @@ namespace LineWars.Model
 
             return false;
         }
-
+        public CommandType GetAttackTypeBy(IAlive target);
         public void Attack(Unit enemy);
         public bool CanAttack(Unit unit);
         
