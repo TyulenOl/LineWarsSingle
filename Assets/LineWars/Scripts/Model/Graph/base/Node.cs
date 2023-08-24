@@ -77,8 +77,9 @@ namespace LineWars.Model
             selectable2D.PointerClicked += OnPointerClicked;
         }
 
-        private void OnDisable()
+        protected override void OnDisable()
         {
+            base.OnDisable();
             selectable2D.PointerClicked -= OnPointerClicked;
         }
 

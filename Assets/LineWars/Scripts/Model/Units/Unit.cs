@@ -49,7 +49,16 @@ namespace LineWars.Model
         [SerializeField, ReadOnlyInspector] private int currentArmor;
         [SerializeField, ReadOnlyInspector] private int currentActionPoints;
         [SerializeField] private bool isBlocked;
+        
+        [field: Header("Events")]
+        [field: SerializeField] public UnityEvent<UnitSize, UnitDirection> UnitDirectionChange { get; private set; }
 
+        [field: SerializeField] public UnityEvent<int, int> HpChanged { get; private set; }
+        [field: SerializeField] public UnityEvent<int, int> ArmorChanged { get; private set; }
+        [field: SerializeField] public UnityEvent<Unit> Died { get; private set; }
+        [field: SerializeField] public UnityEvent<int, int> ActionPointChanged { get; private set; }
+        [field: SerializeField] public UnityEvent<bool, bool> CanBlockChanged { get; private set; }
+        
         public int CurrentActionPoints
         {
             get => currentActionPoints;
@@ -57,21 +66,9 @@ namespace LineWars.Model
             {
                 var previousValue = currentActionPoints;
                 currentActionPoints = Math.Max(0, value);
-                ActionPointChanged.Invoke(previousValue, value);
+                ActionPointChanged.Invoke(previousValue, currentActionPoints);
             }
         }
-
-
-        [field: Header("Events")]
-        [field: SerializeField]
-        public UnityEvent<UnitSize, UnitDirection> UnitDirectionChange { get; private set; }
-
-        [field: SerializeField] public UnityEvent<int, int> HpChanged { get; private set; }
-        [field: SerializeField] public UnityEvent<int, int> ArmorChanged { get; private set; }
-        [field: SerializeField] public UnityEvent<Unit> Died { get; private set; }
-        [field: SerializeField] public UnityEvent<int, int> ActionPointChanged { get; private set; }
-        [field: SerializeField] public UnityEvent<bool, bool> CanBlockChanged { get; private set; }
-
         public int MaxHp => maxHp;
 
         public int CurrentHp
@@ -152,8 +149,9 @@ namespace LineWars.Model
             movementLogic.MovementIsOver += MovementLogicOnMovementIsOver;
         }
 
-        private void OnDisable()
+        protected override void OnDisable()
         {
+            base.OnDisable();
             movementLogic.MovementIsOver -= MovementLogicOnMovementIsOver;
         }
 

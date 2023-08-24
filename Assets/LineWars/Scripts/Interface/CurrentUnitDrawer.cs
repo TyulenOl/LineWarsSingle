@@ -7,9 +7,14 @@ using UnityEngine;
 
 public class CurrentUnitDrawer : MonoBehaviour
 {
-    private void Awake()
+    private void OnEnable()
     {
         CommandsManager.Instance.ExecutorChanged.AddListener(ExecutorChanged);
+    }
+
+    private void OnDisable()
+    {
+        CommandsManager.Instance.ExecutorChanged.RemoveListener(ExecutorChanged);
     }
 
     private void ExecutorChanged(IExecutor oldExecutor, IExecutor newExecutor)

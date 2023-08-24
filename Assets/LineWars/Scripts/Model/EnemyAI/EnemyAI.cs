@@ -81,7 +81,6 @@ namespace LineWars.Model
                 }
                 else
                 {
-                    Debug.Log("OKAY I AM DONE");
                     currentExecutor = null;
                     ExecuteTurn(PhaseType.Idle);
                 }

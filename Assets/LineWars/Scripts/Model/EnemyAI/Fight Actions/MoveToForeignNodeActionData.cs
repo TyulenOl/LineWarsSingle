@@ -30,16 +30,32 @@ namespace LineWars.Model
             {
                 if (!(executor is Unit unit)) return;
 
-                var moveCost = unit.CurrentActionPoints - unit.MovePointsModifier.Modify(unit.CurrentActionPoints);
-                var possibleDistance = unit.CurrentActionPoints / moveCost + 1;
-                var nearbyNodes = 
-                    Graph.GetNodesInRange(unit.Node, (uint)possibleDistance, unit);
-               
-                foreach (var currentNode in nearbyNodes)   
+                var queue = new Queue<(Node, int)>();
+                var nodeSet = new HashSet<Node>();
+                queue.Enqueue((unit.Node, unit.CurrentActionPoints));
+                nodeSet.Add(unit.Node);
+                while (queue.Count > 0)
                 {
-                    if(currentNode == unit.Node) continue;
-                    if(currentNode.Owner == basePlayer) continue;
-                    list.Add(new MoveToForeignNodeAction(basePlayer, executor, currentNode, this));
+                    var currentNodeInfo = queue.Dequeue();
+                    
+                    if(currentNodeInfo.Item2 == 0) continue;
+                    foreach(var neighborNode in currentNodeInfo.Item1.GetNeighbors())
+                    {
+                        if(nodeSet.Contains(neighborNode)) continue;
+                        
+                        var pointsAfterMove = unit.MovePointsModifier.Modify(currentNodeInfo.Item2);
+                        var edge = neighborNode.GetLine(currentNodeInfo.Item1);
+                        
+                        if (pointsAfterMove >= 0 
+                            && (int) edge.LineType >= (int) unit.Passability 
+                            && Graph.CheckNodeForWalkability(neighborNode, unit))
+                        {
+                            queue.Enqueue((neighborNode, pointsAfterMove));
+                            nodeSet.Add(neighborNode);
+                            if(neighborNode.Owner != basePlayer)
+                                list.Add(new MoveToForeignNodeAction(basePlayer, executor, neighborNode, this));
+                        }
+                    }
                 }
             }
         }
@@ -75,12 +91,9 @@ namespace LineWars.Model
                     foreach (var node in path)
                     {
                         if(node == unit.Node) continue;
-                        
                         if (!unit.CanMoveTo(node))
-                        {
                             Debug.LogError($"{unit} cannot move to {node}");
-                        }
-                        
+
                         UnitsController.ExecuteCommand(new MoveCommand(unit, unit.Node, node));
                         yield return new WaitForSeconds(data.WaitTime);
                     }
@@ -98,16 +111,26 @@ namespace LineWars.Model
 
             private float ForeignGetScore()
             {
-                var moveCost = 0 - unit.MovePointsModifier.Modify(0);
-                var pointsLeft = unit.CurrentActionPoints - moveCost * (path.Count - 1);
+                var pointsLeft = unit.CurrentActionPoints;
+                
+                foreach (var node in path)
+                {
+                    if(node == unit.Node) continue;
+                    pointsLeft = unit.MovePointsModifier.Modify(pointsLeft);
+                }
                 return data.ForeignBaseScore
                        + pointsLeft * data.ForeignScorePerPoint;
             }
 
             private float WhiteGetScore()
             {
-                var moveCost = 0 - unit.MovePointsModifier.Modify(0);
-                var pointsLeft = unit.CurrentActionPoints - moveCost * (path.Count - 1);
+                var pointsLeft = unit.CurrentActionPoints;
+                
+                foreach (var node in path)
+                {
+                    if(node == unit.Node) continue;
+                    pointsLeft = unit.MovePointsModifier.Modify(pointsLeft);
+                }
                 return data.WhiteBaseScore
                        + pointsLeft * data.WhiteScorePerPoint;
             }
