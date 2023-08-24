@@ -39,12 +39,15 @@ public class UnitPartDrawer : MonoBehaviour
         MeleeAttackDrawer = Instantiate(CharacteristicDrawerPrefab.gameObject, CharacteristicsLayoutGroup.transform)
             .GetComponent<CharacteristicDrawer>();
         MeleeAttackDrawer.Init(attackSprite, unitToInit.MeleeDamage.ToString());
+        
         ArmorDrawer = Instantiate(CharacteristicDrawerPrefab.gameObject, CharacteristicsLayoutGroup.transform)
             .GetComponent<CharacteristicDrawer>();
         ArmorDrawer.Init(armorSprite, unitToInit.ArmorChanged.ToString());
+        
         HPDrawer = Instantiate(CharacteristicDrawerPrefab.gameObject, CharacteristicsLayoutGroup.transform)
             .GetComponent<CharacteristicDrawer>();
         HPDrawer.Init(hpSprite, unitToInit.CurrentHp.ToString());
+        
         UnitName.text = DrawHelper.GetNameByUnitType(unitToInit.Type);
     }
 

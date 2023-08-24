@@ -16,6 +16,8 @@ namespace LineWars.Model
     {
         Attack,
         Heal,
+        Explose,
+        Fire,
         Move,
         UpRoad
     }

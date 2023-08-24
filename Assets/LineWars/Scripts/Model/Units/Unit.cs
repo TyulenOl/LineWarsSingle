@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using LineWars.Extensions.Attributes;
 using UnityEngine;
@@ -406,6 +407,11 @@ namespace LineWars.Model
         protected static bool ActionPointsCondition(IntModifier modifier, int actionPoints)
         {
             return actionPoints > 0 && modifier != null && modifier.Modify(actionPoints) >= 0;
+        }
+        
+        public IEnumerable<(ITarget,CommandType)> GetAllAvailableTargets()
+        {
+            throw new NotImplementedException();
         }
     }
 }
