@@ -59,7 +59,7 @@ namespace LineWars.Model
                         }
                         
                         if (pointsAfterMove >= 0 
-                            && (int) edge.LineType >= (int) unit.Passability 
+                            && (int) edge.LineType >= (int) unit.MovementLineType 
                             && Graph.CheckNodeForWalkability(neighborNode, unit))
                         {
                             queue.Enqueue((neighborNode, pointsAfterMove));

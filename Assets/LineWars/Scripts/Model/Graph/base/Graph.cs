@@ -170,7 +170,7 @@ namespace LineWars.Model
                 var node = queue.Dequeue();
                 foreach (var neighborhood in node.GetNeighbors())
                 {
-                    if((int)neighborhood.GetLine(node).LineType < (int) unit.Passability) continue;
+                    if(!unit.CanMoveOnLineWithType(neighborhood.GetLine(node).LineType)) continue;
                     if(neighborhood != end && !CheckNodeForWalkability(neighborhood, unit)) continue;
                     if (track.ContainsKey(neighborhood)) continue;
                     
@@ -219,8 +219,7 @@ namespace LineWars.Model
             }
         }
 
-        public static IEnumerable<Node> GetNodesInRange(Node startNode, uint range, 
-           Unit unit)
+        public static IEnumerable<Node> GetNodesInRange(Node startNode, uint range, Unit unit)
         {
             var queue = new Queue<Node>();
             var distanceMemory = new Dictionary<Node, uint>();
@@ -233,7 +232,7 @@ namespace LineWars.Model
                 yield return node;
                 foreach (var neighbor in node.GetNeighbors())
                 {
-                    if ((int) neighbor.GetLine(node).LineType < (int) unit.Passability) continue;
+                    if(!unit.CanMoveOnLineWithType(neighbor.GetLine(node).LineType)) continue;
                     if(!CheckNodeForWalkability(neighbor, unit)) continue;
                     if (distanceMemory.ContainsKey(neighbor)) continue;
                     
