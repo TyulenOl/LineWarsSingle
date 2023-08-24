@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace LineWars.Controllers
 {
-    [RequireComponent(typeof(Unit))]
+    [RequireComponent(typeof(Unit), typeof(TargetDrawer))]
     public class UnitDrawer : MonoBehaviour
     {
         [Header("Animate Settings")]
@@ -26,16 +26,16 @@ namespace LineWars.Controllers
         [SerializeField] private UnitPartDrawer leftDrawer;
         [SerializeField] private UnitPartDrawer centerDrawer;
         [SerializeField] private UnitPartDrawer rightDrawer;
-        
-        
+
         private Unit unit;
         private List<UnitPartDrawer> allDrawers;
+        private TargetDrawer targetDrawer;
 
         private void Awake()
         {
             unit = GetComponent<Unit>();
 
-            unit.ActionPointChanged.AddListener((_,newValue) => ExecuteForAllDrawers(drawer => drawer.ReDrawActivity(newValue != 0)));
+            unit.ActionPointsChanged.AddListener((_,newValue) => ExecuteForAllDrawers(drawer => drawer.ReDrawActivity(newValue != 0)));
             unit.CanBlockChanged.AddListener((_,newBool) => ExecuteForAllDrawers(drawer => drawer.ReDrawCanBlock(newBool)));
             
             if (leftPart != null)
@@ -64,6 +64,8 @@ namespace LineWars.Controllers
                 rightDrawer.CurrentUnit = unit;
             if (centerDrawer != null)
                 centerDrawer.CurrentUnit = unit;
+
+            targetDrawer = GetComponent<TargetDrawer>();
             //TODO центральный отрисовщик характеристик
         }
 
@@ -125,8 +127,12 @@ namespace LineWars.Controllers
         
         public void DrawLeft()
         {
+            
             if (leftPart != null)
+            {
                 leftPart.gameObject.SetActive(true);
+                targetDrawer.image = leftDrawer.targetSprite;
+            }
             if (centerPart != null)
                 centerPart.gameObject.SetActive(false);
             if (rightPart != null)
@@ -138,7 +144,10 @@ namespace LineWars.Controllers
             if (leftPart != null)
                 leftPart.gameObject.SetActive(false);
             if (centerPart != null)
+            {
                 centerPart.gameObject.SetActive(true);
+                targetDrawer.image = centerDrawer.targetSprite;
+            }
             if (rightPart != null)
                 rightPart.gameObject.SetActive(false);
         }
@@ -150,7 +159,10 @@ namespace LineWars.Controllers
             if (centerPart != null)
                 centerPart.gameObject.SetActive(false);
             if (rightPart != null)
+            {
                 rightPart.gameObject.SetActive(true);
+                targetDrawer.image = rightDrawer.targetSprite;
+            }
         }
 
         private void ReDrawCharacteristics()

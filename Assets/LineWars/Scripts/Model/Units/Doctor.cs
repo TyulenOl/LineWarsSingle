@@ -38,6 +38,7 @@ namespace LineWars.Model
             if (IsMassHeal && TryGetNeighbour(out var neighbour))
                 neighbour.HealMe(HealingAmount);
             CurrentActionPoints = healPointModifier.Modify(CurrentActionPoints);
+            ActionCompleted.Invoke();
         }
     }
 }

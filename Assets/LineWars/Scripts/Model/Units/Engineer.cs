@@ -22,6 +22,7 @@ namespace LineWars.Model
             if (edge == null) throw new ArgumentNullException(nameof(edge));
             edge.LevelUp();
             engineerPoint--;
+            ActionCompleted.Invoke();
         }
     }
 }
