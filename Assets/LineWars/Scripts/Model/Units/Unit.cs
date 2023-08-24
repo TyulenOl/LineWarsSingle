@@ -409,9 +409,25 @@ namespace LineWars.Model
             return actionPoints > 0 && modifier != null && modifier.Modify(actionPoints) >= 0;
         }
         
-        public IEnumerable<(ITarget,CommandType)> GetAllAvailableTargets()
+        public virtual IEnumerable<(ITarget,CommandType)> GetAllAvailableTargets()
         {
-            throw new NotImplementedException();
+            return GetAllAvailableTargetsInRange((uint)currentActionPoints);
+        }
+
+        protected IEnumerable<(ITarget, CommandType)> GetAllAvailableTargetsInRange(uint range)
+        {
+            foreach (var e in Graph.GetNodesInRange(node, range))
+            {
+                foreach (var target in e.GetTargetsWithMe())
+                {
+                    yield return (target, UnitsController.Instance.GetCommandTypeBy(this, target));
+                }
+            }
+        }
+
+        public virtual CommandType GetAttackTypeBy(IAlive target)
+        {
+            return CommandType.Attack;
         }
     }
 }

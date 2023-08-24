@@ -19,5 +19,14 @@ namespace LineWars.Model
         {
             return Graph.FindShortestPath(start, end);
         }
+
+        public static IEnumerable<ITarget> GetTargetsWithMe(this Node node)
+        {
+            yield return node;
+            if (node.LeftUnit != null)
+                yield return node.LeftUnit;
+            if (node.RightUnit != null)
+                yield return node.RightUnit;
+        }
     }
 }

@@ -17,10 +17,10 @@ namespace LineWars.Model
         None,
         Attack,
         Heal,
-        Explose,
+        Explosion,
         Fire,
         Move,
-        UpRoad
+        Build
     }
 }   
 
