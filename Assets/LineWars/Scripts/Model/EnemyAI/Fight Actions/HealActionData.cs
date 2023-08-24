@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
@@ -23,22 +24,44 @@ namespace LineWars.Model
             public override void AddAllPossibleActions(List<EnemyAction> list, EnemyAI basePlayer, IExecutor executor)
             {
                 if(!(executor is Doctor doctor)) return;
-                
-                foreach(var owned in basePlayer.OwnedObjects)
+
+                var queue = new Queue<(Node, int)>();
+                var unitSet = new HashSet<Unit>();
+                var nodeSet = new HashSet<Node>();
+
+                nodeSet.Add(doctor.Node);
+                queue.Enqueue((doctor.Node, doctor.CurrentActionPoints));
+                while (queue.Count > 0)
                 {
-                    if(!(owned is Unit unit)) continue;
-                    if(unit.CurrentHp == unit.MaxHp) continue;
-                    if(unit == doctor) continue;
-                    var pathToNode = Graph.FindShortestPath(doctor.Node, unit.Node, 
-                       unit);
-                    if(!pathToNode.Remove(unit.Node)) continue;
-                    var healCost = 0 -
-                                   doctor.HealPointModifier.Modify(0);
-                    var moveCost = 0 -
-                                   doctor.MovePointsModifier.Modify(0);
-                    
-                    if(moveCost * pathToNode.Count + healCost > doctor.CurrentActionPoints) continue;
-                    list.Add(new HealAction(basePlayer, executor, unit, pathToNode, this));
+                    var currentNodeInfo = queue.Dequeue();
+                    if(currentNodeInfo.Item2 == 0) continue;
+                    foreach (var neighbor in currentNodeInfo.Item1.GetNeighbors())
+                    {
+                        if(nodeSet.Contains(neighbor)) continue;
+                        var pointsAfterMove = doctor.MovePointsModifier.Modify(currentNodeInfo.Item2);
+                        var pointsAfterHeal = doctor.HealPointModifier.Modify(currentNodeInfo.Item2);
+
+                        var edge = neighbor.GetLine(currentNodeInfo.Item1);
+                        if (pointsAfterHeal >= 0
+                            && (int) edge.LineType >= (int) LineType.Firing)
+                        {
+                            foreach (var unit in EnemyActionUtilities.GetUnitsInNode(neighbor))
+                            {
+                                if(unit.Owner != basePlayer) continue;
+                                if(unitSet.Contains(unit)) continue;
+                                list.Add(new HealAction(basePlayer, executor, unit, this));
+                                unitSet.Add(unit);
+                            }
+                        }
+
+                        if (pointsAfterMove >= 0
+                            && doctor.CanMoveOnLineWithType(edge.LineType)
+                            && Graph.CheckNodeForWalkability(neighbor, doctor))
+                        {
+                            queue.Enqueue((neighbor, pointsAfterMove));
+                            nodeSet.Add(neighbor);
+                        }
+                    }
                 }
             }
         }
@@ -47,10 +70,10 @@ namespace LineWars.Model
         {
             private readonly Unit damagedUnit;
             private readonly Doctor doctor;
-            private readonly List<Node> path;
             private readonly HealActionData data;
+            private readonly List<Node> path;
             
-            public HealAction(EnemyAI enemy, IExecutor executor, Unit damagedUnit, List<Node> path, HealActionData data) 
+            public HealAction(EnemyAI enemy, IExecutor executor, Unit damagedUnit, HealActionData data) 
                 : base(enemy, executor)
             {
                 if (!(executor is Doctor doctor))
@@ -61,8 +84,8 @@ namespace LineWars.Model
 
                 this.doctor = doctor;
                 this.damagedUnit = damagedUnit;
-                this.path = path;
                 this.data = data;
+                path = Graph.FindShortestPath(doctor.Node, damagedUnit.Node, doctor);
                 score = GetScore();
             }
 
@@ -77,6 +100,7 @@ namespace LineWars.Model
                         if (node == doctor.Node) continue;
                         if(!doctor.CanMoveTo(node))
                             Debug.LogError($"{doctor} cannot go to {node}");
+                        
                         UnitsController.ExecuteCommand(new MoveCommand(doctor, doctor.Node, node));
                         yield return new WaitForSeconds(data.WaitTime);
                     }
@@ -88,13 +112,19 @@ namespace LineWars.Model
 
             private float GetScore()
             {
-                var hpPercent = (float)damagedUnit.CurrentHp / damagedUnit.MaxHp;
-                var healCost = 0 -
-                               doctor.HealPointModifier.Modify(0);
-                var moveCost = doctor.CurrentActionPoints -
-                               doctor.MovePointsModifier.Modify(0);
-                var pointsLeft = doctor.CurrentActionPoints - (healCost + moveCost * path.Count);
-                return data.BaseScore + hpPercent * data.DamagedUnitBonus + pointsLeft * data.BonusPerPoints;
+                var hpDamagePercent = 1 - (float)damagedUnit.CurrentHp / damagedUnit.MaxHp;
+                var pointsLeft = doctor.CurrentActionPoints;
+                foreach (var node in path)
+                {
+                    if(node == damagedUnit.Node) continue;
+                    if (node == doctor.Node) continue;
+                    pointsLeft = doctor.MovePointsModifier.Modify(pointsLeft);
+                }
+
+                pointsLeft = doctor.HealPointModifier.Modify(pointsLeft);
+                return data.BaseScore 
+                       + hpDamagePercent * data.DamagedUnitBonus 
+                       + pointsLeft * data.BonusPerPoints;
                 
             }
         }

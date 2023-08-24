@@ -10,53 +10,51 @@ namespace LineWars.Model
         public class MoveToOwnNodeActionData : EnemyActionData
         {
             [SerializeField] private float waitTime;
-            [Header("Further Settings")] 
-            [SerializeField] private float furtherBaseScore;
-            [SerializeField] private float furtherBonusPerHp;
-            [SerializeField] private float furtherBonusPerAttack;
-            [SerializeField] private float furtherBonusPerEnemyHp;
-            [SerializeField] private float furtherBonusPerEnemyAttack;
-            [SerializeField] private float furtherBonusPerPoints;
+            [SerializeField] private float baseScore;
+            [SerializeField] private float bonusPerUnitHp;
+            [SerializeField] private float penaltyForEnemiesAttack;
+            [SerializeField] private float bonusPerDistance;
+            [SerializeField] private float bonusPerPoint;
 
-            [Header("Closer Settings")] 
-            [SerializeField] private float closerBaseScore;
-            [SerializeField] private float closerMaxBonusForHpDamage;
-            [SerializeField] private float closerBonusPerPoints;
-
-            #region Attributes
-            public float FurtherBaseScore => furtherBaseScore;
-            public float FurtherBonusPerHp => furtherBonusPerHp;
-            public float FurtherBonusPerAttack => furtherBonusPerAttack;
-            public float FurtherBonusPerEnemyHp => furtherBonusPerEnemyHp;
-            public float FurtherBonusPerEnemyAttack => furtherBonusPerEnemyAttack;
-            public float FurtherBonusPerPoints => furtherBonusPerPoints;
-            public float CloserBaseScore => closerBaseScore;
-            public float CloserMaxBonusForHpDamage => closerMaxBonusForHpDamage;
-            public float CloserBonusPerPoints => closerBonusPerPoints;
+            public float BaseScore => baseScore;
             public float WaitTime => waitTime;
-            #endregion
+            public float BonusPerUnitHp => bonusPerUnitHp;
+            public float PenaltyForEnemiesAttack => penaltyForEnemiesAttack;
+            public float BonusPerDistance => bonusPerDistance;
+            public float BonusPerPoint => bonusPerPoint;
 
             public override void AddAllPossibleActions(List<EnemyAction> list, EnemyAI basePlayer, IExecutor executor)
             {
                 if (!(executor is Unit unit)) return;
 
-                var moveCost = unit.CurrentActionPoints - unit.MovePointsModifier.Modify(unit.CurrentActionPoints);
-                var possibleDistance = unit.CurrentActionPoints / moveCost + 1;
-                var baseDistance = Graph.FindShortestPath(unit.Node, basePlayer.Base, 
-                    unit).Count;
-                var nearbyNodes = 
-                    Graph.GetNodesInRange(unit.Node, (uint)possibleDistance, unit);
-               
-                foreach (var currentNode in nearbyNodes)   
+                var queue = new Queue<(Node, int)>();
+                var nodeSet = new HashSet<Node>();
+                queue.Enqueue((unit.Node, unit.CurrentActionPoints));
+                nodeSet.Add(unit.Node);
+                while (queue.Count > 0)
                 {
-                    if(currentNode == unit.Node) continue;
-                    if(currentNode.Owner != basePlayer) continue;
-                    var currentNodeDistance = Graph.FindShortestPath(currentNode,
-                        basePlayer.Base,
-                        unit).Count;
-                    list.Add(new MoveToOwnNodeAction(basePlayer, executor, currentNode, this,
-                        currentNodeDistance > baseDistance));
+                    var currentNodeInfo = queue.Dequeue();
+                    
+                    if(currentNodeInfo.Item2 == 0) continue;
+                    foreach(var neighborNode in currentNodeInfo.Item1.GetNeighbors())
+                    {
+                        if(nodeSet.Contains(neighborNode)) continue;
+                        
+                        var pointsAfterMove = unit.MovePointsModifier.Modify(currentNodeInfo.Item2);
+                        var edge = neighborNode.GetLine(currentNodeInfo.Item1);
+                        
+                        if (pointsAfterMove >= 0 
+                            && unit.CanMoveOnLineWithType(edge.LineType)
+                            && Graph.CheckNodeForWalkability(neighborNode, unit))
+                        {
+                            queue.Enqueue((neighborNode, pointsAfterMove));
+                            nodeSet.Add(neighborNode);
+                            if(neighborNode.Owner == basePlayer)
+                                list.Add(new MoveToOwnNodeAction(basePlayer, executor, neighborNode, this));
+                        }
+                    }
                 }
+                
             }
         }
 
@@ -66,9 +64,9 @@ namespace LineWars.Model
             private readonly Unit unit;
             private readonly List<Node> path;
             private readonly MoveToOwnNodeActionData data;
-            private readonly bool isFurther;
+            
             public MoveToOwnNodeAction(EnemyAI enemy, IExecutor executor, 
-                Node targetNode, MoveToOwnNodeActionData data, bool isFurther) : base(enemy, executor)
+                Node targetNode, MoveToOwnNodeActionData data) : base(enemy, executor)
             {
                 this.targetNode = targetNode;
                 if (executor is not Unit unit)
@@ -79,7 +77,6 @@ namespace LineWars.Model
 
                 this.unit = unit;
                 this.data = data;
-                this.isFurther = isFurther;
                 path = Graph.FindShortestPath(unit.Node, targetNode, unit);
                 score = GetScore();
             }
@@ -94,6 +91,7 @@ namespace LineWars.Model
                         if(node == unit.Node) continue;
                         if(!unit.CanMoveTo(node))
                             Debug.LogError($"Unit cannot move to {node}");
+                        
                         UnitsController.ExecuteCommand(new MoveCommand(unit, unit.Node, node));
                         yield return new WaitForSeconds(data.WaitTime);
                     }
@@ -103,42 +101,26 @@ namespace LineWars.Model
 
             protected float GetScore()
             {
-                if (isFurther)
-                   return GetFurtherScore();
-                return GetCloserScore();
-            }
-
-            private float GetCloserScore()
-            {
-                var moveCost = unit.CurrentActionPoints - unit.MovePointsModifier.Modify(unit.CurrentActionPoints);
-                var pointsLeft = unit.CurrentActionPoints - moveCost * (path.Count - 1);
-                var bonusPerHpDamage = (1 - (unit.CurrentHp / unit.MaxHp)) * data.CloserMaxBonusForHpDamage;
-                var bonusPerPoints = data.CloserBonusPerPoints * pointsLeft;
-                return data.CloserBaseScore + bonusPerPoints + bonusPerHpDamage;
-            }
-
-            private float GetFurtherScore()
-            {
-                var enemies = EnemyActionUtilities.FindAdjacentEnemies(targetNode, basePlayer);
-                var enemiesHp = 0;
+                var enemies = EnemyActionUtilities.FindAdjacentEnemies(unit.Node, basePlayer);
                 var enemiesAttack = 0;
-                foreach (var currentEnemy in enemies)
+                foreach (var enemy in enemies)
                 {
-                    enemiesHp += currentEnemy.CurrentHp;
-                    enemiesAttack += currentEnemy.MeleeDamage;
+                    enemiesAttack += enemy.MeleeDamage;
                 }
-
-                var moveCost = unit.CurrentActionPoints - unit.MovePointsModifier.Modify(unit.CurrentActionPoints);
-                var pointsLeft = unit.CurrentActionPoints - moveCost * (path.Count - 1);
-                var enemyBonus = 0f;
-                if (enemies.Count > 0)
+                var safetyBonus = data.BonusPerUnitHp * unit.CurrentHp 
+                                  - data.PenaltyForEnemiesAttack * enemiesAttack;
+                var oldNodeDistance = Graph.FindShortestPath(unit.Node, basePlayer.Base).Count;
+                var newNodeDistance = Graph.FindShortestPath(targetNode, basePlayer.Base).Count;
+                var pointsLeft = unit.CurrentActionPoints;
+                foreach (var node in path)
                 {
-                    enemyBonus = data.FurtherBonusPerHp * unit.CurrentHp +
-                                 unit.MeleeDamage * data.FurtherBonusPerAttack +
-                                 enemiesHp * data.FurtherBonusPerEnemyHp +
-                                 enemiesAttack * data.FurtherBonusPerEnemyAttack;
+                    if(node == unit.Node) continue;
+                    pointsLeft = unit.MovePointsModifier.Modify(pointsLeft);
                 }
-                return data.FurtherBaseScore + enemyBonus + pointsLeft * data.FurtherBonusPerPoints;
+                return data.BaseScore 
+                       + safetyBonus 
+                       + data.BonusPerDistance * (newNodeDistance - oldNodeDistance)
+                       + data.BonusPerPoint * pointsLeft;
             }
         }
     }

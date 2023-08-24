@@ -257,23 +257,5 @@ namespace LineWars.Model
             
             return true;
         }
-
-        /*
-        public static List<Node> GetNodesInRangeAlt(Node node, Unit unit, int distance)
-        {
-            var list = new List<Node>();
-            var queue = new Queue<(Node, int)>();
-            queue.Enqueue((node, distance));
-            while (queue.Count > 0)
-            {
-                var currentNodeInfo = queue.Dequeue();
-                list.Add(currentNodeInfo.Item1);
-                if(currentNodeInfo.Item2 <= 0) continue;
-                foreach (var neighbor in currentNodeInfo.Item1.GetNeighbors())
-                {
-                    
-                }
-            }
-        }*/
     }
 }
