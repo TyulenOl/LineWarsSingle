@@ -15,10 +15,13 @@ namespace LineWars.Model
         [SerializeField] private LineType lineType;
         [SerializeField, Min(0)] private int maxHp;
         [SerializeField] private Sprite sprite;
+        [SerializeField, Min(0)] private float width = 5;
 
         public LineType LineType => lineType;
         public int MaxHp => maxHp;
         public Sprite Sprite => sprite;
+
+        public float Width => width;
 
         public LineTypeCharacteristics(LineType type)
         {
@@ -31,30 +34,36 @@ namespace LineWars.Model
     [RequireComponent(typeof(BoxCollider2D))]
     public class Edge : MonoBehaviour, IAlive, ITarget, INumbered, ISerializationCallbackReceiver
     {
-        [Header("Graph Settings")] 
-        [SerializeField] private int index;
+        [Header("Graph Settings")] [SerializeField]
+        private int index;
 
-        [SerializeField] [ReadOnlyInspector] private Node firstNode;
-        [SerializeField] [ReadOnlyInspector] private Node secondNode;
+        [SerializeField] private Node firstNode;
+        [SerializeField] private Node secondNode;
 
-        [Header("Line Settings")]
-        [SerializeField] private LineType lineType;
+        [Header("Line Settings")] [SerializeField]
+        private LineType lineType;
 
-        [SerializeField, NamedArray("lineType")] private List<LineTypeCharacteristics> lineTypeCharacteristics;
+        [SerializeField, NamedArray("lineType")]
+        private List<LineTypeCharacteristics> lineTypeCharacteristics;
 
-        [Header("Commands Settings")]
-        [SerializeField] private CommandPriorityData priorityData;
+        [Header("Commands Settings")] [SerializeField]
+        private CommandPriorityData priorityData;
 
-        [Header("DEBUG")] 
-        [SerializeField] [ReadOnlyInspector] private int hp;
-        
+        [Header("DEBUG")] [SerializeField] [ReadOnlyInspector]
+        private int hp;
+
         [field: Header("Events")]
-        [field: SerializeField] public UnityEvent<int, int> HpChanged { get; private set; }
+        [field: SerializeField]
+        public UnityEvent<int, int> HpChanged { get; private set; }
+
         [field: SerializeField] public UnityEvent<LineType, LineType> LineTypeChanged { get; private set; }
 
-        private Dictionary<LineType, LineTypeCharacteristics> lineTypeCharacteristicsMap;
+        private Dictionary<LineType, LineTypeCharacteristics> lineMap;
         [SerializeField, HideInInspector] private SpriteRenderer spriteRenderer;
         [SerializeField, HideInInspector] private BoxCollider2D boxCollider2D;
+
+        public SpriteRenderer SpriteRenderer => spriteRenderer;
+        public BoxCollider2D BoxCollider2D => boxCollider2D;
 
         public int Index
         {
@@ -62,8 +71,8 @@ namespace LineWars.Model
             set => index = value;
         }
 
-        public int MaxHp => lineTypeCharacteristicsMap.ContainsKey(LineType)
-            ? lineTypeCharacteristicsMap[LineType].MaxHp
+        public int MaxHp => lineMap.ContainsKey(LineType)
+            ? lineMap[LineType].MaxHp
             : 0;
 
         public Node FirstNode => firstNode;
@@ -87,7 +96,7 @@ namespace LineWars.Model
                 HpChanged.Invoke(before, hp);
             }
         }
-        
+
         public LineType LineType
         {
             get => lineType;
@@ -101,13 +110,23 @@ namespace LineWars.Model
         }
 
         public CommandPriorityData CommandPriorityData => priorityData;
-        
+
+        private float CurrentWidth => lineMap.TryGetValue(lineType, out var ch) 
+            ? ch.Width 
+            : 0.1f;
+
+        private Sprite CurrentSprite => lineMap.TryGetValue(lineType, out var ch)
+            ? ch.Sprite
+            : Resources.Load<Sprite>("Sprites/Road");
+
+
         protected void OnValidate()
         {
             hp = MaxHp;
             AssignFields();
-        }     
-        
+        }
+
+
         public void Initialize(Node firstNode, Node secondNode)
         {
             this.firstNode = firstNode;
@@ -118,7 +137,7 @@ namespace LineWars.Model
         {
             CurrentHp -= hit.Damage;
         }
-        
+
         public Node GetOther(Node node)
         {
             if (FirstNode.Equals(node))
@@ -133,10 +152,10 @@ namespace LineWars.Model
 
         public void OnAfterDeserialize()
         {
-            lineTypeCharacteristicsMap = new Dictionary<LineType, LineTypeCharacteristics>();
+            lineMap = new Dictionary<LineType, LineTypeCharacteristics>();
 
             for (int i = 0; i != lineTypeCharacteristics.Count; i++)
-                lineTypeCharacteristicsMap.TryAdd(lineTypeCharacteristics[i].LineType, lineTypeCharacteristics[i]);
+                lineMap.TryAdd(lineTypeCharacteristics[i].LineType, lineTypeCharacteristics[i]);
 
             UpdateTypes();
         }
@@ -145,8 +164,8 @@ namespace LineWars.Model
         {
             foreach (var value in Enum.GetValues(typeof(LineType)).OfType<LineType>())
             {
-                if (!lineTypeCharacteristicsMap.ContainsKey(value))
-                    lineTypeCharacteristicsMap[value] = new LineTypeCharacteristics(value);
+                if (!lineMap.ContainsKey(value))
+                    lineMap[value] = new LineTypeCharacteristics(value);
             }
         }
 
@@ -154,29 +173,29 @@ namespace LineWars.Model
         {
             LineType = LineTypeHelper.Up(LineType);
         }
-        
-        public void ReDraw()
+
+        public void Redraw()
         {
+            name = $"Edge{Index} from {(FirstNode ? FirstNode.name : "Null")} to {(SecondNode ? SecondNode.name : "None")}";
             RedrawLine();
             AlineCollider();
         }
 
         private void RedrawLine()
         {
-            var positionFirst = firstNode.Position;
-            var positionSecond = secondNode.Position;
-            var distance = Vector3.Distance(positionFirst, positionSecond);
-            spriteRenderer.size = new Vector2(distance,spriteRenderer.size.y);
-            var center = positionFirst;
-            var newSecondNodePosition = positionSecond - center;
-            var radian = Mathf.Atan2(newSecondNodePosition.y , newSecondNodePosition.x) * 180 / Math.PI;
-            spriteRenderer.transform.rotation = Quaternion.Euler(0,0,(float)radian);
-            spriteRenderer.transform.position = (positionFirst + positionSecond) / 2;
+            var v1 = firstNode?firstNode.Position: Vector2.zero;
+            var v2 = secondNode? secondNode.Position: Vector2.right;
+            var distance = Vector2.Distance(v1, v2);
+            var center = v1;
+            var newSecondNodePosition = v2 - center;
+            var radian = Mathf.Atan2(newSecondNodePosition.y, newSecondNodePosition.x) * 180 / Mathf.PI;
+            spriteRenderer.transform.rotation = Quaternion.Euler(0, 0, radian);
+            spriteRenderer.transform.position = (v1 + v2) / 2;
 
-            spriteRenderer.sprite = lineTypeCharacteristicsMap.TryGetValue(lineType, out var ch)
-                ? ch.Sprite
-                : Resources.Load<Sprite>("Sprites/Road");
+            spriteRenderer.size = new Vector2(distance, CurrentWidth);
+            spriteRenderer.sprite = CurrentSprite;
         }
+
 
         public void AlineCollider()
         {

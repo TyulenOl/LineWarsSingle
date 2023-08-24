@@ -5,7 +5,6 @@ using LineWars.Extensions.Attributes;
 using LineWars.Interface;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using LineWars.Controllers;
 
 namespace LineWars.Model
 {
@@ -25,11 +24,16 @@ namespace LineWars.Model
         [SerializeField] private Outline2D outline;
         [SerializeField] private Selectable2D selectable2D;
         [SerializeField] private CommandPriorityData priorityData;
-
-        [field: SerializeField] public bool IsBase { get; set; }
+        
+        [field: Header("Initial Info")]
+        [field: SerializeField] public Spawn ReferenceToSpawn { get; set; }
+        [field: SerializeField] public UnitType LeftUnitType { get; set; }
+        [field: SerializeField] public UnitType RightUnitType { get; set; }
+        
 
         private Camera mainCamera;
 
+        public bool IsBase => ReferenceToSpawn.Node == this;
         public Vector2 Position => transform.position;
         public IReadOnlyCollection<Edge> Edges => edges;
         public bool LeftIsFree => LeftUnit == null;
@@ -82,6 +86,7 @@ namespace LineWars.Model
             base.OnDisable();
             selectable2D.PointerClicked -= OnPointerClicked;
         }
+        
 
         private GameObject OnPointerClicked(GameObject obj, PointerEventData eventData)
         {
@@ -98,7 +103,7 @@ namespace LineWars.Model
                 return leftUnit.gameObject;
             }
 
-            return this.gameObject;
+            return gameObject;
         }
 
         public void Initialize()
@@ -156,39 +161,34 @@ namespace LineWars.Model
 
         protected override void OnSetOwner(BasePlayer oldPlayer, BasePlayer newPlayer)
         {
-            if (newPlayer != null)
-                Redraw(newPlayer.SpawnInfo.SpawnNode);
-            else
-                DrawToDefault();
+            ReferenceToSpawn = newPlayer != null ? basePlayer.SpawnInfo.SpawnNode : null;
+            Redraw();
         }
-
-        #region Debug
-        public void Redraw(Spawn spawn)
+        
+        public void Redraw()
         {
-            if (spawn == null)
+            if (ReferenceToSpawn == null)
             {
                 DrawToDefault();
             }
-            else if (GetComponent<Spawn>() != spawn)
+            else if (IsBase)
             {
-                gameObject.name = $"Node{Index} Group with {spawn.groupName}";
-                GetComponent<SpriteRenderer>().color = spawn.groupColor;
-            }
-            else
-            {
-                gameObject.name = $"Spawn {spawn.groupName}";
-                GetComponent<SpriteRenderer>().color = spawn.groupColor;
+                gameObject.name = $"Spawn {ReferenceToSpawn.groupName}";
+                GetComponent<SpriteRenderer>().color = ReferenceToSpawn.groupColor;
                 GetComponent<Outline2D>().SetActiveOutline(true);
             }
+            else
+            {
+                gameObject.name = $"Node{Index} Group with {ReferenceToSpawn.groupName}";
+                GetComponent<SpriteRenderer>().color = ReferenceToSpawn.groupColor;
+            }
         }
-
-
-        public void DrawToDefault()
+        
+        private void DrawToDefault()
         {
             gameObject.name = $"Node{Index}";
             GetComponent<SpriteRenderer>().color = Spawn.defaultColor;
             GetComponent<Outline2D>().SetActiveOutline(false);
         }
-        #endregion
     }
 }

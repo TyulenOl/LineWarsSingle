@@ -38,9 +38,6 @@ public class GraphTool : EditorTool
         EditorApplication.RepaintHierarchyWindow();
 
         nodeListener = new SelectionListener<Node>();
-
-        foreach (var edge in FindObjectsOfType<Edge>())
-            edge.ReDraw();
         
         //Debug.Log("CreateGraph is Activated!");
     }
@@ -243,9 +240,10 @@ public class GraphTool : EditorTool
     {
         foreach (var edge in node.Edges)
         {
-            foreach (var o in edge.GetComponents<Object>())
-                Undo.RecordObject(o, "ReDrawEdge");
-            edge.ReDraw();
+            Undo.RecordObject(edge.transform, "ReDrawEdge");
+            Undo.RecordObject(edge.SpriteRenderer, "ReDrawEdge");
+            Undo.RecordObject(edge.BoxCollider2D, "ReDrawEdge");
+            edge.Redraw();
         }
     }
 
@@ -266,8 +264,7 @@ public class GraphTool : EditorTool
         return coord;
     }
 
-    private int GetNextIndex<T>(T obj)
-        where T : Object, INumbered
+    private int GetNextIndex<T>(T obj) where T : Object, INumbered
     {
         var objects = FindObjectsOfType<T>()
             .Where(x => x != obj)

@@ -10,13 +10,13 @@ namespace LineWars.Model
     {
          public readonly int PlayerIndex;
          public readonly Spawn SpawnNode;
-         public readonly List<NodeInitialInfo> NodeInfos;
+         public readonly List<Node> Nodes;
 
-         public SpawnInfo(int playerIndex, Spawn spawnNode, IEnumerable<NodeInitialInfo> nodeInfos)
+         public SpawnInfo(int playerIndex, Spawn spawnNode, IEnumerable<Node> nodeInfos)
          {
              PlayerIndex = playerIndex;
              SpawnNode = spawnNode;
-             NodeInfos = nodeInfos.ToList();
+             Nodes = nodeInfos.ToList();
          }
     }
 }

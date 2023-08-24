@@ -45,7 +45,7 @@ namespace LineWars.Model
         {
             var spawns = FindObjectsOfType<Spawn>();
 
-            var initialInfos = FindObjectsOfType<NodeInitialInfo>();
+            var initialInfos = FindObjectsOfType<Node>();
 
 
             spawnInfos = new List<SpawnInfo>(spawns.Length);

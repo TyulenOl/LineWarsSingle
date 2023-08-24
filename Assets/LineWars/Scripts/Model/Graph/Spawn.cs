@@ -6,8 +6,6 @@ using UnityEngine;
 namespace LineWars.Model
 {
     [RequireComponent(typeof(Node))]
-    [RequireComponent(typeof(NodeInitialInfo))]
-    [ExecuteInEditMode]
     public class Spawn : MonoBehaviour
     {
         public static readonly string defaultName = "";
@@ -17,48 +15,31 @@ namespace LineWars.Model
         [field: SerializeField] public int StartMoney { get; private set; }
         [field: SerializeField] public string groupName { get; set; } = defaultName;
         [field: SerializeField] public Color groupColor { get; set; } = defaultColor;
-        
+
         [field: SerializeField, HideInInspector] public Node Node { get; private set; }
-        [field: SerializeField, HideInInspector] public NodeInitialInfo NodeInitialInfo { get; private set; }
 
         private void OnValidate()
         {
-            AssignComponents();
             AssignFields();
+            AssignComponents();
             Redraw();
         }
 
         private void AssignComponents()
         {
-            var referenceToSpawn = GetComponent<NodeInitialInfo>().ReferenceToSpawn;
-            if (referenceToSpawn == null || referenceToSpawn != this)
-                GetComponent<NodeInitialInfo>().ReferenceToSpawn = this;
-            if (!GetComponent<Node>().IsBase)
-                GetComponent<Node>().IsBase = true;
+            Node.ReferenceToSpawn = this;
         }
 
         private void AssignFields()
         {
             if (Node == null)
                 Node = GetComponent<Node>();
-            if (NodeInitialInfo == null)
-                NodeInitialInfo = GetComponent<NodeInitialInfo>();
         }
 
         private void Redraw()
         {
-            foreach (var info in FindObjectsOfType<NodeInitialInfo>()
-                         .Where(x => x.ReferenceToSpawn == this))
-                info.Redraw(this);
-        }
-
-        private void OnDisable()
-        {
-            foreach (var info in FindObjectsOfType<NodeInitialInfo>()
-                         .Where(x=>x.ReferenceToSpawn == this))
-            {
-                info.Redraw(null);
-            }
+            foreach (var info in FindObjectsOfType<Node>().Where(x => x.ReferenceToSpawn == this))
+                info.Redraw();
         }
     }
 }
