@@ -13,7 +13,8 @@ public class UnitPartDrawer : MonoBehaviour
     [SerializeField] private SpriteRenderer ifInactivePanel;
     [SerializeField] private Image unitIsExecutorImage;
     [SerializeField] private SpriteRenderer canBlockSprite;
-
+    [field: SerializeField] public SpriteRenderer targetSprite { get; private set; }
+    
     private CharacteristicDrawer MeleeAttackDrawer;
     private CharacteristicDrawer FarAttackDrawer;
     private CharacteristicDrawer ArmorDrawer;
@@ -48,7 +49,7 @@ public class UnitPartDrawer : MonoBehaviour
             .GetComponent<CharacteristicDrawer>();
         HPDrawer.Init(hpSprite, unitToInit.CurrentHp.ToString());
         
-        UnitName.text = DrawHelper.GetNameByUnitType(unitToInit.Type);
+        UnitName.text = unitToInit.UnitName;
     }
 
     public void SetUnitAsExecutor(bool isExecutor)

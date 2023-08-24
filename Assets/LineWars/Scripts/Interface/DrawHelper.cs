@@ -20,6 +20,23 @@ public static class DrawHelper
         }
     }
     
+    public static Sprite GetSpriteByCommandType(CommandType commandType)
+    {
+        switch (commandType)
+        {
+            case CommandType.Attack:
+                return Resources.Load<Sprite>("UI/Icons/attack");
+            case CommandType.Heal:
+                return Resources.Load<Sprite>("UI/Icons/Hp");
+            case CommandType.Fire:
+                return Resources.Load<Sprite>("UI/Icons/fire");
+            case CommandType.Move:
+                return Resources.Load<Sprite>("UI/Icons/target");
+            default: return Resources.Load<Sprite>("UI/Icons/HP");
+        }
+    }
+
+    
     public static Sprite GetSpriteByUnitType(UnitType characteristicType)
     {
         switch (characteristicType)

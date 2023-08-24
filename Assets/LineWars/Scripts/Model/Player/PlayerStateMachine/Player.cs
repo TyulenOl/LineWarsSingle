@@ -77,13 +77,13 @@ namespace LineWars
         private void OnOwnedAdded(Owned owned)
         {
             if(!(owned is Unit unit)) return;
-            unit.ActionPointChanged.AddListener(ProcessActionPointsChange);
+            unit.ActionPointsChanged.AddListener(ProcessActionPointsChange);
         }
 
         private void OnOwnerRemoved(Owned owned)
         {
             if(!(owned is Unit unit)) return;
-            unit.ActionPointChanged.RemoveListener(ProcessActionPointsChange);
+            unit.ActionPointsChanged.RemoveListener(ProcessActionPointsChange);
         }
 
         private void ProcessActionPointsChange(int previousValue, int currentValue)
