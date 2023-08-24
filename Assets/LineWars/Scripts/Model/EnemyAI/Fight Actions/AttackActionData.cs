@@ -13,17 +13,15 @@ namespace LineWars.Model
         {
             [SerializeField] private float waitTime;
             [SerializeField] private float baseScore;
-            [SerializeField] private float scoreForDistance;
-            [SerializeField] private float scoreForFightSuperiority;
-            [SerializeField] private float scorePerPoints;
-            [SerializeField] private float defaultAttacksToKillUnit;
+            [SerializeField] private float bonusPerDistance;
+            [SerializeField] private float bonusPerEnemyHpDamage;
+            [SerializeField] private float bonusPerPoint;
 
             public float BaseScore => baseScore;
-            public float ScoreForDistance => scoreForDistance;
-            public float ScoreForFightSuperiority => scoreForFightSuperiority;
-            public float ScorePerPoints => scorePerPoints;
             public float WaitTime => waitTime;
-            public float DefaultAttackToKillUnit => defaultAttacksToKillUnit;
+            public float BonusPerDistance => bonusPerDistance;
+            public float BonusPerEnemyHpDamage => bonusPerEnemyHpDamage;
+            public float BonusPerPoint => bonusPerPoint;
 
             public override void AddAllPossibleActions(List<EnemyAction> list, EnemyAI basePlayer, IExecutor executor)
             {
@@ -37,7 +35,8 @@ namespace LineWars.Model
                 while (queue.Count > 0)
                 {
                     var currentNodeInfo = queue.Dequeue();
-                    Debug.Log($"{currentNodeInfo.Item1} {currentNodeInfo.Item2}");
+                    
+                    if(currentNodeInfo.Item2 == 0) continue;
                     foreach(var neighborNode in currentNodeInfo.Item1.GetNeighbors())
                     {
                         if(nodeSet.Contains(neighborNode)) continue;
@@ -45,15 +44,16 @@ namespace LineWars.Model
                         var pointsAfterMove = unit.MovePointsModifier.Modify(currentNodeInfo.Item2);
                         var edge = neighborNode.GetLine(currentNodeInfo.Item1);
                         
-                        if (currentNodeInfo.Item2 != 0 
-                            && pointsAfterAttack >= 0 
+                        if (pointsAfterAttack >= 0 
                             && (int) edge.LineType >= (int) LineType.Firing)
                         {
-                            var enemies = GetEnemiesInNode(neighborNode, basePlayer);
-                            foreach (var enemy in enemies) 
+                            var units = EnemyActionUtilities.GetUnitsInNode(neighborNode);
+                            foreach (var enemy in units) 
                             {
+                                if(enemy.Owner == basePlayer) continue;
                                 if(enemySet.Contains(enemy)) continue;
-                                list.Add(new AttackAction(basePlayer, executor, enemy, this));
+                                if(unit.CanAttack(enemy))
+                                    list.Add(new AttackAction(basePlayer, executor, enemy, this));
                                 enemySet.Add(enemy);
                             }
                         }
@@ -67,21 +67,6 @@ namespace LineWars.Model
                         }
                     }
                 }
-            }
-
-            private List<Unit> GetEnemiesInNode(Node node, EnemyAI basePlayer)
-            {
-                var enemies = new List<Unit>();
-                if (node.LeftUnit != null && node.LeftUnit.Owner != basePlayer)
-                {
-                    enemies.Add(node.LeftUnit);
-                }
-                if (node.RightUnit != null && node.RightUnit.Owner != basePlayer)
-                {
-                    enemies.Add(node.RightUnit);
-                }
-
-                return enemies;
             }
         }
 
@@ -119,15 +104,13 @@ namespace LineWars.Model
                 basePlayer.StartCoroutine(ExecuteCoroutine());
                 IEnumerator ExecuteCoroutine()
                 {
-                    Debug.Log(path.Count);
                     foreach (var node in path) 
                     {
                         if(node == target.Node) continue;
                         if(node == unit.Node) continue;
                         if (!unit.CanMoveTo(node))
-                        {
                             Debug.LogError($"{unit} cannot move to {node}");
-                        }
+                        
                         UnitsController.ExecuteCommand(new MoveCommand(unit, unit.Node, node));
                         yield return new WaitForSeconds(data.WaitTime);
                     }
@@ -142,26 +125,26 @@ namespace LineWars.Model
             private float GetScore()
             {
                 if (unit.MeleeDamage == 0) return 0f;
-                var distanceToBase = 
-                    Graph.FindShortestPath(target.Node, basePlayer.Base, unit).Count;
-                var attacksToKillTarget = Mathf.Ceil((float) target.CurrentHp / unit.MeleeDamage);
 
-                float attacksToKillUnit;
-                if (target.MeleeDamage == 0)
-                    attacksToKillUnit = data.DefaultAttackToKillUnit;
-                else
-                    attacksToKillUnit = Mathf.Ceil((float) unit.CurrentHp / target.MeleeDamage);
+                var enemyDistance = Graph.FindShortestPath(target.Node, basePlayer.Base, target).Count;
+                if (enemyDistance == 0) enemyDistance = 1;
+                var distanceBonus = data.BonusPerDistance / enemyDistance;
+                var hpBonus = data.BonusPerEnemyHpDamage 
+                              * (1 - target.CurrentHp / target.MaxHp);
+                var pointsLeft = unit.CurrentActionPoints;
+                foreach (var node in path)
+                {
+                    if(node == target.Node) continue;
+                    if(node == unit.Node) continue;
+                    pointsLeft = unit.MovePointsModifier.Modify(pointsLeft);
+                }
 
-                var attackPoint = 0 - unit.AttackPointsModifier.Modify(0);
-                var movePoint = 0 - unit.MovePointsModifier.Modify(0);
-                var pointsLeft = unit.CurrentActionPoints - attackPoint - movePoint * path.Count;
-                float distanceScore = 0f;
-                if (distanceToBase != 0)
-                    distanceScore = data.ScoreForDistance / distanceToBase;
-                return data.BaseScore
-                       + (distanceScore)
-                       + (data.ScoreForFightSuperiority * (attacksToKillTarget - attacksToKillUnit))
-                       + data.ScorePerPoints * pointsLeft;
+                pointsLeft = unit.AttackPointsModifier.Modify(pointsLeft);
+                return data.BaseScore 
+                       + distanceBonus 
+                       + hpBonus 
+                       + pointsLeft * data.BonusPerPoint;
+
             }
         }
     }
