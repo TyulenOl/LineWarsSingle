@@ -14,6 +14,7 @@ namespace LineWars.Model
 
     public enum CommandType
     {
+        None,
         Attack,
         Heal,
         Explose,
