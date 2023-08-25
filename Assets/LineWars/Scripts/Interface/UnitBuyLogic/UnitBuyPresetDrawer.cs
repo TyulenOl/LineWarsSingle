@@ -1,31 +1,34 @@
-using System.Collections;
-using System.Collections.Generic;
+using LineWars.Model;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UnitBuyPresetDrawer : MonoBehaviour
+namespace LineWars.Interface
 {
-    [SerializeField] private TMP_Text cost;
-    [SerializeField] private Image image;
-    [SerializeField] private Button button;
-
-    public Button Button => button;
-
-    private UnitBuyPreset unitBuyPreset;
-    public UnitBuyPreset UnitBuyPreset
+    public class UnitBuyPresetDrawer : MonoBehaviour
     {
-        get => unitBuyPreset;
-        set
+        [SerializeField] private TMP_Text cost;
+        [SerializeField] private Image image;
+        [SerializeField] private Button button;
+
+        public Button Button => button;
+
+        private UnitBuyPreset unitBuyPreset;
+
+        public UnitBuyPreset UnitBuyPreset
         {
-            unitBuyPreset = value;
-            Init();
+            get => unitBuyPreset;
+            set
+            {
+                unitBuyPreset = value;
+                Init();
+            }
         }
-    }
 
-    private void Init()
-    {
-        image.sprite = unitBuyPreset.Image;
-        cost.text = unitBuyPreset.Cost.ToString();
+        private void Init()
+        {
+            image.sprite = unitBuyPreset.Image;
+            cost.text = unitBuyPreset.Cost.ToString();
+        }
     }
 }

@@ -5,27 +5,31 @@ using LineWars.Controllers;
 using LineWars.Model;
 using UnityEngine;
 
-public class CurrentUnitDrawer : MonoBehaviour
+namespace LineWars.Interface
 {
-    private void OnEnable()
+    public class CurrentUnitDrawer : MonoBehaviour
     {
-        CommandsManager.Instance.ExecutorChanged.AddListener(ExecutorChanged);
-    }
-
-    private void OnDisable()
-    {
-        CommandsManager.Instance.ExecutorChanged.RemoveListener(ExecutorChanged);
-    }
-
-    private void ExecutorChanged(IExecutor oldExecutor, IExecutor newExecutor)
-    {
-        if (newExecutor is Unit unit)
+        private void OnEnable()
         {
-            unit.GetComponent<UnitDrawer>().SetUnitAsExecutor(true);
+            CommandsManager.Instance.ExecutorChanged.AddListener(ExecutorChanged);
         }
-        if (oldExecutor is Unit oldUnit)
+
+        private void OnDisable()
         {
-            oldUnit.GetComponent<UnitDrawer>().SetUnitAsExecutor(false);
+            CommandsManager.Instance.ExecutorChanged.RemoveListener(ExecutorChanged);
+        }
+
+        private void ExecutorChanged(IExecutor oldExecutor, IExecutor newExecutor)
+        {
+            if (newExecutor is Unit unit)
+            {
+                unit.GetComponent<UnitDrawer>().SetUnitAsExecutor(true);
+            }
+            if (oldExecutor is Unit oldUnit)
+            {
+                oldUnit.GetComponent<UnitDrawer>().SetUnitAsExecutor(false);
+            }
         }
     }
+  
 }

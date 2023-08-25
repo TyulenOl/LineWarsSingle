@@ -5,7 +5,7 @@ using UnityEngine;
 
 // ReSharper disable Unity.InefficientPropertyAccess
 
-namespace LineWars.Scripts.Interface
+namespace LineWars.Interface
 {
     [RequireComponent(typeof(PathCreator))]
     public class BezierUILineController : PathSceneTool

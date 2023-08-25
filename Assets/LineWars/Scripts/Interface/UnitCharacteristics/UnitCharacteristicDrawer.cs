@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UnitPartDrawer : MonoBehaviour
+public class UnitCharacteristicDrawer : MonoBehaviour
 {
     [SerializeField] private CharacteristicDrawer CharacteristicDrawerPrefab;
     [SerializeField] private LayoutGroup CharacteristicsLayoutGroup;

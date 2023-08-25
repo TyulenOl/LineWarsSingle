@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    public class Engineer: Unit
+    public class Engineer: Unit, IRoadUpper
     {
         [field: Header("Engineer Settings")]
         [field: SerializeField] private int engineerPoint;

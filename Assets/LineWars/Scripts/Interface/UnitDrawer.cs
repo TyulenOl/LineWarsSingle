@@ -6,7 +6,7 @@ using LineWars.Model;
 using UnityEditor.U2D.Path;
 using UnityEngine;
 
-namespace LineWars.Controllers
+namespace LineWars.Interface
 {
     [RequireComponent(typeof(Unit), typeof(TargetDrawer))]
     public class UnitDrawer : MonoBehaviour
@@ -23,12 +23,12 @@ namespace LineWars.Controllers
         [SerializeField] private Interface.UnitPartDrawer rightPart;
         
         [Header("CharacteristicsDrawers")]
-        [SerializeField] private UnitPartDrawer leftDrawer;
-        [SerializeField] private UnitPartDrawer centerDrawer;
-        [SerializeField] private UnitPartDrawer rightDrawer;
+        [SerializeField] private UnitCharacteristicDrawer leftDrawer;
+        [SerializeField] private UnitCharacteristicDrawer centerDrawer;
+        [SerializeField] private UnitCharacteristicDrawer rightDrawer;
 
         private Unit unit;
-        private List<UnitPartDrawer> allDrawers;
+        private List<UnitCharacteristicDrawer> allDrawers;
         private TargetDrawer targetDrawer;
 
         private void Awake()
@@ -53,7 +53,7 @@ namespace LineWars.Controllers
                 rightPart.offset = offset;
             }
 
-            allDrawers = new List<UnitPartDrawer>
+            allDrawers = new List<UnitCharacteristicDrawer>
             { leftDrawer, rightDrawer, centerDrawer }
                 .Where(x => x is not null)
                 .ToList();
@@ -181,7 +181,7 @@ namespace LineWars.Controllers
             }
         }
 
-        private void ExecuteForAllDrawers(Action<UnitPartDrawer> action)
+        private void ExecuteForAllDrawers(Action<UnitCharacteristicDrawer> action)
         {
             foreach (var drawer in allDrawers)
             {

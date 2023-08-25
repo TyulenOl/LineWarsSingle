@@ -63,20 +63,20 @@ namespace LineWars.Model
 
 
 
-        public static bool[] GetVisibilityInfo(Player player) =>
+        public static Dictionary<Node, bool> GetVisibilityInfo(BasePlayer player) =>
             Instance != null
                 ? Instance._GetVisibilityInfo(player)
                 : throw new NullReferenceException("Graph is not Instance!");
 
-        private bool[] _GetVisibilityInfo(Player player)
+        private Dictionary<Node, bool> _GetVisibilityInfo(BasePlayer player)
         {
-            var result = new bool[allNodes.Length];
+            var result = new Dictionary<Node, bool>(allNodes.Length);
 
             var ownedNodes = player.OwnedObjects.OfType<Node>().ToArray();
 
             foreach (var visibilityNode in _GetVisibilityNodes(ownedNodes))
             {
-                result[visibilityNode.Index] = true;
+                result[visibilityNode] = true;
             }
 
             return result;

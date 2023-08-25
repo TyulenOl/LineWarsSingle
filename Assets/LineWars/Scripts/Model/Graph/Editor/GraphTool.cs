@@ -23,7 +23,7 @@ public class GraphTool : EditorTool
     {
         base.OnActivated();
 
-        edgePrefab = Resources.Load<Edge>("Prefabs/Line");
+        edgePrefab = Resources.Load<Edge>("Prefabs/Edge");
         nodePrefab = Resources.Load<Node>("Prefabs/Node");
 
         AssignGraph();
@@ -148,7 +148,7 @@ public class GraphTool : EditorTool
         EditorUtility.SetDirty(firstNode);
         EditorUtility.SetDirty(secondNode);
         EditorUtility.SetDirty(edge);
-
+        edge.Redraw();
         return edge;
     }
 

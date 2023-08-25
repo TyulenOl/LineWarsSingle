@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using LineWars.Scripts.Interface.UnitBuyLogic;
 using UnityEngine;
 
 namespace LineWars.Model

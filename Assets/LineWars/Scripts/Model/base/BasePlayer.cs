@@ -12,13 +12,11 @@ namespace LineWars.Model
     /// </summary>
     public abstract class BasePlayer : MonoBehaviour, IActor
     {
-        [field: SerializeField, ReadOnlyInspector]
-        public int Index { get; set; }
+        [field: SerializeField, ReadOnlyInspector] public int Index { get; set; }
 
         [SerializeField, ReadOnlyInspector] private NationType nationType;
         [SerializeField, ReadOnlyInspector] private int money;
-        [field: SerializeField, ReadOnlyInspector] public Node Base { get; set; }
-        public SpawnInfo SpawnInfo { get; set; }
+        [field: SerializeField, ReadOnlyInspector] public Spawn Base { get; set; }
         public PhaseType CurrentPhase { get; private set; }
 
         private HashSet<Owned> myOwned;

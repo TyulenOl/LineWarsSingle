@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    public class Doctor : Unit
+    public class Doctor : Unit, IDoctor
     {
         [field: Header("Doctor Settings")]
         [field: SerializeField] public bool IsMassHeal { get; private set; }

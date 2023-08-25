@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using LineWars.Extensions.Attributes;
-using LineWars.Interface;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Serialization;
 
 namespace LineWars.Model
 {
@@ -106,6 +104,7 @@ namespace LineWars.Model
                 lineType = value;
                 LineTypeChanged.Invoke(before, lineType);
                 CurrentHp = MaxHp;
+                RedrawLine();
             }
         }
 
@@ -184,7 +183,7 @@ namespace LineWars.Model
         private void RedrawLine()
         {
             var v1 = firstNode?firstNode.Position: Vector2.zero;
-            var v2 = secondNode? secondNode.Position: Vector2.right;
+            var v2 = secondNode?secondNode.Position: Vector2.right;
             var distance = Vector2.Distance(v1, v2);
             var center = v1;
             var newSecondNodePosition = v2 - center;
@@ -197,7 +196,7 @@ namespace LineWars.Model
         }
 
 
-        public void AlineCollider()
+        private void AlineCollider()
         {
             boxCollider2D.size = spriteRenderer.size;
         }

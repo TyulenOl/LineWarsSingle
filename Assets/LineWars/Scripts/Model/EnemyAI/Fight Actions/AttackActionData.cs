@@ -126,7 +126,7 @@ namespace LineWars.Model
             {
                 if (unit.MeleeDamage == 0) return 0f;
 
-                var enemyDistance = Graph.FindShortestPath(target.Node, basePlayer.Base, target).Count;
+                var enemyDistance = Graph.FindShortestPath(target.Node, basePlayer.Base.Node, target).Count;
                 if (enemyDistance == 0) enemyDistance = 1;
                 var distanceBonus = data.BonusPerDistance / enemyDistance;
                 var hpBonus = data.BonusPerEnemyHpDamage 

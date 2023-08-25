@@ -109,8 +109,8 @@ namespace LineWars.Model
                 }
                 var safetyBonus = data.BonusPerUnitHp * unit.CurrentHp 
                                   - data.PenaltyForEnemiesAttack * enemiesAttack;
-                var oldNodeDistance = Graph.FindShortestPath(unit.Node, basePlayer.Base).Count;
-                var newNodeDistance = Graph.FindShortestPath(targetNode, basePlayer.Base).Count;
+                var oldNodeDistance = Graph.FindShortestPath(unit.Node, basePlayer.Base.Node).Count;
+                var newNodeDistance = Graph.FindShortestPath(targetNode, basePlayer.Base.Node).Count;
                 var pointsLeft = unit.CurrentActionPoints;
                 foreach (var node in path)
                 {

@@ -161,7 +161,7 @@ namespace LineWars.Model
 
         protected override void OnSetOwner(BasePlayer oldPlayer, BasePlayer newPlayer)
         {
-            ReferenceToSpawn = newPlayer != null ? basePlayer.SpawnInfo.SpawnNode : null;
+            ReferenceToSpawn = newPlayer != null ? basePlayer.Base : null;
             Redraw();
         }
         
