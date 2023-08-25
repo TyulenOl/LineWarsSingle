@@ -20,7 +20,7 @@ namespace LineWars.Model
         public PhaseType CurrentPhase { get; private set; }
 
         private HashSet<Owned> myOwned;
-        private Nation nation;
+        protected Nation nation;
 
         public event Action<int, int> CurrentMoneyChanged;
 
@@ -53,6 +53,8 @@ namespace LineWars.Model
                 
             }
         }
+
+        public int Income => 20; // Временно
 
         protected virtual void Awake()
         {

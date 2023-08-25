@@ -77,6 +77,7 @@ namespace LineWars.Model
             }
         }
         public int MaxHp => maxHp;
+        public int InitialArmor => initialArmor;
 
         public int CurrentHp
         {

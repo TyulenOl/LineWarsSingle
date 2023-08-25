@@ -14,6 +14,7 @@ namespace LineWars.Model
         [SerializeField] private EnemyPhaseActions enemyPhaseActions;
         [SerializeField] private EnemyDifficulty difficulty;
         [SerializeField] private float actionCooldown;
+        [SerializeField] private EnemyAIPersonality personality;
 
         private IExecutor currentExecutor;
         public IReadOnlyCollection<UnitType> PotentialExecutors => executorsData.PhaseToUnits[CurrentPhase];
