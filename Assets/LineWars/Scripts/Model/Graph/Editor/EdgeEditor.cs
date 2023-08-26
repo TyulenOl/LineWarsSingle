@@ -14,6 +14,7 @@ public class EdgeEditor: Editor
         if (EditorSceneManager.IsPreviewSceneObject(Edge.gameObject))
         {
             return;
+            
         }
         Edge.Redraw();
         EditorUtility.SetDirty(Edge);

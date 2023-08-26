@@ -12,6 +12,8 @@ public class NodeEditor : Editor
     {
         if (EditorSceneManager.IsPreviewSceneObject(Node.gameObject))
         {
+            Debug.Log("SSSSSSSSSSSS");
+            
             return;
         }
         

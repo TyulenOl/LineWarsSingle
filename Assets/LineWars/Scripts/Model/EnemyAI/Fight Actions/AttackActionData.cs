@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using UnityEngine;
-using UnityEngine.Rendering.Universal;
 
 namespace LineWars.Model
 {
@@ -59,7 +58,7 @@ namespace LineWars.Model
                         }
                         
                         if (pointsAfterMove >= 0 
-                            && (int) edge.LineType >= (int) unit.MovementLineType 
+                            && unit.CanMoveOnLineWithType(edge.LineType)
                             && Graph.CheckNodeForWalkability(neighborNode, unit))
                         {
                             queue.Enqueue((neighborNode, pointsAfterMove));

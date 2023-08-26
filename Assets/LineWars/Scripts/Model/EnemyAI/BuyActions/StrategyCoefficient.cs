@@ -21,7 +21,7 @@ namespace LineWars.Model
         {
             AssignStartPhaseValues();
             AssignStrategyInfoValues();
-
+            
             void AssignStrategyInfoValues()
             {
                 foreach (var phase in Enum.GetValues(typeof(StrategyPhase))

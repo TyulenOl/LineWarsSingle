@@ -25,11 +25,12 @@ namespace LineWars.Interface
             {
                 unit.GetComponent<UnitDrawer>().SetUnitAsExecutor(true);
             }
+
             if (oldExecutor is Unit oldUnit)
             {
-                oldUnit.GetComponent<UnitDrawer>().SetUnitAsExecutor(false);
+                if (oldUnit != null) //TODO: Это заплатка дебильная, надо разобраться
+                    oldUnit.GetComponent<UnitDrawer>().SetUnitAsExecutor(false);
             }
         }
     }
-  
 }

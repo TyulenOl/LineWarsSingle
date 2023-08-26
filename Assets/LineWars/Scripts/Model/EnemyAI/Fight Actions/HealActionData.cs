@@ -113,6 +113,7 @@ namespace LineWars.Model
             private float GetScore()
             {
                 var hpDamagePercent = 1 - (float)damagedUnit.CurrentHp / damagedUnit.MaxHp;
+                if (hpDamagePercent == 0) return 0;
                 var pointsLeft = doctor.CurrentActionPoints;
                 foreach (var node in path)
                 {
