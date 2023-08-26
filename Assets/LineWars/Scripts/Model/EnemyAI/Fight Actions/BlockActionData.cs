@@ -54,7 +54,7 @@ namespace LineWars.Model
             }
 
             public override void Execute()
-            {
+            {       
                 UnitsController.ExecuteCommand(new EnableBlockCommand((Unit) Executor), false);
                 InvokeActionCompleted();
             }

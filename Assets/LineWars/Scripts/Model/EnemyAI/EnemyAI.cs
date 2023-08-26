@@ -17,10 +17,28 @@ namespace LineWars.Model
         [SerializeField] private EnemyAIPersonality personality;
 
         private IExecutor currentExecutor;
+        private EnemyAIBuySelector buySelector;
         public IReadOnlyCollection<UnitType> PotentialExecutors => executorsData.PhaseToUnits[CurrentPhase];
-        
+
+        protected override void Awake()
+        {
+            base.Awake();
+            buySelector = new EnemyAIBuySelector();
+        }
+
         #region Turns
-        public override void ExecuteBuy() => ExecuteAITurn(PhaseType.Buy);
+
+        public override void ExecuteBuy()
+        {
+            StartCoroutine(BuyCoroutine());
+            IEnumerator BuyCoroutine()
+            {
+                if(buySelector.TryGetPreset(this, out var preset))
+                    SpawnPreset(Base.Node, preset);
+                yield return null;
+                ExecuteTurn(PhaseType.Idle);
+            }
+        }
         public override void ExecuteArtillery() => ExecuteAITurn(PhaseType.Artillery);
         public override void ExecuteFight() => ExecuteAITurn(PhaseType.Fight);
         public override void ExecuteScout() => ExecuteAITurn(PhaseType.Scout);
@@ -110,9 +128,9 @@ namespace LineWars.Model
             {
                 var currentAction = sortedList[i];
                 Debug.Log($"action - {currentAction}, score - {currentAction.Score}, i - {i}, count - {sortedList.Count}, " +
-                          $"time - {(float) i/ sortedList.Count}, evaluate - {difficulty.Curve.Evaluate((float) i/ sortedList.Count)}");
+                          $"time - {((float) i + 1)/ sortedList.Count}, evaluate - {difficulty.Curve.Evaluate(((float) i + 1)/ sortedList.Count)}");
                 randomList.Add(currentAction, 
-                    difficulty.Curve.Evaluate((float) i/ sortedList.Count));
+                    difficulty.Curve.Evaluate(((float) i + 1)/ sortedList.Count));
             }
 
             return randomList.PickRandomObject();
