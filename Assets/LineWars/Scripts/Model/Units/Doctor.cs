@@ -44,10 +44,5 @@ namespace LineWars.Model
             CurrentActionPoints = healPointModifier.Modify(CurrentActionPoints);
             ActionCompleted.Invoke();
         }
-
-        public override float GetMyValue(EnemyAIPersonality personality)
-        {
-            return base.GetMyValue(personality) + HealingAmount * (IsMassHeal ? 1.5f: 1) * personality.Defensiveness;
-        }
     }
 }

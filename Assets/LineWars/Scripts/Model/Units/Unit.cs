@@ -40,7 +40,8 @@ namespace LineWars.Model
         [SerializeField] protected IntModifier movePointsModifier;
         [SerializeField] protected IntModifier blockPointsModifier;
 
-        [Header("Other")] [SerializeField] protected IntModifier contrAttackDamageModifier;
+        [Header("Other")] 
+        [SerializeField] protected IntModifier contrAttackDamageModifier;
 
         private UnitMovementLogic movementLogic;
         private IUnitBlockerSelector blockerSelector;
@@ -448,17 +449,5 @@ namespace LineWars.Model
         {
             return CommandType.Attack;
         }
-
-        public virtual float GetMyValue(EnemyAIPersonality personality)
-        {
-            return Base();
-
-            float Base()
-            {
-                return (MaxHp + InitialArmor) * personality.Defensiveness
-                       + (MeleeDamage + initialActionPoints) * personality.Aggressiveness;
-            }
-        }
-        
     }
 }

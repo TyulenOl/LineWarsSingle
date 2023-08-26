@@ -20,13 +20,16 @@ namespace LineWars.Model
                 var currentMoney = enemyAI.CurrentMoney;
                 float income = enemyAI.Income;
                 var personality = enemyAI.personality;
+                var strategyCoef = enemyAI.personality.StrategyCoefficient;
 
                 var maxValue = float.MinValue;
                 foreach (var preset in allPresets)
                 {
-                    var basePresetValue =
-                        GetUnitsByPreset(preset, enemyAI)
-                            .Sum(unit => GetValueForUnit(unit, personality));
+                    var basePresetValue = GetUnitsByPreset(preset, enemyAI)
+                        .Sum(x => 
+                            strategyCoef.GetValue(x.Type) 
+                            / (enemyAI.GetCountUnitByType(x.Type) + 1)
+                            * (x.Size == UnitSize.Large ? 2 : 1));
                     
                     var numberOfRoundsBeforeBuy = Mathf.CeilToInt(Mathf.Max(0, preset.Cost - currentMoney) / income);
                     
@@ -42,12 +45,6 @@ namespace LineWars.Model
                 }
 
                 return buyPreset != null;
-            }
-
-            private float GetValueForUnit(Unit unit, EnemyAIPersonality personality)
-            {
-                var coef = personality.StrategyCoefficient;
-                return unit.GetMyValue(personality) * (coef ? coef.GetValue(unit.Type) : 1);
             }
 
             private IEnumerable<Unit> GetUnitsByPreset(UnitBuyPreset preset, EnemyAI enemyAI)

@@ -11,8 +11,8 @@ namespace LineWars.Model
         menuName = "EnemyAI/DynamicCoefficient/Create EnemyPersonality")]
     public class StrategyCoefficient : ScriptableObject
     {
-        [SerializeField, SerializedDictionary("UnitType", "StrategyInfo")]
-        private SerializedDictionary<UnitType, UnitTypeCoefficientDictionary> strategyInfosMap;
+        [SerializeField, SerializedDictionary("Phase", "StrategyInfo")]
+        private SerializedDictionary<StrategyPhase, UnitTypeCoefficientDictionary> strategyInfosMap;
 
         [SerializeField, SerializedDictionary("Phase", "Start")]
         private SerializedDictionary<StrategyPhase, Coefficient> startPhaseValuesMap;
@@ -24,18 +24,19 @@ namespace LineWars.Model
 
             void AssignStrategyInfoValues()
             {
-                foreach (var unitType in Enum.GetValues(typeof(UnitType))
-                             .OfType<UnitType>()
-                             .Where(x => x != UnitType.None))
+                foreach (var phase in Enum.GetValues(typeof(StrategyPhase))
+                             .OfType<StrategyPhase>())
                 {
-                    strategyInfosMap.TryAdd(unitType, new UnitTypeCoefficientDictionary());
+                    strategyInfosMap.TryAdd(phase, new UnitTypeCoefficientDictionary());
                     AssignUnitTypeCoefficientDictionary();
                     
                     void AssignUnitTypeCoefficientDictionary()
                     {
-                        foreach (var phase in Enum.GetValues(typeof(StrategyPhase))
-                                     .OfType<StrategyPhase>())
-                            strategyInfosMap[unitType].pairs.TryAdd(phase, 0);
+                        foreach (var unitType in Enum.GetValues(typeof(UnitType))
+                                     .OfType<UnitType>()
+                                     .Where(x => x != UnitType.None))
+
+                            strategyInfosMap[phase].pairs.TryAdd(unitType, 0);
                     }
                 }
             }
@@ -56,7 +57,7 @@ namespace LineWars.Model
         public float GetValue(UnitType unitType)
         {
             var currentPhase = GetCurrentPhase(new GameStateHelper());
-            return strategyInfosMap[unitType].pairs[currentPhase];
+            return strategyInfosMap[currentPhase].pairs[unitType];
         }
 
         protected virtual StrategyPhase GetCurrentPhase([NotNull] GameStateHelper stateHelper)
@@ -79,13 +80,15 @@ namespace LineWars.Model
     [Serializable]
     public class UnitTypeCoefficientDictionary
     {
-        [SerializedDictionary("Phase", "Coefficient")]
-        public SerializedDictionary<StrategyPhase, Coefficient> pairs;
+        [SerializedDictionary("UnitType", "Coefficient")]
+        public SerializedDictionary<UnitType, Coefficient> pairs;
 
         public UnitTypeCoefficientDictionary()
         {
-            pairs = new SerializedDictionary<StrategyPhase, Coefficient>();
-            foreach (var strategyPhase in Enum.GetValues(typeof(StrategyPhase)).OfType<StrategyPhase>())
+            pairs = new SerializedDictionary<UnitType, Coefficient>();
+            foreach (var strategyPhase in Enum.GetValues(typeof(UnitType))
+                         .OfType<UnitType>()
+                         .Where(x => x!= UnitType.None))
                 pairs.Add(strategyPhase, 0);
         }
     }
