@@ -16,8 +16,8 @@ namespace LineWars.Model
         ITarget,
         IExecutor
     {
-        [Header("Units Settings")] 
-        [SerializeField, Min(0)] private int maxHp;
+        [Header("Units Settings")] [SerializeField, Min(0)]
+        private int maxHp;
 
         [SerializeField, Min(0)] protected int initialArmor;
         [SerializeField, Min(0)] protected int meleeDamage;
@@ -32,16 +32,15 @@ namespace LineWars.Model
         [SerializeField] protected LineType movementLineType;
         [SerializeField] protected CommandPriorityData priorityData;
         [field: SerializeField] public string UnitName { get; private set; }
-        
-        [Header("Action Points Settings")] 
-        [SerializeField] [Min(0)] protected int initialActionPoints;
+
+        [Header("Action Points Settings")] [SerializeField] [Min(0)]
+        protected int initialActionPoints;
 
         [SerializeField] protected IntModifier attackPointsModifier;
         [SerializeField] protected IntModifier movePointsModifier;
         [SerializeField] protected IntModifier blockPointsModifier;
 
-        [Header("Other")] 
-        [SerializeField] protected IntModifier contrAttackDamageModifier;
+        [Header("Other")] [SerializeField] protected IntModifier contrAttackDamageModifier;
 
         private UnitMovementLogic movementLogic;
         private IUnitBlockerSelector blockerSelector;
@@ -54,18 +53,19 @@ namespace LineWars.Model
         [SerializeField, ReadOnlyInspector] private int currentArmor;
         [SerializeField, ReadOnlyInspector] private int currentActionPoints;
         [SerializeField] private bool isBlocked;
-        
+
         [field: Header("Events")]
-        [field: SerializeField] public UnityEvent<UnitSize, UnitDirection> UnitDirectionChange { get; private set; }
+        [field: SerializeField]
+        public UnityEvent<UnitSize, UnitDirection> UnitDirectionChange { get; private set; }
 
         [field: SerializeField] public UnityEvent<int, int> HpChanged { get; private set; }
         [field: SerializeField] public UnityEvent<int, int> ArmorChanged { get; private set; }
         [field: SerializeField] public UnityEvent<Unit> Died { get; private set; }
         [field: SerializeField] public UnityEvent<int, int> ActionPointsChanged { get; private set; }
         [field: SerializeField] public UnityEvent<bool, bool> CanBlockChanged { get; private set; }
-        
+
         [field: SerializeField] public UnityEvent ActionCompleted { get; private set; }
-        
+
         public int CurrentActionPoints
         {
             get => currentActionPoints;
@@ -76,6 +76,7 @@ namespace LineWars.Model
                 ActionPointsChanged.Invoke(previousValue, currentActionPoints);
             }
         }
+
         public int MaxHp => maxHp;
         public int InitialArmor => initialArmor;
 
@@ -166,7 +167,6 @@ namespace LineWars.Model
 
         private void MovementLogicOnMovementIsOver(Transform arg2)
         {
-            
         }
 
         public void Initialize(Node node, UnitDirection direction)
@@ -183,9 +183,9 @@ namespace LineWars.Model
                 node.LeftUnit = null;
             if (node.RightUnit == this)
                 node.RightUnit = null;
-            
+
             AssignNewNode(target);
-            
+
             movementLogic.MoveTo(target.transform);
             CurrentActionPoints = movePointsModifier.Modify(CurrentActionPoints);
             ActionCompleted.Invoke();
@@ -245,6 +245,7 @@ namespace LineWars.Model
         #endregion MoveCommand
 
         #region IAliveImplimitation
+
         public virtual void TakeDamage(Hit hit)
         {
             var blockedDamage = Math.Min(hit.Damage, CurrentArmor);
@@ -263,16 +264,19 @@ namespace LineWars.Model
                 throw new ArgumentException($"{nameof(healAmount)} > 0 !");
             CurrentHp += healAmount;
         }
+
         #endregion
 
         #region AttackCommand
+
         public virtual bool CanAttack([NotNull] Unit unit)
         {
             if (unit == null) throw new ArgumentNullException(nameof(unit));
-           
+
             return BaseMeleeAttackCondition(unit)
                    && ActionPointsCondition(attackPointsModifier, CurrentActionPoints);
         }
+
         public virtual void Attack([NotNull] Unit enemy)
         {
             if (enemy == null) throw new ArgumentNullException(nameof(enemy));
@@ -312,18 +316,22 @@ namespace LineWars.Model
 
         public virtual bool CanAttack([NotNull] Edge edge) => false;
 
-        public virtual void Attack([NotNull] Edge edge) { }
+        public virtual void Attack([NotNull] Edge edge)
+        {
+        }
+
         #endregion
 
         #region ContrAttackCommand
+
         public virtual bool CanContrAttack([NotNull] Unit enemy)
         {
             if (enemy == null) throw new ArgumentNullException(nameof(enemy));
-            return IsBlocked 
+            return IsBlocked
                    && BaseMeleeAttackCondition(enemy)
                    && MeleeDamage > 0;
         }
-        
+
         public virtual void ContrAttack([NotNull] Unit enemy)
         {
             if (enemy == null) throw new ArgumentNullException(nameof(enemy));
@@ -333,9 +341,11 @@ namespace LineWars.Model
             enemy.TakeDamage(new Hit(contrAttackDamage, this, enemy));
             IsBlocked = false;
         }
+
         #endregion
-        
+
         #region BlockCommand
+
         public virtual bool CanBlock()
         {
             return ActionPointsCondition(blockPointsModifier, CurrentActionPoints);
@@ -349,7 +359,9 @@ namespace LineWars.Model
                 : CurrentActionPoints = 0;
             ActionCompleted.Invoke();
         }
+
         #endregion
+
         protected virtual void OnDied()
         {
             if (unitSize == UnitSize.Large)
@@ -405,20 +417,20 @@ namespace LineWars.Model
         private bool BaseMeleeAttackCondition(Unit unit)
         {
             var line = node.GetLine(unit.node);
-            return !attackLocked 
+            return !attackLocked
                    && unit.Owner != Owner
                    && line != null
                    && CanMoveOnLineWithType(line.LineType);
         }
-        
+
         protected static bool ActionPointsCondition(IntModifier modifier, int actionPoints)
         {
             return actionPoints > 0 && modifier != null && modifier.Modify(actionPoints) >= 0;
         }
-        
-        public virtual IEnumerable<(ITarget,CommandType)> GetAllAvailableTargets()
+
+        public virtual IEnumerable<(ITarget, CommandType)> GetAllAvailableTargets()
         {
-            return GetAllAvailableTargetsInRange((uint)currentActionPoints + 1);
+            return GetAllAvailableTargetsInRange((uint) currentActionPoints + 1);
         }
 
         protected IEnumerable<(ITarget, CommandType)> GetAllAvailableTargetsInRange(uint range)
@@ -436,5 +448,17 @@ namespace LineWars.Model
         {
             return CommandType.Attack;
         }
+
+        public virtual float GetMyValue(EnemyAIPersonality personality)
+        {
+            return Base();
+
+            float Base()
+            {
+                return (MaxHp + InitialArmor) * personality.Defensiveness
+                       + (MeleeDamage + initialActionPoints) * personality.Aggressiveness;
+            }
+        }
+        
     }
 }
