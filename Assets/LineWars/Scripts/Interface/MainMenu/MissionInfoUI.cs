@@ -57,13 +57,13 @@ namespace LineWars
 
         public void Initialize(MissionState state)
         {
-            var data = state.MissionData;
+            var data = state.missionData;
             missionName.text = data.MissionName;
             missionDescription.text = data.MissionDescription;
             missionImage.sprite = data.MissionImage;
 
-            missionStatus.text = state.IsCompleted ? @"<color=green>Завершена</color>" : "Не пройдена";
-            startButtonText.text = state.IsCompleted ? "Начать заново" : "Начать";
+            missionStatus.text = state.isCompleted ? @"<color=green>Завершена</color>" : "Не пройдена";
+            startButtonText.text = state.isCompleted ? "Начать заново" : "Начать";
 
             sceneToLoad = data.SceneToLoad;
         }

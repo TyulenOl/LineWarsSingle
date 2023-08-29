@@ -11,12 +11,8 @@ namespace LineWars
         public T Initialize<T>(SpawnInfo spawnInfo) where T : BasePlayer
         {
             var player = Instantiate(playersPrefabs.OfType<T>().First());
-
-            player.name = $"{typeof(T).Name}{spawnInfo.PlayerIndex} {spawnInfo.SpawnNode.name}";
-            player.Index = spawnInfo.PlayerIndex;
-            player.NationType = spawnInfo.SpawnNode.Nation;
-            player.CurrentMoney = spawnInfo.SpawnNode.StartMoney;
-            player.Base = spawnInfo.SpawnNode;
+            
+            player.Initialize(spawnInfo);
 
             foreach (var node in spawnInfo.Nodes)
             {

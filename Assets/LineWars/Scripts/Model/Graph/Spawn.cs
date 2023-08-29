@@ -8,13 +8,15 @@ namespace LineWars.Model
     [RequireComponent(typeof(Node))]
     public class Spawn : MonoBehaviour
     {
-        public static readonly string defaultName = "";
-        public static readonly Color defaultColor = Color.white;
+        public const string DEFAULT_NAME = "";
+        public static readonly Color DefaultColor = Color.white;
 
-        [field: SerializeField] public NationType Nation { get; private set; }
-        [field: SerializeField] public int StartMoney { get; private set; }
-        [field: SerializeField] public string groupName { get; set; } = defaultName;
-        [field: SerializeField] public Color groupColor { get; set; } = defaultColor;
+        [field: Header("Logic")]
+        [field: SerializeField] public PlayerRules Rules { get; set; }
+        
+        [field: Header("DEBUG")]
+        [field: SerializeField] public string GroupName { get; set; } = DEFAULT_NAME;
+        [field: SerializeField] public Color GroupColor { get; set; } = DefaultColor;
 
         [field: SerializeField, HideInInspector] public Node Node { get; private set; }
 

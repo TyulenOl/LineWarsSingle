@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using JetBrains.Annotations;
 using LineWars.Extensions.Attributes;
 using UnityEngine;
 using UnityEngine.Events;
@@ -12,17 +14,29 @@ namespace LineWars.Model
     /// </summary>
     public abstract class BasePlayer : MonoBehaviour, IActor
     {
-        [field: SerializeField, ReadOnlyInspector] public int Index { get; set; }
+        [field: SerializeField, ReadOnlyInspector]
+        public int Index { get; private set; }
 
         [SerializeField, ReadOnlyInspector] private NationType nationType;
         [SerializeField, ReadOnlyInspector] private int money;
-        [field: SerializeField, ReadOnlyInspector] public Spawn Base { get; set; }
+        [SerializeField, ReadOnlyInspector] private int score;
+
+        [field: SerializeField, ReadOnlyInspector]
+        public Spawn Base { get; private set; }
+
+        [field: SerializeField, ReadOnlyInspector]
+        public PlayerRules Rules { get; private set; }
+
         public PhaseType CurrentPhase { get; private set; }
 
         private HashSet<Owned> myOwned;
         protected Nation nation;
 
-        public event Action<int, int> CurrentMoneyChanged;
+        /// <summary>
+        /// Для оптимизации income всегда хешируется
+        /// </summary>
+        private int income;
+        
 
         public NationType NationType
         {
@@ -34,9 +48,14 @@ namespace LineWars.Model
             }
         }
 
+        private IEnumerable<Node> MyNodes => myOwned.OfType<Node>();
+
         public event Action<PhaseType, PhaseType> TurnChanged;
         public event Action<Owned> OwnedAdded;
         public event Action<Owned> OwnedRemoved;
+        public event Action<int, int> CurrentMoneyChanged;
+        public event Action<int, int> IncomeChanged;
+        public event Action<int, int> ScoreChanged;
         public IReadOnlyCollection<Owned> OwnedObjects => myOwned;
         public bool IsMyOwn(Owned owned) => myOwned.Contains(owned);
 
@@ -50,11 +69,30 @@ namespace LineWars.Model
 
                 if (before != money)
                     CurrentMoneyChanged?.Invoke(before, money);
-                
             }
         }
 
-        public int Income => 20; // Временно
+        public int Income
+        {
+            get => income;
+            set
+            {
+                var before = income;
+                income = value;
+                IncomeChanged?.Invoke(before, income);
+            }
+        }
+
+        public int Score
+        {
+            get => score;
+            set
+            {
+                var before = score;
+                score = value;
+                ScoreChanged?.Invoke(before, score);
+            }
+        }
 
         protected virtual void Awake()
         {
@@ -72,12 +110,22 @@ namespace LineWars.Model
 
         protected virtual void OnEnable()
         {
-            
         }
-        
+
         protected virtual void OnDisable()
         {
-            
+        }
+
+        public virtual void Initialize(SpawnInfo spawnInfo)
+        {
+            name = $"{GetType().Name}{spawnInfo.PlayerIndex} {spawnInfo.SpawnNode.name}";
+            Index = spawnInfo.PlayerIndex;
+            Base = spawnInfo.SpawnNode;
+            Rules = spawnInfo.SpawnNode.Rules ? spawnInfo.SpawnNode.Rules : PlayerRules.DefaultRules;
+
+            CurrentMoney = Rules.StartMoney;
+            Income = Rules.DefaultIncome;
+            NationType = Rules.Nation;
         }
 
         public bool CanSpawnUnit(Node node, UnitBuyPreset preset)
@@ -97,42 +145,83 @@ namespace LineWars.Model
 
         public void SpawnUnit(Node node, UnitType unitType)
         {
-            if(unitType == UnitType.None) return;
+            if (unitType == UnitType.None) return;
             var unitPrefab = GetUnitPrefab(unitType);
             BasePlayerUtility.CreateUnitForPlayer(this, node, unitPrefab);
         }
 
         public void SpawnPreset(Node node, UnitBuyPreset unitPreset)
         {
-            SpawnUnit(node,unitPreset.FirstUnitType);
-            SpawnUnit(node,unitPreset.SecondUnitType);
+            SpawnUnit(node, unitPreset.FirstUnitType);
+            SpawnUnit(node, unitPreset.SecondUnitType);
             CurrentMoney -= unitPreset.Cost;
         }
 
-        public void AddOwned(Owned owned)
+        public void AddOwned([NotNull] Owned owned)
         {
-            if (owned == null) return;
-            if (owned.Owner != null)
+            if (owned == null) throw new ArgumentNullException(nameof(owned));
+
+            if (owned.Owner != null && owned.Owner == this)
+                return;
+            if (owned.Owner != null && owned.Owner != this)
             {
-                if (owned.Owner != this)
-                {
-                    owned.Owner.RemoveOwned(owned);
-                    myOwned.Add(owned);
-                    OwnedAdded?.Invoke(owned);
-                }
+                owned.Owner.RemoveOwned(owned);
             }
-            else
+
+            switch (owned)
             {
-                myOwned.Add(owned);
-                OwnedAdded?.Invoke(owned);
+                case Node node:
+                    BeforeAddOwned(node);
+                    break;
+                case Unit unit:
+                    BeforeAddOwned(unit);
+                    break;
             }
+
+            myOwned.Add(owned);
+            OwnedAdded?.Invoke(owned);
         }
 
-        public void RemoveOwned(Owned owned)
+        protected virtual void BeforeAddOwned(Node node)
         {
+            if (!node.IsDirty) CurrentMoney += Rules.MoneyForFirstCapturingNode;
+            Income += Mathf.RoundToInt(Rules.IncomeModifier.Modify(node.BaseIncome));
+            Score += Rules.ScoreForCapturingNodeModifier.Modify(node.Score);
+        }
+        
+        protected virtual void BeforeAddOwned(Unit unit)
+        {
+            
+        }
+
+        public void RemoveOwned([NotNull] Owned owned)
+        {
+            if (owned == null) throw new ArgumentNullException(nameof(owned));
+
             if (!myOwned.Contains(owned)) return;
+
+            switch (owned)
+            {
+                case Node node:
+                    BeforeRemoveOwned(node);
+                    break;
+                case Unit unit:
+                    BeforeRemoveOwned(unit);
+                    break;
+            }
+            
             myOwned.Remove(owned);
             OwnedRemoved?.Invoke(owned);
+        }
+        
+        protected virtual void BeforeRemoveOwned(Node node)
+        {
+            Income -= Mathf.RoundToInt(Rules.IncomeModifier.Modify(node.BaseIncome));
+            Score -= Rules.ScoreForCapturingNodeModifier.Modify(node.Score);
+        }
+
+        protected virtual void BeforeRemoveOwned(Unit unit)
+        {
         }
 
         public Unit GetUnitPrefab(UnitType unitType) => nation.GetUnitPrefab(unitType);

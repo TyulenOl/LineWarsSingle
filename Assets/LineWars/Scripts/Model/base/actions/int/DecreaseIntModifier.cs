@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    [CreateAssetMenu(fileName = "New Decrease", menuName = "IntModifier/Decrease", order = 52)]
+    [CreateAssetMenu(fileName = "New Decrease", menuName = "Modifiers/IntModifier/Decrease", order = 52)]
     public class DecreaseIntModifier : IntModifier
     {
         [SerializeField] private int decreaseValue;

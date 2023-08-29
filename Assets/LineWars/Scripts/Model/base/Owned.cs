@@ -27,7 +27,7 @@ namespace LineWars.Model
             basePlayer.AddOwned(owned);
             owned.SetOwner(basePlayer);
         }
-
+        
         protected virtual void OnDisable()
         {
             if(Owner != null)

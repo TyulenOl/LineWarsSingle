@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace LineWars
 {
@@ -8,16 +9,13 @@ namespace LineWars
     [System.Serializable]
     public class MissionState
     {
-        [SerializeField] private MissionData missionData;
-        [SerializeField] private bool isCompleted;
+        public MissionData missionData;
+        public bool isCompleted;
 
         public MissionState(MissionData missionData, bool isCompleted)
         {
             this.missionData = missionData;
             this.isCompleted = isCompleted;
         }
-
-        public MissionData MissionData => missionData;
-        public bool IsCompleted => isCompleted;
     }
 }

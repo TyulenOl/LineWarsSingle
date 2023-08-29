@@ -7,8 +7,7 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    [CreateAssetMenu(fileName = "New StrategyCoefficient",
-        menuName = "EnemyAI/DynamicCoefficient/Create EnemyPersonality")]
+    [CreateAssetMenu(fileName = "New StrategyCoefficient", menuName = "EnemyAI/DynamicCoefficient/Create EnemyPersonality")]
     public class StrategyCoefficient : ScriptableObject
     {
         [SerializeField, SerializedDictionary("Phase", "StrategyInfo")]

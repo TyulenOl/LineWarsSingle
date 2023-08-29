@@ -17,6 +17,8 @@ namespace LineWars.Model
 
         [SerializeField] [Min(0)] private int visibility;
         [SerializeField] [Min(0)] private int valueOfHidden;
+        [SerializeField] private int baseIncome;
+        [SerializeField] private int score;
 
         [SerializeField, ReadOnlyInspector] private Unit leftUnit;
         [SerializeField, ReadOnlyInspector] private Unit rightUnit;
@@ -27,11 +29,16 @@ namespace LineWars.Model
         
         [field: Header("Initial Info")]
         [field: SerializeField] public Spawn ReferenceToSpawn { get; set; }
-        [field: SerializeField] public UnitType LeftUnitType { get; set; }
-        [field: SerializeField] public UnitType RightUnitType { get; set; }
+        [field: SerializeField] public UnitType LeftUnitType { get; private set; }
+        [field: SerializeField] public UnitType RightUnitType { get; private set; }
         
 
         private Camera mainCamera;
+        
+        /// <summary>
+        /// Флаг, который указывает, что нода уже кому-то принадлежала
+        /// </summary>
+        public bool IsDirty { get; private set; }
 
         public bool IsBase => ReferenceToSpawn.Node == this;
         public Vector2 Position => transform.position;
@@ -56,6 +63,10 @@ namespace LineWars.Model
             );
 
         public int ValueOfHidden => valueOfHidden;
+
+        public int BaseIncome => baseIncome;
+
+        public int Score => score;
 
         public Unit LeftUnit
         {
@@ -162,6 +173,7 @@ namespace LineWars.Model
         protected override void OnSetOwner(BasePlayer oldPlayer, BasePlayer newPlayer)
         {
             ReferenceToSpawn = newPlayer != null ? basePlayer.Base : null;
+            IsDirty = true;
             Redraw();
         }
         
@@ -173,21 +185,21 @@ namespace LineWars.Model
             }
             else if (IsBase)
             {
-                gameObject.name = $"Spawn {ReferenceToSpawn.groupName}";
-                GetComponent<SpriteRenderer>().color = ReferenceToSpawn.groupColor;
+                gameObject.name = $"Spawn {ReferenceToSpawn.GroupName}";
+                GetComponent<SpriteRenderer>().color = ReferenceToSpawn.GroupColor;
                 GetComponent<Outline2D>().SetActiveOutline(true);
             }
             else
             {
-                gameObject.name = $"Node{Index} Group with {ReferenceToSpawn.groupName}";
-                GetComponent<SpriteRenderer>().color = ReferenceToSpawn.groupColor;
+                gameObject.name = $"Node{Index} Group with {ReferenceToSpawn.GroupName}";
+                GetComponent<SpriteRenderer>().color = ReferenceToSpawn.GroupColor;
             }
         }
         
         private void DrawToDefault()
         {
             gameObject.name = $"Node{Index}";
-            GetComponent<SpriteRenderer>().color = Spawn.defaultColor;
+            GetComponent<SpriteRenderer>().color = Spawn.DefaultColor;
             GetComponent<Outline2D>().SetActiveOutline(false);
         }
     }

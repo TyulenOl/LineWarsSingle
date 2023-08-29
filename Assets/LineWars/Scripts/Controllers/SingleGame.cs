@@ -7,23 +7,28 @@ using LineWars.Extensions;
 using LineWars.Extensions.Attributes;
 using LineWars.Model;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace LineWars
 {
-    public class SingleGameManager: MonoBehaviour
+    public class SingleGame: MonoBehaviour
     {
-        public SingleGameManager Instance { get; private set; }
-        [SerializeField] private PlayerInitializer playerInitializer;
+        public static SingleGame Instance { get; private set; }
+        [Header("Logic")]
         [SerializeField] private Spawn playerSpawn;
+        [SerializeField] private int scoreForWin;
         
+        [Header("References")]
+        [SerializeField] private PlayerInitializer playerInitializer;
         [Header("Debug")] 
         [SerializeField] private bool isAI;
         [SerializeField, ReadOnlyInspector] private List<BasePlayer> players;
 
         private Stack<SpawnInfo> spawnInfosStack;
         private SpawnInfo playerSpawnInfo;
-        
 
+        public SceneName MyScene => (SceneName) SceneManager.GetActiveScene().buildIndex;
+        public int ScoreForWin => scoreForWin;
         private bool HasSpawnPoint() => spawnInfosStack.Count > 0;
         private SpawnInfo GetSpawnPoint() => spawnInfosStack.Pop();
         
@@ -33,6 +38,11 @@ namespace LineWars
         }
 
         private void Start()
+        {
+            StartGame();
+        }
+
+        private void StartGame()
         {
             InitializeSpawns();
             InitializePlayer();
@@ -85,7 +95,16 @@ namespace LineWars
                 }
             }
         }
-        
+
+        public void WinGame()
+        {
+            Debug.Log("Юхууу, вы выйграли!");
+        }
+
+        public void LoseGame()
+        {
+            Debug.Log("Потрачено");
+        }
 
         public void ToMainMenu()
         {

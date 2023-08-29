@@ -40,7 +40,7 @@ namespace LineWars
 
         public void Initialize(CompanyState companyState)
         {
-            var data = companyState.CompanyData;
+            var data = companyState.companyData;
             if (initializedMap != null)
                 Destroy(initializedMap.gameObject);
             var prefab = data.MissionsMapUIPrefab;
@@ -49,7 +49,7 @@ namespace LineWars
             for (var i = 0; i < initializedMap.MissionUIs.Count; i++)
             {
                 var missionUi = initializedMap.MissionUIs[i];
-                var missionState = companyState.MissionStates[i]; 
+                var missionState = companyState.missionStates[i]; 
                 missionUi.Initialize(missionState, i, OnMissionUiClick);
             }
         }
@@ -58,6 +58,7 @@ namespace LineWars
         {
             missionInfoUI.gameObject.SetActive(true);
             missionInfoUI.Initialize(state);
+            CompaniesDataBase.ChooseMission = state;
         }
 
         public override void OnOpen()

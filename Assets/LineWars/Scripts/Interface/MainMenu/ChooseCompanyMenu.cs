@@ -55,6 +55,7 @@ namespace LineWars
         {
             UIStack.Instance.PushElement(ChooseMissionMenu.Instance);
             ChooseMissionMenu.Instance.Initialize(companyState);
+            CompaniesDataBase.ChooseCompany = companyState;
         }
     }
 }

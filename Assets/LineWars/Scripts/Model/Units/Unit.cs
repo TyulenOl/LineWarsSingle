@@ -185,6 +185,7 @@ namespace LineWars.Model
             if (node.RightUnit == this)
                 node.RightUnit = null;
 
+            InspectNodeForCallback(target);
             AssignNewNode(target);
 
             movementLogic.MoveTo(target.transform);
@@ -192,6 +193,22 @@ namespace LineWars.Model
             ActionCompleted.Invoke();
         }
 
+        private void InspectNodeForCallback(Node target)
+        {
+            if (target.Owner == null)
+            {
+                OnCapturingFreeNode();
+                return;
+            }
+
+            if (target.Owner != this.Owner)
+            {
+                OnCapturingEnemyNode();
+                if (target.IsBase)
+                    OnCapturingEnemyBase();
+            }
+        }
+        
         private void AssignNewNode(Node target)
         {
             node = target;
@@ -449,5 +466,23 @@ namespace LineWars.Model
         {
             return CommandType.Attack;
         }
+
+
+        #region CallBack
+        protected virtual void OnCapturingEnemyBase()
+        {
+            
+        }
+
+        protected virtual void OnCapturingEnemyNode()
+        {
+            
+        }
+
+        protected virtual void OnCapturingFreeNode()
+        {
+            
+        }
+        #endregion
     }
 }

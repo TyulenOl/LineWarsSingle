@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace LineWars
 {
@@ -10,8 +11,8 @@ namespace LineWars
     [System.Serializable]
     public class CompanyState
     {
-        [SerializeField] private CompanyData companyData;
-        [SerializeField] private List<MissionState> missionStates;
+        public CompanyData companyData;
+        public List<MissionState> missionStates;
 
         public CompanyState(CompanyData companyData)
         {
@@ -25,14 +26,5 @@ namespace LineWars
                     )
                 ).ToList();
         }
-
-        public CompanyState(CompanyData companyData, IEnumerable<MissionState> missionStates)
-        {
-            this.companyData = companyData;
-            this.missionStates = missionStates.ToList();
-        }
-
-        public CompanyData CompanyData => companyData;
-        public List<MissionState> MissionStates => missionStates;
     }
 }

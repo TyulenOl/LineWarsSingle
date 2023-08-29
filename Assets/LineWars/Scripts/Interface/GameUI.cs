@@ -11,16 +11,29 @@ namespace LineWars.Interface
     {
         [SerializeField] private TMP_Text currentMoneyText;
         [SerializeField] private TMP_Text currentPhaseText;
+        [SerializeField] private TMP_Text currentIncomeText;
+        [SerializeField] private TMP_Text scoreText;
+        
         private IExecutor currentExecutor;
         private List<TargetDrawer> currentDrawers;
         private void Start()
         {
-            Player.LocalPlayer.CurrentMoneyChanged += (PlayerOnCurrenMoneyChanged);
-            PhaseManager.Instance.PhaseChanged.AddListener(OnPhaseChanged);
+            Player.LocalPlayer.CurrentMoneyChanged += PlayerOnCurrenMoneyChanged;
             PlayerOnCurrenMoneyChanged(0, Player.LocalPlayer.CurrentMoney);
+            
+            Player.LocalPlayer.IncomeChanged += LocalPlayerOnIncomeChanged;
+            LocalPlayerOnIncomeChanged(0, Player.LocalPlayer.Income);
+
+            Player.LocalPlayer.ScoreChanged += LocalPlayerOnScoreChanged;
+            LocalPlayerOnScoreChanged(0, Player.LocalPlayer.Score);
+            
+            PhaseManager.Instance.PhaseChanged.AddListener(OnPhaseChanged);
             CommandsManager.Instance.ExecutorChanged.AddListener(OnExecutorChanged);
             currentDrawers = new List<TargetDrawer>();
         }
+
+
+
 
         private void OnExecutorChanged(IExecutor arg0, IExecutor arg1)
         {
@@ -72,7 +85,17 @@ namespace LineWars.Interface
         }
         void PlayerOnCurrenMoneyChanged(int before, int after)
         {
-            currentMoneyText.text = $" Kоличество денег: {after}";
+            currentMoneyText.text = $"Money: {after}";
+        }
+        
+        private void LocalPlayerOnIncomeChanged(int before, int after)
+        {
+            currentIncomeText.text = $"Income:{after}";
+        }
+        
+        private void LocalPlayerOnScoreChanged(int before, int after)
+        {
+            scoreText.text = $"Score: {after} / {SingleGame.Instance.ScoreForWin}";
         }
     }
 }

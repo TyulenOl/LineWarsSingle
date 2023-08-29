@@ -7,7 +7,6 @@ namespace LineWars.Model
         SubmachineGunner,
         MachineGunner,
         Scout,
-        Sniper,
         Engineer,
         Cavalry,
         Artillery,

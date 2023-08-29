@@ -32,7 +32,7 @@ namespace LineWars
         
         public void Initialize(MissionState state, int index, Action<MissionState> clicked)
         {
-            var data = state.MissionData;
+            var data = state.missionData;
             missionName.text = $"{index} - {data.MissionName}";
             this.clicked = clicked;
             this.currentState = state;

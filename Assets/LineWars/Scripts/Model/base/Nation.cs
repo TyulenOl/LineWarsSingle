@@ -1,34 +1,36 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AYellowpaper.SerializedCollections;
 using UnityEngine;
 
 namespace LineWars.Model
 {
     [CreateAssetMenu(fileName = "new Nation", menuName = "Data/Create Nation", order = 50)]
-    [System.Serializable]
-    public class Nation: ScriptableObject, ISerializationCallbackReceiver
+    [Serializable]
+    public class Nation: ScriptableObject
     {
-        [SerializeField, HideInInspector] private List<UnitType> unitTypes = new();
-        [SerializeField, HideInInspector] private List<Unit> units = new();
         [SerializeField] private NationEconomicLogic nationEconomicLogic;
-
+        [field: SerializeField] public SerializedDictionary<UnitType, Unit> UnitTypeUnitPairs { get; private set; } = new();
+        
         public NationEconomicLogic NationEconomicLogic => nationEconomicLogic;
-
-        public Dictionary<UnitType, Unit> UnitTypeUnitPairs { get; private set; } = new();
         private void OnEnable()
         {
-            UpdateTypes();
+            ValidateUnitTypeUnitPairs();
         }
-
-        private void UpdateTypes()
+        
+        private void ValidateUnitTypeUnitPairs()
         {
-            var allUnitTypes = Enum.GetValues(typeof(UnitType))
-                .OfType<UnitType>()
-                .Where(x => x is not UnitType.None)
-                .ToArray();
-            foreach (var unitType in allUnitTypes)
-                UnitTypeUnitPairs.TryAdd(unitType, null);
+            foreach (var (key, value) in UnitTypeUnitPairs)
+            {
+                if (value == null)
+                    return;
+                if (key != value.Type)
+                {
+                    UnitTypeUnitPairs[key] = null;
+                    Debug.LogWarning($"Ключь и значени типа юнита не совпадают! {name}");
+                }
+            }
         }
 
         public Unit GetUnitPrefab(UnitType type)
@@ -36,27 +38,6 @@ namespace LineWars.Model
             if (UnitTypeUnitPairs.TryGetValue(type, out var unit))
                 return unit;
             return null;
-        }
-        
-        public void OnBeforeSerialize()
-        {
-            unitTypes.Clear();
-            units.Clear();
-            foreach (var (unitType, unit)  in UnitTypeUnitPairs)
-            {
-                unitTypes.Add(unitType);
-                units.Add(unit);
-            }
-        }
-
-        public void OnAfterDeserialize()
-        {
-            UnitTypeUnitPairs = new Dictionary<UnitType, Unit>();
-
-            for (int i = 0; i != Math.Min(unitTypes.Count, units.Count); i++)
-                UnitTypeUnitPairs.Add(unitTypes[i], units[i]);
-            
-            UpdateTypes();
         }
     }
 }
