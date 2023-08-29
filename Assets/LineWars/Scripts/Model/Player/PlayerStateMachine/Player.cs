@@ -126,6 +126,7 @@ namespace LineWars
 
         public override void ExecuteReplenish()
         {
+            base.ExecuteReplenish();
             stateMachine.SetState(replenishPhase);
         }
 

@@ -45,6 +45,7 @@ namespace LineWars.Model
 
         public override void ExecuteReplenish()
         {
+            base.ExecuteReplenish();
             StartCoroutine(ReplenishCoroutine());
             IEnumerator ReplenishCoroutine()
             {

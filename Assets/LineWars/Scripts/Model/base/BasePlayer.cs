@@ -325,6 +325,7 @@ namespace LineWars.Model
 
         public virtual void ExecuteReplenish()
         {
+            CurrentMoney += Income;
         }
 
         #endregion
