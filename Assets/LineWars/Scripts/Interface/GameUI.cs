@@ -90,7 +90,7 @@ namespace LineWars.Interface
         
         private void LocalPlayerOnIncomeChanged(int before, int after)
         {
-            currentIncomeText.text = $"Income:{after}";
+            currentIncomeText.text = $"Income: {after}";
         }
         
         private void LocalPlayerOnScoreChanged(int before, int after)

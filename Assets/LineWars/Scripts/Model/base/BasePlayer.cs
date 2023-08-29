@@ -4,8 +4,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using LineWars.Extensions.Attributes;
 using UnityEngine;
-using UnityEngine.Events;
-using LineWars.Controllers;
+
 
 namespace LineWars.Model
 {
@@ -20,35 +19,32 @@ namespace LineWars.Model
         [SerializeField, ReadOnlyInspector] private NationType nationType;
         [SerializeField, ReadOnlyInspector] private int money;
         [SerializeField, ReadOnlyInspector] private int score;
+        /// <summary>
+        /// Для оптимизации income всегда хешируется
+        /// </summary>
+        [SerializeField, ReadOnlyInspector] private int income;
+        
+        [field: SerializeField, ReadOnlyInspector] public Spawn Base { get; private set; }
 
-        [field: SerializeField, ReadOnlyInspector]
-        public Spawn Base { get; private set; }
-
-        [field: SerializeField, ReadOnlyInspector]
-        public PlayerRules Rules { get; private set; }
+        [field: SerializeField, ReadOnlyInspector] public PlayerRules Rules { get; private set; }
 
         public PhaseType CurrentPhase { get; private set; }
 
         private HashSet<Owned> myOwned;
-        protected Nation nation;
-
-        /// <summary>
-        /// Для оптимизации income всегда хешируется
-        /// </summary>
-        private int income;
+        protected Nation Nation;
         
-
         public NationType NationType
         {
             get => nationType;
             set
             {
                 nationType = value;
-                nation = NationHelper.GetNationByType(nationType);
+                Nation = NationHelper.GetNationByType(nationType);
             }
         }
 
         private IEnumerable<Node> MyNodes => myOwned.OfType<Node>();
+        private IEnumerable<Unit> MyUnits => myOwned.OfType<Unit>();
 
         public event Action<PhaseType, PhaseType> TurnChanged;
         public event Action<Owned> OwnedAdded;
@@ -56,6 +52,7 @@ namespace LineWars.Model
         public event Action<int, int> CurrentMoneyChanged;
         public event Action<int, int> IncomeChanged;
         public event Action<int, int> ScoreChanged;
+        public event Action Defeaded; 
         public IReadOnlyCollection<Owned> OwnedObjects => myOwned;
         public bool IsMyOwn(Owned owned) => myOwned.Contains(owned);
 
@@ -218,13 +215,33 @@ namespace LineWars.Model
         {
             Income -= Mathf.RoundToInt(Rules.IncomeModifier.Modify(node.BaseIncome));
             Score -= Rules.ScoreForCapturingNodeModifier.Modify(node.Score);
+
+            if (node == Base.Node)
+            {
+                Defeat();
+            }
         }
 
         protected virtual void BeforeRemoveOwned(Unit unit)
         {
         }
 
-        public Unit GetUnitPrefab(UnitType unitType) => nation.GetUnitPrefab(unitType);
+        public void Defeat()
+        {
+            OnDefeat();
+            Defeaded?.Invoke();
+        }
+        protected virtual void OnDefeat()
+        {
+            foreach (var unit in MyUnits.ToList())
+                Destroy(unit.gameObject);
+            foreach (var node in MyNodes.ToList()) 
+                node.SetOwner(null);
+
+            myOwned = new HashSet<Owned>();
+        }
+        
+        public Unit GetUnitPrefab(UnitType unitType) => Nation.GetUnitPrefab(unitType);
 
         public void ExecuteTurn(PhaseType phaseType)
         {

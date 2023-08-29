@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using LineWars.Extensions.Attributes;
 using LineWars.Model;
 using UnityEngine;
@@ -15,7 +16,7 @@ namespace LineWars.Model
         [SerializeField] [ReadOnlyInspector] protected BasePlayer basePlayer;
         public BasePlayer Owner => basePlayer;
 
-        public void SetOwner(BasePlayer newBasePlayer)
+        public void SetOwner([MaybeNull]BasePlayer newBasePlayer)
         {
             var temp = basePlayer;
             basePlayer = newBasePlayer;

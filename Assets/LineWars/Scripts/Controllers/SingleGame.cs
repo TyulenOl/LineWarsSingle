@@ -22,7 +22,11 @@ namespace LineWars
         [SerializeField] private PlayerInitializer playerInitializer;
         [Header("Debug")] 
         [SerializeField] private bool isAI;
-        [SerializeField, ReadOnlyInspector] private List<BasePlayer> players;
+        
+        private List<BasePlayer> allPlayers = new ();
+        private Player player;
+        private int enemyCount = 0;
+        
 
         private Stack<SpawnInfo> spawnInfosStack;
         private SpawnInfo playerSpawnInfo;
@@ -31,7 +35,8 @@ namespace LineWars
         public int ScoreForWin => scoreForWin;
         private bool HasSpawnPoint() => spawnInfosStack.Count > 0;
         private SpawnInfo GetSpawnPoint() => spawnInfosStack.Pop();
-        
+        private bool IsWinScore(int after) => after >= scoreForWin;
+
         private void Awake()
         {
             Instance = this;
@@ -73,9 +78,22 @@ namespace LineWars
         }
 
         private void InitializePlayer()
+        { 
+            player = playerInitializer.Initialize<Player>(playerSpawnInfo);
+            player.Defeaded += PlayerOnDefeaded;
+            player.ScoreChanged += PlayerOnScoreChanged;
+            allPlayers.Add(player);
+        }
+
+        private void PlayerOnScoreChanged(int before, int after)
         {
-            var player = playerInitializer.Initialize<Player>(playerSpawnInfo);
-            players.Add(player);
+            if (IsWinScore(after))
+                WinGame();
+        }
+        
+        private void PlayerOnDefeaded()
+        {
+            LoseGame();
         }
 
         private void InitializeAIs()
@@ -83,27 +101,44 @@ namespace LineWars
             while (HasSpawnPoint())
             {
                 var spawnPoint = GetSpawnPoint();
-                if (isAI)
-                {
-                    var player = playerInitializer.Initialize<EnemyAI>(spawnPoint);
-                    players.Add(player);
-                }
-                else
-                {
-                    var testActor = playerInitializer.Initialize<TestActor>(spawnPoint);
-                    players.Add(testActor);
-                }
+                BasePlayer enemy = isAI
+                    ? playerInitializer.Initialize<EnemyAI>(spawnPoint)
+                    : playerInitializer.Initialize<TestActor>(spawnPoint); 
+
+                allPlayers.Add(enemy);
+                enemyCount++;
+                enemy.Defeaded += EnemyOnDefeaded;
+                enemy.ScoreChanged += EnemyOnScoreChanged;
             }
         }
 
-        public void WinGame()
+        private void EnemyOnScoreChanged(int before, int after)
         {
-            Debug.Log("Юхууу, вы выйграли!");
+            if (IsWinScore(after))
+                LoseGame();
         }
 
-        public void LoseGame()
+        private void EnemyOnDefeaded()
+        {
+            enemyCount--;
+            if (enemyCount == 0)
+                WinGame();
+        }
+
+        private void WinGame()
+        {
+            Debug.Log("Юхууу, вы выйграли!");
+            WinLoseUI.isWin = true; //Пока так
+            SceneTransition.LoadScene(SceneName.WinOrLoseScene);
+            CompaniesDataBase.ChooseMission.isCompleted = true;
+            CompaniesDataBase.SaveChooseMission();
+        }
+
+        private void LoseGame()
         {
             Debug.Log("Потрачено");
+            WinLoseUI.isWin = false;
+            SceneTransition.LoadScene(SceneName.WinOrLoseScene);
         }
 
         public void ToMainMenu()
