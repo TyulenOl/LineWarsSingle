@@ -125,7 +125,7 @@ public class MaskRendererV3 : MonoBehaviour
         if (!CheckValid()) return;
 
         initialized = true;
-
+        
         UpdateHash();
 
         blurHorID = blurShader.FindKernel("HorzBlurCs");
