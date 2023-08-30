@@ -13,9 +13,6 @@ namespace LineWars.Controllers
     {
         public static CommandsManager Instance { get; private set; }
         
-        [Header("Debug")]
-        [SerializeField] private bool isActive;
-        
         private ITarget target;
         private IExecutor executor;
 

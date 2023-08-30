@@ -160,9 +160,9 @@ namespace LineWars.Model
             movementLogic.MovementIsOver += MovementLogicOnMovementIsOver;
         }
 
-        protected override void OnDisable()
+        protected override void OnDestroy()
         {
-            base.OnDisable();
+            base.OnDestroy();
             movementLogic.MovementIsOver -= MovementLogicOnMovementIsOver;
         }
 
@@ -454,12 +454,8 @@ namespace LineWars.Model
         protected IEnumerable<(ITarget, CommandType)> GetAllAvailableTargetsInRange(uint range)
         {
             foreach (var e in Graph.GetNodesInRange(node, range))
-            {
-                foreach (var target in e.GetTargetsWithMe())
-                {
-                    yield return (target, UnitsController.Instance.GetCommandTypeBy(this, target));
-                }
-            }
+            foreach (var target in e.GetTargetsWithMe())
+                yield return (target, UnitsController.Instance.GetCommandTypeBy(this, target));
         }
 
         public virtual CommandType GetAttackTypeBy(IAlive target)

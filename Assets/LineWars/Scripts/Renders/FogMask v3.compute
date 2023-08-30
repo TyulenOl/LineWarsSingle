@@ -31,7 +31,6 @@ bool compareFloat4(float4 a, float4 b)
 void CSMain(uint3 id : SV_DispatchThreadID)
 {
     _VisibilityMask[id.xy] = 0;
-    const int a = 5;
     for (int i = 0; i < _NodesCount; i++)
     {
         const float4 nodeColor = _NodesBuffer[i].Color;

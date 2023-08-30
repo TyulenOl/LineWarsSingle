@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 // ReSharper disable Unity.NoNullPropagation
@@ -21,7 +22,8 @@ public class MaskRendererV3 : MonoBehaviour
     [SerializeField] private ComputeShader blurShader;
     [SerializeField] private Material targetMaterial;
 
-    [Header("")] [SerializeField] private List<RenderNodeV3> nodes;
+    [Header("")] 
+    [SerializeField] private List<RenderNodeV3> nodes;
 
 
     private RenderTexture visibilityMask;
@@ -76,7 +78,7 @@ public class MaskRendererV3 : MonoBehaviour
 
     public void Start()
     {
-        nodes = new List<RenderNodeV3>();
+        nodes = FindObjectsOfType<RenderNodeV3>().ToList();
         if (autoInitialize)
             Initialise();
     }
@@ -139,6 +141,8 @@ public class MaskRendererV3 : MonoBehaviour
         InitializeBlur();
 
         targetMaterial.SetTexture(visibilityMaskId, shaderInput);
+        
+        ApplyChanges();
     }
 
 

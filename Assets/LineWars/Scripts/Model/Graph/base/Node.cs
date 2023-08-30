@@ -10,11 +10,13 @@ namespace LineWars.Model
 {
     [RequireComponent(typeof(Outline2D))]
     [RequireComponent(typeof(Selectable2D))]
+    [RequireComponent(typeof(RenderNodeV3))]
     public class Node : Owned, ITarget, INumbered
     {
         [SerializeField] private int index;
         [SerializeField] private List<Edge> edges;
 
+        //Если visibility равно 0, то видна только нода, если 1, то нода и ее соседи
         [SerializeField] [Min(0)] private int visibility;
         [SerializeField] [Min(0)] private int valueOfHidden;
         [SerializeField] private int baseIncome;
@@ -25,6 +27,7 @@ namespace LineWars.Model
 
         [SerializeField] private Outline2D outline;
         [SerializeField] private Selectable2D selectable2D;
+        [SerializeField] private RenderNodeV3 renderNodeV3;
         [SerializeField] private CommandPriorityData priorityData;
         
         [field: Header("Initial Info")]
@@ -80,10 +83,12 @@ namespace LineWars.Model
             set { rightUnit = value; }
         }
         public CommandPriorityData CommandPriorityData => priorityData;
+        public RenderNodeV3 RenderNodeV3 => renderNodeV3;
 
         private void Awake()
         {
             mainCamera = Camera.main;
+            IsDirty = ReferenceToSpawn != null;
         }
 
 
@@ -92,12 +97,21 @@ namespace LineWars.Model
             selectable2D.PointerClicked += OnPointerClicked;
         }
 
-        protected override void OnDisable()
+        protected override void OnDestroy()
         {
-            base.OnDisable();
+            base.OnDestroy();
             selectable2D.PointerClicked -= OnPointerClicked;
         }
-        
+
+        protected void OnValidate()
+        {
+            if (outline == null)
+                outline = GetComponent<Outline2D>();
+            if (renderNodeV3 == null)
+                renderNodeV3 = GetComponent<RenderNodeV3>();
+            if (selectable2D == null)
+                selectable2D = GetComponent<Selectable2D>();
+        }
 
         private GameObject OnPointerClicked(GameObject obj, PointerEventData eventData)
         {

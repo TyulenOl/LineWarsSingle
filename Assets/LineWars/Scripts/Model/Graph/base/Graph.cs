@@ -74,32 +74,37 @@ namespace LineWars.Model
 
             var ownedNodes = player.OwnedObjects.OfType<Node>().ToArray();
 
+            foreach (var node in allNodes)
+                result[node] = false;
             foreach (var visibilityNode in _GetVisibilityNodes(ownedNodes))
-            {
                 result[visibilityNode] = true;
-            }
 
             return result;
         }
 
         private IEnumerable<Node> _GetVisibilityNodes(Node[] ownedNodes)
         {
+            if (ownedNodes == null || ownedNodes.Length == 0)
+                yield break;
+            
             var closedNodes = new HashSet<Node>();
             var priorityQueue = new PriorityQueue<Node, int>(0);
             foreach (var ownedNode in ownedNodes)
-                priorityQueue.Enqueue(ownedNode, ownedNode.Visibility);
+                priorityQueue.Enqueue(ownedNode, -ownedNode.Visibility);
 
             while (priorityQueue.Count != 0)
             {
                 var (node, currentVisibility) = priorityQueue.Dequeue();
+                if (closedNodes.Contains(node)) continue;
+                
                 closedNodes.Add(node);
                 yield return node;
                 if (currentVisibility == 0) continue;
                 foreach (var neighbor in node.GetNeighbors())
                 {
-                    if (closedNodes.Contains(neighbor))
-                        continue;
-                    var nextVisibility = currentVisibility - 1 - neighbor.ValueOfHidden;
+                    if (closedNodes.Contains(neighbor)) continue;
+                    var nextVisibility = currentVisibility + 1 + neighbor.ValueOfHidden;
+                    if (nextVisibility > 0) continue;
                     priorityQueue.Enqueue(neighbor, nextVisibility);
                 }
             }

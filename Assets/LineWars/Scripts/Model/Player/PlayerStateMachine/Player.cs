@@ -48,12 +48,13 @@ namespace LineWars
             
             InitializeStateMachine();
         }
-
+        
         protected override void OnEnable()
         {
             base.OnEnable();
             OwnedAdded += OnOwnedAdded;
             OwnedRemoved += OnOwnerRemoved;
+            CommandsManager.Instance.CommandExecuted.AddListener(OnExecuteCommand);
         }
 
         protected override void OnDisable()
@@ -61,6 +62,7 @@ namespace LineWars
             base.OnDisable();
             OwnedAdded -= OnOwnedAdded;
             OwnedRemoved -= OnOwnerRemoved;
+            CommandsManager.Instance.CommandExecuted.RemoveListener(OnExecuteCommand);
         }
 
         private void InitializeStateMachine()
@@ -159,5 +161,23 @@ namespace LineWars
         }
 
         #endregion
+
+        private void OnExecuteCommand(IExecutor executor, ITarget target)
+        {
+            RecalculateVisibility();
+            Debug.Log("Command");
+        }
+
+        public void RecalculateVisibility(bool useLerp = true)
+        {
+            var visibilityMap = Graph.GetVisibilityInfo(this);
+            foreach (var (node, visibility) in visibilityMap)
+            {
+                if (useLerp)
+                    node.RenderNodeV3.SetVisibilityGradually(visibility ? 1 : 0);
+                else
+                    node.RenderNodeV3.SetVisibilityInstantly(visibility ? 1 : 0);
+            }
+        }
     }
 }

@@ -9,7 +9,7 @@ namespace LineWars.Model
     public class Spawn : MonoBehaviour
     {
         public const string DEFAULT_NAME = "";
-        public static readonly Color DefaultColor = Color.white;
+        public static readonly Color DefaultColor = Color.black;
 
         [field: Header("Logic")]
         [field: SerializeField] public PlayerRules Rules { get; set; }

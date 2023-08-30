@@ -22,6 +22,7 @@ namespace LineWars
         [SerializeField] private PlayerInitializer playerInitializer;
         [Header("Debug")] 
         [SerializeField] private bool isAI;
+        [SerializeField] private bool lockWinOrLose = true;
         
         private List<BasePlayer> allPlayers = new ();
         private Player player;
@@ -83,6 +84,7 @@ namespace LineWars
             player.Defeaded += PlayerOnDefeaded;
             player.ScoreChanged += PlayerOnScoreChanged;
             allPlayers.Add(player);
+            player.RecalculateVisibility(false);
         }
 
         private void PlayerOnScoreChanged(int before, int after)
@@ -127,8 +129,9 @@ namespace LineWars
 
         private void WinGame()
         {
-            Debug.Log("Юхууу, вы выйграли!");
-            WinLoseUI.isWin = true; //Пока так
+            if (lockWinOrLose)
+                return;
+            WinLoseUI.isWin = true;
             SceneTransition.LoadScene(SceneName.WinOrLoseScene);
             CompaniesDataBase.ChooseMission.isCompleted = true;
             CompaniesDataBase.SaveChooseMission();
@@ -136,7 +139,8 @@ namespace LineWars
 
         private void LoseGame()
         {
-            Debug.Log("Потрачено");
+            if (lockWinOrLose)
+                return;
             WinLoseUI.isWin = false;
             SceneTransition.LoadScene(SceneName.WinOrLoseScene);
         }

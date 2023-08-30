@@ -1,6 +1,6 @@
 ﻿public enum SceneName
 {
     MainMenu,
-    SingleGame,
+    Map_1,
     WinOrLoseScene
 }
