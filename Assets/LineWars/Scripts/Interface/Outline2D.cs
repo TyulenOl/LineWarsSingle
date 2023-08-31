@@ -2,10 +2,9 @@
 
 namespace LineWars.Interface
 {
+    [RequireComponent(typeof(SpriteRenderer))]
     public class Outline2D: MonoBehaviour
     {
-        [SerializeField] private Material withOutline;
-        [SerializeField] private Material withoutOutline;
         [SerializeField] private SpriteRenderer spriteRenderer;
 
         private bool isActive;
@@ -14,11 +13,6 @@ namespace LineWars.Interface
         {
             if (isActive == value) return;
             
-            if (value)
-                spriteRenderer.sharedMaterial = withOutline;
-            else
-                spriteRenderer.sharedMaterial = withoutOutline;
-
             isActive = value;
         }
     }

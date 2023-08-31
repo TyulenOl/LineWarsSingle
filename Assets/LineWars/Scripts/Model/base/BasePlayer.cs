@@ -32,6 +32,7 @@ namespace LineWars.Model
 
         private HashSet<Owned> myOwned;
         protected Nation Nation;
+        private bool isFirstReplenish = true;
         
         public NationType NationType
         {
@@ -325,6 +326,11 @@ namespace LineWars.Model
 
         public virtual void ExecuteReplenish()
         {
+            if (isFirstReplenish)
+            {
+                isFirstReplenish = false;
+                return;
+            }
             CurrentMoney += Income;
         }
 

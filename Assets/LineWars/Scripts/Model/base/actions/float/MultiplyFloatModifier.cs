@@ -11,10 +11,15 @@ namespace LineWars.Model
         {
             return value * multiplyValue;
         }
-
-        protected override void Awake()
+        
+        public static MultiplyFloatModifier MultiplyOne
         {
-            multiplyValue = 1;
+            get
+            {
+                var value = CreateInstance<MultiplyFloatModifier>();
+                value.multiplyValue = 1;
+                return value;
+            }
         }
     }
 }

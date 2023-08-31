@@ -8,7 +8,6 @@ using UnityEngine.EventSystems;
 
 namespace LineWars.Model
 {
-    [RequireComponent(typeof(Outline2D))]
     [RequireComponent(typeof(Selectable2D))]
     [RequireComponent(typeof(RenderNodeV3))]
     public class Node : Owned, ITarget, INumbered

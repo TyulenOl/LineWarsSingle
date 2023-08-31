@@ -30,7 +30,7 @@ namespace LineWars
                 currentCommandIndex++;
                 if (needLog)
                 {
-                    Debug.Log($"<color=yellow>{currentCommandIndex})</color> {command.GetLog()}");
+                    Debug.Log($"<color=yellow>COMMAND {currentCommandIndex}</color> {command.GetLog()}");
                 }
                 command.Execute();
             }
@@ -42,7 +42,7 @@ namespace LineWars
             {
                 switch (commandType)
                 {
-                    case CommandType.Attack when
+                    case CommandType.MeleeAttack when
                         executor is IAttackerVisitor attacker && target is IAlive alive && attacker.CanAttack(alive):
                         UnitsController.ExecuteCommand(new AttackCommand(attacker, alive));
                         return true;
@@ -70,7 +70,7 @@ namespace LineWars
             {
                 switch (commandType)
                 {
-                    case CommandType.Attack when
+                    case CommandType.MeleeAttack when
                         executor is IAttackerVisitor attacker && target is IAlive alive && attacker.CanAttack(alive):
                         return attacker.GetAttackTypeBy(alive);
                     case CommandType.Move when

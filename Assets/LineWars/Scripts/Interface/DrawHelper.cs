@@ -24,7 +24,7 @@ public static class DrawHelper
     {
         switch (commandType)
         {
-            case CommandType.Attack:
+            case CommandType.MeleeAttack:
                 return Resources.Load<Sprite>("UI/Icons/attack");
             case CommandType.Heal:
                 return Resources.Load<Sprite>("UI/Icons/Hp");
