@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using LineWars.Interface;
 using LineWars.Model;
-using UnityEditor.U2D.Path;
 using UnityEngine;
 
 namespace LineWars.Interface
