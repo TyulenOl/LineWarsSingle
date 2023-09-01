@@ -3,7 +3,7 @@
 
 int _BlurRadius;
 
-Texture2D<float4> _Source;
+Texture2D _Source;
 RWTexture2D<float4> _VerBlurOutput;
 shared RWTexture2D<float4> _HorBlurOutput;
 
