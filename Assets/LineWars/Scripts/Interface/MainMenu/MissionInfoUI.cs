@@ -12,7 +12,6 @@ namespace LineWars
         [SerializeField] private Image missionImage;
         [SerializeField] private TMP_Text missionStatus;
         [SerializeField] private Button startButton;
-        [SerializeField] private TMP_Text startButtonText;
 
         private SceneName sceneToLoad;
 
@@ -50,9 +49,6 @@ namespace LineWars
             
             if (startButton == null)
                 Debug.LogError($"{nameof(startButton)} is null on {name}");
-            
-            if (startButtonText == null)
-                Debug.LogError($"{nameof(startButtonText)} is null on {name}");
         }
 
         public void Initialize(MissionState state)
@@ -63,7 +59,6 @@ namespace LineWars
             missionImage.sprite = data.MissionImage;
 
             missionStatus.text = state.isCompleted ? @"<color=green>Завершена</color>" : "Не пройдена";
-            startButtonText.text = state.isCompleted ? "Начать заново" : "Начать";
 
             sceneToLoad = data.SceneToLoad;
         }
