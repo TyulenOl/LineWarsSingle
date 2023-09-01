@@ -126,13 +126,13 @@ namespace LineWars.Model
             NationType = Rules.Nation;
         }
 
-        public bool CanSpawnUnit(Node node, UnitBuyPreset preset)
+        public bool CanSpawnPreset(UnitBuyPreset preset)
         {
             return NodeConditional() && MoneyConditional();
 
             bool NodeConditional()
             {
-                return node.IsBase && node.AllIsFree;
+                return Base.Node.AllIsFree;
             }
 
             bool MoneyConditional()
@@ -148,10 +148,10 @@ namespace LineWars.Model
             BasePlayerUtility.CreateUnitForPlayer(this, node, unitPrefab);
         }
 
-        public void SpawnPreset(Node node, UnitBuyPreset unitPreset)
+        public void SpawnPreset(UnitBuyPreset unitPreset)
         {
-            SpawnUnit(node, unitPreset.FirstUnitType);
-            SpawnUnit(node, unitPreset.SecondUnitType);
+            SpawnUnit(Base.Node, unitPreset.FirstUnitType);
+            SpawnUnit(Base.Node, unitPreset.SecondUnitType);
             CurrentMoney -= unitPreset.Cost;
         }
 
