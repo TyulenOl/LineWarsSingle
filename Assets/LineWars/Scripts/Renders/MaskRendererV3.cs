@@ -48,6 +48,7 @@ public class MaskRendererV3 : MonoBehaviour
     private static readonly int blurRadiusId = Shader.PropertyToID("_BlurRadius");
 
     private static readonly int sourceId = Shader.PropertyToID("_Source");
+    private static readonly int texSizeId = Shader.PropertyToID("_TexSize");
     private static readonly int verBlurOutputId = Shader.PropertyToID("_VerBlurOutput");
     private static readonly int horBlurOutputId = Shader.PropertyToID("_HorBlurOutput");
 
@@ -186,6 +187,8 @@ public class MaskRendererV3 : MonoBehaviour
 
         blurShader.SetTexture(blurVerID, horBlurOutputId, horBlurOutput);
         blurShader.SetTexture(blurVerID, verBlurOutputId, verBlurOutput);
+        
+        blurShader.SetFloats(texSizeId, visibilityMap.width, visibilityMap.height);
     }
 
     private bool CheckValid()

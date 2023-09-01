@@ -1,0 +1,77 @@
+#pragma kernel HorzBlurCs
+#pragma kernel VertBlurCs
+
+
+int _BlurRadius;
+
+Texture2D _Source;
+RWTexture2D<float4> _VerBlurOutput;
+shared RWTexture2D<float4> _HorBlurOutput;
+shared float2 _TexSize;
+
+
+[numthreads(8, 1, 1)]
+void HorzBlurCs(uint3 groupThreadID : SV_GroupThreadID, uint3 dispatchThreadId : SV_DispatchThreadID)
+{
+    const float radius = _BlurRadius;
+
+    float totalScale = 1;
+    float4 value = _Source[dispatchThreadId.xy];
+
+    float i = 1.0;
+    while (i <= radius)
+    {
+        const float2 dudv = float2(i, 0);
+        
+        const float2 left = dispatchThreadId.xy - dudv;
+        const float2 right = dispatchThreadId.xy + dudv;
+        
+        value += _Source[left] + _Source[right];
+
+        if (left.x > 0)
+        {
+            totalScale += 1.0;
+        }
+        if (right.x < _TexSize.x)
+        {
+            totalScale += 1.0;
+        }
+        
+        i += 1.0;
+    }
+
+    _HorBlurOutput[dispatchThreadId.xy] = value / totalScale;
+}
+
+[numthreads(1, 8, 1)]
+void VertBlurCs(uint3 groupThreadID : SV_GroupThreadID, uint3 dispatchThreadId : SV_DispatchThreadID)
+{
+    const float radius = _BlurRadius;
+
+    float totalScale = 1.0;
+    float4 value = _HorBlurOutput[dispatchThreadId.xy];
+
+    float i = 1.0;
+    while (i <= radius)
+    {
+        float2 dudv = float2(0, i);
+
+        const float2 bottom = dispatchThreadId.xy - dudv;
+        const float2 top = dispatchThreadId.xy + dudv;
+        
+        value += _HorBlurOutput[bottom] + _HorBlurOutput[top];
+
+        if (bottom.y > 0)
+        {
+            totalScale += 1.0;
+        }
+        if (top.y < _TexSize.y)
+        {
+            totalScale += 1.0;
+        }
+        
+        i += 1.0;
+    }
+
+    _VerBlurOutput[dispatchThreadId.xy] = value / totalScale;
+}
