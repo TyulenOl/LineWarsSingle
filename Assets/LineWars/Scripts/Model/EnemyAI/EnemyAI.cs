@@ -34,7 +34,7 @@ namespace LineWars.Model
             IEnumerator BuyCoroutine()
             {
                 if(buySelector.TryGetPreset(this, out var preset))
-                    SpawnPreset(Base.Node, preset);
+                    SpawnPreset(preset);
                 yield return null;
                 ExecuteTurn(PhaseType.Idle);
             }

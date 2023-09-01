@@ -81,21 +81,21 @@ namespace LineWars.Interface
 
         private void OnPhaseChanged(PhaseType previousPhase, PhaseType currentPhase)
         {
-            currentPhaseText.text = currentPhase.ToString();
+            currentPhaseText.text = DrawHelper.GetPhaseName(currentPhase);
         }
         void PlayerOnCurrenMoneyChanged(int before, int after)
         {
-            currentMoneyText.text = $"Money: {after}";
+            currentMoneyText.text = after.ToString();
         }
         
         private void LocalPlayerOnIncomeChanged(int before, int after)
         {
-            currentIncomeText.text = $"Income: {after}";
+            currentIncomeText.text = after.ToString();
         }
         
         private void LocalPlayerOnScoreChanged(int before, int after)
         {
-            scoreText.text = $"Score: {after} / {SingleGame.Instance.ScoreForWin}";
+            scoreText.text = $"{after} / {SingleGame.Instance.ScoreForWin}";
         }
     }
 }
