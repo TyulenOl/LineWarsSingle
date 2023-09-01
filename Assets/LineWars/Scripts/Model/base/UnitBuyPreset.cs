@@ -9,6 +9,7 @@ namespace LineWars.Model
     public class UnitBuyPreset
     {
         [SerializeField] private string name;
+        [SerializeField] private string description;
         [SerializeField] private UnitType firstUnitType;
         [SerializeField] private UnitType secondUnitType;
         [SerializeField] private int cost;
@@ -16,6 +17,9 @@ namespace LineWars.Model
 
 
         public string Name => name;
+
+        public string Description => description;
+
         public UnitType FirstUnitType => firstUnitType;
         public UnitType SecondUnitType => secondUnitType;
         public int Cost => cost;

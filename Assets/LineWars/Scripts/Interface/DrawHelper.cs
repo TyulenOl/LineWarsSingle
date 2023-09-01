@@ -16,8 +16,8 @@ public static class DrawHelper
             case CharacteristicType.Armor:
                 return Resources.Load<Sprite>("UI/Icons/armor");
             case CharacteristicType.Hp:
-                return Resources.Load<Sprite>("UI/Icons/HP");
-            default: return Resources.Load<Sprite>("UI/Icons/HP");
+                return Resources.Load<Sprite>("UI/Icons/Icon_Heart");
+            default: return Resources.Load<Sprite>("UI/Icons/Icon_Heart");
         }
     }
     
@@ -28,12 +28,12 @@ public static class DrawHelper
             case CommandType.MeleeAttack:
                 return Resources.Load<Sprite>("UI/Icons/attack");
             case CommandType.Heal:
-                return Resources.Load<Sprite>("UI/Icons/Hp");
+                return Resources.Load<Sprite>("UI/Icons/HP");
             case CommandType.Fire:
-                return Resources.Load<Sprite>("UI/Icons/fire");
+                return Resources.Load<Sprite>("UI/Icons/Icon_Focus");
             case CommandType.Move:
-                return Resources.Load<Sprite>("UI/Icons/target");
-            default: return Resources.Load<Sprite>("UI/Icons/HP");
+                return Resources.Load<Sprite>("UI/Icons/Icon_Flag");
+            default: return Resources.Load<Sprite>("UI/Icons/Icon_Focus");
         }
     }
 
