@@ -16,7 +16,7 @@ namespace LineWars.Model
             get
             {
                 var value = CreateInstance<DivideIntModifier>();
-                value.divideValue = 1;
+                value.divideValue = 2;
                 return value;
             }
         }

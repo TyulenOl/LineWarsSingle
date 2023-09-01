@@ -15,7 +15,7 @@ namespace LineWars.Interface
         [SerializeField] private TMP_Text scoreText;
         
         private IExecutor currentExecutor;
-        private List<TargetDrawer> currentDrawers;
+        private List<TargetDrawer> currentDrawers = new ();
         private void Start()
         {
             Player.LocalPlayer.CurrentMoneyChanged += PlayerOnCurrenMoneyChanged;
@@ -29,19 +29,14 @@ namespace LineWars.Interface
             
             PhaseManager.Instance.PhaseChanged.AddListener(OnPhaseChanged);
             CommandsManager.Instance.ExecutorChanged.AddListener(OnExecutorChanged);
-            currentDrawers = new List<TargetDrawer>();
         }
-
-
-
-
-        private void OnExecutorChanged(IExecutor arg0, IExecutor arg1)
+        
+        private void OnExecutorChanged(IExecutor before, IExecutor after)
         {
-            if (arg0 != null)
-            {
-                arg0.ActionCompleted.RemoveListener(ReDrawCurrentTargets);
-            }
-            currentExecutor = arg1;
+            if (before != null)
+                before.ActionCompleted.RemoveListener(ReDrawCurrentTargets);
+            
+            currentExecutor = after;
             ReDrawCurrentTargets();
             if(currentExecutor == null) return;
             currentExecutor.ActionCompleted.AddListener(ReDrawCurrentTargets);
@@ -72,13 +67,7 @@ namespace LineWars.Interface
                 drawer.ReDraw(valueTuple.Item2);
             }
         }
-
-        private void OnDestroy()
-        {
-            Player.LocalPlayer.CurrentMoneyChanged -= (PlayerOnCurrenMoneyChanged);
-            PhaseManager.Instance.PhaseChanged.RemoveListener(OnPhaseChanged);
-        }
-
+        
         private void OnPhaseChanged(PhaseType previousPhase, PhaseType currentPhase)
         {
             currentPhaseText.text = DrawHelper.GetPhaseName(currentPhase);

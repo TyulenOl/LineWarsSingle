@@ -29,10 +29,8 @@ namespace LineWars.Model
             owned.SetOwner(basePlayer);
         }
         
-        protected virtual void OnDestroy()
+        protected virtual void OnDisable()
         {
-            if(Owner != null)
-                Owner.RemoveOwned(this);
         }
 
         protected virtual void OnSetOwner(BasePlayer oldPlayer, BasePlayer newPlayer) {}

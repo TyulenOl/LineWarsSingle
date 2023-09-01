@@ -431,6 +431,7 @@ namespace LineWars.Model
                 node.RightUnit = null;
             }
 
+            Owner.RemoveOwned(this);
             Destroy(gameObject);
         }
 
