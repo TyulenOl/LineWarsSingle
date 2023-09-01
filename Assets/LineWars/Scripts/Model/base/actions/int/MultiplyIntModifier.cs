@@ -5,15 +5,20 @@ namespace LineWars.Model
     [CreateAssetMenu(fileName = "New Multiply", menuName = "Modifiers/IntModifier/Multiply", order = 57)]
     public class MultiplyIntModifier: IntModifier
     {
-        [SerializeField] private float multiplyValue; 
+        [SerializeField] private float multiplyValue = 1; 
         public override int Modify(int points)
         {
             return Mathf.RoundToInt(points * multiplyValue);
         }
-
-        protected override void Awake()
+        
+        public static MultiplyIntModifier MultiplyOne
         {
-            multiplyValue = 1;
+            get
+            {
+                var value = CreateInstance<MultiplyIntModifier>();
+                value.multiplyValue = 1;
+                return value;
+            }
         }
     }
 }

@@ -8,7 +8,6 @@ using UnityEngine.EventSystems;
 
 namespace LineWars.Model
 {
-    [RequireComponent(typeof(Outline2D))]
     [RequireComponent(typeof(Selectable2D))]
     [RequireComponent(typeof(RenderNodeV3))]
     public class Node : Owned, ITarget, INumbered
@@ -97,9 +96,9 @@ namespace LineWars.Model
             selectable2D.PointerClicked += OnPointerClicked;
         }
 
-        protected override void OnDestroy()
+        protected override void OnDisable()
         {
-            base.OnDestroy();
+            base.OnDisable();
             selectable2D.PointerClicked -= OnPointerClicked;
         }
 

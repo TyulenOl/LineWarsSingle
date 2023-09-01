@@ -12,5 +12,15 @@ namespace LineWars.Model
         {
             return points - decreaseValue;
         }
+
+        public static DecreaseIntModifier DecreaseOne
+        {
+            get
+            {
+                var value = CreateInstance<DecreaseIntModifier>();
+                value.decreaseValue = 1;
+                return value;
+            }
+        }
     }
 }

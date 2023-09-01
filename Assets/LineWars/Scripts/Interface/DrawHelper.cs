@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using LineWars;
 using LineWars.Model;
 using UnityEngine;
 
@@ -24,7 +25,7 @@ public static class DrawHelper
     {
         switch (commandType)
         {
-            case CommandType.Attack:
+            case CommandType.MeleeAttack:
                 return Resources.Load<Sprite>("UI/Icons/attack");
             case CommandType.Heal:
                 return Resources.Load<Sprite>("UI/Icons/Hp");
@@ -36,6 +37,24 @@ public static class DrawHelper
         }
     }
 
+    public static string GetPhaseName(PhaseType phaseType)
+    {
+        switch (phaseType)
+        {
+            case PhaseType.Artillery:
+            return "Артподготовка";
+            case PhaseType.Idle:
+            return "Рутина";
+            case PhaseType.Buy:
+            return "Подкрепление";
+            case PhaseType.Fight:
+            return "Боевые действия";
+            case PhaseType.Scout:
+            return "Разведка";
+            default: return "Подготовка";
+        }
+    }
+ 
     
     public static Sprite GetSpriteByUnitType(UnitType characteristicType)
     {

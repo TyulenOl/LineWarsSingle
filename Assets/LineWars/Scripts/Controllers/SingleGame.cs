@@ -22,8 +22,7 @@ namespace LineWars
         [SerializeField] private PlayerInitializer playerInitializer;
         [Header("Debug")] 
         [SerializeField] private bool isAI;
-        [SerializeField] private bool lockWinOrLose = true;
-        
+
         private List<BasePlayer> allPlayers = new ();
         private Player player;
         private int enemyCount = 0;
@@ -129,8 +128,7 @@ namespace LineWars
 
         private void WinGame()
         {
-            if (lockWinOrLose)
-                return;
+            if (!Game.IsNormalStart) return;
             WinLoseUI.isWin = true;
             SceneTransition.LoadScene(SceneName.WinOrLoseScene);
             CompaniesDataBase.ChooseMission.isCompleted = true;
@@ -139,8 +137,7 @@ namespace LineWars
 
         private void LoseGame()
         {
-            if (lockWinOrLose)
-                return;
+            if (!Game.IsNormalStart) return;
             WinLoseUI.isWin = false;
             SceneTransition.LoadScene(SceneName.WinOrLoseScene);
         }

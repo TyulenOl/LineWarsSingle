@@ -6,7 +6,7 @@ struct NodesBuffer
     float Visibility;
 };
 
-RWTexture2D<float4> _VisibilityMask;
+RWTexture2D<float4> _VisibilityMaskV3;
 
 int _NodesCount;
 float _Sensitivity = 0.05;
@@ -30,7 +30,7 @@ bool compareFloat4(float4 a, float4 b)
 [numthreads(8,8,1)]
 void CSMain(uint3 id : SV_DispatchThreadID)
 {
-    _VisibilityMask[id.xy] = 0;
+    _VisibilityMaskV3[id.xy] = 0;
     for (int i = 0; i < _NodesCount; i++)
     {
         const float4 nodeColor = _NodesBuffer[i].Color;
@@ -40,7 +40,7 @@ void CSMain(uint3 id : SV_DispatchThreadID)
         
         if (compareFloat4(nodeColor, pixelColor))
         {
-            _VisibilityMask[id.xy] = visibility;
+            _VisibilityMaskV3[id.xy] = visibility;
         }
     }
 }

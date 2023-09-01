@@ -137,7 +137,7 @@ namespace LineWars.Model
 
         private float GetScore()
         {
-            if (distanceUnit.MeleeDamage == 0) return 0f;
+            if (distanceUnit.Damage == 0) return 0f;
 
             var enemyDistance = Graph.FindShortestPath(target.Node, basePlayer.Base.Node, target).Count;
             if (enemyDistance == 0) enemyDistance = 1;

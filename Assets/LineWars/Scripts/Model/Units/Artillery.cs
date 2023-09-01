@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace LineWars.Model
 {
@@ -10,15 +9,24 @@ namespace LineWars.Model
         
         public override bool CanAttack(Edge edge)
         {
-            return !attackLocked &&
-                   edge.LineType >= LineType.CountryRoad
-                   && Node.FindShortestPath(edge.FirstNode).Count - 1 <= Distance
-                   && Node.FindShortestPath(edge.SecondNode).Count - 1 <= Distance;
+            var pathLen1 = Node.FindShortestPath(edge.FirstNode).Count - 1;
+            var pathLen2 = Node.FindShortestPath(edge.SecondNode).Count - 1;
+            return !attackLocked 
+                   && Damage > 0
+                   && edge.LineType >= LineType.CountryRoad
+                   && (pathLen1 <= Distance && pathLen2 + 1 <= Distance
+                       || pathLen2 <= Distance && pathLen1 + 1 <= Distance)
+                   && ActionPointsCondition(attackPointsModifier, CurrentActionPoints);
         }
 
         public override void Attack(Edge edge)
         {
-            DistanceAttack(edge);
+            var explosion = Instantiate(explosionPrefab);
+            explosion.transform.position = edge.transform.position;
+            explosion.ExplosionEnded += () =>
+            {
+                DistanceAttack(edge);
+            };
         }
         
         public override void Attack(Unit enemy)

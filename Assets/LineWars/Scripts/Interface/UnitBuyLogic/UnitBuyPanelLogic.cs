@@ -9,6 +9,7 @@ namespace LineWars.Interface
     {
         [SerializeField] private LayoutGroup presetsLayoutGroup;
         [SerializeField] private UnitBuyPresetDrawer presetDrawerPrefab;
+        [SerializeField] private UnitBuyLayerLogic unitBuyLayerLogic;
 
         private List<UnitBuyPresetDrawer> unitBuyPresetDrawers;
         private Dictionary<UnitBuyPreset, UnitBuyPresetDrawer> unitBuyPresetDrawersDictionary;
@@ -32,14 +33,8 @@ namespace LineWars.Interface
                 presetDrawer.UnitBuyPreset = preset;
                 presetDrawer.Button.onClick.AddListener(() =>
                 {
-                    var player = Player.LocalPlayer;
-                    if (PhaseManager.Instance.CurrentPhase != PhaseType.Buy) return;
-                    UnitsController.ExecuteCommand(
-                        new SpawnPresetCommand(
-                            player,
-                            player.Base.Node,
-                            preset
-                        ), false);
+                    unitBuyLayerLogic.CurrentPreset = presetDrawer.UnitBuyPreset;
+                    unitBuyLayerLogic.ChosenUnitPresetDrawer = presetDrawer;
                 });
             }
         }

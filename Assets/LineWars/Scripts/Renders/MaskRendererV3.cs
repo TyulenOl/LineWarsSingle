@@ -18,9 +18,9 @@ public class MaskRendererV3 : MonoBehaviour
     [SerializeField] [Range(0.001f, 0.5f)] private float sensitivity = 0.05f;
     [SerializeField] [Range(0, 10)] private int blurRadius;
 
-    [Header("Shaders")] [SerializeField] private ComputeShader maskShader;
+    [Header("Shaders")]
+    [SerializeField] private ComputeShader maskShader;
     [SerializeField] private ComputeShader blurShader;
-    [SerializeField] private Material targetMaterial;
 
     [Header("")] 
     [SerializeField] private List<RenderNodeV3> nodes;
@@ -39,7 +39,7 @@ public class MaskRendererV3 : MonoBehaviour
     private static readonly int nodesCountId = Shader.PropertyToID("_NodesCount");
     private static readonly int nodesBufferId = Shader.PropertyToID("_NodesBuffer");
     private static readonly int visibilityMapId = Shader.PropertyToID("_VisibilityMap");
-    private static readonly int visibilityMaskId = Shader.PropertyToID("_VisibilityMask");
+    private static readonly int visibilityMaskId = Shader.PropertyToID("_VisibilityMaskV3");
     private static readonly int sensitivityId = Shader.PropertyToID("_Sensitivity");
 
     private static readonly int blurRadiusId = Shader.PropertyToID("_BlurRadius");
@@ -140,8 +140,8 @@ public class MaskRendererV3 : MonoBehaviour
         InitializeMaskShader();
         InitializeBlur();
 
-        targetMaterial.SetTexture(visibilityMaskId, shaderInput);
-        
+        Shader.SetGlobalTexture(visibilityMaskId, shaderInput);
+
         ApplyChanges();
     }
 
@@ -205,12 +205,6 @@ public class MaskRendererV3 : MonoBehaviour
         if (maskShader == null)
         {
             Debug.LogError($"{nameof(maskShader)} is null!");
-            return false;
-        }
-
-        if (targetMaterial == null)
-        {
-            Debug.LogError($"{nameof(targetMaterial)} is null!");
             return false;
         }
 

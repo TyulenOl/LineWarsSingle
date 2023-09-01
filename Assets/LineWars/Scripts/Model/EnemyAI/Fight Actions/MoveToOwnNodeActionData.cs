@@ -105,7 +105,7 @@ namespace LineWars.Model
                 var enemiesAttack = 0;
                 foreach (var enemy in enemies)
                 {
-                    enemiesAttack += enemy.MeleeDamage;
+                    enemiesAttack += enemy.Damage;
                 }
                 var safetyBonus = data.BonusPerUnitHp * unit.CurrentHp 
                                   - data.PenaltyForEnemiesAttack * enemiesAttack;
