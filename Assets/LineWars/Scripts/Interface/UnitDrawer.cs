@@ -65,7 +65,6 @@ namespace LineWars.Interface
                 centerDrawer.CurrentUnit = unit;
 
             targetDrawer = GetComponent<TargetDrawer>();
-            //TODO центральный отрисовщик характеристик
         }
 
         private void OnEnable()

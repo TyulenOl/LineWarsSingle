@@ -50,7 +50,7 @@ namespace LineWars
             {
                 var missionUi = initializedMap.MissionUIs[i];
                 var missionState = companyState.missionStates[i]; 
-                missionUi.Initialize(missionState, i, OnMissionUiClick);
+                missionUi.Initialize(missionState, i+1, OnMissionUiClick);
             }
         }
 
