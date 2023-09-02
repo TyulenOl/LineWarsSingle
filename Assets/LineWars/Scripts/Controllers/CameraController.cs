@@ -1,8 +1,10 @@
+using System.Collections.Generic;
 using System.Linq;
+using LineWars.Scripts.Interface;
 using UnityEngine;
-using Graph = LineWars.Model.Graph;
+using UnityEngine.EventSystems;
 
-namespace LineWars
+namespace LineWars.Scripts.Controllers
 {
     public class CameraController : MonoBehaviour
     {
@@ -22,8 +24,8 @@ namespace LineWars
         private bool isDragging;
         private float zoomValue;
 
-        private Vector2 maxLimit;
-        private Vector2 minLimit;
+        private Vector2 mapPointMin;
+        private Vector2 mapPointMax;
 
         private void Awake()
         {
@@ -37,13 +39,17 @@ namespace LineWars
 
         private void Start()
         {
-            if (Graph.AllNodes.Count != 0)
-                (minLimit, maxLimit) = GetMinAndMaxGraphPoints();
+            var basePosition = Player.LocalPlayer.Base.transform.position;
+            cameraTransform.position = new Vector3(basePosition.x, basePosition.y, cameraTransform.position.z);
+            var bounds = Map.MapSpriteRenderer.bounds;
+            mapPointMax = bounds.max;
+            mapPointMin = bounds.min;
         }
 
         private void Update()
         {
-            if (Input.GetMouseButtonDown(0) || Input.touches.Any(touch => touch.phase == TouchPhase.Began))
+            if ((Input.GetMouseButtonDown(0) || Input.touches.Any(touch => touch.phase == TouchPhase.Began)) &&
+                !PointerIsOverUI())
             {
                 pivotPoint = mainCamera.ScreenToWorldPoint(Input.mousePosition);
                 isDragging = true;
@@ -65,8 +71,19 @@ namespace LineWars
             MouseZoom();
             TouchZoom();
 
-            UpdateVelocity();
             UpdateOrthographicSize();
+            UpdateVelocity();
+        }
+
+        private bool PointerIsOverUI()
+        {
+            var results = new List<RaycastResult>();
+            var pointerData = new PointerEventData(EventSystem.current) { position = Input.mousePosition };
+            EventSystem.current.RaycastAll(pointerData, results);
+
+            var hitObject = results.Count < 1 ? null : results[0].gameObject;
+
+            return hitObject != null && hitObject.layer == LayerMask.NameToLayer("UI");
         }
 
         private Vector2 GetMidpointBetweenTouches()
@@ -79,8 +96,8 @@ namespace LineWars
 
         private void DragCamera(Vector2 position)
         {
-            var resultPosition = cameraTransform.position + (Vector3) (position - pivotPoint) * -1;
-            cameraTransform.position = VectorClamp(resultPosition, minLimit, maxLimit);
+            var resultPosition = cameraTransform.position + (Vector3)(position - pivotPoint) * -1;
+            cameraTransform.position = ClampCameraPosition(resultPosition);
         }
 
         private void UpdateVelocity()
@@ -94,8 +111,8 @@ namespace LineWars
             else
             {
                 horizontalVelocity = Vector3.Lerp(horizontalVelocity, Vector3.zero, speedDampening * Time.deltaTime);
-                var resultPosition = cameraTransform.position + (Vector3) horizontalVelocity * Time.deltaTime;
-                cameraTransform.position = VectorClamp(resultPosition, minLimit, maxLimit);
+                var resultPosition = cameraTransform.position + (Vector3)horizontalVelocity * Time.deltaTime;
+                cameraTransform.position = ClampCameraPosition(resultPosition);
             }
         }
 
@@ -103,14 +120,7 @@ namespace LineWars
         {
             mainCamera.orthographicSize = Mathf.Lerp(mainCamera.orthographicSize, zoomValue,
                 zoomDampening * Time.deltaTime);
-        }
-
-        private Vector3 VectorClamp(Vector3 value, Vector3 min, Vector3 max)
-        {
-            return new Vector3(
-                Mathf.Clamp(value.x, min.x, max.x),
-                Mathf.Clamp(value.y, min.y, max.y),
-                value.z);
+            cameraTransform.position = ClampCameraPosition(cameraTransform.position);
         }
 
         private void MouseZoom()
@@ -137,27 +147,18 @@ namespace LineWars
             }
         }
 
-        private (Vector2, Vector2) GetMinAndMaxGraphPoints()
+        private Vector3 ClampCameraPosition(Vector3 position)
         {
-            var maxPoint = Vector2.negativeInfinity;
-            var minPoint = Vector2.positiveInfinity;
+            var camHalfHeight = mainCamera.orthographicSize;
+            float camHalfWidth = mainCamera.aspect * camHalfHeight;
 
-            var allNodes = Graph.AllNodes;
-            foreach (var node in allNodes)
-            {
-                var position = node.Position;
-                maxPoint.x = position.x > maxPoint.x ? position.x : maxPoint.x;
-                maxPoint.y = position.y > maxPoint.y ? position.y : maxPoint.y;
-                minPoint.x = position.x < minPoint.x ? position.x : minPoint.x;
-                minPoint.y = position.y < minPoint.y ? position.y : minPoint.y;
-            }
+            var halfSizeCamera = new Vector2(camHalfWidth, camHalfHeight);
+            var maxLimitPoint = mapPointMax - halfSizeCamera - (additionalPaddingFromBorders * Vector2.one);
+            var minLimitPoint = mapPointMin + halfSizeCamera + (additionalPaddingFromBorders * Vector2.one);
 
-            maxPoint += additionalPaddingFromBorders * Vector2.one;
-            minPoint -= additionalPaddingFromBorders * Vector2.one;
-
-
-            Debug.Log($"Min: {minPoint} || Max: {maxPoint}");
-            return (minPoint, maxPoint);
+            return new Vector3(Mathf.Clamp(position.x, minLimitPoint.x, maxLimitPoint.x),
+                Mathf.Clamp(position.y, minLimitPoint.y, maxLimitPoint.y),
+                cameraTransform.position.z);
         }
     }
 }
