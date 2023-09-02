@@ -11,6 +11,7 @@ public class UnitBuyLayerLogic : MonoBehaviour
 {
     [SerializeField] private RectTransform buyUnitsLayer;
     [SerializeField] private Button buyButton;
+    [SerializeField] private DescriptionPanelLogic descriptionPanelLogic;
 
     private UnitBuyPresetDrawer chosenUnitPresetDrawer;
 
@@ -23,6 +24,7 @@ public class UnitBuyLayerLogic : MonoBehaviour
             chosenUnitPresetDrawer = value;
             chosenUnitPresetDrawer?.SetChosen(true);
             buyButton.interactable = value != null;
+            descriptionPanelLogic.ReDrawDescription(ChosenUnitPresetDrawer?.UnitBuyPreset);
         }
     }
 

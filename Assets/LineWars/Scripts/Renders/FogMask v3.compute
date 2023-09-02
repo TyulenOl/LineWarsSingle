@@ -10,6 +10,7 @@ RWTexture2D<float4> _VisibilityMaskV3;
 
 int _NodesCount;
 float _Sensitivity = 0.05;
+
 StructuredBuffer<NodesBuffer> _NodesBuffer;
 Texture2D<float4> _VisibilityMap;
 

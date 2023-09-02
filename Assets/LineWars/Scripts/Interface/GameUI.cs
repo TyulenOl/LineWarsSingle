@@ -46,6 +46,7 @@ namespace LineWars.Interface
         {
             foreach (var currentDrawer in currentDrawers)
             {
+                if(currentDrawer == null) continue;
                 currentDrawer.ReDraw(CommandType.None);
             }
             currentDrawers = new List<TargetDrawer>();

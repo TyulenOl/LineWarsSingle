@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -11,8 +12,10 @@ public class MaskRendererV3 : MonoBehaviour
 
     [Header("Settings")] 
     [SerializeField] private bool autoInitialize;
+    [SerializeField, Min(0)] private int numberFramesSkippedBeforeUpdate = 60;
     
-    [Header("Map")] [SerializeField] private Texture2D visibilityMap;
+    [Header("Map")] 
+    [SerializeField] private Texture2D visibilityMap;
     [SerializeField] private Transform startPosition;
     [SerializeField] private Transform endPosition;
     [SerializeField] [Range(0.001f, 0.5f)] private float sensitivity = 0.05f;
@@ -45,6 +48,7 @@ public class MaskRendererV3 : MonoBehaviour
     private static readonly int blurRadiusId = Shader.PropertyToID("_BlurRadius");
 
     private static readonly int sourceId = Shader.PropertyToID("_Source");
+    private static readonly int texSizeId = Shader.PropertyToID("_TexSize");
     private static readonly int verBlurOutputId = Shader.PropertyToID("_VerBlurOutput");
     private static readonly int horBlurOutputId = Shader.PropertyToID("_HorBlurOutput");
 
@@ -56,6 +60,10 @@ public class MaskRendererV3 : MonoBehaviour
 
 
     private bool initialized;
+    
+    private bool applyStarted;
+    private bool needUpdate;
+    
 
     private struct NodesBuffer
     {
@@ -86,22 +94,21 @@ public class MaskRendererV3 : MonoBehaviour
     private void Update()
     {
         if (!initialized) return;
-
-        var isUpdated = HashIsUpdated();
+        
+        needUpdate = needUpdate || HashIsUpdated();
 
         for (var i = 0; i < nodes.Count; i++)
         {
             var node = nodes[i];
             var nodeBuffer = nodeBuffers[i];
-            isUpdated = isUpdated || Math.Abs(nodeBuffer.Visibility - node.Visibility) > 0.001f;
+            needUpdate = needUpdate || Math.Abs(nodeBuffer.Visibility - node.Visibility) > 0.001f;
             nodeBuffer.Visibility = node.Visibility;
             nodeBuffers[i] = nodeBuffer;
         }
 
-        if (isUpdated)
+        if (needUpdate && !applyStarted)
         {
-            UpdateHash();
-            ApplyChanges();
+            StartCoroutine(ApplyChangesCoroutine());
         }
     }
 
@@ -180,6 +187,8 @@ public class MaskRendererV3 : MonoBehaviour
 
         blurShader.SetTexture(blurVerID, horBlurOutputId, horBlurOutput);
         blurShader.SetTexture(blurVerID, verBlurOutputId, verBlurOutput);
+        
+        blurShader.SetFloats(texSizeId, visibilityMap.width, visibilityMap.height);
     }
 
     private bool CheckValid()
@@ -253,8 +262,8 @@ public class MaskRendererV3 : MonoBehaviour
             visibilityMap.width,
             visibilityMap.height,
             0,
-            RenderTextureFormat.ARGB32,
-            RenderTextureReadWrite.Linear
+            RenderTextureFormat.Default,
+            RenderTextureReadWrite.Default
         )
         {
             enableRandomWrite = true
@@ -290,5 +299,16 @@ public class MaskRendererV3 : MonoBehaviour
         }
 
         nodes.Add(node);
+    }
+
+    private IEnumerator ApplyChangesCoroutine()
+    {  
+        applyStarted = true;
+        for (int i = 0; i < numberFramesSkippedBeforeUpdate; i++)
+            yield return null;
+        UpdateHash();
+        ApplyChanges();
+        applyStarted = false;
+        needUpdate = false;
     }
 }
