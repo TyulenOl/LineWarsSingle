@@ -6,9 +6,17 @@ using UnityEngine;
 
 // ReSharper disable Unity.NoNullPropagation
 
-public class MaskRendererV3 : MonoBehaviour
+public class MaskRendererV3_2 : MonoBehaviour
 {
-    public MaskRendererV3 Instance { get; private set; }
+#if UNITY_IOS || UNITY_IPHONE || UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
+    protected const int GPU_MEMORY_BLOCK_SIZE_BLUR = 484;
+#elif UNITY_ANDROID
+    protected const int GPU_MEMORY_BLOCK_SIZE_BLUR = 64;
+#else
+    protected const int GPU_MEMORY_BLOCK_SIZE_BLUR = 1024;
+#endif
+    
+    public MaskRendererV3_2 Instance { get; private set; }
 
     [Header("Settings")] 
     [SerializeField] private bool autoInitialize;
@@ -18,7 +26,6 @@ public class MaskRendererV3 : MonoBehaviour
     [SerializeField] private Texture2D visibilityMap;
     [SerializeField] private Transform startPosition;
     [SerializeField] private Transform endPosition;
-    [SerializeField] [Range(0.001f, 0.5f)] private float sensitivity = 0.05f;
     [SerializeField] [Range(0, 10)] private int blurRadius;
 
     [Header("Shaders")]
@@ -43,24 +50,19 @@ public class MaskRendererV3 : MonoBehaviour
     private static readonly int nodesBufferId = Shader.PropertyToID("_NodesBuffer");
     private static readonly int visibilityMapId = Shader.PropertyToID("_VisibilityMap");
     private static readonly int visibilityMaskId = Shader.PropertyToID("_VisibilityMaskV3");
-    private static readonly int sensitivityId = Shader.PropertyToID("_Sensitivity");
 
-    private static readonly int blurRadiusId = Shader.PropertyToID("_BlurRadius");
+    private static readonly int blurRadiusId = Shader.PropertyToID("blurRadius");
 
     private static readonly int sourceId = Shader.PropertyToID("_Source");
-    private static readonly int texSizeId = Shader.PropertyToID("_TexSize");
     private static readonly int verBlurOutputId = Shader.PropertyToID("_VerBlurOutput");
     private static readonly int horBlurOutputId = Shader.PropertyToID("_HorBlurOutput");
 
     private int blurHorID;
     private int blurVerID;
-
-    private float sensitivityHash;
-    private int blurRadiusHash;
-
-
-    private bool initialized;
     
+    private int blurRadiusHash;
+    
+    private bool initialized;
     private bool applyStarted;
     private bool needUpdate;
     
@@ -96,30 +98,13 @@ public class MaskRendererV3 : MonoBehaviour
         if (!initialized) return;
         
         needUpdate = needUpdate || HashIsUpdated();
-
-        for (var i = 0; i < nodes.Count; i++)
-        {
-            var node = nodes[i];
-            var nodeBuffer = nodeBuffers[i];
-            needUpdate = needUpdate || Math.Abs(nodeBuffer.Visibility - node.Visibility) > 0.001f;
-            nodeBuffer.Visibility = node.Visibility;
-            nodeBuffers[i] = nodeBuffer;
-        }
-
+        
         if (needUpdate && !applyStarted)
         {
             StartCoroutine(ApplyChangesCoroutine());
         }
     }
-
-    private void OnDestroy()
-    {
-        buffer?.Dispose();
-        visibilityMask?.Release();
-        horBlurOutput?.Release();
-        verBlurOutput?.Release();
-        shaderInput?.Release();
-    }
+    
 
     public void Initialise()
     {
@@ -133,13 +118,12 @@ public class MaskRendererV3 : MonoBehaviour
 
         initialized = true;
         
-        UpdateHash();
-
         blurHorID = blurShader.FindKernel("HorzBlurCs");
         blurVerID = blurShader.FindKernel("VertBlurCs");
+        
+        visibilityMask = CreateTexture();
 
         tempSource = CreateTexture();
-        visibilityMask = CreateTexture();
         horBlurOutput = CreateTexture();
         verBlurOutput = CreateTexture();
         shaderInput = CreateTexture();
@@ -149,7 +133,43 @@ public class MaskRendererV3 : MonoBehaviour
 
         Shader.SetGlobalTexture(visibilityMaskId, shaderInput);
 
+        UpdateHash();
         ApplyChanges();
+        
+        bool CheckValid()
+        {
+            if (visibilityMap == null)
+            {
+                Debug.LogError($"{nameof(visibilityMap)} is null!");
+                return false;
+            }
+
+            if (nodes == null || nodes.Count == 0)
+            {
+                Debug.LogError($"{nameof(nodes)} is enmpy!");
+                return false;
+            }
+
+            if (blurShader == null)
+            {
+                Debug.LogError($"{nameof(blurShader)} is null!");
+                return false;
+            }
+
+            if (maskShader == null)
+            {
+                Debug.LogError($"{nameof(maskShader)} is null!");
+                return false;
+            }
+
+            if (!visibilityMap.isReadable)
+            {
+                Debug.LogError("Карта видимости не доступна для чтения. Пожалуйста исправте это в настройках импорта");
+                return false;
+            }
+
+            return true;
+        }
     }
 
 
@@ -160,6 +180,8 @@ public class MaskRendererV3 : MonoBehaviour
         maskShader.SetInt(nodesCountId, nodes.Count);
 
         InitializeBuffer();
+        
+        maskShader.SetBuffer(0, nodesBufferId, buffer);
     }
 
     private void InitializeBuffer()
@@ -177,9 +199,8 @@ public class MaskRendererV3 : MonoBehaviour
         }
 
         buffer.SetData(nodeBuffers);
-        maskShader.SetBuffer(0, nodesBufferId, buffer);
     }
-
+    
     private void InitializeBlur()
     {
         blurShader.SetTexture(blurHorID, sourceId, tempSource);
@@ -187,44 +208,8 @@ public class MaskRendererV3 : MonoBehaviour
 
         blurShader.SetTexture(blurVerID, horBlurOutputId, horBlurOutput);
         blurShader.SetTexture(blurVerID, verBlurOutputId, verBlurOutput);
-        
-        blurShader.SetFloats(texSizeId, visibilityMap.width, visibilityMap.height);
     }
 
-    private bool CheckValid()
-    {
-        if (visibilityMap == null)
-        {
-            Debug.LogError($"{nameof(visibilityMap)} is null!");
-            return false;
-        }
-
-        if (nodes == null || nodes.Count == 0)
-        {
-            Debug.LogError($"{nameof(nodes)} is enmpy!");
-            return false;
-        }
-
-        if (blurShader == null)
-        {
-            Debug.LogError($"{nameof(blurShader)} is null!");
-            return false;
-        }
-
-        if (maskShader == null)
-        {
-            Debug.LogError($"{nameof(maskShader)} is null!");
-            return false;
-        }
-
-        if (!visibilityMap.isReadable)
-        {
-            Debug.LogError("Карта видимости не доступна для чтения. Пожалуйста исправте это в настройках импорта");
-            return false;
-        }
-
-        return true;
-    }
 
     private Color GetNodeColor(RenderNodeV3 renderNode)
     {
@@ -242,17 +227,18 @@ public class MaskRendererV3 : MonoBehaviour
     private void ApplyChanges()
     {
         buffer.SetData(nodeBuffers);
-        maskShader.SetFloat(sensitivityId, sensitivity);
 
         var x = Mathf.CeilToInt(visibilityMap.width / 8.0f);
         var y = Mathf.CeilToInt(visibilityMap.height / 8.0f);
         maskShader.Dispatch(0, x, y, 1);
 
+        int horizontalBlurDisX = Mathf.CeilToInt(((float)visibilityMap.width / (float)GPU_MEMORY_BLOCK_SIZE_BLUR)); // it is here becouse res of window can change
+        int horizontalBlurDisY = Mathf.CeilToInt(((float)visibilityMap.height / (float)GPU_MEMORY_BLOCK_SIZE_BLUR));
 
         Graphics.Blit(visibilityMask, tempSource);
         blurShader.SetInt(blurRadiusId, blurRadius);
-        blurShader.Dispatch(blurHorID, x, visibilityMap.height, 1);
-        blurShader.Dispatch(blurVerID, visibilityMap.width, y, 1);
+        blurShader.Dispatch(blurHorID, horizontalBlurDisX, visibilityMap.height, 1);
+        blurShader.Dispatch(blurVerID, visibilityMap.width, horizontalBlurDisY, 1);
         Graphics.Blit(verBlurOutput, shaderInput);
     }
 
@@ -276,14 +262,31 @@ public class MaskRendererV3 : MonoBehaviour
 
     private bool HashIsUpdated()
     {
-        bool isUpdated = blurRadiusHash != blurRadius || Math.Abs(sensitivityHash - sensitivity) > 0.0001f;
+        bool isUpdated = blurRadiusHash != blurRadius;
+        
+        for (var i = 0; i < nodes.Count; i++)
+        {
+            if (isUpdated)
+                break;
+            
+            var node = nodes[i];
+            var nodeBuffer = nodeBuffers[i];
+            isUpdated = Math.Abs(nodeBuffer.Visibility - node.Visibility) > 0.001f;
+        }
+        
         return isUpdated;
     }
 
     private void UpdateHash()
     {
         blurRadiusHash = blurRadius;
-        sensitivityHash = sensitivity;
+        
+        for (var i = 0; i < nodes.Count; i++)
+        {
+            var nodeBuffer = nodeBuffers[i];
+            nodeBuffer.Visibility = nodes[i].Visibility;
+            nodeBuffers[i] = nodeBuffer;
+        }
     }
 
     public void AddRenderNode(RenderNodeV3 node)
@@ -312,5 +315,14 @@ public class MaskRendererV3 : MonoBehaviour
         ApplyChanges();
         applyStarted = false;
         needUpdate = false;
+    }
+    
+    private void OnDestroy()
+    {
+        buffer?.Dispose();
+        visibilityMask?.Release();
+        horBlurOutput?.Release();
+        verBlurOutput?.Release();
+        shaderInput?.Release();
     }
 }
