@@ -9,11 +9,17 @@ namespace LineWars.Scripts.Controllers
     public class CameraController : MonoBehaviour
     {
         [SerializeField] private float speedDampening = 15;
-        [SerializeField] private float additionalPaddingFromBorders = 2f;
         [SerializeField] private float zoomDampening = 6f;
         [SerializeField] private float zoomStepSize = 2f;
         [SerializeField] private float maxHeight = 10f;
         [SerializeField] private float minHeight = 3f;
+        
+        [Header("Paddings")]
+        [SerializeField] private float paddingsTop;
+        [SerializeField] private float paddingsRight;
+        [SerializeField] private float paddingsBottom;
+        [SerializeField] private float paddingsLeft;
+
 
         private Camera mainCamera;
         private Transform cameraTransform;
@@ -153,8 +159,8 @@ namespace LineWars.Scripts.Controllers
             float camHalfWidth = mainCamera.aspect * camHalfHeight;
 
             var halfSizeCamera = new Vector2(camHalfWidth, camHalfHeight);
-            var maxLimitPoint = mapPointMax - halfSizeCamera - (additionalPaddingFromBorders * Vector2.one);
-            var minLimitPoint = mapPointMin + halfSizeCamera + (additionalPaddingFromBorders * Vector2.one);
+            var maxLimitPoint = mapPointMax - halfSizeCamera - (new Vector2(paddingsRight, paddingsTop));
+            var minLimitPoint = mapPointMin + halfSizeCamera + (new Vector2(paddingsLeft, paddingsBottom));
 
             return new Vector3(Mathf.Clamp(position.x, minLimitPoint.x, maxLimitPoint.x),
                 Mathf.Clamp(position.y, minLimitPoint.y, maxLimitPoint.y),
