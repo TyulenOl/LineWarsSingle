@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using LineWars.Controllers;
+using LineWars.Interface;
 using LineWars.Model;
 using UnityEngine;
 using UnityEngine.Events;
@@ -123,20 +124,24 @@ namespace LineWars
         public override void ExecuteArtillery()
         {
             stateMachine.SetState(artilleryPhase);
+            GameUI.Instance.ReDrawAllAvailability(GetAllUnitsByPhase(PhaseType.Artillery), true);
         }
 
         public override void ExecuteFight()
         {
             stateMachine.SetState(fightPhase);
+            GameUI.Instance.ReDrawAllAvailability(GetAllUnitsByPhase(PhaseType.Fight), true);
         }
 
         public override void ExecuteScout()
         {
             stateMachine.SetState(scoutPhase);
+            GameUI.Instance.ReDrawAllAvailability(GetAllUnitsByPhase(PhaseType.Scout), true);
         }
 
-        public override void ExecuteIdle()
+        public override void ExecuteIdle()//Exit
         {
+            GameUI.Instance.ReDrawAllAvailability(MyUnits, false);
             stateMachine.SetState(idlePhase);
         }
 

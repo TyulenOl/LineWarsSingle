@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using LineWars.Controllers;
@@ -9,6 +10,7 @@ namespace LineWars.Interface
 {
     public class GameUI : MonoBehaviour
     {
+        public static GameUI Instance;
         [SerializeField] private TMP_Text currentMoneyText;
         [SerializeField] private TMP_Text currentPhaseText;
         [SerializeField] private TMP_Text currentIncomeText;
@@ -18,6 +20,19 @@ namespace LineWars.Interface
 
         private IExecutor currentExecutor;
         private List<TargetDrawer> currentDrawers = new ();
+
+        private void Awake()
+        {
+            if(Instance == null)
+            {
+                Instance = this;
+            }
+            else
+            {
+                Debug.LogError("Больше чем два CommandsManager на сцене");
+            }
+        }
+
         private void Start()
         {
             Player.LocalPlayer.CurrentMoneyChanged += PlayerOnCurrenMoneyChanged;
@@ -40,31 +55,33 @@ namespace LineWars.Interface
             
             currentExecutor = after;
             ReDrawCurrentTargets();
-            ReDrawAllAvailability(after);
+            ReDrawAllAvailability(before, after);
             if(currentExecutor == null) return;
             currentExecutor.ActionCompleted.AddListener(ReDrawCurrentTargets);
         }
 
-        private void ReDrawAllAvailability(IExecutor executor)
+        private void ReDrawAllAvailability(IExecutor before, IExecutor after)
         {
-            if (executor is null)
+            var unitsToReDraw = Player.LocalPlayer.GetAllUnitsByPhase(PhaseManager.Instance.CurrentPhase);
+            if (after is null)
             {
-                var unitsToReDraw = Player.LocalPlayer.GetAllUnitsByPhase(PhaseManager.Instance.CurrentPhase);
-                foreach (var unit in unitsToReDraw)
-                {
-                    if(!unit.CanDoAnyAction) continue;
-                    var drawer = unit.GetComponent<UnitDrawer>();
-                    drawer.ReDrawAvailability(true);
-                    activeUnitDrawersHash.Add(drawer);
-                }
+                if(before is { CanDoAnyAction: true })
+                    ReDrawAllAvailability(unitsToReDraw, true);
             }
             else
             {
-                foreach (var unitDrawer in activeUnitDrawersHash)
-                {
-                    unitDrawer.ReDrawAvailability(false);
-                }
-                activeUnitDrawersHash.Clear();
+                ReDrawAllAvailability(unitsToReDraw, false);
+            }
+        }
+
+        public void ReDrawAllAvailability(IEnumerable<Unit> units, bool isAvailable)
+        {
+            foreach (var unit in units)
+            {
+                if(!unit.CanDoAnyAction) continue;
+                var drawer = unit.GetComponent<UnitDrawer>();
+                drawer.ReDrawAvailability(isAvailable);
+                activeUnitDrawersHash.Add(drawer);
             }
         }
 
