@@ -9,6 +9,8 @@ namespace LineWars.Model
         [field: Header("Engineer Settings")]
         [field: SerializeField] private IntModifier engineerPointModifier;
 
+        public IntModifier EngineerPointModifier => engineerPointModifier;
+
         protected override void Awake()
         {
             base.Awake();
@@ -19,10 +21,12 @@ namespace LineWars.Model
             }
         }
 
-        public bool CanUpRoad([NotNull] Edge edge)
+        public bool CanUpRoad([NotNull] Edge edge) => CanUpRoad(edge, Node);
+
+        public bool CanUpRoad([NotNull] Edge edge, Node node)
         {
             if (edge == null) throw new ArgumentNullException(nameof(edge));
-            return Node.ContainsEdge(edge)
+            return node.ContainsEdge(edge)
                    && LineTypeHelper.CanUp(edge.LineType)
                    && ActionPointsCondition(engineerPointModifier, CurrentActionPoints);
         }

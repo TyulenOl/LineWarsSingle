@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -19,6 +20,38 @@ namespace LineWars.Model
             }
 
             return enemies;
+        }
+        
+        public static List<Unit> FindAdjacentEnemies(Node node, BasePlayer basePlayer, LineType minEdgeType)
+        {
+            var enemies = new List<Unit>();
+            foreach (var edge in node.Edges)
+            {
+                if((int) minEdgeType > (int)edge.LineType) continue;
+                var otherNode = edge.FirstNode == node ? edge.SecondNode : edge.FirstNode;
+                if (otherNode.LeftUnit != null && otherNode.LeftUnit.Owner != basePlayer)
+                    enemies.Add(otherNode.LeftUnit);
+                if (otherNode.RightUnit != null && otherNode.RightUnit.Owner != basePlayer)
+                    enemies.Add(otherNode.RightUnit);
+            }
+
+            return enemies;
+        }
+        
+        public static List<Unit> FindAdjacentAllies(Node node, BasePlayer basePlayer, LineType minEdgeType)
+        {
+            var allies = new List<Unit>();
+            foreach (var edge in node.Edges)
+            {
+                if((int) minEdgeType > (int)edge.LineType) continue;
+                var otherNode = edge.FirstNode == node ? edge.SecondNode : edge.FirstNode;
+                if (otherNode.LeftUnit != null && otherNode.LeftUnit.Owner == basePlayer)
+                    allies.Add(otherNode.LeftUnit);
+                if (otherNode.RightUnit != null && otherNode.RightUnit.Owner == basePlayer)
+                    allies.Add(otherNode.RightUnit);
+            }
+
+            return allies;
         }
 
         public static List<Unit> GetUnitsInNode(Node node)
@@ -52,6 +85,68 @@ namespace LineWars.Model
                         list.Add(neighborNode);
                         queue.Enqueue((neighborNode, rangeAfterMove));
                         nodeSet.Add(neighborNode);
+                    }
+                }
+            }
+
+            return list;
+        }
+        
+        public static List<Node> GetNodesInIntModifierRange(Node node, int range, 
+            IntModifier modifier, Action<Node, Node, int> nodeParser)
+        {
+            var list = new List<Node>();
+            var queue = new Queue<(Node, int)>();
+            var nodeSet = new HashSet<Node>();
+            
+            queue.Enqueue((node, range));
+            while (queue.Count > 0)
+            {
+                var currentNodeInfo = queue.Dequeue();
+                if(currentNodeInfo.Item2 <= 0) continue;
+                foreach (var neighborNode in currentNodeInfo.Item1.GetNeighbors())
+                {
+                    if(nodeSet.Contains(neighborNode)) continue;
+                    var rangeAfterMove = modifier.Modify(currentNodeInfo.Item2);
+                    if (rangeAfterMove >= 0)
+                    {
+                        list.Add(neighborNode);
+                        queue.Enqueue((neighborNode, rangeAfterMove));
+                        nodeSet.Add(neighborNode);
+                        nodeParser(currentNodeInfo.Item1, neighborNode, rangeAfterMove);
+                    }
+                }
+            }
+
+            return list;
+        }
+        
+        public static List<Node> GetNodesInIntModifierRange(Node node, int range, 
+            IntModifier modifier, Action<Node, Node, int> nodeParser, Unit unit)
+        {
+            var list = new List<Node>();
+            var queue = new Queue<(Node, int)>();
+            var nodeSet = new HashSet<Node>();
+            
+            queue.Enqueue((node, range));
+            nodeParser(null, node, range);
+            while (queue.Count > 0)
+            {
+                var currentNodeInfo = queue.Dequeue();
+                if(currentNodeInfo.Item2 <= 0) continue;
+                foreach (var neighborNode in currentNodeInfo.Item1.GetNeighbors())
+                {
+                    if(nodeSet.Contains(neighborNode)) continue;
+                    var rangeAfterMove = modifier.Modify(currentNodeInfo.Item2);
+                    var edge = neighborNode.GetLine(currentNodeInfo.Item1);
+                    if (rangeAfterMove >= 0 
+                        && unit.CanMoveOnLineWithType(edge.LineType)
+                        && Graph.CheckNodeForWalkability(neighborNode, unit))
+                    {
+                        list.Add(neighborNode);
+                        queue.Enqueue((neighborNode, rangeAfterMove));
+                        nodeSet.Add(neighborNode);
+                        nodeParser(currentNodeInfo.Item1, neighborNode, rangeAfterMove);
                     }
                 }
             }

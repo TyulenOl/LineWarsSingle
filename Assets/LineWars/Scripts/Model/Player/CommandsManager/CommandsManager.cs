@@ -47,6 +47,8 @@ namespace LineWars.Controllers
                 ExecutorChanged.Invoke(previousExecutor, executor);
             }
         }
+
+        public StateMachine StateMachine => stateMachine;
         #endregion
 
         private void Awake()
@@ -63,7 +65,7 @@ namespace LineWars.Controllers
             stateMachine = new StateMachine();
             executorState = new CommandsManagerExecutorState(this);
             targetState = new CommandsManagerTargetState(this);
-            idleState = new State();
+            idleState = new CommandsManagerIdleState(this);
         }
 
         private void Start()
