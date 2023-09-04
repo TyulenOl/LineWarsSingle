@@ -1,10 +1,6 @@
-using System.Linq;
-using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
-using LineWars;
 using LineWars.Model;
-using System.Collections.Generic;
 
 namespace LineWars.Controllers
 {
@@ -19,7 +15,7 @@ namespace LineWars.Controllers
         private StateMachine stateMachine;
         private CommandsManagerExecutorState executorState;
         private CommandsManagerTargetState targetState;
-        private State idleState;
+        private CommandsManagerIdleState idleState;
 
 
         public UnityEvent<ITarget, ITarget> TargetChanged;
@@ -47,6 +43,8 @@ namespace LineWars.Controllers
                 ExecutorChanged.Invoke(previousExecutor, executor);
             }
         }
+
+        public StateMachine StateMachine => stateMachine;
         #endregion
 
         private void Awake()
@@ -63,7 +61,7 @@ namespace LineWars.Controllers
             stateMachine = new StateMachine();
             executorState = new CommandsManagerExecutorState(this);
             targetState = new CommandsManagerTargetState(this);
-            idleState = new State();
+            idleState = new CommandsManagerIdleState(this);
         }
 
         private void Start()

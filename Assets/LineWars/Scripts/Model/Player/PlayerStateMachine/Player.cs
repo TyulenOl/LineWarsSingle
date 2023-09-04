@@ -165,7 +165,6 @@ namespace LineWars
         private void OnExecuteCommand(IExecutor executor, ITarget target)
         {
             RecalculateVisibility();
-            Debug.Log("Command");
         }
 
         public void RecalculateVisibility(bool useLerp = true)

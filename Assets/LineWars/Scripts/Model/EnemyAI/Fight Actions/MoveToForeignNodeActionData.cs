@@ -30,33 +30,19 @@ namespace LineWars.Model
             {
                 if (!(executor is Unit unit)) return;
 
-                var queue = new Queue<(Node, int)>();
-                var nodeSet = new HashSet<Node>();
-                queue.Enqueue((unit.Node, unit.CurrentActionPoints));
-                nodeSet.Add(unit.Node);
-                while (queue.Count > 0)
-                {
-                    var currentNodeInfo = queue.Dequeue();
-                    
-                    if(currentNodeInfo.Item2 == 0) continue;
-                    foreach(var neighborNode in currentNodeInfo.Item1.GetNeighbors())
-                    {
-                        if(nodeSet.Contains(neighborNode)) continue;
-                        
-                        var pointsAfterMove = unit.MovePointsModifier.Modify(currentNodeInfo.Item2);
-                        var edge = neighborNode.GetLine(currentNodeInfo.Item1);
-                        
-                        if (pointsAfterMove >= 0 
-                            && unit.CanMoveOnLineWithType(edge.LineType)
-                            && Graph.CheckNodeForWalkability(neighborNode, unit))
-                        {
-                            queue.Enqueue((neighborNode, pointsAfterMove));
-                            nodeSet.Add(neighborNode);
-                            if(neighborNode.Owner != basePlayer)
-                                list.Add(new MoveToForeignNodeAction(basePlayer, executor, neighborNode, this));
-                        }
-                    }
-                }
+                EnemyActionUtilities.GetNodesInIntModifierRange(unit.Node, unit.CurrentActionPoints,
+                    unit.MovePointsModifier, 
+                    (prevNode, node, actionPoints) => NodeParser(prevNode, node, actionPoints, basePlayer, unit, list), 
+                    unit);
+            }
+
+            private void NodeParser(Node _, Node node, int actionPoints, 
+                EnemyAI basePlayer, Unit unit, List<EnemyAction> actionList)
+            {
+                if (actionPoints < 0) return;
+                if(node == unit.Node) return;
+                if(node.Owner != basePlayer)
+                    actionList.Add(new MoveToForeignNodeAction(basePlayer, unit, node, this));
             }
         }
 
@@ -80,6 +66,7 @@ namespace LineWars.Model
                 this.targetNode = targetNode;
                 this.data = data;
                 path = Graph.FindShortestPath(unit.Node, targetNode, unit);
+                path.Remove(unit.Node);
                 score = GetScore();
             }
 

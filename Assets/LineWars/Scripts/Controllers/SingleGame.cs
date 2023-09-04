@@ -31,6 +31,7 @@ namespace LineWars
         private Stack<SpawnInfo> spawnInfosStack;
         private SpawnInfo playerSpawnInfo;
 
+        public IReadOnlyList<BasePlayer> AllPlayers => allPlayers;
         public SceneName MyScene => (SceneName) SceneManager.GetActiveScene().buildIndex;
         public int ScoreForWin => scoreForWin;
         private bool HasSpawnPoint() => spawnInfosStack.Count > 0;

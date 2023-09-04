@@ -24,44 +24,28 @@ namespace LineWars.Model
             public override void AddAllPossibleActions(List<EnemyAction> list, EnemyAI basePlayer, IExecutor executor)
             {
                 if(!(executor is Doctor doctor)) return;
-
-                var queue = new Queue<(Node, int)>();
                 var unitSet = new HashSet<Unit>();
-                var nodeSet = new HashSet<Node>();
+                EnemyActionUtilities.GetNodesInIntModifierRange(doctor.Node, doctor.CurrentActionPoints,
+                    doctor.MovePointsModifier, 
+                    (prevNode, node, actionPoints) => 
+                        NodeParser(prevNode, node, actionPoints, unitSet, doctor, basePlayer, list), 
+                    doctor);
+            }
 
-                nodeSet.Add(doctor.Node);
-                queue.Enqueue((doctor.Node, doctor.CurrentActionPoints));
-                while (queue.Count > 0)
+            private void NodeParser(Node previousNode, Node node, int actionPoints, 
+                HashSet<Unit> unitSet, Doctor doctor, EnemyAI basePlayer, List<EnemyAction> actionList)
+            {
+                if(actionPoints <= 0) return;
+                var pointsAfterHeal = doctor.HealPointModifier.Modify(actionPoints);
+                if(pointsAfterHeal < 0) return;
+                
+                var allies = EnemyActionUtilities.FindAdjacentAllies(node, basePlayer, LineType.Firing);
+                foreach (var ally in allies)
                 {
-                    var currentNodeInfo = queue.Dequeue();
-                    if(currentNodeInfo.Item2 == 0) continue;
-                    foreach (var neighbor in currentNodeInfo.Item1.GetNeighbors())
-                    {
-                        if(nodeSet.Contains(neighbor)) continue;
-                        var pointsAfterMove = doctor.MovePointsModifier.Modify(currentNodeInfo.Item2);
-                        var pointsAfterHeal = doctor.HealPointModifier.Modify(currentNodeInfo.Item2);
-
-                        var edge = neighbor.GetLine(currentNodeInfo.Item1);
-                        if (pointsAfterHeal >= 0
-                            && (int) edge.LineType >= (int) LineType.Firing)
-                        {
-                            foreach (var unit in EnemyActionUtilities.GetUnitsInNode(neighbor))
-                            {
-                                if(unit.Owner != basePlayer) continue;
-                                if(unitSet.Contains(unit)) continue;
-                                list.Add(new HealAction(basePlayer, executor, unit, this));
-                                unitSet.Add(unit);
-                            }
-                        }
-
-                        if (pointsAfterMove >= 0
-                            && doctor.CanMoveOnLineWithType(edge.LineType)
-                            && Graph.CheckNodeForWalkability(neighbor, doctor))
-                        {
-                            queue.Enqueue((neighbor, pointsAfterMove));
-                            nodeSet.Add(neighbor);
-                        }
-                    }
+                    if (unitSet.Contains(ally)) continue;
+                    if(ally == doctor) continue;
+                    actionList.Add(new HealAction(basePlayer, doctor, ally, this));
+                    unitSet.Add(ally);
                 }
             }
         }
@@ -86,7 +70,9 @@ namespace LineWars.Model
                 this.damagedUnit = damagedUnit;
                 this.data = data;
                 path = Graph.FindShortestPath(doctor.Node, damagedUnit.Node, doctor);
+                path.Remove(doctor.Node);
                 score = GetScore();
+                //Debug.Log($"DAMAGED - {damagedUnit}");
             }
 
             public override void Execute()
@@ -113,6 +99,7 @@ namespace LineWars.Model
             private float GetScore()
             {
                 var hpDamagePercent = 1 - (float)damagedUnit.CurrentHp / damagedUnit.MaxHp;
+                Debug.Log($"{damagedUnit.CurrentHp} / {damagedUnit.MaxHp} {damagedUnit}");
                 if (hpDamagePercent == 0) return 0;
                 var pointsLeft = doctor.CurrentActionPoints;
                 foreach (var node in path)
@@ -121,7 +108,8 @@ namespace LineWars.Model
                     if (node == doctor.Node) continue;
                     pointsLeft = doctor.MovePointsModifier.Modify(pointsLeft);
                 }
-
+                Debug.Log($"{data.BaseScore} {hpDamagePercent * data.DamagedUnitBonus} " +
+                          $"{pointsLeft * data.BonusPerPoints}");
                 pointsLeft = doctor.HealPointModifier.Modify(pointsLeft);
                 return data.BaseScore 
                        + hpDamagePercent * data.DamagedUnitBonus 

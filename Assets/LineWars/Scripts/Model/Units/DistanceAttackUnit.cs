@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 namespace LineWars.Model
 {
@@ -7,12 +8,14 @@ namespace LineWars.Model
         [field: Header("Distance Attack Settings")]
         [field: SerializeField, Min(0)] public int Distance { get; private set; }
 
-        public override bool CanAttack(Unit unit)
+        public override bool CanAttack(Unit unit) => CanAttack(unit, Node);
+
+        public override bool CanAttack(Unit unit, Node node)
         {
             return !attackLocked
                    && Damage > 0
                    && unit.Owner != Owner
-                   && Node.FindShortestPath(unit.Node).Count - 1 <= Distance
+                   && node.FindShortestPath(unit.Node).Count - 1 <= Distance
                    && ActionPointsCondition(attackPointsModifier, CurrentActionPoints);
         }
 

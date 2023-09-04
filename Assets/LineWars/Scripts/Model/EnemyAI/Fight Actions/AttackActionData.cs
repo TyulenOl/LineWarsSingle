@@ -25,47 +25,29 @@ namespace LineWars.Model
             public override void AddAllPossibleActions(List<EnemyAction> list, EnemyAI basePlayer, IExecutor executor)
             {
                 if(executor is not Unit unit) return;
-
-                var queue = new Queue<(Node, int)>();
                 var enemySet = new HashSet<Unit>();
-                var nodeSet = new HashSet<Node>();
-                queue.Enqueue((unit.Node, unit.CurrentActionPoints));
-                nodeSet.Add(unit.Node);
-                while (queue.Count > 0)
+                
+                EnemyActionUtilities.GetNodesInIntModifierRange(unit.Node, unit.CurrentActionPoints,
+                    unit.MovePointsModifier,
+                    (prevNode, node, range) =>
+                        NodeParser(prevNode, node, range, enemySet, unit, basePlayer, list), unit);
+            }
+
+            private void NodeParser(Node previousNode, Node node, int actionPoints, 
+                HashSet<Unit> enemySet, Unit unit, EnemyAI basePlayer, List<EnemyAction> actionList)
+            {
+                if(actionPoints <= 0) return;
+                var pointsAfterAttack = unit.AttackPointsModifier.Modify(actionPoints);
+                if(pointsAfterAttack < 0) return;
+
+                var enemies = EnemyActionUtilities.FindAdjacentEnemies(node, basePlayer, LineType.Firing);
+                foreach (var enemy in enemies)
                 {
-                    var currentNodeInfo = queue.Dequeue();
-                    
-                    if(currentNodeInfo.Item2 == 0) continue;
-                    foreach(var neighborNode in currentNodeInfo.Item1.GetNeighbors())
-                    {
-                        if(nodeSet.Contains(neighborNode)) continue;
-                        var pointsAfterAttack = unit.AttackPointsModifier.Modify(currentNodeInfo.Item2);
-                        var pointsAfterMove = unit.MovePointsModifier.Modify(currentNodeInfo.Item2);
-                        var edge = neighborNode.GetLine(currentNodeInfo.Item1);
-                        
-                        if (pointsAfterAttack >= 0 
-                            && (int) edge.LineType >= (int) LineType.Firing)
-                        {
-                            var units = EnemyActionUtilities.GetUnitsInNode(neighborNode);
-                            foreach (var enemy in units) 
-                            {
-                                if(enemy.Owner == basePlayer) continue;
-                                if(enemySet.Contains(enemy)) continue;
-                                if(unit.CanAttack(enemy))
-                                    list.Add(new AttackAction(basePlayer, executor, enemy, this));
-                                enemySet.Add(enemy);
-                            }
-                        }
-                        
-                        if (pointsAfterMove >= 0 
-                            && unit.CanMoveOnLineWithType(edge.LineType)
-                            && Graph.CheckNodeForWalkability(neighborNode, unit))
-                        {
-                            queue.Enqueue((neighborNode, pointsAfterMove));
-                            nodeSet.Add(neighborNode);
-                        }
-                    }
+                    if(enemySet.Contains(enemy)) continue;
+                    actionList.Add(new AttackAction(basePlayer, unit, enemy, this));
+                    enemySet.Add(enemy);
                 }
+
             }
         }
 
