@@ -4,7 +4,6 @@ using System.Net;
 using Unity.VisualScripting;
 using UnityEngine;
 
-
 namespace LineWars.Model
 {
     [CreateAssetMenu(fileName = "New Distance Attack Action", menuName = "EnemyAI/Enemy Actions/Artillery Phase/Distance Attack")]
@@ -22,48 +21,35 @@ namespace LineWars.Model
         public float BonusPerDistance => bonusPerDistance;
         public float BonusPerEnemyHpDamage => bonusPerEnemyHpDamage;
         public float BonusPerPoint => bonusPerPoint;
-        public override void AddAllPossibleActions(List<EnemyAction> list, EnemyAI basePlayer, IExecutor executor)
+        public override void AddAllPossibleActions(List<EnemyAction> actionList, EnemyAI basePlayer, IExecutor executor)
         {
-            if (executor is not Artillery distanceUnit) return;
-
-            var queue = new Queue<(Node, int)>();
-            var nodeSet = new HashSet<Node>();
+            if (executor is not DistanceAttackUnit distanceUnit) return;
             var enemySet = new HashSet<Unit>();
             
-            queue.Enqueue((distanceUnit.Node, distanceUnit.CurrentActionPoints));
-            nodeSet.Add(distanceUnit.Node);
-            while (queue.Count > 0)
-            {
-                var currentNodeInfo = queue.Dequeue();
-                if(currentNodeInfo.Item2 == 0) continue;
-
-                var enemies = CheckDistanceAttack(currentNodeInfo.Item1, distanceUnit, enemySet);
-                var pointsAfterAttack = distanceUnit.AttackPointsModifier.Modify(currentNodeInfo.Item2);
-                if(pointsAfterAttack >= 0)
-                    foreach (var enemy in enemies)
-                    {
-                        list.Add(new DistanceAttackAction(basePlayer, executor, currentNodeInfo.Item1, enemy));
-                    }
-                
-                foreach (var neighborNode in currentNodeInfo.Item1.GetNeighbors())
-                {
-                    if (nodeSet.Contains(neighborNode)) continue;
-
-                    var pointsAfterMove = distanceUnit.MovePointsModifier.Modify(currentNodeInfo.Item2);
-
-                    var edge = neighborNode.GetLine(currentNodeInfo.Item1);
-                    if (pointsAfterMove >= 0 &&
-                        distanceUnit.CanMoveOnLineWithType(edge.LineType)
-                        && Graph.CheckNodeForWalkability(neighborNode, distanceUnit))
-                    {
-                        queue.Enqueue((currentNodeInfo.Item1, pointsAfterMove));
-                        nodeSet.Add(currentNodeInfo.Item1);
-                    }
-                }
-            }
+            NodeParser(null, distanceUnit.Node, distanceUnit.CurrentActionPoints, 
+                distanceUnit, enemySet, actionList, basePlayer);
+            
+            EnemyActionUtilities.GetNodesInIntModifierRange(distanceUnit.Node,
+                distanceUnit.CurrentActionPoints,
+                distanceUnit.MovePointsModifier,
+                (prevNode, node, actionPoints) =>
+                    NodeParser(prevNode, node, actionPoints, distanceUnit, enemySet, actionList, basePlayer),
+                distanceUnit);
         }
 
-        private List<Unit> CheckDistanceAttack(Node node, Artillery distanceUnit, HashSet<Unit> enemySet)
+        private void NodeParser(Node previousNode, Node node, int actionPoints, DistanceAttackUnit distanceUnit, 
+            HashSet<Unit> enemySet, List<EnemyAction> list, EnemyAI basePlayer)
+        {
+            var enemies = CheckDistanceAttack(node, distanceUnit, enemySet);
+            var pointsAfterAttack = distanceUnit.AttackPointsModifier.Modify(actionPoints);
+            if(actionPoints > 0 && pointsAfterAttack >= 0)
+                foreach (var enemy in enemies)
+                {
+                    list.Add(new DistanceAttackAction(basePlayer, distanceUnit, node, enemy));
+                }
+        }
+
+        private List<Unit> CheckDistanceAttack(Node node, DistanceAttackUnit distanceUnit, HashSet<Unit> enemySet)
         {
             var list = new List<Unit>();
             var attackedNodes =
@@ -76,6 +62,7 @@ namespace LineWars.Model
                 foreach (var unit in unitsInNode)
                 {
                     if(enemySet.Contains(unit)) continue;
+                    enemySet.Add(unit);
                     if(unit.Owner == distanceUnit.Owner) continue;
                     if(distanceUnit.CanAttack(unit))
                         list.Add(unit);
@@ -105,6 +92,7 @@ namespace LineWars.Model
             nodeToWalk = node;
             target = targetUnit;
             path = Graph.FindShortestPath(distanceUnit.Node, nodeToWalk, this.distanceUnit);
+            path.Remove(distanceUnit.Node);
             score = GetScore();
         }
 

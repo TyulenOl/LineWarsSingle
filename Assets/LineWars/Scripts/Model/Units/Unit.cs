@@ -145,7 +145,7 @@ namespace LineWars.Model
         }
 
         public int Visibility => visibility;
-        public int Cost => 10; // не использовать! устаревшее свойство
+        public int Cost => 10; // не использовать! устаревшее свойство (блин)
         public UnitSize Size => unitSize;
         public LineType MovementLineType => movementLineType;
         public Node Node => node;
@@ -318,6 +318,14 @@ namespace LineWars.Model
                    && ActionPointsCondition(attackPointsModifier, CurrentActionPoints);
         }
 
+        public virtual bool CanAttack(Unit unit, Node node)
+        {
+            if (unit == null) throw new ArgumentNullException(nameof(unit));
+
+            return BaseMeleeAttackCondition(unit, node)
+                   && ActionPointsCondition(attackPointsModifier, CurrentActionPoints);
+        }
+
         public virtual void Attack([NotNull] Unit enemy)
         {
             if (enemy == null) throw new ArgumentNullException(nameof(enemy));
@@ -356,12 +364,15 @@ namespace LineWars.Model
         }
 
         public virtual bool CanAttack([NotNull] Edge edge) => false;
+        public virtual bool CanAttack(Edge edge, Node node) => false;
 
         public virtual void Attack([NotNull] Edge edge)
         {
         }
         
-        private bool BaseMeleeAttackCondition(Unit unit)
+        private bool BaseMeleeAttackCondition(Unit unit) => BaseMeleeAttackCondition(unit, node);
+
+        private bool BaseMeleeAttackCondition(Unit unit, Node node)
         {
             var line = node.GetLine(unit.Node);
             return !attackLocked

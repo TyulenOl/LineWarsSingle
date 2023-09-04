@@ -6,11 +6,13 @@ namespace LineWars.Model
     {
         [field: Header("ArtillerySettings")]
         [SerializeField] private Explosion explosionPrefab;
-        
-        public override bool CanAttack(Edge edge)
+
+        public override bool CanAttack(Edge edge) => CanAttack(edge, Node);
+
+        public override bool CanAttack(Edge edge, Node node)
         {
-            var pathLen1 = Node.FindShortestPath(edge.FirstNode).Count - 1;
-            var pathLen2 = Node.FindShortestPath(edge.SecondNode).Count - 1;
+            var pathLen1 = node.FindShortestPath(edge.FirstNode).Count - 1;
+            var pathLen2 = node.FindShortestPath(edge.SecondNode).Count - 1;
             return !attackLocked 
                    && Damage > 0
                    && edge.LineType >= LineType.CountryRoad
@@ -18,7 +20,7 @@ namespace LineWars.Model
                        || pathLen2 <= Distance && pathLen1 + 1 <= Distance)
                    && ActionPointsCondition(attackPointsModifier, CurrentActionPoints);
         }
-
+        
         public override void Attack(Edge edge)
         {
             var explosion = Instantiate(explosionPrefab);

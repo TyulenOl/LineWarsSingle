@@ -74,6 +74,7 @@ namespace LineWars.Model
             var chosenAction = PickAction(actions);
             currentExecutor = chosenAction.Executor;
             chosenAction.ActionCompleted += GetActionOnActionCompleted(phase);
+            Debug.Log($"{chosenAction} CHOSEN");
             chosenAction.Execute();
         }
         
