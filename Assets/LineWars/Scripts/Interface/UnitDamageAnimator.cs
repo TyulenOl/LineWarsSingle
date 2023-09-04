@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace LineWars.Interface
 {
-    public class UnitPartDrawer : MonoBehaviour
+    public class UnitDamageAnimator : MonoBehaviour
     {
         [HideInInspector] public Vector2 offset;
         [SerializeField] private float animationThreshold = 0.5f;

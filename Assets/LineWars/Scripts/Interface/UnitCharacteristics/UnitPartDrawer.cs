@@ -5,12 +5,13 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UnitCharacteristicDrawer : MonoBehaviour
+public class UnitPartDrawer : MonoBehaviour
 {
     [SerializeField] private CharacteristicDrawer CharacteristicDrawerPrefab;
     [SerializeField] private LayoutGroup CharacteristicsLayoutGroup;
     [SerializeField] private TMP_Text UnitName;
-    [SerializeField] private SpriteRenderer ifInactivePanel;
+    [SerializeField] private SpriteRenderer ifInactivePanel;    
+    [SerializeField] private SpriteRenderer ifAvailablePanel;
     [SerializeField] private Image unitIsExecutorImage;
     [SerializeField] private SpriteRenderer canBlockSprite;
     [field: SerializeField] public SpriteRenderer targetSprite { get; private set; }
@@ -57,6 +58,12 @@ public class UnitCharacteristicDrawer : MonoBehaviour
         unitIsExecutorImage.gameObject.SetActive(isExecutor);
     }
 
+    public void ReDrawAvailability(bool available)
+    {
+        ifAvailablePanel.gameObject.SetActive(available);
+        Debug.Log($"{name} переотрисовался");
+    }
+    
     public void ReDrawActivity(bool isActive)
     {
         ifInactivePanel.gameObject.SetActive(!isActive);

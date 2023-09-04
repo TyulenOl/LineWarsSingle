@@ -13,7 +13,9 @@ namespace LineWars.Interface
         [SerializeField] private TMP_Text currentPhaseText;
         [SerializeField] private TMP_Text currentIncomeText;
         [SerializeField] private TMP_Text scoreText;
-        
+
+        private List<UnitDrawer> activeUnitDrawersHash = new ();
+
         private IExecutor currentExecutor;
         private List<TargetDrawer> currentDrawers = new ();
         private void Start()
@@ -38,8 +40,32 @@ namespace LineWars.Interface
             
             currentExecutor = after;
             ReDrawCurrentTargets();
+            ReDrawAllAvailability(after);
             if(currentExecutor == null) return;
             currentExecutor.ActionCompleted.AddListener(ReDrawCurrentTargets);
+        }
+
+        private void ReDrawAllAvailability(IExecutor executor)
+        {
+            if (executor is null)
+            {
+                var unitsToReDraw = Player.LocalPlayer.GetAllUnitsByPhase(PhaseManager.Instance.CurrentPhase);
+                foreach (var unit in unitsToReDraw)
+                {
+                    if(!unit.CanDoAnyAction) continue;
+                    var drawer = unit.GetComponent<UnitDrawer>();
+                    drawer.ReDrawAvailability(true);
+                    activeUnitDrawersHash.Add(drawer);
+                }
+            }
+            else
+            {
+                foreach (var unitDrawer in activeUnitDrawersHash)
+                {
+                    unitDrawer.ReDrawAvailability(false);
+                }
+                activeUnitDrawersHash.Clear();
+            }
         }
 
         private void ReDrawCurrentTargets()

@@ -100,6 +100,20 @@ namespace LineWars
             ExecuteTurn(PhaseType.Idle);
         }
 
+        public IEnumerable<Unit> GetAllUnitsByPhase(PhaseType phaseType)
+        {
+            if (phaseExecutorsData.PhaseToUnits.TryGetValue(phaseType, out var value))
+            {
+                foreach (var myUnit in MyUnits)
+                {
+                    if (value.Contains(myUnit.Type))
+                    {
+                        yield return myUnit;
+                    }
+                }
+            }
+        }
+        
         #region Turns
         public override void ExecuteBuy()
         {
