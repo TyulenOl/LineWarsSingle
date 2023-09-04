@@ -77,6 +77,8 @@ namespace LineWars.Model
 
         public string UnitName => unitName;
 
+        public bool CanDoAnyAction => CurrentActionPoints > 0;
+
         public int CurrentActionPoints
         {
             get => currentActionPoints;

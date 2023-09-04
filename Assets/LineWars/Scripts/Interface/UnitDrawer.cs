@@ -17,17 +17,17 @@ namespace LineWars.Interface
         [SerializeField] private Color healColor = Color.green;
         
         [Header("Reference")]
-        [SerializeField] private Interface.UnitPartDrawer leftPart;
-        [SerializeField] private Interface.UnitPartDrawer centerPart;
-        [SerializeField] private Interface.UnitPartDrawer rightPart;
+        [SerializeField] private UnitDamageAnimator leftPart;
+        [SerializeField] private UnitDamageAnimator centerPart;
+        [SerializeField] private UnitDamageAnimator rightPart;
         
         [Header("CharacteristicsDrawers")]
-        [SerializeField] private UnitCharacteristicDrawer leftDrawer;
-        [SerializeField] private UnitCharacteristicDrawer centerDrawer;
-        [SerializeField] private UnitCharacteristicDrawer rightDrawer;
+        [SerializeField] private UnitPartDrawer leftDrawer;
+        [SerializeField] private UnitPartDrawer centerDrawer;
+        [SerializeField] private UnitPartDrawer rightDrawer;
 
         private Unit unit;
-        private List<UnitCharacteristicDrawer> allDrawers;
+        private List<UnitPartDrawer> allDrawers;
         private TargetDrawer targetDrawer;
 
         private void Awake()
@@ -52,7 +52,7 @@ namespace LineWars.Interface
                 rightPart.offset = offset;
             }
 
-            allDrawers = new List<UnitCharacteristicDrawer>
+            allDrawers = new List<UnitPartDrawer>
             { leftDrawer, rightDrawer, centerDrawer }
                 .Where(x => x is not null)
                 .ToList();
@@ -121,7 +121,12 @@ namespace LineWars.Interface
             
             ReDrawCharacteristics();
         }
-        
+
+
+        public void ReDrawAvailability(bool available)
+        {
+            ExecuteForAllDrawers((drawer => drawer.ReDrawAvailability(available)));
+        }
         
         public void DrawLeft()
         {
@@ -179,7 +184,7 @@ namespace LineWars.Interface
             }
         }
 
-        private void ExecuteForAllDrawers(Action<UnitCharacteristicDrawer> action)
+        private void ExecuteForAllDrawers(Action<UnitPartDrawer> action)
         {
             foreach (var drawer in allDrawers)
             {
