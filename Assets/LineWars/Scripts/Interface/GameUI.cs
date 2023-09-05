@@ -5,6 +5,7 @@ using LineWars.Controllers;
 using LineWars.Model;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace LineWars.Interface
 {
@@ -15,6 +16,8 @@ namespace LineWars.Interface
         [SerializeField] private TMP_Text currentPhaseText;
         [SerializeField] private TMP_Text currentIncomeText;
         [SerializeField] private TMP_Text scoreText;
+        [SerializeField] private EnemyTurnPanel enemyTurnPanel;
+        [SerializeField] private List<Button> buttonsToBlockIfEnemyTurn;
 
         private List<UnitDrawer> activeUnitDrawersHash = new ();
 
@@ -101,6 +104,15 @@ namespace LineWars.Interface
             }
         }
 
+        public void SetEnemyTurn(bool isEnemyTurn)
+        {
+            enemyTurnPanel.IsCoroutinActive = isEnemyTurn;
+            foreach (var button in buttonsToBlockIfEnemyTurn)
+            {
+                button.interactable = !isEnemyTurn;
+            }
+        }
+        
         private void ReDrawCurrentTargets()
         {
             foreach (var currentDrawer in currentDrawers)
