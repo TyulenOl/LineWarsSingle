@@ -49,12 +49,6 @@ namespace LineWars.Model
             StartCoroutine(ReplenishCoroutine());
             IEnumerator ReplenishCoroutine()
             {
-                foreach (var owned in OwnedObjects)
-                {
-                    if(owned is not Unit unit) continue;
-                    unit.OnReplenish();
-                }
-                
                 yield return null;
                 ExecuteTurn(PhaseType.Idle);
             }

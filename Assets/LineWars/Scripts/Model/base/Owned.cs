@@ -14,6 +14,8 @@ namespace LineWars.Model
     {
         [Header("Accessory settings")]
         [SerializeField] [ReadOnlyInspector] protected BasePlayer basePlayer;
+        public event Action<BasePlayer, BasePlayer> OwnerChanged;
+        public event Action Replenished;
         public BasePlayer Owner => basePlayer;
 
         public void SetOwner([MaybeNull]BasePlayer newBasePlayer)
@@ -21,6 +23,7 @@ namespace LineWars.Model
             var temp = basePlayer;
             basePlayer = newBasePlayer;
             OnSetOwner(temp, newBasePlayer);
+            OwnerChanged?.Invoke(temp, newBasePlayer);
         }
 
         public static void Connect(BasePlayer basePlayer, Owned owned)
@@ -34,5 +37,13 @@ namespace LineWars.Model
         }
 
         protected virtual void OnSetOwner(BasePlayer oldPlayer, BasePlayer newPlayer) {}
+
+        public void Replenish()
+        {
+            OnReplenish();
+            Replenished?.Invoke();
+        }
+
+        protected virtual void OnReplenish() {}
     }
 }

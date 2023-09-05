@@ -12,7 +12,6 @@ namespace LineWars
         [field: SerializeField] public NationType Nation { get; private set; }
         [field: SerializeField] public int MoneyForFirstCapturingNode { get; private set; }
         [field: SerializeField] public FloatModifier IncomeModifier { get; private set; }
-        [field: SerializeField] public IntModifier ScoreForCapturingNodeModifier { get; private set; }
 
 
         private PlayerRules ToDefault()
@@ -22,7 +21,6 @@ namespace LineWars
             Nation = NationType.Russia;
             MoneyForFirstCapturingNode = 0;
             IncomeModifier = CreateInstance<MultiplyFloatModifier>();
-            ScoreForCapturingNodeModifier = CreateInstance<MultiplyIntModifier>();
             return this;
         }
         public static PlayerRules DefaultRules => CreateInstance<PlayerRules>().ToDefault();

@@ -18,7 +18,6 @@ namespace LineWars.Model
 
         [SerializeField, ReadOnlyInspector] private NationType nationType;
         [SerializeField, ReadOnlyInspector] private int money;
-        [SerializeField, ReadOnlyInspector] private int score;
         /// <summary>
         /// Для оптимизации income всегда хешируется
         /// </summary>
@@ -52,7 +51,6 @@ namespace LineWars.Model
         public event Action<Owned> OwnedRemoved;
         public event Action<int, int> CurrentMoneyChanged;
         public event Action<int, int> IncomeChanged;
-        public event Action<int, int> ScoreChanged;
         public event Action Defeaded; 
         public IReadOnlyCollection<Owned> OwnedObjects => myOwned;
         public bool IsMyOwn(Owned owned) => myOwned.Contains(owned);
@@ -78,17 +76,6 @@ namespace LineWars.Model
                 var before = income;
                 income = value;
                 IncomeChanged?.Invoke(before, income);
-            }
-        }
-
-        public int Score
-        {
-            get => score;
-            set
-            {
-                var before = score;
-                score = value;
-                ScoreChanged?.Invoke(before, score);
             }
         }
 
@@ -184,7 +171,6 @@ namespace LineWars.Model
         {
             if (!node.IsDirty) CurrentMoney += Rules.MoneyForFirstCapturingNode;
             Income += Mathf.RoundToInt(Rules.IncomeModifier.Modify(node.BaseIncome));
-            Score += Rules.ScoreForCapturingNodeModifier.Modify(node.Score);
         }
         
         protected virtual void BeforeAddOwned(Unit unit)
@@ -215,7 +201,6 @@ namespace LineWars.Model
         protected virtual void BeforeRemoveOwned(Node node)
         {
             Income -= Mathf.RoundToInt(Rules.IncomeModifier.Modify(node.BaseIncome));
-            Score -= Rules.ScoreForCapturingNodeModifier.Modify(node.Score);
 
             if (node == Base.Node)
             {
@@ -240,6 +225,7 @@ namespace LineWars.Model
                 node.SetOwner(null);
 
             myOwned = new HashSet<Owned>();
+            Destroy(gameObject);
         }
         
         public Unit GetUnitPrefab(UnitType unitType) => Nation.GetUnitPrefab(unitType);
@@ -332,6 +318,8 @@ namespace LineWars.Model
                 return;
             }
             CurrentMoney += Income;
+            foreach (var owned in OwnedObjects)
+                owned.Replenish();
         }
 
         #endregion

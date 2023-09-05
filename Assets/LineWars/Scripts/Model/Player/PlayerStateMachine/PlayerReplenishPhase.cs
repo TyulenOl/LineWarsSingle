@@ -19,13 +19,6 @@ namespace LineWars
             public override void OnEnter()
             {
                 base.OnEnter();
-
-                foreach(var owned in player.OwnedObjects)
-                {
-                    if(!(owned is Unit unit)) continue;
-                    unit.OnReplenish();
-                }
-
                 player.StartCoroutine(IdleCroroutine());
                 IEnumerator IdleCroroutine()
                 {

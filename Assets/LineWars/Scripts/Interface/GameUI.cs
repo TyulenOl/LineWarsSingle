@@ -29,7 +29,8 @@ namespace LineWars.Interface
             }
             else
             {
-                Debug.LogError("Больше чем два CommandsManager на сцене");
+                Debug.LogError($"Больше чем два {nameof(GameUI)} на сцене");
+                Destroy(gameObject);
             }
         }
 
@@ -40,12 +41,27 @@ namespace LineWars.Interface
             
             Player.LocalPlayer.IncomeChanged += LocalPlayerOnIncomeChanged;
             LocalPlayerOnIncomeChanged(0, Player.LocalPlayer.Income);
-
-            Player.LocalPlayer.ScoreChanged += LocalPlayerOnScoreChanged;
-            LocalPlayerOnScoreChanged(0, Player.LocalPlayer.Score);
             
             PhaseManager.Instance.PhaseChanged.AddListener(OnPhaseChanged);
             CommandsManager.Instance.ExecutorChanged.AddListener(OnExecutorChanged);
+            
+            SubscribeEventForGameReferee();
+        }
+
+        private void SubscribeEventForGameReferee()
+        {
+            if (GameReferee.Instance is ScoreReferee scoreReferee)
+            {
+                scoreReferee.ScoreChanged += (player, before, after) =>
+                {
+                    if (player == Player.LocalPlayer)
+                    {
+                        scoreText.text = $"{after}/{scoreReferee.ScoreForWin}";
+                    }
+                };
+                
+                scoreText.text = $"{scoreReferee.GetScoreForPlayer(Player.LocalPlayer)}/{scoreReferee.ScoreForWin}";
+            }
         }
         
         private void OnExecutorChanged(IExecutor before, IExecutor after)
@@ -124,11 +140,6 @@ namespace LineWars.Interface
         private void LocalPlayerOnIncomeChanged(int before, int after)
         {
             currentIncomeText.text = after.ToString();
-        }
-        
-        private void LocalPlayerOnScoreChanged(int before, int after)
-        {
-            scoreText.text = $"{after} / {SingleGame.Instance.ScoreForWin}";
         }
     }
 }

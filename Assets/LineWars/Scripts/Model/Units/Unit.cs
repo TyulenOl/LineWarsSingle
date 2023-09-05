@@ -448,7 +448,7 @@ namespace LineWars.Model
             Destroy(gameObject);
         }
 
-        public virtual void OnReplenish()
+        protected override void OnReplenish()
         {
             CurrentActionPoints = initialActionPoints;
             IsBlocked = false;

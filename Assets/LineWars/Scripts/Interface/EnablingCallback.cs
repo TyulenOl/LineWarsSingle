@@ -6,16 +6,16 @@ using UnityEngine.Events;
 
 public class EnablingCallback : MonoBehaviour
 {
-    public UnityEvent enabled;
-    public UnityEvent disabled;
+    [field: SerializeField] public UnityEvent Enabled { get; private set; }
+    [field: SerializeField] public UnityEvent Disabled { get; private set; }
 
     private void OnEnable()
     {
-        enabled.Invoke();
+        Enabled.Invoke();
     }
 
     private void OnDisable()
     {
-        disabled.Invoke();
+        Disabled.Invoke();
     }
 }

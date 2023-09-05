@@ -19,7 +19,6 @@ namespace LineWars.Model
         [SerializeField] [Min(0)] private int visibility;
         [SerializeField] [Min(0)] private int valueOfHidden;
         [SerializeField] private int baseIncome;
-        [SerializeField] private int score;
 
         [SerializeField, ReadOnlyInspector] private Unit leftUnit;
         [SerializeField, ReadOnlyInspector] private Unit rightUnit;
@@ -67,8 +66,6 @@ namespace LineWars.Model
         public int ValueOfHidden => valueOfHidden;
 
         public int BaseIncome => baseIncome;
-
-        public int Score => score;
 
         public Unit LeftUnit
         {
@@ -190,6 +187,8 @@ namespace LineWars.Model
             Redraw();
         }
         
+        
+        #region Visualisation
         public void Redraw()
         {
             if (ReferenceToSpawn == null)
@@ -215,5 +214,8 @@ namespace LineWars.Model
             GetComponent<SpriteRenderer>().color = Spawn.DefaultColor;
             GetComponent<Outline2D>().SetActiveOutline(false);
         }
+        
+
+        #endregion
     }
 }
