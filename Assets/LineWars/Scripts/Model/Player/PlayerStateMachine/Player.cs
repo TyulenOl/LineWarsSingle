@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using LineWars.Controllers;
+using LineWars.Interface;
 using LineWars.Model;
 using UnityEngine;
 using UnityEngine.Events;
@@ -100,6 +101,20 @@ namespace LineWars
             ExecuteTurn(PhaseType.Idle);
         }
 
+        public IEnumerable<Unit> GetAllUnitsByPhase(PhaseType phaseType)
+        {
+            if (phaseExecutorsData.PhaseToUnits.TryGetValue(phaseType, out var value))
+            {
+                foreach (var myUnit in MyUnits)
+                {
+                    if (value.Contains(myUnit.Type))
+                    {
+                        yield return myUnit;
+                    }
+                }
+            }
+        }
+        
         #region Turns
         public override void ExecuteBuy()
         {
@@ -109,20 +124,24 @@ namespace LineWars
         public override void ExecuteArtillery()
         {
             stateMachine.SetState(artilleryPhase);
+            GameUI.Instance.ReDrawAllAvailability(GetAllUnitsByPhase(PhaseType.Artillery), true);
         }
 
         public override void ExecuteFight()
         {
             stateMachine.SetState(fightPhase);
+            GameUI.Instance.ReDrawAllAvailability(GetAllUnitsByPhase(PhaseType.Fight), true);
         }
 
         public override void ExecuteScout()
         {
             stateMachine.SetState(scoutPhase);
+            GameUI.Instance.ReDrawAllAvailability(GetAllUnitsByPhase(PhaseType.Scout), true);
         }
 
-        public override void ExecuteIdle()
+        public override void ExecuteIdle()//Exit
         {
+            GameUI.Instance.ReDrawAllAvailability(MyUnits, false);
             stateMachine.SetState(idlePhase);
         }
 

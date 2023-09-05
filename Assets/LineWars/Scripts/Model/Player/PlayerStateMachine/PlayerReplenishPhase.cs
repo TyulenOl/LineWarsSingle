@@ -24,13 +24,13 @@ namespace LineWars
                 {
                     if(!(owned is Unit unit)) continue;
                     unit.OnReplenish();
-                    
                 }
 
                 player.StartCoroutine(IdleCroroutine());
                 IEnumerator IdleCroroutine()
                 {
                     yield return null;
+                    player.IsTurnMade = true;
                     player.ExecuteTurn(PhaseType.Idle);
                 }
             }

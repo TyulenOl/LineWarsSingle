@@ -45,7 +45,7 @@ namespace LineWars.Model
         }
 
         private IEnumerable<Node> MyNodes => myOwned.OfType<Node>();
-        private IEnumerable<Unit> MyUnits => myOwned.OfType<Unit>();
+        protected IEnumerable<Unit> MyUnits => myOwned.OfType<Unit>();
 
         public event Action<PhaseType, PhaseType> TurnChanged;
         public event Action<Owned> OwnedAdded;
