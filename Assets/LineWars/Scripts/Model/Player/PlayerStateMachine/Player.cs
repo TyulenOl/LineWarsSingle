@@ -119,29 +119,34 @@ namespace LineWars
         public override void ExecuteBuy()
         {
             stateMachine.SetState(buyPhase);
+            GameUI.Instance.SetEnemyTurn(false);
         }
 
         public override void ExecuteArtillery()
         {
             stateMachine.SetState(artilleryPhase);
             GameUI.Instance.ReDrawAllAvailability(GetAllUnitsByPhase(PhaseType.Artillery), true);
+            GameUI.Instance.SetEnemyTurn(false);
         }
 
         public override void ExecuteFight()
         {
             stateMachine.SetState(fightPhase);
             GameUI.Instance.ReDrawAllAvailability(GetAllUnitsByPhase(PhaseType.Fight), true);
+            GameUI.Instance.SetEnemyTurn(false);
         }
 
         public override void ExecuteScout()
         {
             stateMachine.SetState(scoutPhase);
             GameUI.Instance.ReDrawAllAvailability(GetAllUnitsByPhase(PhaseType.Scout), true);
+            GameUI.Instance.SetEnemyTurn(false);
         }
 
         public override void ExecuteIdle()//Exit
         {
             GameUI.Instance.ReDrawAllAvailability(MyUnits, false);
+            GameUI.Instance.SetEnemyTurn(true);
             stateMachine.SetState(idlePhase);
         }
 
