@@ -4,7 +4,7 @@ namespace LineWars.Model
 {
     public class Artillery: DistanceAttackUnit
     {
-        [field: Header("ArtillerySettings")]
+        [field: Header("Artillery Settings")]
         [SerializeField] private Explosion explosionPrefab;
 
         public override bool CanAttack(Edge edge) => CanAttack(edge, Node);

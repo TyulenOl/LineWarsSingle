@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using LineWars.Controllers;
 using UnityEngine;
 
 namespace LineWars.Model
@@ -8,6 +9,9 @@ namespace LineWars.Model
     {
         [field: Header("Engineer Settings")]
         [field: SerializeField] private IntModifier engineerPointModifier;
+
+        [Header("Sound Settings")] 
+        [SerializeField] private SFXData upRoadSFX;
 
         public IntModifier EngineerPointModifier => engineerPointModifier;
 
@@ -36,6 +40,7 @@ namespace LineWars.Model
             if (edge == null) throw new ArgumentNullException(nameof(edge));
             edge.LevelUp();
             ActionCompleted.Invoke();
+            SfxManager.Instance.Play(upRoadSFX);
         }
     }
 }
