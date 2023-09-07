@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using LineWars.Controllers;
 using UnityEngine;
 
 namespace LineWars.Model
@@ -12,6 +13,10 @@ namespace LineWars.Model
 
         [Header("Action Points Settings")]
         [SerializeField] private IntModifier healPointModifier;
+
+        [Header("Sound Settings")] 
+        [SerializeField] private SFXData healSFX;
+        
 
         public IntModifier HealPointModifier => healPointModifier;
 
@@ -43,6 +48,7 @@ namespace LineWars.Model
                 neighbour.HealMe(HealingAmount);
             CurrentActionPoints = healPointModifier.Modify(CurrentActionPoints);
             ActionCompleted.Invoke();
+            SfxManager.Instance.Play(healSFX);
         }
     }
 }

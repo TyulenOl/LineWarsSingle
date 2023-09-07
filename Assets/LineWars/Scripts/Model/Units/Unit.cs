@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using LineWars.Controllers;
 using LineWars.Extensions.Attributes;
 using UnityEngine;
 using UnityEngine.Events;
@@ -53,6 +54,10 @@ namespace LineWars.Model
         [SerializeField] protected IntModifier attackPointsModifier;
         [SerializeField] protected IntModifier movePointsModifier;
         [SerializeField] protected IntModifier blockPointsModifier;
+
+        [Header("Sfx Settings")] 
+        [SerializeField] private SFXData moveSFX;
+        [SerializeField] private SFXData attackSFX;
 
         [Header("DEBUG")]
         [SerializeField, ReadOnlyInspector] private Node node;
@@ -244,6 +249,7 @@ namespace LineWars.Model
             movementLogic.MoveTo(target.transform);
             CurrentActionPoints = movePointsModifier.Modify(CurrentActionPoints);
             ActionCompleted.Invoke();
+            SfxManager.Instance.Play(moveSFX);
             
             void InspectNodeForCallback()
             {
@@ -363,6 +369,7 @@ namespace LineWars.Model
             target.TakeDamage(new Hit(Damage, this, target, isPenetratingDamage));
             CurrentActionPoints = attackPointsModifier.Modify(CurrentActionPoints);
             ActionCompleted.Invoke();
+            SfxManager.Instance.Play(attackSFX);
         }
 
         public virtual bool CanAttack([NotNull] Edge edge) => false;

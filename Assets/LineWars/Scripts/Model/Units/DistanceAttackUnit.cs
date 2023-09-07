@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using LineWars.Controllers;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace LineWars.Model
@@ -7,6 +8,9 @@ namespace LineWars.Model
     {
         [field: Header("Distance Attack Settings")]
         [field: SerializeField, Min(0)] public int Distance { get; private set; }
+
+        [Header("Sound Settings")] 
+        [SerializeField] private SFXData distanceAttackSFX;
 
         public override bool CanAttack(Unit unit) => CanAttack(unit, Node);
 
@@ -30,6 +34,7 @@ namespace LineWars.Model
             CurrentActionPoints = attackPointsModifier.Modify(CurrentActionPoints);
         
             ActionCompleted.Invoke();
+            SfxManager.Instance.Play(distanceAttackSFX);
         }
 
         public override CommandType GetAttackTypeBy(IAlive target)
