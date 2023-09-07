@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using LineWars.Model;
 using UnityEngine;
 
-namespace LineWars.Controllers
+namespace LineWars
 {
     public partial class PhaseManager
     {
@@ -48,10 +48,10 @@ namespace LineWars.Controllers
                 if(previousPhase != Type)
                 {
                     if(previousPhase != PhaseType.Idle)
-                        Debug.LogError($"{actor} ended turn {previousPhase}; He ended {Type} earlier!");
+                        Debug.LogWarning($"{actor} ended turn {previousPhase};");
                     return;
                 }
-                if(actorsReadiness[actor] == true)
+                if(actorsReadiness[actor])
                     Debug.LogError($"{actor} ended turn {previousPhase}; He ended {Type} earlier!");
 
                 actorsLeft--;

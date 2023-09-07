@@ -102,6 +102,7 @@ namespace LineWars.Model
 
         public override void ExecuteReplenish()
         {
+            base.ExecuteReplenish();
             stateMachine.SetState(replenishState);
         }
         #endregion

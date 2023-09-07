@@ -23,7 +23,7 @@ public class GraphTool : EditorTool
     {
         base.OnActivated();
 
-        edgePrefab = Resources.Load<Edge>("Prefabs/Line");
+        edgePrefab = Resources.Load<Edge>("Prefabs/Edge");
         nodePrefab = Resources.Load<Node>("Prefabs/Node");
 
         AssignGraph();
@@ -38,7 +38,7 @@ public class GraphTool : EditorTool
         EditorApplication.RepaintHierarchyWindow();
 
         nodeListener = new SelectionListener<Node>();
-
+        
         //Debug.Log("CreateGraph is Activated!");
     }
 
@@ -148,7 +148,7 @@ public class GraphTool : EditorTool
         EditorUtility.SetDirty(firstNode);
         EditorUtility.SetDirty(secondNode);
         EditorUtility.SetDirty(edge);
-
+        edge.Redraw();
         return edge;
     }
 
@@ -241,8 +241,9 @@ public class GraphTool : EditorTool
         foreach (var edge in node.Edges)
         {
             Undo.RecordObject(edge.transform, "ReDrawEdge");
-            Undo.RecordObject(edge.Drawer.LineSpriteRenderer, "ReDrawEdge");
-            edge.ReDraw();
+            Undo.RecordObject(edge.SpriteRenderer, "ReDrawEdge");
+            Undo.RecordObject(edge.BoxCollider2D, "ReDrawEdge");
+            edge.Redraw();
         }
     }
 
@@ -263,8 +264,7 @@ public class GraphTool : EditorTool
         return coord;
     }
 
-    private int GetNextIndex<T>(T obj)
-        where T : Object, INumbered
+    private int GetNextIndex<T>(T obj) where T : Object, INumbered
     {
         var objects = FindObjectsOfType<T>()
             .Where(x => x != obj)

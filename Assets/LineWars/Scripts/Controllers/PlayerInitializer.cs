@@ -12,24 +12,19 @@ namespace LineWars
         {
             var player = Instantiate(playersPrefabs.OfType<T>().First());
             
-            player.Index = spawnInfo.PlayerIndex;
-            player.NationType = spawnInfo.SpawnNode.Nation;
-            player.SpawnInfo = spawnInfo;
-            player.CurrentMoney = spawnInfo.SpawnNode.StartMoney;
-            
+            player.Initialize(spawnInfo);
 
-            foreach (var nodeInfo in spawnInfo.NodeInfos)
+            foreach (var node in spawnInfo.Nodes)
             {
-                var node = nodeInfo.ReferenceToNode;
                 Owned.Connect(player, node);
 
-                var leftUnitPrefab = player.GetUnitPrefab(nodeInfo.LeftUnitType);
+                var leftUnitPrefab = player.GetUnitPrefab(node.LeftUnitType);
                 if (BasePlayerUtility.CanSpawnUnit(node, leftUnitPrefab, UnitDirection.Left))
                 {
                     BasePlayerUtility.CreateUnitForPlayer(player, node, leftUnitPrefab, UnitDirection.Left);
                 }
 
-                var rightUnitPrefab = player.GetUnitPrefab(nodeInfo.RightUnitType);
+                var rightUnitPrefab = player.GetUnitPrefab(node.RightUnitType);
                 if (BasePlayerUtility.CanSpawnUnit(node, rightUnitPrefab, UnitDirection.Right))
                 {
                     BasePlayerUtility.CreateUnitForPlayer(player, node, rightUnitPrefab, UnitDirection.Right);

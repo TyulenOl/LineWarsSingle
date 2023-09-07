@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using LineWars.Controllers;
+using LineWars.Interface;
 using LineWars.Model;
 using UnityEngine;
 using UnityEngine.Events;
@@ -13,8 +14,7 @@ namespace LineWars
         [SerializeField] private PhaseExecutorsData phaseExecutorsData;
 
         private IReadOnlyCollection<UnitType> potentialExecutors;
-        private Dictionary<Unit, bool> unitUsage;
-        private bool isTurnMade = false;
+        private bool isTurnMade;
 
         private StateMachine stateMachine;
         private PlayerPhase idlePhase;
@@ -26,7 +26,6 @@ namespace LineWars
         
         [field: SerializeField] public UnityEvent TurnMade {get; private set;}
         public IReadOnlyCollection<UnitType> PotentialExecutors => potentialExecutors;
-        public IReadOnlyDictionary<Unit, bool> UnitUsage => unitUsage;
         public bool IsTurnMade
         {
             get => isTurnMade;
@@ -47,15 +46,16 @@ namespace LineWars
             else
                 LocalPlayer = this;
 
-            unitUsage = new Dictionary<Unit, bool>();
+            
             InitializeStateMachine();
         }
-
+        
         protected override void OnEnable()
         {
             base.OnEnable();
             OwnedAdded += OnOwnedAdded;
             OwnedRemoved += OnOwnerRemoved;
+            CommandsManager.Instance.CommandExecuted.AddListener(OnExecuteCommand);
         }
 
         protected override void OnDisable()
@@ -63,6 +63,7 @@ namespace LineWars
             base.OnDisable();
             OwnedAdded -= OnOwnedAdded;
             OwnedRemoved -= OnOwnerRemoved;
+            CommandsManager.Instance.CommandExecuted.RemoveListener(OnExecuteCommand);
         }
 
         private void InitializeStateMachine()
@@ -78,54 +79,80 @@ namespace LineWars
 
         private void OnOwnedAdded(Owned owned)
         {
-            if (owned is Unit unit)
-            {
-                unitUsage[unit] = false;
-            }
+            if(!(owned is Unit unit)) return;
+            unit.ActionPointsChanged.AddListener(ProcessActionPointsChange);
         }
 
         private void OnOwnerRemoved(Owned owned)
         {
-            if (owned is Unit unit)
-            {
-                unitUsage.Remove(unit);
-            }
+            if(!(owned is Unit unit)) return;
+            unit.ActionPointsChanged.RemoveListener(ProcessActionPointsChange);
         }
 
+        private void ProcessActionPointsChange(int previousValue, int currentValue)
+        {
+            if (currentValue <= 0 && CurrentPhase != PhaseType.Idle)
+                IsTurnMade = true;
+        }
+        
         public void FinishTurn()
         {
             if(!IsTurnMade) return;
             ExecuteTurn(PhaseType.Idle);
         }
 
+        public IEnumerable<Unit> GetAllUnitsByPhase(PhaseType phaseType)
+        {
+            if (phaseExecutorsData.PhaseToUnits.TryGetValue(phaseType, out var value))
+            {
+                foreach (var myUnit in MyUnits)
+                {
+                    if (value.Contains(myUnit.Type))
+                    {
+                        yield return myUnit;
+                    }
+                }
+            }
+        }
+        
         #region Turns
         public override void ExecuteBuy()
         {
             stateMachine.SetState(buyPhase);
+            GameUI.Instance.SetEnemyTurn(false);
         }
 
         public override void ExecuteArtillery()
         {
             stateMachine.SetState(artilleryPhase);
+            GameUI.Instance.ReDrawAllAvailability(GetAllUnitsByPhase(PhaseType.Artillery), true);
+            GameUI.Instance.SetEnemyTurn(false);
         }
 
         public override void ExecuteFight()
         {
             stateMachine.SetState(fightPhase);
+            GameUI.Instance.ReDrawAllAvailability(GetAllUnitsByPhase(PhaseType.Fight), true);
+            GameUI.Instance.SetEnemyTurn(false);
         }
 
         public override void ExecuteScout()
         {
             stateMachine.SetState(scoutPhase);
+            GameUI.Instance.ReDrawAllAvailability(GetAllUnitsByPhase(PhaseType.Scout), true);
+            GameUI.Instance.SetEnemyTurn(false);
         }
 
-        public override void ExecuteIdle()
+        public override void ExecuteIdle()//Exit
         {
+            GameUI.Instance.ReDrawAllAvailability(MyUnits, false);
+            GameUI.Instance.SetEnemyTurn(true);
             stateMachine.SetState(idlePhase);
         }
 
         public override void ExecuteReplenish()
         {
+            base.ExecuteReplenish();
             stateMachine.SetState(replenishPhase);
         }
 
@@ -147,17 +174,34 @@ namespace LineWars
         {
             var phaseExecutors = phaseExecutorsData.PhaseToUnits[phaseType];
 
-            foreach (var unitData in unitUsage)
+            foreach (var owned in OwnedObjects)
             {
-                if (!unitData.Value && phaseExecutors.Contains(unitData.Key.Type))
-                {
+                if(!(owned is Unit unit)) continue;
+                if(phaseExecutors.Contains(unit.Type) && unit.CurrentActionPoints > 0)
                     return true;
-                }
             }
 
             return false;
         }
 
         #endregion
+
+        private void OnExecuteCommand(IExecutor executor, ITarget target)
+        {
+            RecalculateVisibility();
+            Debug.Log("Command");
+        }
+
+        public void RecalculateVisibility(bool useLerp = true)
+        {
+            var visibilityMap = Graph.GetVisibilityInfo(this);
+            foreach (var (node, visibility) in visibilityMap)
+            {
+                if (useLerp)
+                    node.RenderNodeV3.SetVisibilityGradually(visibility ? 1 : 0);
+                else
+                    node.RenderNodeV3.SetVisibilityInstantly(visibility ? 1 : 0);
+            }
+        }
     }
 }

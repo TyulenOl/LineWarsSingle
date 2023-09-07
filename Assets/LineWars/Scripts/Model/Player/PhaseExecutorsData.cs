@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using LineWars.Controllers;
+using LineWars.Extensions.Attributes;
 using LineWars.Model;
 using UnityEngine;
 
@@ -20,7 +21,7 @@ namespace LineWars
     [CreateAssetMenu(fileName = "New Phase Executors", menuName = "Phase Executors Data")]
     public class PhaseExecutorsData : ScriptableObject
     {
-        [SerializeField] private List<ExecutorsForPhase> executorsForPhases;
+        [NamedArray("phase")][SerializeField] private List<ExecutorsForPhase> executorsForPhases;
 
         public Dictionary<PhaseType, IReadOnlyCollection<UnitType>> PhaseToUnits {get; private set;}
 
@@ -32,8 +33,8 @@ namespace LineWars
             PhaseToUnits = executorsForPhases.ToDictionary((obj) => obj.Phase, (obj) => obj.Executors);
         }
 
-        private void CheckValidity() {
-            
+        private void CheckValidity()
+        {
             foreach(PhaseType phase in Enum.GetValues(typeof(PhaseType)))
             {
                 var phaseOccurrences = executorsForPhases.Count((obj) => obj.Phase == phase);

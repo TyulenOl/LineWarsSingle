@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using LineWars.Controllers;
 using LineWars.Extensions.Attributes;
@@ -7,45 +8,95 @@ using UnityEngine.Events;
 
 namespace LineWars.Model
 {
+    [RequireComponent(typeof(UnitMovementLogic))]
     public class Unit : Owned,
         IAttackerVisitor,
         IAlive,
         IMovable,
         ITarget,
-        IExecutor,
-        ITurnEndAction
+        IExecutor
     {
-        [Header("Units Settings")] 
-        [SerializeField] [Min(0)] private int initialHp;
-        [SerializeField] private UnitType unitType;
-        [SerializeField] [Min(0)] private int initialArmor;
-        [SerializeField] [Min(0)] private int meleeDamage;
-        [SerializeField] [Min(0)] private int initialSpeedPoints;
-        [SerializeField] [Min(0)] private int visibility;
-        [SerializeField] [Min(0)] private int cost;
-        [field: SerializeField] public bool AttackLocked { get; set; }
-        [SerializeField] private UnitSize unitSize;
-        [SerializeField] private Passability passability;
-        [SerializeField] private CommandPriorityData priorityData;
+        [Header("Units Settings")] [SerializeField]
+        private string unitName;
 
-        private UnitMovementLogic movementLogic;
+        [SerializeField, Min(0)] private int maxHp;
+        [SerializeField, Min(0)] protected int initialArmor;
+        [SerializeField, Min(0)] protected int visibility;
 
-        [Header("DEBUG")] 
-        [SerializeField] private bool debugMode;
+
+        [SerializeField] protected UnitType unitType;
+        [SerializeField] protected UnitSize unitSize;
+        [SerializeField] protected LineType movementLineType;
+        [SerializeField] protected CommandPriorityData priorityData;
+
+        [Header("Attack Settings")]
+        [SerializeField] protected bool attackLocked = false;
+        [SerializeField, Min(0)] protected int damage;
+        [SerializeField] protected bool isPenetratingDamage = false;
+        /// <summary>
+        /// указывет на то, нужно ли захватывать точку после атаки
+        /// </summary>
+        [SerializeField] protected bool onslaught = false;
+        /// <summary>
+        /// теряет ли юнит блок после контратаки?
+        /// </summary>
+        [SerializeField] protected bool protection = false;
+
+        [Header("ContrAttack Settings")]
+        [SerializeField] protected bool canContrAttack;
+
+        [SerializeField] protected IntModifier contrAttackDamageModifier;
+
+
+        [Header("Action Points Settings")] 
+        [SerializeField] [Min(0)] protected int initialActionPoints;
+
+        [SerializeField] protected IntModifier attackPointsModifier;
+        [SerializeField] protected IntModifier movePointsModifier;
+        [SerializeField] protected IntModifier blockPointsModifier;
+
+        [Header("Sfx Settings")] 
+        [SerializeField] private SFXData moveSFX;
+        [SerializeField] private SFXData attackSFX;
+
+        [Header("DEBUG")]
         [SerializeField, ReadOnlyInspector] private Node node;
         [SerializeField, ReadOnlyInspector] private UnitDirection unitDirection;
         [SerializeField, ReadOnlyInspector] private int currentHp;
         [SerializeField, ReadOnlyInspector] private int currentArmor;
-        [SerializeField, ReadOnlyInspector] private int currentSpeedPoints;
+        [SerializeField, ReadOnlyInspector] private int currentActionPoints;
+        [SerializeField, ReadOnlyInspector] private bool isBlocked;
 
 
         [field: Header("Events")]
-        [field: SerializeField]
-        public UnityEvent<UnitSize, UnitDirection> UnitDirectionChange { get; private set; }
-
+        [field: SerializeField] public UnityEvent<UnitSize, UnitDirection> UnitDirectionChange { get; private set; }
         [field: SerializeField] public UnityEvent<int, int> HpChanged { get; private set; }
         [field: SerializeField] public UnityEvent<int, int> ArmorChanged { get; private set; }
         [field: SerializeField] public UnityEvent<Unit> Died { get; private set; }
+        [field: SerializeField] public UnityEvent<int, int> ActionPointsChanged { get; private set; }
+        [field: SerializeField] public UnityEvent<bool, bool> CanBlockChanged { get; private set; }
+        [field: SerializeField] public UnityEvent ActionCompleted { get; private set; }
+
+        private UnitMovementLogic movementLogic;
+        private IUnitBlockerSelector blockerSelector;
+
+        public string UnitName => unitName;
+
+        public bool CanDoAnyAction => CurrentActionPoints > 0;
+
+        public int CurrentActionPoints
+        {
+            get => currentActionPoints;
+            protected set
+            {
+                var previousValue = currentActionPoints;
+                currentActionPoints = Math.Max(0, value);
+                ActionPointsChanged.Invoke(previousValue, currentActionPoints);
+            }
+        }
+
+        public int MaxHp => maxHp;
+        public int Armor => initialArmor;
 
         public int CurrentHp
         {
@@ -53,7 +104,7 @@ namespace LineWars.Model
             private set
             {
                 var before = currentHp;
-                currentHp = Math.Min(Math.Max(0, value), initialHp);
+                currentHp = Math.Min(Math.Max(0, value), maxHp);
                 HpChanged.Invoke(before, currentHp);
                 if (currentHp == 0)
                 {
@@ -76,15 +127,20 @@ namespace LineWars.Model
             }
         }
 
-        public int MeleeDamage => meleeDamage;
-
-        public int CurrentSpeedPoints
+        public bool IsBlocked
         {
-            get => currentSpeedPoints;
-            private set { currentSpeedPoints = Math.Max(0, value); }
+            get => isBlocked;
+            protected set
+            {
+                var before = isBlocked;
+                isBlocked = value;
+                CanBlockChanged.Invoke(before, isBlocked);
+            }
         }
 
+        public int Damage => damage;
         public UnitType Type => unitType;
+
         private UnitDirection UnitDirection
         {
             get => unitDirection;
@@ -96,87 +152,70 @@ namespace LineWars.Model
         }
 
         public int Visibility => visibility;
-        public int Cost => cost;
+        public int Cost => 10; // не использовать! устаревшее свойство (блин)
         public UnitSize Size => unitSize;
-        public Passability Passability => passability;
+        public LineType MovementLineType => movementLineType;
         public Node Node => node;
         public CommandPriorityData CommandPriorityData => priorityData;
+        public IntModifier BlockPointsModifier => blockPointsModifier;
+        public IntModifier AttackPointsModifier => attackPointsModifier;
+        public IntModifier MovePointsModifier => movePointsModifier;
+        public bool CanMoveOnLineWithType(LineType lineType) => lineType >= MovementLineType;
 
-        private void Awake()
+        protected virtual void Awake()
         {
-            currentHp = initialHp;
-            currentSpeedPoints = initialSpeedPoints;
+            currentHp = maxHp;
             currentArmor = initialArmor;
-
+            currentActionPoints = initialActionPoints;
             movementLogic = GetComponent<UnitMovementLogic>();
-        }
+            blockerSelector = new BaseUnitBlockerSelector();
+            
+            AssignModifiers();
 
-        protected void OnValidate()
-        {
-            if (GetComponent<UnitMovementLogic>() == null)
+            void AssignModifiers()
             {
-                Debug.LogError($"у {name} не обнаружен компонент {nameof(UnitMovementLogic)}");
+                if (attackPointsModifier == null)
+                {
+                    attackPointsModifier = DecreaseIntModifier.DecreaseOne;
+                    Debug.LogWarning($"{nameof(attackPointsModifier)} is null on {name}");
+                }
+
+                if (contrAttackDamageModifier == null)
+                {
+                    contrAttackDamageModifier = MultiplyIntModifier.MultiplyOne;
+                    Debug.LogWarning($"{nameof(contrAttackDamageModifier)} is null on {name}");
+                }
+
+                if (blockPointsModifier == null)
+                {
+                    blockPointsModifier = SetIntModifier.Set0;
+                    Debug.LogWarning($"{nameof(blockPointsModifier)} is null on {name}");
+                }
+
+                if (movePointsModifier == null)
+                {
+                    movePointsModifier = DecreaseIntModifier.DecreaseOne;
+                    Debug.LogWarning($"{nameof(movePointsModifier)} is null on {name}");
+                }
             }
         }
-
-        private void OnEnable()
-        {
-            movementLogic.MovementIsOver += MovementLogicOnMovementIsOver;
-        }
-
-        private void OnDisable()
-        {
-            movementLogic.MovementIsOver -= MovementLogicOnMovementIsOver;
-        }
-
-        private void MovementLogicOnMovementIsOver(Transform arg2)
-        {
-            CurrentSpeedPoints--;
-
-            node = arg2.GetComponent<Node>();
-            if (Size == UnitSize.Large)
-            {
-                node.LeftUnit = this;
-                node.RightUnit = this;
-            }
-            else if (node.LeftIsFree && (UnitDirection == UnitDirection.Left ||
-                                         UnitDirection == UnitDirection.Right && !node.RightIsFree))
-            {
-                node.LeftUnit = this;
-                UnitDirection = UnitDirection.Left;
-            }
-            else
-            {
-                node.RightUnit = this;
-                UnitDirection = UnitDirection.Right;
-            }
-
-            if (this.Owner != node.Owner)
-                Owned.Connect(Owner, node);
-        }
-
+        
+        
         public void Initialize(Node node, UnitDirection direction)
         {
             this.node = node;
             UnitDirection = direction;
         }
 
-        public void MoveTo([NotNull] Node target)
-        {
-            if (node.LeftUnit == this)
-                node.LeftUnit = null;
-            if (node.RightUnit == this)
-                node.RightUnit = null;
-
-            movementLogic.MoveTo(target.transform);
-        }
+        #region MoveCommand
 
         public bool CanMoveTo([NotNull] Node target)
         {
-            return OwnerCondition()
+            return Node != target
+                   && OwnerCondition()
                    && SizeCondition()
                    && LineCondition()
-                   && SpeedCondition();
+                   && ActionPointsCondition(movePointsModifier, CurrentActionPoints);
 
             bool SizeCondition()
             {
@@ -188,14 +227,7 @@ namespace LineWars.Model
             {
                 var line = node.GetLine(target);
                 return line != null
-                       && line.LineType != LineType.Visibility
-                       && line.LineType != LineType.Firing
-                       && (int) Passability >= (int) line.LineType;
-            }
-
-            bool SpeedCondition()
-            {
-                return CurrentSpeedPoints > 0 || debugMode;
+                       && CanMoveOnLineWithType(line.LineType);
             }
 
             bool OwnerCondition()
@@ -204,58 +236,204 @@ namespace LineWars.Model
             }
         }
 
-        public void TakeDamage(Hit hit)
+        public void MoveTo([NotNull] Node target)
+        {
+            if (node.LeftUnit == this)
+                node.LeftUnit = null;
+            if (node.RightUnit == this)
+                node.RightUnit = null;
+
+            InspectNodeForCallback();
+            AssignNewNode();
+
+            movementLogic.MoveTo(target.transform);
+            CurrentActionPoints = movePointsModifier.Modify(CurrentActionPoints);
+            ActionCompleted.Invoke();
+            SfxManager.Instance.Play(moveSFX);
+            
+            void InspectNodeForCallback()
+            {
+                if (target.Owner == null)
+                {
+                    OnCapturingFreeNode();
+                    return;
+                }
+
+                if (target.Owner != this.Owner)
+                {
+                    OnCapturingEnemyNode();
+                    if (target.IsBase)
+                        OnCapturingEnemyBase();
+                }
+            }
+            void AssignNewNode()
+            {
+                node = target;
+                if (Size == UnitSize.Large)
+                {
+                    node.LeftUnit = this;
+                    node.RightUnit = this;
+                }
+                else if (node.LeftIsFree && (UnitDirection == UnitDirection.Left ||
+                                             UnitDirection == UnitDirection.Right && !node.RightIsFree))
+                {
+                    node.LeftUnit = this;
+                    UnitDirection = UnitDirection.Left;
+                }
+                else
+                {
+                    node.RightUnit = this;
+                    UnitDirection = UnitDirection.Right;
+                }
+
+                if (this.Owner != node.Owner)
+                    Owned.Connect(Owner, node);
+            }
+        }
+        
+        #endregion MoveCommand
+
+        #region IAliveImplimitation
+
+        public virtual void TakeDamage(Hit hit)
         {
             var blockedDamage = Math.Min(hit.Damage, CurrentArmor);
-            if (blockedDamage != 0)
-                CurrentArmor -= blockedDamage;
 
-            var notBlockedDamage = hit.Damage - blockedDamage;
+            var notBlockedDamage = hit.IsPenetrating ? hit.Damage : hit.Damage - blockedDamage;
             if (notBlockedDamage != 0)
                 CurrentHp -= notBlockedDamage;
+
+            if (hit is {Source: Unit enemy, IsRangeAttack: false})
+                UnitsController.ExecuteCommand(new ContrAttackCommand(this, enemy), false);
         }
 
-        public void Heal(int healAmount)
+        public virtual void HealMe(int healAmount)
         {
             if (healAmount < 0)
                 throw new ArgumentException($"{nameof(healAmount)} > 0 !");
             CurrentHp += healAmount;
         }
 
-        public void Attack([NotNull] Edge edge)
+        #endregion
+
+        #region AttackCommand
+
+        public virtual bool CanAttack([NotNull] Unit unit)
         {
-            _Attack(edge);
+            if (unit == null) throw new ArgumentNullException(nameof(unit));
+
+            return BaseMeleeAttackCondition(unit)
+                   && ActionPointsCondition(attackPointsModifier, CurrentActionPoints);
         }
 
-        public void Attack([NotNull] Unit enemy)
+        public virtual bool CanAttack(Unit unit, Node node)
         {
-            var enemyNode = enemy.node;
-            _Attack(enemy);
+            if (unit == null) throw new ArgumentNullException(nameof(unit));
 
-            if (enemy.IsDied && enemyNode.AllIsFree)
+            return BaseMeleeAttackCondition(unit, node)
+                   && ActionPointsCondition(attackPointsModifier, CurrentActionPoints);
+        }
+
+        public virtual void Attack([NotNull] Unit enemy)
+        {
+            if (enemy == null) throw new ArgumentNullException(nameof(enemy));
+
+            // если нет соседа, то тогда просто атаковать
+            if (!enemy.TryGetNeighbour(out var neighbour))
+                AttackUnitButIgnoreBlock(enemy);
+            // иначе выбрать того, кто будет блокировать урон
+            else
+            {
+                var selectedUnit = blockerSelector.SelectBlocker(enemy, neighbour);
+                if (selectedUnit == enemy)
+                    AttackUnitButIgnoreBlock(enemy);
+                else
+                {
+                    UnitsController.ExecuteCommand(new BlockAttackCommand(this, selectedUnit));
+                }
+            }
+        }
+
+        public void AttackUnitButIgnoreBlock([NotNull] Unit enemy)
+        {
+            if (enemy == null) throw new ArgumentNullException(nameof(enemy));
+            var enemyNode = enemy.node;
+            MeleeAttack(enemy);
+
+            if (enemy.IsDied && enemyNode.AllIsFree && onslaught)
                 UnitsController.ExecuteCommand(new MoveCommand(this, node, enemyNode));
         }
 
-        private void _Attack(IAlive target)
+        private void MeleeAttack(IAlive target)
         {
-            target.TakeDamage(new Hit(MeleeDamage));
+            target.TakeDamage(new Hit(Damage, this, target, isPenetratingDamage));
+            CurrentActionPoints = attackPointsModifier.Modify(CurrentActionPoints);
+            ActionCompleted.Invoke();
+            SfxManager.Instance.Play(attackSFX);
         }
 
-        public bool CanAttack([NotNull] Unit unit)
+        public virtual bool CanAttack([NotNull] Edge edge) => false;
+        public virtual bool CanAttack(Edge edge, Node node) => false;
+
+        public virtual void Attack([NotNull] Edge edge)
         {
-            var line = node.GetLine(unit.node);
-            return !AttackLocked &&
-                   unit.basePlayer != basePlayer
+        }
+        
+        private bool BaseMeleeAttackCondition(Unit unit) => BaseMeleeAttackCondition(unit, node);
+
+        private bool BaseMeleeAttackCondition(Unit unit, Node node)
+        {
+            var line = node.GetLine(unit.Node);
+            return !attackLocked
+                   && Damage > 0
+                   && unit.Owner != Owner
                    && line != null
-                   && (int) Passability >= (int) line.LineType;
+                   && CanMoveOnLineWithType(line.LineType);
         }
 
-        public bool CanAttack([NotNull] Edge edge)
+        #endregion
+
+        #region ContrAttackCommand
+
+        public virtual bool CanContrAttack([NotNull] Unit enemy)
         {
-            return !AttackLocked &&
-                   edge.LineType >= LineType.CountryRoad
-                   && node.ContainsEdge(edge);
+            if (enemy == null) throw new ArgumentNullException(nameof(enemy));
+            return canContrAttack 
+                   && IsBlocked
+                   && contrAttackDamageModifier.Modify(Damage) > 0
+                   && BaseMeleeAttackCondition(enemy);
         }
+
+        public virtual void ContrAttack([NotNull] Unit enemy)
+        {
+            if (enemy == null) throw new ArgumentNullException(nameof(enemy));
+            var contrAttackDamage = contrAttackDamageModifier.Modify(Damage);
+          
+            enemy.TakeDamage(new Hit(contrAttackDamage, this, enemy));
+            
+            if (!protection)
+                IsBlocked = false;
+        }
+
+        #endregion
+
+        #region BlockCommand
+
+        public virtual bool CanBlock()
+        {
+            return ActionPointsCondition(blockPointsModifier, CurrentActionPoints);
+        }
+
+        public virtual void EnableBlock()
+        {
+            IsBlocked = true;
+            CurrentActionPoints = blockPointsModifier
+                ? blockPointsModifier.Modify(CurrentActionPoints)
+                : CurrentActionPoints = 0;
+            ActionCompleted.Invoke();
+        }
+
+        #endregion
 
         protected virtual void OnDied()
         {
@@ -273,13 +451,14 @@ namespace LineWars.Model
                 node.RightUnit = null;
             }
 
+            Owner.RemoveOwned(this);
             Destroy(gameObject);
         }
 
-        public void OnTurnEnd()
+        public virtual void OnReplenish()
         {
-            currentArmor = initialArmor;
-            currentSpeedPoints = initialSpeedPoints;
+            CurrentActionPoints = initialActionPoints;
+            IsBlocked = false;
         }
 
 
@@ -302,11 +481,46 @@ namespace LineWars.Model
 
             return false;
         }
-
         public bool IsNeighbour(Unit unit)
         {
             return node.LeftUnit == this && node.RightUnit == unit
                    || node.RightUnit == this && node.LeftUnit == unit;
         }
+        
+
+        protected static bool ActionPointsCondition(IntModifier modifier, int actionPoints)
+        {
+            return actionPoints > 0 && modifier != null && modifier.Modify(actionPoints) >= 0;
+        }
+
+        public virtual IEnumerable<(ITarget, CommandType)> GetAllAvailableTargets()
+        {
+            return GetAllAvailableTargetsInRange((uint) currentActionPoints + 1);
+        }
+
+        protected IEnumerable<(ITarget, CommandType)> GetAllAvailableTargetsInRange(uint range)
+        {
+            foreach (var e in Graph.GetNodesInRange(node, range))
+            foreach (var target in e.GetTargetsWithMe())
+                yield return (target, UnitsController.Instance.GetCommandTypeBy(this, target));
+        }
+
+        public virtual CommandType GetAttackTypeBy(IAlive target) => CommandType.MeleeAttack;
+
+        #region CallBack
+
+        protected virtual void OnCapturingEnemyBase()
+        {
+        }
+
+        protected virtual void OnCapturingEnemyNode()
+        {
+        }
+
+        protected virtual void OnCapturingFreeNode()
+        {
+        }
+
+        #endregion
     }
 }

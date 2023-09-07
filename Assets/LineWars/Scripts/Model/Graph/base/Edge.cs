@@ -1,38 +1,67 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using LineWars.Extensions.Attributes;
-using LineWars.Interface;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace LineWars.Model
 {
-    public class Edge : MonoBehaviour, IAlive, ITarget, INumbered
+    [Serializable]
+    public class LineTypeCharacteristics
+    {
+        [SerializeField] private LineType lineType;
+        [SerializeField, Min(0)] private int maxHp;
+        [SerializeField] private Sprite sprite;
+        [SerializeField, Min(0)] private float width = 5;
+
+        public LineType LineType => lineType;
+        public int MaxHp => maxHp;
+        public Sprite Sprite => sprite;
+
+        public float Width => width;
+
+        public LineTypeCharacteristics(LineType type)
+        {
+            lineType = type;
+            maxHp = 0;
+        }
+    }
+
+    [RequireComponent(typeof(SpriteRenderer))]
+    [RequireComponent(typeof(BoxCollider2D))]
+    public class Edge : MonoBehaviour, IAlive, ITarget, INumbered, ISerializationCallbackReceiver
     {
         [Header("Graph Settings")] [SerializeField]
         private int index;
 
-        [SerializeField] [ReadOnlyInspector] private Node firstNode;
-        [SerializeField] [ReadOnlyInspector] private Node secondNode;
+        [SerializeField] private Node firstNode;
+        [SerializeField] private Node secondNode;
 
-        [Header("Logical Settings")] [SerializeField] [Min(1)]
-        private int maxHp = 2;
+        [Header("Line Settings")] [SerializeField]
+        private LineType lineType;
 
-        [SerializeField] [ReadOnlyInspector] private int hp;
-        [SerializeField] private LineType lineType;
+        [SerializeField, NamedArray("lineType")]
+        private List<LineTypeCharacteristics> lineTypeCharacteristics;
 
         [Header("Commands Settings")] [SerializeField]
         private CommandPriorityData priorityData;
 
-
-        [SerializeField] [HideInInspector] private LineDrawer drawer;
-
+        [Header("DEBUG")] [SerializeField] [ReadOnlyInspector]
+        private int hp;
 
         [field: Header("Events")]
         [field: SerializeField]
         public UnityEvent<int, int> HpChanged { get; private set; }
 
         [field: SerializeField] public UnityEvent<LineType, LineType> LineTypeChanged { get; private set; }
-        [field: SerializeField] public UnityEvent<Unit> Died { get; private set; }
+
+        private Dictionary<LineType, LineTypeCharacteristics> lineMap;
+        [SerializeField, HideInInspector] private SpriteRenderer spriteRenderer;
+        [SerializeField, HideInInspector] private BoxCollider2D boxCollider2D;
+
+        public SpriteRenderer SpriteRenderer => spriteRenderer;
+        public BoxCollider2D BoxCollider2D => boxCollider2D;
 
         public int Index
         {
@@ -40,9 +69,12 @@ namespace LineWars.Model
             set => index = value;
         }
 
+        public int MaxHp => lineMap.ContainsKey(LineType)
+            ? lineMap[LineType].MaxHp
+            : 0;
+
         public Node FirstNode => firstNode;
         public Node SecondNode => secondNode;
-        public LineDrawer Drawer => drawer;
 
         public int CurrentHp
         {
@@ -54,16 +86,14 @@ namespace LineWars.Model
                 if (value < 0)
                 {
                     LineType = LineTypeHelper.Down(LineType);
-                    hp = maxHp;
+                    hp = MaxHp;
                 }
                 else
-                    hp = Math.Min(value, maxHp);
+                    hp = Math.Min(value, MaxHp);
 
                 HpChanged.Invoke(before, hp);
             }
         }
-
-        public bool IsDied => CurrentHp <= 0;
 
         public LineType LineType
         {
@@ -73,37 +103,39 @@ namespace LineWars.Model
                 var before = lineType;
                 lineType = value;
                 LineTypeChanged.Invoke(before, lineType);
+                CurrentHp = MaxHp;
+                RedrawLine();
             }
         }
 
         public CommandPriorityData CommandPriorityData => priorityData;
 
+        private float CurrentWidth => lineMap.TryGetValue(lineType, out var ch) 
+            ? ch.Width 
+            : 0.1f;
+
+        private Sprite CurrentSprite => lineMap.TryGetValue(lineType, out var ch)
+            ? ch.Sprite
+            : Resources.Load<Sprite>("Sprites/Road");
+
+
         protected void OnValidate()
         {
-            hp = maxHp;
+            hp = MaxHp;
+            AssignFields();
         }
 
-        public void Initialize(Node firstNode, Node secondNode, LineType lineType = LineType.ScoutRoad)
+
+        public void Initialize(Node firstNode, Node secondNode)
         {
             this.firstNode = firstNode;
             this.secondNode = secondNode;
-            drawer = GetComponent<LineDrawer>();
-            drawer.Initialise(firstNode.transform, secondNode.transform);
         }
 
         public void TakeDamage(Hit hit)
         {
-            throw new System.NotImplementedException();
+            CurrentHp -= hit.Damage;
         }
-
-        public void Heal(int healAmount)
-        {
-            if (healAmount < 0)
-                throw new ArgumentException($"{nameof(healAmount)} > 0 !");
-            CurrentHp += healAmount;
-        }
-
-        public void ReDraw() => drawer.DrawLine();
 
         public Node GetOther(Node node)
         {
@@ -111,6 +143,70 @@ namespace LineWars.Model
                 return SecondNode;
             else
                 return FirstNode;
+        }
+
+        public void OnBeforeSerialize()
+        {
+        }
+
+        public void OnAfterDeserialize()
+        {
+            lineMap = new Dictionary<LineType, LineTypeCharacteristics>();
+
+            for (int i = 0; i != lineTypeCharacteristics.Count; i++)
+                lineMap.TryAdd(lineTypeCharacteristics[i].LineType, lineTypeCharacteristics[i]);
+
+            UpdateTypes();
+        }
+
+        private void UpdateTypes()
+        {
+            foreach (var value in Enum.GetValues(typeof(LineType)).OfType<LineType>())
+            {
+                if (!lineMap.ContainsKey(value))
+                    lineMap[value] = new LineTypeCharacteristics(value);
+            }
+        }
+
+        public void LevelUp()
+        {
+            LineType = LineTypeHelper.Up(LineType);
+        }
+
+        public void Redraw()
+        {
+            name = $"Edge{Index} from {(FirstNode ? FirstNode.name : "Null")} to {(SecondNode ? SecondNode.name : "None")}";
+            RedrawLine();
+            AlineCollider();
+        }
+
+        private void RedrawLine()
+        {
+            var v1 = firstNode?firstNode.Position: Vector2.zero;
+            var v2 = secondNode?secondNode.Position: Vector2.right;
+            var distance = Vector2.Distance(v1, v2);
+            var center = v1;
+            var newSecondNodePosition = v2 - center;
+            var radian = Mathf.Atan2(newSecondNodePosition.y, newSecondNodePosition.x) * 180 / Mathf.PI;
+            spriteRenderer.transform.rotation = Quaternion.Euler(0, 0, radian);
+            spriteRenderer.transform.position = (v1 + v2) / 2;
+
+            spriteRenderer.size = new Vector2(distance, CurrentWidth);
+            spriteRenderer.sprite = CurrentSprite;
+        }
+
+
+        private void AlineCollider()
+        {
+            boxCollider2D.size = spriteRenderer.size;
+        }
+
+        private void AssignFields()
+        {
+            if (spriteRenderer == null)
+                spriteRenderer = GetComponent<SpriteRenderer>();
+            if (boxCollider2D == null)
+                boxCollider2D = GetComponent<BoxCollider2D>();
         }
     }
 }

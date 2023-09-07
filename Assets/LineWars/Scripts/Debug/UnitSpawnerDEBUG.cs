@@ -14,15 +14,15 @@ public class UnitSpawnerDEBUG : MonoBehaviour
 
     private void Update()
     {
-        if (spawn)
-        {
-            UnitsController.ExecuteCommand(
-                new SpawnUnitCommand(
-                    Player.LocalPlayer,
-                    GetComponent<Node>(),
-                    typeToSpawn
-                ), false);
-            spawn = false;
-        }
+        // if (spawn)
+        // {
+        //     UnitsController.ExecuteCommand(
+        //         new SpawnPresetCommand(
+        //             Player.LocalPlayer,
+        //             GetComponent<Node>(),
+        //             typeToSpawn
+        //         ), false);
+        //     spawn = false;
+        // }
     }
 }

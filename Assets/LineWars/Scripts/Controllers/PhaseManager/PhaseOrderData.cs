@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Unity.Collections;
 using UnityEngine;
 
-namespace LineWars.Controllers
+namespace LineWars
 {
     [CreateAssetMenu(fileName = "New Phase Order Data", menuName = "Phase Order Data")]
     public class PhaseOrderData : ScriptableObject

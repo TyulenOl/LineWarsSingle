@@ -1,25 +1,41 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using LineWars.Extensions.Attributes;
 using UnityEngine;
 
 namespace LineWars
 {
     public class CompaniesDataBase : MonoBehaviour
     {
-        public static CompaniesDataBase Instance { get; private set; }
-
-        public const string COMPANIES_DIRECTORY_NAME = "Companies";
-        public const string SAVE_FILE_EXTENSION = ".json";
+        private static CompaniesDataBase Instance { get; set; }
+        
+        private const string COMPANIES_DIRECTORY_NAME = "Companies";
+        private const string SAVE_FILE_EXTENSION = ".json";
         private static DirectoryInfo companiesDirectory;
         private static List<CompanyState> companiesStates;
         
-        public static IReadOnlyList<CompanyState> CurrenCompanyStates => companiesStates;
-
         [SerializeField] private List<CompanyData> companiesDatas;
-        
+        [SerializeField, ReadOnlyInspector] private CompanyState choseCompanyState;
+        [SerializeField, ReadOnlyInspector] private MissionState choseMissionState;
+
+        public static CompanyState ChooseCompany
+        {
+            get => Instance.choseCompanyState;
+            set => Instance.choseCompanyState = value;
+        }
+
+        public static MissionState ChooseMission
+        {
+            get => Instance.choseMissionState;
+            set
+            {
+                InspectNewMission(value);
+                Instance.choseMissionState = value;
+            }
+        }
+
         private void Awake()
         {
-            //Debug.Log("Awake DataBase");
             if (Instance == null)
             {
                 Instance = this;
@@ -28,14 +44,13 @@ namespace LineWars
             else
             {
                 Destroy(gameObject);
-                Debug.LogError($"Too many {nameof(CompaniesDataBase)}");
             }
         }
 
         private void Start()
         {
-            //Debug.Log("Start DataBase");
             Initialize();
+            Game.IsNormalStart = true;
         }
 
         private void Initialize()
@@ -58,7 +73,7 @@ namespace LineWars
                 if (File.Exists(companyFileName))
                 {
                     var state = Serializer.ReadObject<CompanyState>(companyFileName);
-                    if (state == null || state.CompanyData == null || !state.CompanyData.Equals(companyData))
+                    if (state == null || state.companyData == null || !state.companyData.Equals(companyData))
                     {
                         state = new CompanyState(companyData);
                         Serializer.WriteObject(companyFileName, state);
@@ -75,7 +90,27 @@ namespace LineWars
                 }
             }
         }
-        
+
+        public static bool IsExists => Instance != null;
+        public static void SaveAllStates()
+        {
+            foreach (var state in CurrenCompanyStates)
+            {
+                Serializer.WriteObject(GetCompanyFileName(state.companyData), state);
+            }
+        }
+
+        public static void SaveChooseMission()
+        {
+            if (ChooseCompany == null || ChooseMission == null)
+            {
+                Debug.LogError("Невозможно сохранить выбранную миссию!");
+                return;
+            }
+            Serializer.WriteObject(GetCompanyFileName(ChooseCompany.companyData), ChooseCompany);
+        }
+
+        public static IReadOnlyList<CompanyState> CurrenCompanyStates => companiesStates;
 
         private static string GetCompanyFileName(CompanyData company)
         {
@@ -83,6 +118,14 @@ namespace LineWars
                 companiesDirectory.FullName,
                 $"{company.Name}{SAVE_FILE_EXTENSION}"
             );
+        }
+
+        private static void InspectNewMission(MissionState state)
+        {
+            if (state == null)
+                return;
+            if (ChooseCompany == null || !ChooseCompany.missionStates.Contains(state))
+                Debug.LogError($"Invalid fields state in {nameof(CompaniesDataBase)}");
         }
     }
 }

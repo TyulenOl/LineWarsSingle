@@ -64,16 +64,16 @@ namespace LineWars
 
             this.currentState = companyState;
 
-            var data = companyState.CompanyData;
+            var data = companyState.companyData;
 
             companyName.text = data.Name;
             companyDescription.text = data.Description;
             companyImage.sprite = data.Image;
 
-            var finishMissionsCount = companyState.MissionStates
-                .Count(x => x.IsCompleted);
+            var finishMissionsCount = companyState.missionStates
+                .Count(x => x.isCompleted);
 
-            var allMissionCount = companyState.MissionStates.Count;
+            var allMissionCount = companyState.missionStates.Count;
             missionsProgress.text = $"{finishMissionsCount}/{allMissionCount}";
             companyNation.text = NationHelper.GetNationName(data.Nation);
 

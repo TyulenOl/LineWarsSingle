@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using DataStructures.FibonacciHeap;
 
 namespace DataStructures.PriorityQueue

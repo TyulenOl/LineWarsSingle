@@ -20,16 +20,17 @@ namespace LineWars
             {
                 base.OnEnter();
 
-                foreach(var unit in player.UnitUsage.Keys.ToArray())
+                foreach(var owned in player.OwnedObjects)
                 {
-                    unit.OnTurnEnd();
-                    player.unitUsage[unit] = false;
+                    if(!(owned is Unit unit)) continue;
+                    unit.OnReplenish();
                 }
 
                 player.StartCoroutine(IdleCroroutine());
                 IEnumerator IdleCroroutine()
                 {
                     yield return null;
+                    player.IsTurnMade = true;
                     player.ExecuteTurn(PhaseType.Idle);
                 }
             }

@@ -1,0 +1,37 @@
+#pragma kernel CSMain
+
+struct NodesBuffer
+{
+    float4 Color;
+    float Visibility;
+};
+
+RWTexture2D<float4> _VisibilityMaskV3;
+
+int _NodesCount;
+
+StructuredBuffer<NodesBuffer> _NodesBuffer;
+Texture2D<float4> _VisibilityMap;
+
+
+[numthreads(8,8,1)]
+void CSMain(uint3 id : SV_DispatchThreadID)
+{
+    _VisibilityMaskV3[id.xy] = 0;
+    for (int i = 0; i < _NodesCount; i++)
+    {
+        const float4 nodeColor = _NodesBuffer[i].Color;
+        const float visibility = _NodesBuffer[i].Visibility;
+        
+        const float4 pixelColor = _VisibilityMap[id.xy];
+        
+        if (nodeColor.r == pixelColor.r
+            && nodeColor.g == pixelColor.g
+            && nodeColor.b == pixelColor.b)
+        {
+            _VisibilityMaskV3[id.xy] = visibility;
+        }
+    }
+}
+
+

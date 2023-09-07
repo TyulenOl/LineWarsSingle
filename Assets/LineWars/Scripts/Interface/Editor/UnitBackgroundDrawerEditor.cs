@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace LineWars.Controllers
+namespace LineWars.Interface
 {
     [CustomEditor(typeof(UnitDrawer))]
     public class UnitBackgroundDrawerEditor : Editor

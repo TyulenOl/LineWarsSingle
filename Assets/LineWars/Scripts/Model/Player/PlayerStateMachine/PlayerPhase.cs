@@ -24,24 +24,12 @@ namespace LineWars
             {
                 Debug.Log($"Player entered {phaseType}");
                 player.potentialExecutors = player.phaseExecutorsData.PhaseToUnits[phaseType];
-                CommandsManager.Instance.CommandExecuted.AddListener(OnCommandExecuted);
                 player.IsTurnMade = false;
             }
 
             public override void OnExit()
             {
                 Debug.Log($"Player exited {phaseType}");
-                CommandsManager.Instance.CommandExecuted.RemoveListener(OnCommandExecuted);
-            }
-
-            private void OnCommandExecuted(IExecutor executor, ITarget target)
-            {
-                if(executor is Unit unit)
-                {
-                    player.unitUsage[unit] = true;
-                }
-                player.IsTurnMade = true;
-
             }
         }
     }

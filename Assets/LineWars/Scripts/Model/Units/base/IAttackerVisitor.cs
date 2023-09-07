@@ -5,8 +5,6 @@ namespace LineWars.Model
 {
     public interface IAttackerVisitor
     {
-        public bool AttackLocked { get; set; }
-
         public void Attack(IAlive target)
         {
             switch (target)
@@ -33,11 +31,26 @@ namespace LineWars.Model
             return false;
         }
 
+        public bool CanAttack(IAlive target, Node node)
+        {
+            switch (target)
+            {
+                case Edge edge:
+                    return CanAttack(edge, node);
+                case Unit unit:
+                    return CanAttack(unit, node);
+            }
+
+            return false;
+        }
+        public CommandType GetAttackTypeBy(IAlive target);
         public void Attack(Unit enemy);
         public bool CanAttack(Unit unit);
+        public bool CanAttack(Unit unit, Node node);
         
         public void Attack(Edge edge);
         public bool CanAttack(Edge edge);
+        public bool CanAttack(Edge edge, Node node);
 
     }
 }

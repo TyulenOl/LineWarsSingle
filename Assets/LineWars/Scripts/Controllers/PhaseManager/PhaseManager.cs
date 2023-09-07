@@ -5,7 +5,7 @@ using UnityEngine;
 using LineWars.Model;
 using UnityEngine.Events;
 
-namespace LineWars.Controllers
+namespace LineWars
 {  
     public partial class PhaseManager : MonoBehaviour
     {
@@ -63,6 +63,41 @@ namespace LineWars.Controllers
             }
             stateMachine.SetState(idleState);
         }
+        
+        public void StartGame()
+        {
+            Debug.Log("Game Started!");
+            stateMachine.SetState(typeToPhase[orderData.Order[0]]);
+        }
+
+        public void RegisterActor(IActor actor)
+        {
+            if(actors.Contains(actor))
+            {
+                Debug.LogError($"{actor} is already registered!");
+            }
+            actors.Add(actor);
+            actor.TurnChanged += GetInvokingEndingTurn(actor);
+        }
+
+        public void ForceSkipPhase()
+        {
+            switch (CurrentPhase)
+            {
+                case PhaseType.Buy:
+                    stateMachine.SetState(artilleryState);
+                    break;
+                case PhaseType.Artillery:
+                    stateMachine.SetState(fightState);
+                    break;
+                case PhaseType.Fight:
+                    stateMachine.SetState(scoutState);
+                    break;
+                case PhaseType.Scout:
+                    stateMachine.SetState(replenishState);
+                    break;
+            }
+        }
 
         private void IntitializeStateMachine()
         {
@@ -107,22 +142,6 @@ namespace LineWars.Controllers
                 previousPhase = ((Phase)previousState).Type;
             
             PhaseChanged.Invoke(previousPhase, ((Phase)currentState).Type);
-        }
-
-        public void StartGame()
-        {
-            Debug.Log("Game Started!");
-            stateMachine.SetState(typeToPhase[orderData.Order[0]]);
-        }
-
-        public void RegisterActor(IActor actor)
-        {
-            if(actors.Contains(actor))
-            {
-                Debug.LogError($"{actor} is already registered!");
-            }
-            actors.Add(actor);
-            actor.TurnChanged += GetInvokingEndingTurn(actor);
         }
 
         private Action<PhaseType, PhaseType> GetInvokingEndingTurn(IActor actor)

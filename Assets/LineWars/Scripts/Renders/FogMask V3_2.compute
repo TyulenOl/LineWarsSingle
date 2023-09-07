@@ -1,0 +1,55 @@
+#pragma kernel CSMain
+#pragma kernel CSPreparation
+
+struct NodesBuffer
+{
+    float4 Color;
+    float Visibility;
+};
+
+shared int _NodesCount;
+shared StructuredBuffer<NodesBuffer> _NodesBuffer;
+
+Texture2D _VisibilityMap;
+
+RWTexture2D<float4> _VisibilityMaskV3;
+shared RWTexture2D<float4> _VisibilityMapProcessed;
+
+[numthreads(8,8,1)]
+void CSMain(uint3 id : SV_DispatchThreadID)
+{
+    _VisibilityMaskV3[id.xy] = 0;
+    for (int i = 0; i < _NodesCount; i++)
+    {
+        const float4 nodeColor = _NodesBuffer[i].Color;
+        const float visibility = _NodesBuffer[i].Visibility;
+
+        const float4 pixelColor = _VisibilityMapProcessed[id.xy];
+
+        if (nodeColor.r == pixelColor.r)
+        {
+            _VisibilityMaskV3[id.xy] = visibility;
+        }
+    }
+}
+
+
+[numthreads(8,8,1)]
+void CSPreparation(uint3 id : SV_DispatchThreadID)
+{
+    _VisibilityMapProcessed[id.xy] = 0;
+    for (int i = 0; i < _NodesCount; i++)
+    {
+        const float4 nodeColor = _NodesBuffer[i].Color;
+
+        const float4 pixelColor = _VisibilityMap[id.xy];
+
+        if (nodeColor.r == pixelColor.r
+            && nodeColor.g == pixelColor.g
+            && nodeColor.b == pixelColor.b
+            && nodeColor.a == pixelColor.a)
+        {
+            _VisibilityMapProcessed[id.xy] = float4((float)i / (float)_NodesCount,0,0,0);
+        }
+    }
+}
