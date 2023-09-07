@@ -20,6 +20,7 @@ public class UnitPartDrawer : MonoBehaviour
     private CharacteristicDrawer FarAttackDrawer;
     private CharacteristicDrawer ArmorDrawer;
     private CharacteristicDrawer HPDrawer;
+    private CharacteristicDrawer ActionPointsDrawer;
     
     private Unit currentUnit;
 
@@ -38,6 +39,8 @@ public class UnitPartDrawer : MonoBehaviour
         var hpSprite = DrawHelper.GetSpriteByCharacteristicType(CharacteristicType.Hp);
         var armorSprite = DrawHelper.GetSpriteByCharacteristicType(CharacteristicType.Armor);
         var attackSprite = DrawHelper.GetSpriteByCharacteristicType(CharacteristicType.MeleeAttack);
+        var actionPointsSprite = DrawHelper.GetSpriteByCharacteristicType(CharacteristicType.ActionPoints);
+        
         MeleeAttackDrawer = Instantiate(CharacteristicDrawerPrefab.gameObject, CharacteristicsLayoutGroup.transform)
             .GetComponent<CharacteristicDrawer>();
         MeleeAttackDrawer.Init(attackSprite, unitToInit.Damage.ToString());
@@ -49,6 +52,10 @@ public class UnitPartDrawer : MonoBehaviour
         HPDrawer = Instantiate(CharacteristicDrawerPrefab.gameObject, CharacteristicsLayoutGroup.transform)
             .GetComponent<CharacteristicDrawer>();
         HPDrawer.Init(hpSprite, unitToInit.CurrentHp.ToString());
+        
+        ActionPointsDrawer = Instantiate(CharacteristicDrawerPrefab.gameObject, CharacteristicsLayoutGroup.transform)
+            .GetComponent<CharacteristicDrawer>();
+        ActionPointsDrawer.Init(actionPointsSprite, unitToInit.CurrentActionPoints.ToString());
         
         UnitName.text = unitToInit.UnitName;
     }
@@ -96,6 +103,10 @@ public class UnitPartDrawer : MonoBehaviour
         if( HPDrawer != null)
         {
             HPDrawer.ReDraw(currentUnit.CurrentHp.ToString());
+        }
+        if (ActionPointsDrawer != null)
+        {
+            ActionPointsDrawer.ReDraw(currentUnit.CurrentActionPoints.ToString());
         }
     }
 }

@@ -17,6 +17,8 @@ public static class DrawHelper
                 return Resources.Load<Sprite>("UI/Icons/armor");
             case CharacteristicType.Hp:
                 return Resources.Load<Sprite>("UI/Icons/Icon_Heart");
+            case CharacteristicType.ActionPoints:
+                return Resources.Load<Sprite>("UI/Icons/ActionPoints");
             default: return Resources.Load<Sprite>("UI/Icons/Icon_Heart");
         }
     }
@@ -90,5 +92,6 @@ public enum CharacteristicType
     MeleeAttack,
     FarAttack,
     Armor,
-    Hp
+    Hp,
+    ActionPoints
 }

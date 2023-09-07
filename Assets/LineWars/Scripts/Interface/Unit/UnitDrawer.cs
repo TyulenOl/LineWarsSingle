@@ -34,7 +34,11 @@ namespace LineWars.Interface
         {
             unit = GetComponent<Unit>();
 
-            unit.ActionPointsChanged.AddListener((_,newValue) => ExecuteForAllDrawers(drawer => drawer.ReDrawActivity(newValue != 0)));
+            unit.ActionPointsChanged.AddListener((_,newValue) => ExecuteForAllDrawers(drawer =>
+            {
+                drawer.ReDrawActivity(newValue != 0);
+                ReDrawCharacteristics();
+            }));
             unit.CanBlockChanged.AddListener((_,newBool) => ExecuteForAllDrawers(drawer => drawer.ReDrawCanBlock(newBool)));
             
             if (leftPart != null)
