@@ -13,8 +13,7 @@ namespace LineWars.Model
     /// </summary>
     public abstract class BasePlayer : MonoBehaviour, IActor
     {
-        [field: SerializeField, ReadOnlyInspector]
-        public int Index { get; private set; }
+        [field: SerializeField, ReadOnlyInspector] public int Index { get; private set; }
 
         [SerializeField, ReadOnlyInspector] private NationType nationType;
         [SerializeField, ReadOnlyInspector] private int money;

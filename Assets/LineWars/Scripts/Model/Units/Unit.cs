@@ -16,8 +16,8 @@ namespace LineWars.Model
         ITarget,
         IExecutor
     {
-        [Header("Units Settings")] [SerializeField]
-        private string unitName;
+        [Header("Units Settings")] 
+        [SerializeField] private string unitName;
 
         [SerializeField, Min(0)] private int maxHp;
         [SerializeField, Min(0)] protected int initialArmor;
@@ -108,8 +108,8 @@ namespace LineWars.Model
                 HpChanged.Invoke(before, currentHp);
                 if (currentHp == 0)
                 {
-                    Died.Invoke(this);
                     OnDied();
+                    Died.Invoke(this);
                 }
             }
         }
@@ -152,7 +152,15 @@ namespace LineWars.Model
         }
 
         public int Visibility => visibility;
-        public int Cost => 10; // не использовать! устаревшее свойство (блин)
+        public int Cost
+        {
+            get
+            {
+                Debug.LogWarning("Вы используете устаревшее свойство Cost! Ай-яй-яй!");
+                return 1; // не использовать! устаревшее свойство (блин)
+            }
+        }
+
         public UnitSize Size => unitSize;
         public LineType MovementLineType => movementLineType;
         public Node Node => node;

@@ -65,6 +65,8 @@ namespace LineWars
 
         private void InitializeGameReferee()
         {
+            if (GameReferee.Instance == null)
+                Debug.LogError($"Нет {nameof(GameReferee)} на данной сцене");
             GameReferee.Instance.Initialize(Player.LocalPlayer, allPlayers.Where(x => x != Player.LocalPlayer));
             GameReferee.Instance.Wined += WinGame;
             GameReferee.Instance.Losed += LoseGame;

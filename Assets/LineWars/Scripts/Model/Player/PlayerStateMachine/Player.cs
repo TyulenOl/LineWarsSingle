@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Linq;
 using System.Collections.Generic;
 using LineWars.Controllers;
@@ -81,12 +82,15 @@ namespace LineWars
         {
             if(!(owned is Unit unit)) return;
             unit.ActionPointsChanged.AddListener(ProcessActionPointsChange);
+            unit.Died.AddListener(UnitOnDied);
         }
 
         private void OnOwnerRemoved(Owned owned)
         {
             if(!(owned is Unit unit)) return;
             unit.ActionPointsChanged.RemoveListener(ProcessActionPointsChange);
+            if (!unit.IsDied)
+                unit.Died.RemoveListener(UnitOnDied);
         }
 
         private void ProcessActionPointsChange(int previousValue, int currentValue)
@@ -185,7 +189,16 @@ namespace LineWars
         }
 
         #endregion
-
+        
+        private void UnitOnDied(Unit diedUnit)
+        {
+            StartCoroutine(UnitOnDiedCoroutine());
+            IEnumerator UnitOnDiedCoroutine()
+            {
+                yield return null;
+                RecalculateVisibility();
+            }
+        }
         private void OnExecuteCommand(IExecutor executor, ITarget target)
         {
             RecalculateVisibility();

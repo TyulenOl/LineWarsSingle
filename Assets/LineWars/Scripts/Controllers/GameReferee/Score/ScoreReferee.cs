@@ -26,7 +26,14 @@ namespace LineWars
             );
 
             foreach (var (player, score) in playersScore)
-                player.Defeaded += () => playersScore.Remove(player);
+                player.Defeaded += () =>
+                {
+                    playersScore.Remove(player);
+                    if (player == me)
+                        Lose();
+                    if (playersScore.Count == 1) // остался только игрок
+                        Win();
+                };
         }
 
         public int GetScoreForPlayer(BasePlayer basePlayer)
