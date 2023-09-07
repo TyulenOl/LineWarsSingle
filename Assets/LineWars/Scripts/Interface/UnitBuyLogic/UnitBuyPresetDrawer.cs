@@ -37,7 +37,6 @@ namespace LineWars.Interface
         {
             if(phaseTypeNew != PhaseType.Buy) return;
             SetAvailable(Player.LocalPlayer.CanSpawnPreset(unitBuyPreset));
-            Debug.Log($"{unitBuyPreset.Name} {Player.LocalPlayer.CanSpawnPreset(unitBuyPreset)}");
         }
 
         private void Init()
