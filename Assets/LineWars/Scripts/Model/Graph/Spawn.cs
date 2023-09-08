@@ -9,15 +9,14 @@ namespace LineWars.Model
     public class Spawn : MonoBehaviour
     {
         public const string DEFAULT_NAME = "";
-        public static readonly Color DefaultColor = Color.black;
 
         [field: Header("Logic")]
         [field: SerializeField] public PlayerRules Rules { get; set; }
         
         [field: Header("DEBUG")]
         [field: SerializeField] public string GroupName { get; set; } = DEFAULT_NAME;
-        [field: SerializeField] public Color GroupColor { get; set; } = DefaultColor;
-
+        [field: SerializeField] public Sprite GroupSprite { get; set; }
+        [field: SerializeField] public Sprite DefaultSprite { get; set; }
         [field: SerializeField, HideInInspector] public Node Node { get; private set; }
 
         private void OnValidate()
