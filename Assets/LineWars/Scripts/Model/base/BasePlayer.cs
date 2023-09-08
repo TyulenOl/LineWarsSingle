@@ -168,10 +168,21 @@ namespace LineWars.Model
 
         protected virtual void BeforeAddOwned(Node node)
         {
-            if (!node.IsDirty) CurrentMoney += Rules.MoneyForFirstCapturingNode;
-            Income += Mathf.RoundToInt(Rules.IncomeModifier.Modify(node.BaseIncome));
+            var nodeIncome = GetMyIncomeFromNode(node);
+            if (!node.IsDirty) CurrentMoney += GetMyCapturingMoneyFromNode(node);
+            Income += nodeIncome;
+        }
+
+        public int GetMyIncomeFromNode(Node node)
+        {
+            return Mathf.RoundToInt(Rules.IncomeModifier.Modify(node.BaseIncome));
         }
         
+        public int GetMyCapturingMoneyFromNode(Node node)
+        {
+            return Rules.MoneyForFirstCapturingNode + GetMyIncomeFromNode(node);
+        }
+
         protected virtual void BeforeAddOwned(Unit unit)
         {
             

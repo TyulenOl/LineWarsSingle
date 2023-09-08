@@ -12,6 +12,7 @@ namespace LineWars.Model
     [RequireComponent(typeof(RenderNodeV3))]
     public class Node : Owned, ITarget, INumbered
     {
+        private static Sprite defaultSprite;
         [SerializeField] private int index;
         [SerializeField] private List<Edge> edges;
 
@@ -85,8 +86,19 @@ namespace LineWars.Model
         {
             mainCamera = Camera.main;
             IsDirty = ReferenceToSpawn != null;
+            if (defaultSprite == null)
+            {
+                defaultSprite = Resources.Load<Sprite>("Sprites/Circle");
+            }
         }
 
+
+        private void Start()
+        {
+            var nodeInfoDrawer = GetComponent<NodeInfoDrawer>();
+            nodeInfoDrawer.ReDrawCapturingInfo(Player.LocalPlayer.GetMyCapturingMoneyFromNode(this));
+            nodeInfoDrawer.ReDrawIncomeInfo(Player.LocalPlayer.GetMyIncomeFromNode(this));
+        }
 
         private void OnEnable()
         {
@@ -182,6 +194,10 @@ namespace LineWars.Model
 
         protected override void OnSetOwner(BasePlayer oldPlayer, BasePlayer newPlayer)
         {
+            if (!IsDirty)
+            {
+                GetComponent<NodeInfoDrawer>().Capture();
+            }
             ReferenceToSpawn = newPlayer != null ? basePlayer.Base : null;
             IsDirty = true;
             Redraw();
@@ -198,23 +214,26 @@ namespace LineWars.Model
             else if (IsBase)
             {
                 gameObject.name = $"Spawn {ReferenceToSpawn.GroupName}";
-                GetComponent<SpriteRenderer>().color = ReferenceToSpawn.GroupColor;
+                var spriteRenderer = GetComponent<SpriteRenderer>();
+                spriteRenderer.sprite = ReferenceToSpawn.GroupSprite;
                 GetComponent<Outline2D>().SetActiveOutline(true);
             }
             else
             {
                 gameObject.name = $"Node{Index} Group with {ReferenceToSpawn.GroupName}";
-                GetComponent<SpriteRenderer>().color = ReferenceToSpawn.GroupColor;
+                var spriteRenderer = GetComponent<SpriteRenderer>();
+                spriteRenderer.sprite = ReferenceToSpawn.GroupSprite;
+                
             }
         }
         
         private void DrawToDefault()
         {
             gameObject.name = $"Node{Index}";
-            GetComponent<SpriteRenderer>().color = Spawn.DefaultColor;
+            var spriteRenderer = GetComponent<SpriteRenderer>();
+            spriteRenderer.sprite = defaultSprite;
             GetComponent<Outline2D>().SetActiveOutline(false);
         }
-        
 
         #endregion
     }
