@@ -505,7 +505,7 @@ namespace LineWars.Model
             return GetAllAvailableTargetsInRange((uint) currentActionPoints + 1);
         }
 
-        protected IEnumerable<(ITarget, CommandType)> GetAllAvailableTargetsInRange(uint range)
+        protected virtual IEnumerable<(ITarget, CommandType)> GetAllAvailableTargetsInRange(uint range)
         {
             foreach (var e in Graph.GetNodesInRange(node, range))
             foreach (var target in e.GetTargetsWithMe())

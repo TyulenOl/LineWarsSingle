@@ -28,13 +28,15 @@ public static class DrawHelper
         switch (commandType)
         {
             case CommandType.MeleeAttack:
-                return Resources.Load<Sprite>("UI/Icons/attack");
+                return Resources.Load<Sprite>("UI/Icons/Icon_Skull");
             case CommandType.Heal:
                 return Resources.Load<Sprite>("UI/Icons/HP");
             case CommandType.Fire:
                 return Resources.Load<Sprite>("UI/Icons/Icon_Focus");
             case CommandType.Move:
                 return Resources.Load<Sprite>("UI/Icons/Icon_Flag");
+            case CommandType.Build:
+                return Resources.Load<Sprite>("UI/Icons/Upgrade");
             default: return Resources.Load<Sprite>("UI/Icons/Icon_Focus");
         }
     }

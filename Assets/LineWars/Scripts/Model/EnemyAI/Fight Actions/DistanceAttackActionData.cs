@@ -93,8 +93,8 @@ namespace LineWars.Model
             target = targetUnit;
             path = Graph.FindShortestPath(distanceUnit.Node, nodeToWalk, this.distanceUnit);
             path.Remove(distanceUnit.Node);
-            score = GetScore();
             this.data = data;
+            score = GetScore();
         }
 
         public override void Execute()
