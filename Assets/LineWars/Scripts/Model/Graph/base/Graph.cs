@@ -210,32 +210,6 @@ namespace LineWars.Model
             }
         }
 
-        public static IEnumerable<Node> GetNodesInRange(Node startNode, uint range, Unit unit)
-        {
-            var queue = new Queue<Node>();
-            var distanceMemory = new Dictionary<Node, uint>();
-            
-            queue.Enqueue(startNode);
-            distanceMemory[startNode] = 0;
-            while (queue.Count != 0)
-            {
-                var node = queue.Dequeue();
-                yield return node;
-                foreach (var neighbor in node.GetNeighbors())
-                {
-                    if(!unit.CanMoveOnLineWithType(neighbor.GetLine(node).LineType)) continue;
-                    if(!CheckNodeForWalkability(neighbor, unit)) continue;
-                    if (distanceMemory.ContainsKey(neighbor)) continue;
-                    
-                    var distanceForNextNode = distanceMemory[node] + 1;
-                    if (distanceForNextNode >= range) continue;
-                    
-                    distanceMemory[neighbor] = distanceForNextNode;
-                    queue.Enqueue(neighbor);
-                }
-            }
-        }
-
         public static bool CheckNodeForWalkability(Node node, Unit unit)
         {
             if(unit.Size == UnitSize.Large && !(node.LeftUnit == null && node.RightUnit == null)) return false;

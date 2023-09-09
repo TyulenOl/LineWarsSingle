@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using LineWars.Controllers;
 using UnityEngine;
@@ -39,6 +40,7 @@ namespace LineWars.Model
         {
             if (edge == null) throw new ArgumentNullException(nameof(edge));
             edge.LevelUp();
+            CurrentActionPoints = engineerPointModifier.Modify(CurrentActionPoints);
             ActionCompleted.Invoke();
             SfxManager.Instance.Play(upRoadSFX);
         }

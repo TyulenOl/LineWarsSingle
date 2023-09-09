@@ -507,9 +507,19 @@ namespace LineWars.Model
 
         protected IEnumerable<(ITarget, CommandType)> GetAllAvailableTargetsInRange(uint range)
         {
+            var visibilityEdges = new HashSet<Edge>();
             foreach (var e in Graph.GetNodesInRange(node, range))
-            foreach (var target in e.GetTargetsWithMe())
-                yield return (target, UnitsController.Instance.GetCommandTypeBy(this, target));
+            {
+                foreach (var target in e.GetTargetsWithMe())
+                    yield return (target, UnitsController.Instance.GetCommandTypeBy(this, target));
+                foreach (var edge in node.Edges)
+                {
+                    if (visibilityEdges.Contains(edge))
+                        continue;
+                    visibilityEdges.Add(edge);
+                    yield return (edge, UnitsController.Instance.GetCommandTypeBy(this, edge));
+                }
+            }
         }
 
         public virtual CommandType GetAttackTypeBy(IAlive target) => CommandType.MeleeAttack;

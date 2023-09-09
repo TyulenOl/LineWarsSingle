@@ -11,8 +11,9 @@ namespace LineWars.Model
         public const string DEFAULT_NAME = "";
 
         [field: Header("Logic")]
-        [field: SerializeField] public PlayerRules Rules { get; set; }
-        
+        [field: SerializeField] public PlayerRules Rules { get; private set; }
+        [field: SerializeField] public Nation Nation { get; private set; }
+
         [field: Header("DEBUG")]
         [field: SerializeField] public string GroupName { get; set; } = DEFAULT_NAME;
         [field: SerializeField] public Sprite GroupSprite { get; set; }

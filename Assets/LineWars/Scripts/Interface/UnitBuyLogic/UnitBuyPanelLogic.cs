@@ -19,7 +19,7 @@ namespace LineWars.Interface
 
         public void Awake()
         {
-            nation = NationHelper.GetNationByType(Player.LocalPlayer.NationType);
+            nation = Player.LocalPlayer.MyNation;
             GeneratePresets();
         }
 

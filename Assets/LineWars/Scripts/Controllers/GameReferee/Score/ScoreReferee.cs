@@ -26,7 +26,7 @@ namespace LineWars
             );
 
             foreach (var (player, score) in playersScore)
-                player.Defeaded += () =>
+                player.Defeated += () =>
                 {
                     playersScore.Remove(player);
                     if (player == me)

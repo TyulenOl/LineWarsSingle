@@ -14,6 +14,7 @@ namespace LineWars.Model
         [field: SerializeField] public SerializedDictionary<UnitType, Unit> UnitTypeUnitPairs { get; private set; } = new();
         
         public NationEconomicLogic NationEconomicLogic => nationEconomicLogic;
+        
         private void OnEnable()
         {
             ValidateUnitTypeUnitPairs();

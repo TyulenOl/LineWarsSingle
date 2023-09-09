@@ -14,8 +14,6 @@ namespace LineWars.Model
     public abstract class BasePlayer : MonoBehaviour, IActor
     {
         [field: SerializeField, ReadOnlyInspector] public int Index { get; private set; }
-
-        [SerializeField, ReadOnlyInspector] private NationType nationType;
         [SerializeField, ReadOnlyInspector] private int money;
         /// <summary>
         /// Для оптимизации income всегда хешируется
@@ -23,25 +21,14 @@ namespace LineWars.Model
         [SerializeField, ReadOnlyInspector] private int income;
         
         [field: SerializeField, ReadOnlyInspector] public Spawn Base { get; private set; }
-
         [field: SerializeField, ReadOnlyInspector] private PlayerRules Rules { get;  set; }
 
         public PhaseType CurrentPhase { get; private set; }
+        public Nation MyNation { get; private set; }
 
         private HashSet<Owned> myOwned;
-        protected Nation Nation;
         private bool isFirstReplenish = true;
         
-        public NationType NationType
-        {
-            get => nationType;
-            set
-            {
-                nationType = value;
-                Nation = NationHelper.GetNationByType(nationType);
-            }
-        }
-
         private IEnumerable<Node> MyNodes => myOwned.OfType<Node>();
         protected IEnumerable<Unit> MyUnits => myOwned.OfType<Unit>();
 
@@ -50,7 +37,7 @@ namespace LineWars.Model
         public event Action<Owned> OwnedRemoved;
         public event Action<int, int> CurrentMoneyChanged;
         public event Action<int, int> IncomeChanged;
-        public event Action Defeaded; 
+        public event Action Defeated; 
         public IReadOnlyCollection<Owned> OwnedObjects => myOwned;
         public bool IsMyOwn(Owned owned) => myOwned.Contains(owned);
 
@@ -109,7 +96,7 @@ namespace LineWars.Model
 
             CurrentMoney = Rules.StartMoney;
             Income = Rules.DefaultIncome;
-            NationType = Rules.Nation;
+            MyNation = spawnInfo.SpawnNode.Nation;
         }
 
         public bool CanSpawnPreset(UnitBuyPreset preset)
@@ -225,7 +212,7 @@ namespace LineWars.Model
         public void Defeat()
         {
             OnDefeat();
-            Defeaded?.Invoke();
+            Defeated?.Invoke();
         }
         protected virtual void OnDefeat()
         {
@@ -238,7 +225,7 @@ namespace LineWars.Model
             Destroy(gameObject);
         }
         
-        public Unit GetUnitPrefab(UnitType unitType) => Nation.GetUnitPrefab(unitType);
+        public Unit GetUnitPrefab(UnitType unitType) => MyNation.GetUnitPrefab(unitType);
 
         public void ExecuteTurn(PhaseType phaseType)
         {
