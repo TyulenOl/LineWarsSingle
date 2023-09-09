@@ -38,7 +38,7 @@ namespace LineWars.Model
         /// </summary>
         [SerializeField] protected bool onslaught = false;
         /// <summary>
-        /// теряет ли юнит блок после контратаки?
+        /// юнит с этим флагом всегда контратакует
         /// </summary>
         [SerializeField] protected bool protection = false;
 
@@ -134,7 +134,8 @@ namespace LineWars.Model
             {
                 var before = isBlocked;
                 isBlocked = value;
-                CanBlockChanged.Invoke(before, isBlocked);
+                if (before != isBlocked)
+                    CanBlockChanged.Invoke(before, isBlocked);
             }
         }
 
@@ -311,7 +312,7 @@ namespace LineWars.Model
             if (notBlockedDamage != 0)
                 CurrentHp -= notBlockedDamage;
 
-            if (hit is {Source: Unit enemy, IsRangeAttack: false})
+            if (!IsDied && hit is {Source: Unit enemy, IsRangeAttack: false})
                 UnitsController.ExecuteCommand(new ContrAttackCommand(this, enemy), false);
         }
 
@@ -407,7 +408,7 @@ namespace LineWars.Model
         {
             if (enemy == null) throw new ArgumentNullException(nameof(enemy));
             return canContrAttack 
-                   && IsBlocked
+                   && (IsBlocked || protection)
                    && contrAttackDamageModifier.Modify(Damage) > 0
                    && BaseMeleeAttackCondition(enemy);
         }
@@ -418,9 +419,7 @@ namespace LineWars.Model
             var contrAttackDamage = contrAttackDamageModifier.Modify(Damage);
           
             enemy.TakeDamage(new Hit(contrAttackDamage, this, enemy));
-            
-            if (!protection)
-                IsBlocked = false;
+            IsBlocked = false;
         }
 
         #endregion
