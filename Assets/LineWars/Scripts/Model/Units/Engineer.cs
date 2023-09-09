@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using LineWars.Controllers;
 using UnityEngine;
@@ -39,8 +40,26 @@ namespace LineWars.Model
         {
             if (edge == null) throw new ArgumentNullException(nameof(edge));
             edge.LevelUp();
+            CurrentActionPoints = engineerPointModifier.Modify(CurrentActionPoints);
             ActionCompleted.Invoke();
             SfxManager.Instance.Play(upRoadSFX);
+        }
+
+        protected override IEnumerable<(ITarget, CommandType)> GetAllAvailableTargetsInRange(uint range)
+        {
+            var visibilityEdges = new HashSet<Edge>();
+            foreach (var e in Graph.GetNodesInRange(Node, range))
+            {
+                foreach (var target in e.GetTargetsWithMe())
+                    yield return (target, UnitsController.Instance.GetCommandTypeBy(this, target));
+                foreach (var edge in Node.Edges)
+                {
+                    if (visibilityEdges.Contains(edge))
+                        continue;
+                    visibilityEdges.Add(edge);
+                    yield return (edge, UnitsController.Instance.GetCommandTypeBy(this, edge));
+                }
+            }
         }
     }
 }
