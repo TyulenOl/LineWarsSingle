@@ -1,30 +1,31 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using LineWars.Controllers;
 
-[RequireComponent(typeof(Slider))]
-public class VolumeSlider : MonoBehaviour
+namespace LineWars.Interface
 {
-    [SerializeField] private string mixerParam;
-    private Slider slider;
-
-    private void Awake()
+    [RequireComponent(typeof(Slider))]
+    public class VolumeSlider : MonoBehaviour
     {
-        slider = GetComponent<Slider>();
-    }
+        [SerializeField] private VolumeType channelType;
+        private Slider slider;
 
-    private void Start()
-    {
-        VolumeUpdater.Instance.Mixer.GetFloat(mixerParam, out var mixerVolume);
-        var volume = Mathf.Pow(10, mixerVolume / 20);
-        slider.value = volume;
-        slider.onValueChanged.AddListener(OnValueChanged);
-    }
+        private void Awake()
+        {
+            slider = GetComponent<Slider>();
+        }
 
-    private void OnValueChanged(float value)
-    {
-        VolumeUpdater.Instance.SetVolume(mixerParam, value);
+        private void Start()
+        {
+            var volume = VolumeUpdater.Instance.GetVolume(channelType);
+            slider.value = volume;
+            slider.onValueChanged.AddListener(OnValueChanged);
+        }
+
+        private void OnValueChanged(float value)
+        {
+            VolumeUpdater.Instance.SetVolume(channelType, value);
+        }
     }
 }
+

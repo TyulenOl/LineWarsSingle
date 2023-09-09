@@ -1,68 +1,107 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using LineWars;
 using UnityEngine;
 using UnityEngine.Audio;
-using UnityEngine.Serialization;
 
-public class VolumeUpdater : MonoBehaviour
+namespace LineWars.Controllers
 {
-    public static VolumeUpdater Instance { get; private set; }
-    [SerializeField] private string musicMixerParam;
-    [SerializeField] private string sfxMixerParam;
-    [field: SerializeField] public AudioMixer Mixer { get; private set; }
-
-    private void Awake()
+    public enum VolumeType
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Debug.LogError("More than two VolumeUpdaters on the Scene");
-        }
+        Master,
+        Music,
+        SFX
     }
-
-    private void OnEnable()
+    public class VolumeUpdater : MonoBehaviour
     {
-        Debug.Log(PlayerPrefs.GetFloat(musicMixerParam));
-        if (!PlayerPrefs.HasKey(musicMixerParam))
+        public static VolumeUpdater Instance { get; private set; }
+        [SerializeField] private AudioMixer mixer;
+        
+        private void Awake()
         {
-            PlayerPrefs.SetFloat(musicMixerParam, 1);
+            if (Instance == null)
+            {
+                Instance = this;
+            }
+            else
+            {
+                Debug.LogError("More than two VolumeUpdaters on the Scene");
+            }
         }
 
-        if (!PlayerPrefs.HasKey(sfxMixerParam))
+        private void Start()
         {
-            PlayerPrefs.SetFloat(sfxMixerParam, 1);
+            LoadSettings();
+        }
+
+        public void OnDisable()
+        {
+            Save();
+        }
+
+        private void LoadSettings()
+        {
+            foreach (VolumeType channelType in Enum.GetValues(typeof(VolumeType)))
+            {
+                LoadChannel(channelType);
+            }
+            
+            void LoadChannel(VolumeType channelType)
+            {
+                var param = channelType.ToString();
+                if (!PlayerPrefs.HasKey(param))
+                {
+                    PlayerPrefs.SetFloat(param, 1);
+                }
+
+                var volume = FloatToMixer(PlayerPrefs.GetFloat(param));
+                mixer.SetFloat(param, volume);
+            }
         }
         
-        var musicVolume = Mathf.Log10(PlayerPrefs.GetFloat(musicMixerParam)) * 20;
-        var sfxVolume = Mathf.Log10(PlayerPrefs.GetFloat(sfxMixerParam)) * 20;
-        Mixer.SetFloat(sfxMixerParam, musicVolume);
-        Mixer.SetFloat(musicMixerParam, sfxVolume);
-    }
-
-    public void SetVolume(string mixerParam, float value)
-    {
-        if (value == 0)
+        public void Save()
         {
-            Mixer.SetFloat(mixerParam, -80);
-            return;
+            foreach (VolumeType volumeType in Enum.GetValues(typeof(VolumeType)))
+            {
+                SaveChannel(volumeType);
+            }
+            
+            void SaveChannel(VolumeType channelType)
+            {
+                var param = channelType.ToString();
+                mixer.GetFloat(param, out var mixerVolume);
+                var volume = MixerToFloat(mixerVolume);
+                PlayerPrefs.SetFloat(param, volume);
+            }
+            
+            PlayerPrefs.Save();
         }
-        Mixer.SetFloat(mixerParam, Mathf.Log10(value) * 20);
-    }
+        
+        public void SetVolume(VolumeType channel, float value)
+        {
+            var mixerParam = channel.ToString();
+            if (value == 0)
+            {
+                mixer.SetFloat(mixerParam, -80);
+                return;
+            }
+            mixer.SetFloat(mixerParam, FloatToMixer(value));
+        }
 
-    public void OnDisable()
-    {
-        Mixer.GetFloat(musicMixerParam, out var musicMixerVolume);
-        var musicVolume = Mathf.Pow(10, musicMixerVolume / 20);
-        Mixer.GetFloat(sfxMixerParam, out var sfxMixerVolume);
-        var sfxVolume = Mathf.Pow(10, sfxMixerVolume / 20);
-        PlayerPrefs.SetFloat(musicMixerParam, musicVolume);
-        PlayerPrefs.SetFloat(sfxMixerParam, sfxVolume);
-        PlayerPrefs.Save();
-        Debug.Log("Disable");
+        public float GetVolume(VolumeType channel)
+        {
+            var mixerParam = channel.ToString();
+            mixer.GetFloat(mixerParam, out var value);
+            return MixerToFloat(value);
+        }
+
+        public static float MixerToFloat(float value)
+        {
+            return Mathf.Pow(10, value / 20);
+        }
+
+        public static float FloatToMixer(float value)
+        {
+            return Mathf.Log10(value) * 20;
+        }
     }
 }
+
