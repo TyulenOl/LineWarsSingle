@@ -6,9 +6,11 @@ using UnityEngine.UI;
 
 namespace LineWars
 {
-    public class MissionUI: MonoBehaviour, IPointerClickHandler
+    [RequireComponent(typeof(Button))]
+    public class MissionUI: MonoBehaviour
     {
         [SerializeField] private TMP_Text missionName;
+        private Button button;
 
         private MissionState currentState;
         private Action<MissionState> clicked;
@@ -17,7 +19,13 @@ namespace LineWars
         {
             CheckValid();
         }
-        
+
+        private void Start()
+        {
+            button = GetComponent<Button>();
+            button.onClick.AddListener(OnClickButton);
+        }
+
         private void OnClickButton()
         {
             clicked?.Invoke(currentState);
@@ -36,11 +44,6 @@ namespace LineWars
             missionName.text = $"{index} - {data.MissionName}";
             this.clicked = clicked;
             this.currentState = state;
-        }
-
-        public void OnPointerClick(PointerEventData eventData)
-        {
-            clicked?.Invoke(currentState);
         }
     }
 }

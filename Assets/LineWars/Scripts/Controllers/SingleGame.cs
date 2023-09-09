@@ -128,10 +128,5 @@ namespace LineWars
             WinLoseUI.isWin = false;
             SceneTransition.LoadScene(SceneName.WinOrLoseScene);
         }
-
-        public void ToMainMenu()
-        {
-            SceneTransition.LoadScene(SceneName.MainMenu);
-        }
     }
 }
