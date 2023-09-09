@@ -24,7 +24,7 @@ namespace LineWars.Model
         
         [field: SerializeField, ReadOnlyInspector] public Spawn Base { get; private set; }
 
-        [field: SerializeField, ReadOnlyInspector] public PlayerRules Rules { get; private set; }
+        [field: SerializeField, ReadOnlyInspector] private PlayerRules Rules { get;  set; }
 
         public PhaseType CurrentPhase { get; private set; }
 
