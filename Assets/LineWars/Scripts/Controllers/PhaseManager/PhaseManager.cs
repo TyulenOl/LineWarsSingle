@@ -24,7 +24,9 @@ namespace LineWars
         private PhaseAlternatingState fightState;
         private PhaseAlternatingState scoutState;
         private PhaseSimultaneousState replenishState;
+        
         private Dictionary<PhaseType, Phase> typeToPhase;
+        private int currentActorId;
 
         public IReadOnlyList<IActor> Actors => actors.AsReadOnly();
         public PhaseType CurrentPhase => ((Phase)stateMachine.CurrentState).Type;
