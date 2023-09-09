@@ -31,7 +31,7 @@ namespace LineWars.Model
 
         [Header("Attack Settings")]
         [SerializeField] protected bool attackLocked = false;
-        [SerializeField, Min(0)] protected int damage;
+        [SerializeField, Min(0)] private int damage;
         [SerializeField] protected bool isPenetratingDamage = false;
         /// <summary>
         /// указывет на то, нужно ли захватывать точку после атаки

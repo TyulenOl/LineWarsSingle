@@ -12,7 +12,7 @@ public class UnitPartDrawer : MonoBehaviour
     [SerializeField] private TMP_Text UnitName;
     [SerializeField] private SpriteRenderer ifInactivePanel;    
     [SerializeField] private SpriteRenderer ifAvailablePanel;
-    [SerializeField] private Image unitIsExecutorImage;
+    [SerializeField] private SpriteRenderer unitIsExecutorImage;
     [SerializeField] private SpriteRenderer canBlockSprite;
     [field: SerializeField] public SpriteRenderer targetSprite { get; private set; }
     

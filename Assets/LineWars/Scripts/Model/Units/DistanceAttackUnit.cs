@@ -1,4 +1,5 @@
-﻿using LineWars.Controllers;
+﻿using System.Collections.Generic;
+using LineWars.Controllers;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,7 +11,7 @@ namespace LineWars.Model
         [field: SerializeField, Min(0)] public int Distance { get; private set; }
 
         [Header("Sound Settings")] 
-        [SerializeField] private SFXData distanceAttackSFX;
+        [SerializeField] protected SFXData distanceAttackSFX;
 
         public override bool CanAttack(Unit unit) => CanAttack(unit, Node);
 
@@ -25,21 +26,26 @@ namespace LineWars.Model
 
         public override void Attack(Unit enemy)
         {
-            DistanceAttack(enemy);
+            DistanceAttack(enemy, Damage);
+            SfxManager.Instance.Play(distanceAttackSFX);
         }
 
-        protected void DistanceAttack(IAlive alive)
+        protected void DistanceAttack(IAlive alive, int damage)
         {
-            alive.TakeDamage(new Hit(Damage, this, alive, isPenetratingDamage, true));
+            alive.TakeDamage(new Hit(damage, this, alive, isPenetratingDamage, true));
             CurrentActionPoints = attackPointsModifier.Modify(CurrentActionPoints);
         
             ActionCompleted.Invoke();
-            SfxManager.Instance.Play(distanceAttackSFX);
         }
 
         public override CommandType GetAttackTypeBy(IAlive target)
         {
             return CommandType.Fire;
+        }
+        
+        public override IEnumerable<(ITarget, CommandType)> GetAllAvailableTargets()
+        {
+            return GetAllAvailableTargetsInRange((uint)Distance + 1);
         }
     }
 }

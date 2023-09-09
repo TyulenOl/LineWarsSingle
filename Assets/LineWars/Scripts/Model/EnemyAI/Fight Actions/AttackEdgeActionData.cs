@@ -89,6 +89,7 @@ namespace LineWars.Model
             path = Graph.FindShortestPath(artillery.Node, node, artillery);
             path.Remove(this.artillery.Node);
             score = GetScore();
+            this.data = data;
         }
 
         public override void Execute()

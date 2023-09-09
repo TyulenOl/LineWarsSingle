@@ -77,12 +77,12 @@ namespace LineWars.Model
     {
         private readonly Node nodeToWalk;
         private readonly Unit target;
-        private readonly Artillery distanceUnit;
+        private readonly DistanceAttackUnit distanceUnit;
         private readonly List<Node> path;
         private readonly DistanceAttackActionData data;
         public DistanceAttackAction(EnemyAI basePlayer, IExecutor executor, Node node, Unit targetUnit) : base(basePlayer, executor)
         {
-            if (executor is not Artillery distanceUnit)
+            if (executor is not DistanceAttackUnit distanceUnit)
             {
                 Debug.LogError($"{executor} is not a DistanceUnit!");
                 return;

@@ -18,12 +18,10 @@ namespace LineWars.Interface
         
         [Header("Reference")]
         [SerializeField] private UnitDamageAnimator leftPart;
-        [SerializeField] private UnitDamageAnimator centerPart;
         [SerializeField] private UnitDamageAnimator rightPart;
         
         [Header("CharacteristicsDrawers")]
         [SerializeField] private UnitPartDrawer leftDrawer;
-        [SerializeField] private UnitPartDrawer centerDrawer;
         [SerializeField] private UnitPartDrawer rightDrawer;
 
         private Unit unit;
@@ -46,18 +44,13 @@ namespace LineWars.Interface
                 leftPart.offset = offset;
             }
             
-            if (centerPart != null)
-            {
-                centerPart.offset = offset;
-            }
-            
             if (rightPart != null)
             {
                 rightPart.offset = offset;
             }
 
             allDrawers = new List<UnitPartDrawer>
-            { leftDrawer, rightDrawer, centerDrawer }
+            { leftDrawer, rightDrawer }
                 .Where(x => x is not null)
                 .ToList();
             
@@ -65,8 +58,6 @@ namespace LineWars.Interface
                 leftDrawer.CurrentUnit = unit;
             if(rightDrawer != null)
                 rightDrawer.CurrentUnit = unit;
-            if (centerDrawer != null)
-                centerDrawer.CurrentUnit = unit;
 
             targetDrawer = GetComponent<TargetDrawer>();
         }
@@ -90,19 +81,14 @@ namespace LineWars.Interface
         {
             if (size == UnitSize.Little && direction == UnitDirection.Left)
                 DrawLeft();
-            else if (size == UnitSize.Little && direction == UnitDirection.Right)
+            else 
                 DrawRight();
-            else
-                DrawCenter();
         }
 
         private void OnUnitArmorChange(int before, int after)
         {
             if (leftPart != null && leftPart.gameObject.activeSelf)
                 leftPart.AnimateDamageText((after - before).ToString(), armorDamageColor);
-            
-            if (centerPart != null && centerPart.gameObject.activeSelf)
-                centerPart.AnimateDamageText((after - before).ToString(), armorDamageColor);
             
             if (rightPart != null && rightPart.gameObject.activeSelf)
                 rightPart.AnimateDamageText((after - before).ToString(), armorDamageColor);
@@ -116,9 +102,6 @@ namespace LineWars.Interface
             
             if (leftPart != null && leftPart.gameObject.activeSelf)
                 leftPart.AnimateDamageText((diff).ToString(), color);
-            
-            if (centerPart != null && centerPart.gameObject.activeSelf)
-                centerPart.AnimateDamageText((diff).ToString(), color);
             
             if (rightPart != null && rightPart.gameObject.activeSelf)
                 rightPart.AnimateDamageText((diff).ToString(), color);
@@ -140,31 +123,15 @@ namespace LineWars.Interface
                 leftPart.gameObject.SetActive(true);
                 targetDrawer.image = leftDrawer.targetSprite;
             }
-            if (centerPart != null)
-                centerPart.gameObject.SetActive(false);
+            
             if (rightPart != null)
                 rightPart.gameObject.SetActive(false);
         }
-
-        public void DrawCenter()
-        {
-            if (leftPart != null)
-                leftPart.gameObject.SetActive(false);
-            if (centerPart != null)
-            {
-                centerPart.gameObject.SetActive(true);
-                targetDrawer.image = centerDrawer.targetSprite;
-            }
-            if (rightPart != null)
-                rightPart.gameObject.SetActive(false);
-        }
-
+        
         public void DrawRight()
         {
             if (leftPart != null)
                 leftPart.gameObject.SetActive(false);
-            if (centerPart != null)
-                centerPart.gameObject.SetActive(false);
             if (rightPart != null)
             {
                 rightPart.gameObject.SetActive(true);

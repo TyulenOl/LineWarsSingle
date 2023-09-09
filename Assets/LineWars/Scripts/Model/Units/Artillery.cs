@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using LineWars.Controllers;
+using UnityEngine;
 
 namespace LineWars.Model
 {
@@ -24,22 +26,28 @@ namespace LineWars.Model
         public override void Attack(Edge edge)
         {
             var explosion = Instantiate(explosionPrefab);
+            SfxManager.Instance.Play(distanceAttackSFX);
             explosion.transform.position = edge.transform.position;
             explosion.ExplosionEnded += () =>
             {
-                DistanceAttack(edge);
+                DistanceAttack(edge, Damage);
             };
         }
         
         public override void Attack(Unit enemy)
         {
             var explosion = Instantiate(explosionPrefab);
+            SfxManager.Instance.Play(distanceAttackSFX);
             explosion.transform.position = enemy.Node.Position;
             explosion.ExplosionEnded += () =>
             {
-                if (enemy.TryGetNeighbour(out var neighbour)) 
-                    DistanceAttack(neighbour);
-                DistanceAttack(enemy);
+                var damage = Damage;
+                if (enemy.TryGetNeighbour(out var neighbour))
+                {
+                    damage /= 2;
+                    DistanceAttack(neighbour, damage);
+                }
+                DistanceAttack(enemy, damage);
             };
 
         }
