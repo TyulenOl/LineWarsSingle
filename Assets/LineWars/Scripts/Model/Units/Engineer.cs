@@ -44,5 +44,22 @@ namespace LineWars.Model
             ActionCompleted.Invoke();
             SfxManager.Instance.Play(upRoadSFX);
         }
+
+        protected override IEnumerable<(ITarget, CommandType)> GetAllAvailableTargetsInRange(uint range)
+        {
+            var visibilityEdges = new HashSet<Edge>();
+            foreach (var e in Graph.GetNodesInRange(Node, range))
+            {
+                foreach (var target in e.GetTargetsWithMe())
+                    yield return (target, UnitsController.Instance.GetCommandTypeBy(this, target));
+                foreach (var edge in Node.Edges)
+                {
+                    if (visibilityEdges.Contains(edge))
+                        continue;
+                    visibilityEdges.Add(edge);
+                    yield return (edge, UnitsController.Instance.GetCommandTypeBy(this, edge));
+                }
+            }
+        }
     }
 }

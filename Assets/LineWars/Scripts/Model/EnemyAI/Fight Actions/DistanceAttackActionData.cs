@@ -45,7 +45,7 @@ namespace LineWars.Model
             if(actionPoints > 0 && pointsAfterAttack >= 0)
                 foreach (var enemy in enemies)
                 {
-                    list.Add(new DistanceAttackAction(basePlayer, distanceUnit, node, enemy));
+                    list.Add(new DistanceAttackAction(basePlayer, distanceUnit, node, enemy, this));
                 }
         }
 
@@ -80,7 +80,7 @@ namespace LineWars.Model
         private readonly DistanceAttackUnit distanceUnit;
         private readonly List<Node> path;
         private readonly DistanceAttackActionData data;
-        public DistanceAttackAction(EnemyAI basePlayer, IExecutor executor, Node node, Unit targetUnit) : base(basePlayer, executor)
+        public DistanceAttackAction(EnemyAI basePlayer, IExecutor executor, Node node, Unit targetUnit, DistanceAttackActionData data) : base(basePlayer, executor)
         {
             if (executor is not DistanceAttackUnit distanceUnit)
             {
@@ -93,6 +93,7 @@ namespace LineWars.Model
             target = targetUnit;
             path = Graph.FindShortestPath(distanceUnit.Node, nodeToWalk, this.distanceUnit);
             path.Remove(distanceUnit.Node);
+            this.data = data;
             score = GetScore();
         }
 

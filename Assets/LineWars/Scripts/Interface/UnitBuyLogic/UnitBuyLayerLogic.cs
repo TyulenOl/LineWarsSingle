@@ -13,6 +13,7 @@ public class UnitBuyLayerLogic : MonoBehaviour
     [SerializeField] private Button buyButton;
     [SerializeField] private DescriptionPanelLogic descriptionPanelLogic;
 
+
     private UnitBuyPresetDrawer chosenUnitPresetDrawer;
 
     public UnitBuyPresetDrawer ChosenUnitPresetDrawer
@@ -23,7 +24,7 @@ public class UnitBuyLayerLogic : MonoBehaviour
             chosenUnitPresetDrawer?.SetChosen(false);
             chosenUnitPresetDrawer = value;
             chosenUnitPresetDrawer?.SetChosen(true);
-            buyButton.interactable = value != null;
+            buyButton.interactable = value != null && value.IsAvailable;
             descriptionPanelLogic.ReDrawDescription(ChosenUnitPresetDrawer?.UnitBuyPreset);
         }
     }
