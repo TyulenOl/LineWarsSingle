@@ -1,4 +1,5 @@
-﻿using LineWars.Model;
+﻿using System;
+using LineWars.Model;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -10,20 +11,25 @@ public class NodeEditor : Editor
 
     public void OnSceneGUI()
     {
-        if (EditorSceneManager.IsPreviewSceneObject(Node.gameObject))
+        if (EditorSceneManager.IsPreviewSceneObject(Node.gameObject) || Application.isPlaying)
         {
-            Debug.Log("SSSSSSSSSSSS");
-            
             return;
         }
         
-        Node.Redraw();
-        foreach (var edge in Node.Edges)
+        try
         {
-            edge.Redraw();
-            EditorUtility.SetDirty(edge);
-        }
+            Node.Redraw();
+            foreach (var edge in Node.Edges)
+            {
+                edge.Redraw();
+                EditorUtility.SetDirty(edge);
+            }
 
-        EditorUtility.SetDirty(Node);
+            EditorUtility.SetDirty(Node);
+        }
+        catch (Exception)
+        {
+            Debug.LogWarning("Произошла какая-то ошибка");
+        }
     }
 }

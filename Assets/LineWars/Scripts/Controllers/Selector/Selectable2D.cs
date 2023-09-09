@@ -14,11 +14,11 @@ namespace LineWars
         ///</summary>
         public event Func<GameObject, PointerEventData, GameObject> PointerClicked;
 
-        private void OnValidate()
-        {
-            if (GetComponent<Collider2D>() == null)
-                Debug.LogWarning($"У {gameObject.name} нет коллайдера!");
-        }
+        // private void OnValidate()
+        // {
+        //     if (GetComponent<Collider2D>() == null)
+        //         Debug.LogWarning($"У {gameObject.name} нет коллайдера!");
+        // }
 
         public void OnPointerClick(PointerEventData eventData)
         {

@@ -12,7 +12,6 @@ namespace LineWars.Model
     [RequireComponent(typeof(RenderNodeV3))]
     public class Node : Owned, ITarget, INumbered
     {
-        private static Sprite defaultSprite;
         [SerializeField] private int index;
         [SerializeField] private List<Edge> edges;
 
@@ -86,10 +85,6 @@ namespace LineWars.Model
         {
             mainCamera = Camera.main;
             IsDirty = ReferenceToSpawn != null;
-            if (defaultSprite == null)
-            {
-                defaultSprite = Resources.Load<Sprite>("Sprites/Circle");
-            }
         }
 
 
@@ -231,7 +226,7 @@ namespace LineWars.Model
         {
             gameObject.name = $"Node{Index}";
             var spriteRenderer = GetComponent<SpriteRenderer>();
-            spriteRenderer.sprite = defaultSprite;
+            spriteRenderer.sprite = Resources.Load<Sprite>("Sprites/Circle");;
             GetComponent<Outline2D>().SetActiveOutline(false);
         }
 

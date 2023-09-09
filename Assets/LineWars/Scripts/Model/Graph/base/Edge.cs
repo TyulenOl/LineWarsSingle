@@ -27,13 +27,11 @@ namespace LineWars.Model
             maxHp = 0;
         }
     }
-
-    [RequireComponent(typeof(SpriteRenderer))]
-    [RequireComponent(typeof(BoxCollider2D))]
+    
     public class Edge : MonoBehaviour, IAlive, ITarget, INumbered, ISerializationCallbackReceiver
     {
-        [Header("Graph Settings")] [SerializeField]
-        private int index;
+        [Header("Graph Settings")]
+        [SerializeField] private int index;
 
         [SerializeField] private Node firstNode;
         [SerializeField] private Node secondNode;
@@ -44,11 +42,11 @@ namespace LineWars.Model
         [SerializeField, NamedArray("lineType")]
         private List<LineTypeCharacteristics> lineTypeCharacteristics;
 
-        [Header("Commands Settings")] [SerializeField]
-        private CommandPriorityData priorityData;
+        [Header("Commands Settings")] 
+        [SerializeField] private CommandPriorityData priorityData;
 
-        [Header("DEBUG")] [SerializeField] [ReadOnlyInspector]
-        private int hp;
+        [Header("DEBUG")] 
+        [SerializeField] [ReadOnlyInspector] private int hp;
 
         [field: Header("Events")]
         [field: SerializeField]
@@ -57,11 +55,13 @@ namespace LineWars.Model
         [field: SerializeField] public UnityEvent<LineType, LineType> LineTypeChanged { get; private set; }
 
         private Dictionary<LineType, LineTypeCharacteristics> lineMap;
-        [SerializeField, HideInInspector] private SpriteRenderer spriteRenderer;
-        [SerializeField, HideInInspector] private BoxCollider2D boxCollider2D;
+        
+        [Header("References")]
+        [SerializeField] private SpriteRenderer edgeSpriteRenderer;
+        [SerializeField] private BoxCollider2D edgeCollider;
 
-        public SpriteRenderer SpriteRenderer => spriteRenderer;
-        public BoxCollider2D BoxCollider2D => boxCollider2D;
+        public SpriteRenderer SpriteRenderer => edgeSpriteRenderer;
+        public BoxCollider2D BoxCollider2D => edgeCollider;
 
         public int Index
         {
@@ -122,7 +122,6 @@ namespace LineWars.Model
         protected void OnValidate()
         {
             hp = MaxHp;
-            AssignFields();
         }
 
 
@@ -188,25 +187,17 @@ namespace LineWars.Model
             var center = v1;
             var newSecondNodePosition = v2 - center;
             var radian = Mathf.Atan2(newSecondNodePosition.y, newSecondNodePosition.x) * 180 / Mathf.PI;
-            spriteRenderer.transform.rotation = Quaternion.Euler(0, 0, radian);
-            spriteRenderer.transform.position = (v1 + v2) / 2;
+            edgeSpriteRenderer.transform.rotation = Quaternion.Euler(0, 0, radian);
+            edgeSpriteRenderer.transform.position = (v1 + v2) / 2;
 
-            spriteRenderer.size = new Vector2(distance, CurrentWidth);
-            spriteRenderer.sprite = CurrentSprite;
+            edgeSpriteRenderer.size = new Vector2(distance, CurrentWidth);
+            edgeSpriteRenderer.sprite = CurrentSprite;
         }
 
 
         private void AlineCollider()
         {
-            boxCollider2D.size = spriteRenderer.size;
-        }
-
-        private void AssignFields()
-        {
-            if (spriteRenderer == null)
-                spriteRenderer = GetComponent<SpriteRenderer>();
-            if (boxCollider2D == null)
-                boxCollider2D = GetComponent<BoxCollider2D>();
+            edgeCollider.size = edgeSpriteRenderer.size;
         }
     }
 }

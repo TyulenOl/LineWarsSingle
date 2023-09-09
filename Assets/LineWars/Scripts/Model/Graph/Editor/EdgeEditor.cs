@@ -11,12 +11,19 @@ public class EdgeEditor: Editor
 
     private void OnSceneGUI()
     {
-        if (EditorSceneManager.IsPreviewSceneObject(Edge.gameObject))
+        if (EditorSceneManager.IsPreviewSceneObject(Edge.gameObject) || Application.isPlaying)
         {
             return;
-            
         }
-        Edge.Redraw();
-        EditorUtility.SetDirty(Edge);
+
+        try
+        {
+            Edge.Redraw();
+            EditorUtility.SetDirty(Edge);
+        }
+        catch (Exception)
+        {
+            Debug.LogWarning("Произошла какая-то ошибка");
+        }
     }
 }
