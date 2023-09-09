@@ -12,11 +12,16 @@ namespace LineWars.Interface
         [SerializeField] private Image image;
         [SerializeField] private Button button;
         [SerializeField] private Image ifChosenPanel;
+        [SerializeField] private Image ifUnAvailablePanel;
         [SerializeField] private Image ifAvailablePanel;
+
+        private bool isAvailable;
         
         public Button Button => button;
 
         private UnitBuyPreset unitBuyPreset;
+
+        public bool IsAvailable => isAvailable;
 
         public UnitBuyPreset UnitBuyPreset
         {
@@ -46,15 +51,19 @@ namespace LineWars.Interface
             SetAvailable(Player.LocalPlayer.CanSpawnPreset(unitBuyPreset));
         }
 
+        
         public void SetChosen(bool isChosen)
         {
-            ifChosenPanel.gameObject.SetActive(isChosen);
+            if(isAvailable)
+                ifChosenPanel.gameObject.SetActive(isChosen);
+            else
+                ifUnAvailablePanel.gameObject.SetActive(isChosen);
         }
         
         private void SetAvailable(bool isAvailable)
         {
             ifAvailablePanel.gameObject.SetActive(!isAvailable);
-            button.interactable = isAvailable;
+            this.isAvailable = isAvailable;
         }
     }
 }
