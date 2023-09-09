@@ -23,7 +23,8 @@ namespace LineWars.Controllers
             }
             else
             {
-                Debug.LogError("More than two VolumeUpdaters on the Scene");
+                Debug.LogWarning("More than two VolumeUpdaters on the Scene");
+                Destroy(gameObject);
             }
         }
 

@@ -153,5 +153,10 @@ namespace LineWars.Interface
         {
             currentIncomeText.text = after.ToString();
         }
+        
+        public void ToMainMenu()
+        {
+            SceneTransition.LoadScene(SceneName.MainMenu);
+        }
     }
 }
