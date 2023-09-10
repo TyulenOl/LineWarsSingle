@@ -68,7 +68,6 @@ public class UnitPartDrawer : MonoBehaviour
     public void ReDrawAvailability(bool available)
     {
         ifAvailablePanel.gameObject.SetActive(available);
-        Debug.Log($"{name} переотрисовался");
     }
     
     public void ReDrawActivity(bool isActive)
