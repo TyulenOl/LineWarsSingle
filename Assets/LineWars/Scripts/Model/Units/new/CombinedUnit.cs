@@ -8,7 +8,7 @@ using UnityEngine.Events;
 
 namespace LineWars.Model
 {
-    public sealed class CombinedUnit: Owned, IAlive
+    public sealed class CombinedUnit: Owned, ITarget, IExecutor, IAlive
     {
         [Header("Units Settings")] 
         [SerializeField] private string unitName;
@@ -118,6 +118,7 @@ namespace LineWars.Model
         public LineType MovementLineType => movementLineType;
         public Node Node => myNode;
         public CommandPriorityData CommandPriorityData => priorityData;
+        public bool CanDoAnyAction => currentActionPoints > 0;
         #endregion
 
         private void Awake()
@@ -135,13 +136,18 @@ namespace LineWars.Model
                 foreach (var action in myActionsCopy)
                 {
                     var copy = Instantiate(action);
+                    copy.ActionCompleted += OnActionCompleted;
                     copy.Initialize(this);
                     myActions.Add(copy);
+                    
+                    void OnActionCompleted()
+                    {
+                        ActionCompleted.Invoke();
+                    }
                 }
             }
         }
 
-        public bool CanDoAnyAction() => currentActionPoints > 0;
         public bool CanMoveOnLineWithType(LineType lineType) => lineType >= MovementLineType;
 
         public T GetUnitAction<T>() where T : UnitAction => myActions.OfType<T>().FirstOrDefault();
@@ -209,9 +215,20 @@ namespace LineWars.Model
                 unitAction.OnReplenish();
         }
 
+        public IEnumerable<(ITarget, CommandType)> GetAllAvailableTargets()
+        {
+            throw new NotImplementedException();
+        }
+
         public void TakeDamage(Hit hit)
         {
             
+        }
+
+        private void OnDestroy()
+        {
+            foreach (var action in myActions)
+                Destroy(action);
         }
     }
 }

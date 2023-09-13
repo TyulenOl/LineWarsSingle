@@ -9,8 +9,6 @@ namespace LineWars.Model
     public class MeleeAttackAction: BaseAttackAction
     {
         [SerializeField] private UnitBlockerSelector blockerSelector;
-
-        [SerializeField] private bool isPenetratingDamage;
         /// <summary>
         /// указывет на то, нужно ли захватывать точку после атаки
         /// </summary>
@@ -42,10 +40,10 @@ namespace LineWars.Model
             else
             {
                 var selectedUnit = blockerSelector.SelectBlocker(enemy, neighbour);
-                if (selectedUnit == enemy)
-                    AttackUnitButIgnoreBlock(enemy);
-                else
-                    UnitsController.ExecuteCommand(new BlockAttackCommand(this, selectedUnit));
+                //if (selectedUnit == enemy)
+                    //AttackUnitButIgnoreBlock(enemy);
+                //else
+                    //Invoker.ExecuteCommand(new BlockAttackCommand(MyUnit, selectedUnit));
             }
         }
         
@@ -55,13 +53,14 @@ namespace LineWars.Model
             var enemyNode = enemy.Node;
             MeleeAttack(enemy);
 
-            if (enemy.IsDied && enemyNode.AllIsFree && onslaught) 
-                UnitsController.ExecuteCommand(new MoveCommand(MyUnit, MyUnit.Node, enemyNode));
+            //if (enemy.IsDied && enemyNode.AllIsFree && onslaught) 
+                //Invoker.ExecuteCommand(new MoveCommand(MyUnit, MyUnit.Node, enemyNode));
         }
 
-        private void MeleeAttack(IAlive target)
+        private void MeleeAttack(CombinedUnit target)
         {
-            target.TakeDamage(new Hit(Damage, MyUnit, target, isPenetratingDamage));
+            //target.TakeDamage(new Hit(Damage, MyUnit, target, isPenetratingDamage));
+            MyUnit.CurrentActionPoints = ModifyActionPoints();
             SfxManager.Instance.Play(attackSfx);
             
             Complete();

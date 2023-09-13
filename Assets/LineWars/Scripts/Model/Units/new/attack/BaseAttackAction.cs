@@ -7,6 +7,7 @@ namespace LineWars.Model
     {
         [SerializeField] protected bool attackLocked;
         [SerializeField, Min(0)] protected int damage;
+        [SerializeField] protected bool isPenetratingDamage;
         [SerializeField] protected SFXData attackSfx;
         
         public int Damage => damage;
