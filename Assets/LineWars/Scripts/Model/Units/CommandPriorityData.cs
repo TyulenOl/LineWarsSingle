@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    [CreateAssetMenu(fileName = "New Commannds Priority Data", menuName = "Commands Priority Data")]
+    [CreateAssetMenu(fileName = "New Commands Priority Data", menuName = "Create Commands Priority Data")]
     public class CommandPriorityData : ScriptableObject
     {
         [SerializeField] private List<CommandType> commandsPriority;
