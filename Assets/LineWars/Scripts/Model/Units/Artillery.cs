@@ -26,7 +26,7 @@ namespace LineWars.Model
         public override void Attack(Edge edge)
         {
             var explosion = Instantiate(explosionPrefab);
-            SfxManager.Instance.Play(distanceAttackSFX);
+            SfxManager.Instance.Play(attackSFX);
             explosion.transform.position = edge.transform.position;
             explosion.ExplosionEnded += () =>
             {
@@ -37,7 +37,7 @@ namespace LineWars.Model
         public override void Attack(Unit enemy)
         {
             var explosion = Instantiate(explosionPrefab);
-            SfxManager.Instance.Play(distanceAttackSFX);
+            SfxManager.Instance.Play(attackSFX);
             explosion.transform.position = enemy.Node.Position;
             explosion.ExplosionEnded += () =>
             {

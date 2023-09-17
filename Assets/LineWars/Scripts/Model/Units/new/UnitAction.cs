@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    public abstract class UnitAction: ScriptableObject
+    public abstract class UnitAction: ExecutorAction
     {
         [SerializeField] private IntModifier actionModifier;
         

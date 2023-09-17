@@ -10,9 +10,6 @@ namespace LineWars.Model
         [field: Header("Distance Attack Settings")]
         [field: SerializeField, Min(0)] public int Distance { get; private set; }
 
-        [Header("Sound Settings")] 
-        [SerializeField] protected SFXData distanceAttackSFX;
-
         public override bool CanAttack(Unit unit) => CanAttack(unit, Node);
 
         public override bool CanAttack(Unit unit, Node node)
@@ -27,7 +24,7 @@ namespace LineWars.Model
         public override void Attack(Unit enemy)
         {
             DistanceAttack(enemy, Damage);
-            SfxManager.Instance.Play(distanceAttackSFX);
+            SfxManager.Instance.Play(attackSFX);
         }
 
         protected void DistanceAttack(IAlive alive, int damage)

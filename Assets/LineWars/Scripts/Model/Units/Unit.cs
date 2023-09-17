@@ -57,7 +57,7 @@ namespace LineWars.Model
 
         [Header("Sfx Settings")] 
         [SerializeField] private SFXData moveSFX;
-        [SerializeField] private SFXData attackSFX;
+        [SerializeField] protected SFXData attackSFX;
 
         [Header("DEBUG")]
         [SerializeField, ReadOnlyInspector] private Node node;
