@@ -147,7 +147,7 @@ namespace LineWars.Model
             return result;
         }
         
-        public static List<Node> FindShortestPath([NotNull] Node start, [NotNull] Node end, Unit unit)
+        public static List<Node> FindShortestPath([NotNull] Node start, [NotNull] Node end, ComponentUnit unit)
         {
             if (start == null) throw new ArgumentNullException(nameof(start));
             if (end == null) throw new ArgumentNullException(nameof(end));
@@ -210,7 +210,7 @@ namespace LineWars.Model
             }
         }
 
-        public static bool CheckNodeForWalkability(Node node, Unit unit)
+        public static bool CheckNodeForWalkability(Node node, ComponentUnit unit)
         {
             if(unit.Size == UnitSize.Large && !(node.LeftUnit == null && node.RightUnit == null)) return false;
             if (unit.Size == UnitSize.Little)

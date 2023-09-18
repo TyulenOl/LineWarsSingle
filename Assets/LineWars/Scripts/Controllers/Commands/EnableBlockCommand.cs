@@ -4,19 +4,20 @@ namespace LineWars.Model
 {
     public class EnableBlockCommand: ICommand
     {
-        private Unit unit;
-        public EnableBlockCommand([NotNull] Unit unit)
+        private readonly ComponentUnit unit;
+        public EnableBlockCommand([NotNull] ComponentUnit unit)
         {
             this.unit = unit;
         }
         public void Execute()
         {
-            unit.EnableBlock();
+            unit.GetExecutorAction<ComponentUnit.ContAttackAction>().EnableBlock();
         }
 
         public bool CanExecute()
         {
-            return unit.CanBlock();
+            return unit.TryGetExecutorAction<ComponentUnit.ContAttackAction>(out var action)
+                   && action.CanBlock();
         }
 
         public string GetLog()

@@ -18,7 +18,7 @@ namespace LineWars
         private void OnClick()
         {
             var executor = CommandsManager.Instance.Executor;
-            if (executor is Unit unit)
+            if (executor is ComponentUnit unit)
                 UnitsController.ExecuteCommand(new EnableBlockCommand(unit), false);
         }
     }

@@ -7,9 +7,9 @@ namespace LineWars.Model
 {
     public static class EnemyActionUtilities
     {
-        public static List<Unit> FindAdjacentEnemies(Node node, BasePlayer basePlayer)
+        public static List<ComponentUnit> FindAdjacentEnemies(Node node, BasePlayer basePlayer)
         {
-            var enemies = new List<Unit>();
+            var enemies = new List<ComponentUnit>();
             foreach (var edge in node.Edges)
             {
                 var otherNode = edge.FirstNode == node ? edge.SecondNode : edge.FirstNode;
@@ -22,9 +22,9 @@ namespace LineWars.Model
             return enemies;
         }
         
-        public static List<Unit> FindAdjacentEnemies(Node node, BasePlayer basePlayer, LineType minEdgeType)
+        public static List<ComponentUnit> FindAdjacentEnemies(Node node, BasePlayer basePlayer, LineType minEdgeType)
         {
-            var enemies = new List<Unit>();
+            var enemies = new List<ComponentUnit>();
             foreach (var edge in node.Edges)
             {
                 if((int) minEdgeType > (int)edge.LineType) continue;
@@ -38,9 +38,9 @@ namespace LineWars.Model
             return enemies;
         }
         
-        public static List<Unit> FindAdjacentAllies(Node node, BasePlayer basePlayer, LineType minEdgeType)
+        public static List<ComponentUnit> FindAdjacentAllies(Node node, BasePlayer basePlayer, LineType minEdgeType)
         {
-            var allies = new List<Unit>();
+            var allies = new List<ComponentUnit>();
             foreach (var edge in node.Edges)
             {
                 if((int) minEdgeType > (int)edge.LineType) continue;
@@ -54,9 +54,9 @@ namespace LineWars.Model
             return allies;
         }
 
-        public static List<Unit> GetUnitsInNode(Node node)
+        public static List<ComponentUnit> GetUnitsInNode(Node node)
         {
-            var units = new List<Unit>();
+            var units = new List<ComponentUnit>();
             if (node.LeftUnit != null)
                 units.Add(node.LeftUnit);
             if (node.RightUnit != null)
@@ -122,7 +122,7 @@ namespace LineWars.Model
         }
         
         public static List<Node> GetNodesInIntModifierRange(Node node, int range, 
-            IntModifier modifier, Action<Node, Node, int> nodeParser, Unit unit)
+            IntModifier modifier, Action<Node, Node, int> nodeParser, ComponentUnit unit)
         {
             var list = new List<Node>();
             var queue = new Queue<(Node, int)>();

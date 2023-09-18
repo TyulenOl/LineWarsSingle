@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using LineWars.Model;
 using UnityEngine;
@@ -11,7 +12,7 @@ namespace LineWars
         public static UnitsController Instance { get; private set; }
         [SerializeField] private bool needLog = true;  
         private int currentCommandIndex;
-
+        
         private void Awake()
         {
             Instance = this;
@@ -44,20 +45,20 @@ namespace LineWars
                 {
                     case CommandType.MeleeAttack when
                         executor is IAttackerVisitor attacker && target is IAlive alive && attacker.CanAttack(alive):
-                        UnitsController.ExecuteCommand(new AttackCommand(attacker, alive));
+                        UnitsController.ExecuteCommand(new UnitAttackCommand(attacker, alive));
                         return true;
                     case CommandType.Move when
                         (executor is IMovable movable && target is Node node && movable.CanMoveTo(node)):
-                        UnitsController.ExecuteCommand(new MoveCommand(movable, movable.Node, node));
+                        UnitsController.ExecuteCommand(new UnitMoveCommand(movable, movable.Node, node));
                         return true;
                     case CommandType.Heal when
-                        executor is Doctor doctor && target is Unit unit && doctor.CanHeal(unit):
-                        UnitsController.ExecuteCommand(new HealCommand(doctor, unit));
-                        break;
+                        executor is Doctor doctor && target is ComponentUnit unit && doctor.CanHeal(unit):
+                        UnitsController.ExecuteCommand(new UnitHealCommand(doctor, unit));
+                        return true;
                     case CommandType.Build 
                          when executor is Engineer engineer && target is Edge edge && engineer.CanUpRoad(edge):
-                        UnitsController.ExecuteCommand(new UpRoadCommand(engineer, edge));
-                        break;
+                        UnitsController.ExecuteCommand(new UnitUpRoadCommand(engineer, edge));
+                        return true;
                 }
             }
 
@@ -77,7 +78,7 @@ namespace LineWars
                         (executor is IMovable movable && target is Node node && movable.CanMoveTo(node)):
                         return CommandType.Move;
                     case CommandType.Heal when
-                        executor is Doctor doctor && target is Unit unit && doctor.CanHeal(unit):
+                        executor is Doctor doctor && target is ComponentUnit unit && doctor.CanHeal(unit):
                         return CommandType.Heal;
                     case CommandType.Build 
                         when executor is Engineer engineer && target is Edge edge && engineer.CanUpRoad(edge):

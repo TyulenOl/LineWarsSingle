@@ -80,14 +80,14 @@ namespace LineWars
 
         private void OnOwnedAdded(Owned owned)
         {
-            if(!(owned is Unit unit)) return;
+            if(!(owned is ComponentUnit unit)) return;
             unit.ActionPointsChanged.AddListener(ProcessActionPointsChange);
             unit.Died.AddListener(UnitOnDied);
         }
 
         private void OnOwnerRemoved(Owned owned)
         {
-            if(!(owned is Unit unit)) return;
+            if(!(owned is ComponentUnit unit)) return;
             unit.ActionPointsChanged.RemoveListener(ProcessActionPointsChange);
             if (!unit.IsDied)
                 unit.Died.RemoveListener(UnitOnDied);
@@ -105,7 +105,7 @@ namespace LineWars
             ExecuteTurn(PhaseType.Idle);
         }
 
-        public IEnumerable<Unit> GetAllUnitsByPhase(PhaseType phaseType)
+        public IEnumerable<ComponentUnit> GetAllUnitsByPhase(PhaseType phaseType)
         {
             if (phaseExecutorsData.PhaseToUnits.TryGetValue(phaseType, out var value))
             {
@@ -180,7 +180,7 @@ namespace LineWars
 
             foreach (var owned in OwnedObjects)
             {
-                if(!(owned is Unit unit)) continue;
+                if(!(owned is ComponentUnit unit)) continue;
                 if(phaseExecutors.Contains(unit.Type) && unit.CurrentActionPoints > 0)
                     return true;
             }
@@ -190,7 +190,7 @@ namespace LineWars
 
         #endregion
         
-        private void UnitOnDied(Unit diedUnit)
+        private void UnitOnDied(ComponentUnit diedUnit)
         {
             StartCoroutine(UnitOnDiedCoroutine());
             IEnumerator UnitOnDiedCoroutine()

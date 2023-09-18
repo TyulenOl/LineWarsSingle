@@ -30,7 +30,7 @@ namespace LineWars.Model
         private bool isFirstReplenish = true;
         
         private IEnumerable<Node> MyNodes => myOwned.OfType<Node>();
-        protected IEnumerable<Unit> MyUnits => myOwned.OfType<Unit>();
+        protected IEnumerable<ComponentUnit> MyUnits => myOwned.OfType<ComponentUnit>();
 
         public event Action<PhaseType, PhaseType> TurnChanged;
         public event Action<Owned> OwnedAdded;
@@ -144,7 +144,7 @@ namespace LineWars.Model
                 case Node node:
                     BeforeAddOwned(node);
                     break;
-                case Unit unit:
+                case ComponentUnit unit:
                     BeforeAddOwned(unit);
                     break;
             }
@@ -170,7 +170,7 @@ namespace LineWars.Model
             return Rules.MoneyForFirstCapturingNode + GetMyIncomeFromNode(node);
         }
 
-        protected virtual void BeforeAddOwned(Unit unit)
+        protected virtual void BeforeAddOwned(ComponentUnit unit)
         {
             
         }
@@ -186,7 +186,7 @@ namespace LineWars.Model
                 case Node node:
                     BeforeRemoveOwned(node);
                     break;
-                case Unit unit:
+                case ComponentUnit unit:
                     BeforeRemoveOwned(unit);
                     break;
             }
@@ -205,7 +205,7 @@ namespace LineWars.Model
             }
         }
 
-        protected virtual void BeforeRemoveOwned(Unit unit)
+        protected virtual void BeforeRemoveOwned(ComponentUnit unit)
         {
         }
 
@@ -225,7 +225,7 @@ namespace LineWars.Model
             Destroy(gameObject);
         }
         
-        public Unit GetUnitPrefab(UnitType unitType) => MyNation.GetUnitPrefab(unitType);
+        public ComponentUnit GetUnitPrefab(UnitType unitType) => MyNation.GetUnitPrefab(unitType);
 
         public void ExecuteTurn(PhaseType phaseType)
         {

@@ -11,7 +11,7 @@ namespace LineWars.Model
     public class Nation: ScriptableObject
     {
         [SerializeField] private NationEconomicLogic nationEconomicLogic;
-        [field: SerializeField] public SerializedDictionary<UnitType, Unit> UnitTypeUnitPairs { get; private set; } = new();
+        [field: SerializeField] public SerializedDictionary<UnitType, ComponentUnit> UnitTypeUnitPairs { get; private set; } = new();
         
         public NationEconomicLogic NationEconomicLogic => nationEconomicLogic;
         
@@ -34,7 +34,7 @@ namespace LineWars.Model
             }
         }
 
-        public Unit GetUnitPrefab(UnitType type)
+        public ComponentUnit GetUnitPrefab(UnitType type)
         {
             if (UnitTypeUnitPairs.TryGetValue(type, out var unit))
                 return unit;

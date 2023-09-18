@@ -47,7 +47,7 @@ namespace LineWars.Model
                 return buyPreset != null;
             }
 
-            private IEnumerable<Unit> GetUnitsByPreset(UnitBuyPreset preset, EnemyAI enemyAI)
+            private IEnumerable<ComponentUnit> GetUnitsByPreset(UnitBuyPreset preset, EnemyAI enemyAI)
             {
                 var leftUnit = enemyAI.GetUnitPrefab(preset.FirstUnitType);
                 if (leftUnit != null)

@@ -8,7 +8,7 @@ namespace LineWars
         public static int GetCountUnitByType(this BasePlayer player, UnitType type)
         {
             return player.OwnedObjects
-                .OfType<Unit>()
+                .OfType<ComponentUnit>()
                 .Count(x => x.Type == type);
         }
     }

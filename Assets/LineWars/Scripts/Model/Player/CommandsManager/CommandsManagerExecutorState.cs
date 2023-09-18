@@ -34,7 +34,7 @@ namespace LineWars.Controllers
         
                 if(!Player.LocalPlayer.OwnedObjects.Contains(owned))
                     return;
-                if(executor is Unit unit 
+                if(executor is ComponentUnit unit 
                 && !Player.LocalPlayer.PotentialExecutors.Contains(unit.Type)) 
                     return;
                 if(executor.CurrentActionPoints <= 0)

@@ -9,8 +9,11 @@ namespace LineWars.Model
     {
         public bool CanDoAnyAction { get; }
         public int CurrentActionPoints {get;}
-        public UnityEvent ActionCompleted { get; }
+
+        public T GetExecutorAction<T>() where T : ExecutorAction;
+        public bool TryGetExecutorAction<T>(out T action) where T : ExecutorAction;
         
+        public UnityEvent AnyActionCompleted { get; }
         public IEnumerable<(ITarget, CommandType)> GetAllAvailableTargets();
     } 
 }

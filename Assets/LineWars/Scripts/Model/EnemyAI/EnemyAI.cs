@@ -105,7 +105,7 @@ namespace LineWars.Model
         private void AddActionsForExecutor(List<EnemyAction> actions, IExecutor executor, PhaseType phase)
         {
             var unitTypes = executorsData.PhaseToUnits[phase];
-            if (executor is Unit unit && !unitTypes.Contains(unit.Type)) return;
+            if (executor is ComponentUnit unit && !unitTypes.Contains(unit.Type)) return;
             
             var possibleActionData = enemyPhaseActions.PhasesToActions[phase];
             foreach (var actionData in possibleActionData)
@@ -146,7 +146,7 @@ namespace LineWars.Model
             var executors = executorsData.PhaseToUnits[phase];
             foreach (var owned in OwnedObjects)
             {
-                if (!(owned is Unit unit)) continue;
+                if (!(owned is ComponentUnit unit)) continue;
                 if(executors.Contains(unit.Type) && unit.CurrentActionPoints > 0)
                     return true;
             }

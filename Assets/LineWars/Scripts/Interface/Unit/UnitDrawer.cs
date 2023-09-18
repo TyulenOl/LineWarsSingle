@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace LineWars.Interface
 {
-    [RequireComponent(typeof(Unit), typeof(TargetDrawer))]
+    [RequireComponent(typeof(ComponentUnit), typeof(TargetDrawer))]
     public class UnitDrawer : MonoBehaviour
     {
         [Header("Animate Settings")]
@@ -24,13 +24,13 @@ namespace LineWars.Interface
         [SerializeField] private UnitPartDrawer leftDrawer;
         [SerializeField] private UnitPartDrawer rightDrawer;
 
-        private Unit unit;
+        private ComponentUnit unit;
         private List<UnitPartDrawer> allDrawers;
         private TargetDrawer targetDrawer;
 
         private void Awake()
         {
-            unit = GetComponent<Unit>();
+            unit = GetComponent<ComponentUnit>();
 
             unit.ActionPointsChanged.AddListener((_,newValue) => ExecuteForAllDrawers(drawer =>
             {

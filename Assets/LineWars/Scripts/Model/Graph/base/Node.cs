@@ -20,8 +20,8 @@ namespace LineWars.Model
         [SerializeField] [Min(0)] private int valueOfHidden;
         [SerializeField] private int baseIncome;
 
-        [SerializeField, ReadOnlyInspector] private Unit leftUnit;
-        [SerializeField, ReadOnlyInspector] private Unit rightUnit;
+        [SerializeField, ReadOnlyInspector] private ComponentUnit leftUnit;
+        [SerializeField, ReadOnlyInspector] private ComponentUnit rightUnit;
 
         [SerializeField] private Outline2D outline;
         [SerializeField] private Selectable2D selectable2D;
@@ -67,13 +67,13 @@ namespace LineWars.Model
 
         public int BaseIncome => baseIncome;
 
-        public Unit LeftUnit
+        public ComponentUnit LeftUnit
         {
             get => leftUnit;
             set { leftUnit = value; }
         }
 
-        public Unit RightUnit
+        public ComponentUnit RightUnit
         {
             get => rightUnit;
             set { rightUnit = value; }

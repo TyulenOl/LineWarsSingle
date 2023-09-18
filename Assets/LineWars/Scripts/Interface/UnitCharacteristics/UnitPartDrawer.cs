@@ -22,9 +22,9 @@ public class UnitPartDrawer : MonoBehaviour
     private CharacteristicDrawer HPDrawer;
     private CharacteristicDrawer ActionPointsDrawer;
     
-    private Unit currentUnit;
+    private ComponentUnit currentUnit;
 
-    public Unit CurrentUnit
+    public ComponentUnit CurrentUnit
     {
         get => currentUnit;
         set
@@ -34,7 +34,7 @@ public class UnitPartDrawer : MonoBehaviour
         }
     }
 
-    private void Init(Unit unitToInit)
+    private void Init(ComponentUnit unitToInit)
     {
         var hpSprite = DrawHelper.GetSpriteByCharacteristicType(CharacteristicType.Hp);
         var armorSprite = DrawHelper.GetSpriteByCharacteristicType(CharacteristicType.Armor);

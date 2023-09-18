@@ -1,31 +1,19 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using UnityEngine;
 
 namespace LineWars.Model
 {
-    public class BlockAttackCommand: ICommand
+    public class BlockAttackCommand: UnitAttackCommand
     {
-        private readonly Unit attacker;
-        private readonly Unit blocker;
-        
-        public BlockAttackCommand([NotNull] Unit attacker, [NotNull] Unit blocker)
+        public BlockAttackCommand(ComponentUnit attacker, IAlive defender) : base(attacker, defender)
         {
-            this.attacker = attacker;
-            this.blocker = blocker;
         }
 
-        public void Execute()
+        public override string GetLog()
         {
-            attacker.AttackUnitButIgnoreBlock(blocker);
-        }
-
-        public bool CanExecute()
-        {
-            return attacker.CanAttack(blocker);
-        }
-
-        public string GetLog()
-        {
-            return $"{blocker.gameObject.name} перехватил атаку от {attacker.gameObject.name}";
+            if (attacker is MonoBehaviour attackerUnit && defender is MonoBehaviour blockedUnit)
+                return $"{blockedUnit.gameObject.name} перехватил атаку от {attackerUnit.gameObject.name}";
+            return $"{defender.GetType()} перехватил атаку от {attacker.GetType()}";
         }
     }
 }

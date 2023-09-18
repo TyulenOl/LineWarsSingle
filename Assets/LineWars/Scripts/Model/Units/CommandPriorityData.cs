@@ -20,7 +20,8 @@ namespace LineWars.Model
         Explosion,
         Fire,
         Move,
-        Build
+        Build,
+        Block
     }
 }   
 

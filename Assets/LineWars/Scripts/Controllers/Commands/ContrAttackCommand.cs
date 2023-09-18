@@ -4,10 +4,10 @@ namespace LineWars.Model
 {
     public class ContrAttackCommand: ICommand
     {
-        private readonly Unit attacker;
-        private readonly Unit blocker;
+        private readonly ComponentUnit attacker;
+        private readonly ComponentUnit blocker;
         
-        public ContrAttackCommand([NotNull] Unit attacker, [NotNull] Unit blocker)
+        public ContrAttackCommand([NotNull] ComponentUnit attacker, [NotNull] ComponentUnit blocker)
         {
             this.attacker = attacker;
             this.blocker = blocker;
@@ -15,12 +15,14 @@ namespace LineWars.Model
         
         public void Execute()
         {
-            attacker.ContrAttack(blocker);
+            attacker.GetExecutorAction<ComponentUnit.ContAttackAction>()
+                .ContrAttack(blocker);
         }
 
         public bool CanExecute()
         {
-            return attacker.CanContrAttack(blocker);
+            return attacker.TryGetExecutorAction<ComponentUnit.ContAttackAction>(out var action)
+                   && action.CanContrAttack(blocker);
         }
 
         public string GetLog()
