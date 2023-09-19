@@ -43,7 +43,7 @@ public class UnitPartDrawer : MonoBehaviour
         
         MeleeAttackDrawer = Instantiate(CharacteristicDrawerPrefab.gameObject, CharacteristicsLayoutGroup.transform)
             .GetComponent<CharacteristicDrawer>();
-        MeleeAttackDrawer.Init(attackSprite, unitToInit.Damage.ToString());
+        MeleeAttackDrawer.Init(attackSprite, unitToInit.GetDamage().ToString());
         
         ArmorDrawer = Instantiate(CharacteristicDrawerPrefab.gameObject, CharacteristicsLayoutGroup.transform)
             .GetComponent<CharacteristicDrawer>();
@@ -88,7 +88,7 @@ public class UnitPartDrawer : MonoBehaviour
     {
         if( MeleeAttackDrawer != null)
         {
-            MeleeAttackDrawer.ReDraw(currentUnit.Damage.ToString());
+            MeleeAttackDrawer.ReDraw(currentUnit.GetDamage().ToString());
         }
         //TODO Добавить проверку на то, что юнит стреляющий. Если он стреляющий - выводить дальнюю атаку
         // if( FarAttackDrawer != null)

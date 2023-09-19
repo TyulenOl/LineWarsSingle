@@ -12,7 +12,9 @@ namespace LineWars.Model
 
         public T GetExecutorAction<T>() where T : ExecutorAction;
         public bool TryGetExecutorAction<T>(out T action) where T : ExecutorAction;
-        
+
+        public bool TryGetCommand(CommandType priorityType, ITarget target, out ICommand command);
+
         public UnityEvent AnyActionCompleted { get; }
         public IEnumerable<(ITarget, CommandType)> GetAllAvailableTargets();
     } 

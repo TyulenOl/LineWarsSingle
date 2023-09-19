@@ -41,24 +41,11 @@ namespace LineWars
         {
             foreach (var commandType in target.CommandPriorityData.Priority)
             {
-                switch (commandType)
+                if (executor.TryGetCommand(commandType, target, out var command)
+                    && command.CanExecute())
                 {
-                    case CommandType.MeleeAttack when
-                        executor is IAttackerVisitor attacker && target is IAlive alive && attacker.CanAttack(alive):
-                        UnitsController.ExecuteCommand(new UnitAttackCommand(attacker, alive));
-                        return true;
-                    case CommandType.Move when
-                        (executor is IMovable movable && target is Node node && movable.CanMoveTo(node)):
-                        UnitsController.ExecuteCommand(new UnitMoveCommand(movable, movable.Node, node));
-                        return true;
-                    case CommandType.Heal when
-                        executor is Doctor doctor && target is ComponentUnit unit && doctor.CanHeal(unit):
-                        UnitsController.ExecuteCommand(new UnitHealCommand(doctor, unit));
-                        return true;
-                    case CommandType.Build 
-                         when executor is Engineer engineer && target is Edge edge && engineer.CanUpRoad(edge):
-                        UnitsController.ExecuteCommand(new UnitUpRoadCommand(engineer, edge));
-                        return true;
+                    ExecuteCommand(command);
+                    return true;
                 }
             }
 
@@ -69,20 +56,10 @@ namespace LineWars
         {
             foreach (var commandType in target.CommandPriorityData.Priority)
             {
-                switch (commandType)
+                if (executor.TryGetCommand(commandType, target, out var command)
+                    && command.CanExecute())
                 {
-                    case CommandType.MeleeAttack when
-                        executor is IAttackerVisitor attacker && target is IAlive alive && attacker.CanAttack(alive):
-                        return attacker.GetAttackTypeBy(alive);
-                    case CommandType.Move when
-                        (executor is IMovable movable && target is Node node && movable.CanMoveTo(node)):
-                        return CommandType.Move;
-                    case CommandType.Heal when
-                        executor is Doctor doctor && target is ComponentUnit unit && doctor.CanHeal(unit):
-                        return CommandType.Heal;
-                    case CommandType.Build 
-                        when executor is Engineer engineer && target is Edge edge && engineer.CanUpRoad(edge):
-                        return CommandType.Build;
+                    return commandType;
                 }
             }
 

@@ -11,7 +11,7 @@ namespace LineWars.Model
         protected readonly SFXData ActionSfx;
         public event Action ActionCompleted;
 
-        protected ExecutorAction([NotNull] IExecutor unit, [NotNull] BaseExecutorActionData data)
+        protected ExecutorAction([NotNull] IExecutor unit, [NotNull] BaseExecutorAction data)
         {
             actionModifier = data.ActionModifier;
             myExecutor = unit;

@@ -1,24 +1,40 @@
-﻿namespace LineWars.Model
+﻿using System;
+using JetBrains.Annotations;
+
+namespace LineWars.Model
 {
     public class UnitHealCommand: ICommand
     {
+        private readonly ComponentUnit.HealAction healAction;
         private readonly ComponentUnit doctor;
         private readonly ComponentUnit unit;
         
-        public UnitHealCommand(ComponentUnit doctor, ComponentUnit unit)
+        public UnitHealCommand([NotNull] ComponentUnit doctor, [NotNull] ComponentUnit unit)
         {
-            this.doctor = doctor;
-            this.unit = unit;
+            this.doctor = doctor ? doctor : throw new ArgumentNullException(nameof(doctor));
+            this.unit = unit ? unit : throw new ArgumentNullException(nameof(unit));
+            
+            healAction = doctor.TryGetExecutorAction<ComponentUnit.HealAction>(out var action) 
+                ? action 
+                : throw new ArgumentException($"{nameof(ComponentUnit)} does not contain {nameof(ComponentUnit.HealAction)}");
         }
+
+        public UnitHealCommand([NotNull] ComponentUnit.HealAction healAction, [NotNull] ComponentUnit unit)
+        {
+            this.healAction = healAction ?? throw new ArgumentNullException(nameof(healAction));
+            this.unit = unit ? unit : throw new ArgumentNullException(nameof(unit));
+
+            doctor = healAction.MyUnit;
+        }
+
         public void Execute()
         { 
-            doctor.GetExecutorAction<ComponentUnit.HealAction>().Heal(unit);
+            healAction.Heal(unit);
         }
 
         public bool CanExecute()
         {
-            return doctor.TryGetExecutorAction<ComponentUnit.HealAction>(out var action)
-                   && action.CanHeal(unit);
+            return healAction.CanHeal(unit);
         }
 
         public string GetLog()

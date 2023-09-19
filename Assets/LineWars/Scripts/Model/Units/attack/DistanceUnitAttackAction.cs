@@ -5,8 +5,8 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    [CreateAssetMenu(fileName = "New DistanceAttack", menuName = "UnitActions/Attack/DistanceAttack", order = 61)]
-    public class DistanceUnitAttackActionData: BaseUnitAttackActionData
+    //[CreateAssetMenu(fileName = "New DistanceAttack", menuName = "UnitActions/Attack/DistanceAttack", order = 61)]
+    public class DistanceUnitAttackAction: BaseUnitAttackAction
     {
         [field: SerializeField, Min(0)] public int Distance { get; private set; }
         public override ComponentUnit.UnitAction GetAction(ComponentUnit unit) => new ComponentUnit.DistanceAttackAction(unit, this);
@@ -17,7 +17,7 @@ namespace LineWars.Model
         public class DistanceAttackAction: BaseAttackAction
         {
             public uint Distance { get; private set; }
-            public DistanceAttackAction([NotNull] ComponentUnit unit, DistanceUnitAttackActionData data) : base(unit, data)
+            public DistanceAttackAction([NotNull] ComponentUnit unit, DistanceUnitAttackAction data) : base(unit, data)
             {
                 Distance = (uint) data.Distance;
             }

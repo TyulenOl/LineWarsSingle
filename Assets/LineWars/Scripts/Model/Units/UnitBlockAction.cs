@@ -4,8 +4,9 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    [CreateAssetMenu(fileName = "New ContrAttackAction", menuName = "UnitActions/ContrAttackAction", order = 61)]
-    public class UnitContrAttackActionData : BaseUnitActionData
+    //[CreateAssetMenu(fileName = "New ContrAttackAction", menuName = "UnitActions/ContrAttackAction", order = 61)]
+    [RequireComponent(typeof(BaseUnitAttackAction))]
+    public class UnitBlockAction : BaseUnitAction
     {
         [SerializeField] private bool protection = false;
         [SerializeField] private IntModifier contrAttackDamageModifier;
@@ -13,15 +14,15 @@ namespace LineWars.Model
         public IntModifier ContrAttackDamageModifier => contrAttackDamageModifier;
 
         public override ComponentUnit.UnitAction GetAction(ComponentUnit unit) =>
-            new ComponentUnit.ContAttackAction(unit, this);
+            new ComponentUnit.BlockAction(unit, this);
     }
-
+    
     public sealed partial class ComponentUnit
     {
-        public class ContAttackAction : UnitAction
+        public sealed class BlockAction : UnitAction, ISimpleAction
         {
             private bool isBlocked;
-            private IntModifier contrAttackDamageModifier;
+            private readonly IntModifier contrAttackDamageModifier;
             private BaseAttackAction attackAction;
             
             public bool Protection { get; private set; }
@@ -43,10 +44,16 @@ namespace LineWars.Model
 
             public event Action<bool, bool> CanBlockChanged;
 
-            public ContAttackAction([NotNull] ComponentUnit unit, UnitContrAttackActionData data) : base(unit, data)
+            public BlockAction([NotNull] ComponentUnit unit, UnitBlockAction data) : base(unit, data)
             {
                 Protection = data.Protection;
                 contrAttackDamageModifier = data.ContrAttackDamageModifier;
+                unit.CurrentActionCompleted += (unitAction) =>
+                {
+                    if (unitAction == this)
+                        return;
+                    SetBlock(false);
+                };
             }
 
             public bool CanBlock()
@@ -60,7 +67,7 @@ namespace LineWars.Model
             }
             
 
-            public virtual bool CanContrAttack([NotNull] ComponentUnit enemy)
+            public bool CanContrAttack([NotNull] ComponentUnit enemy)
             {
                 if (enemy == null) throw new ArgumentNullException(nameof(enemy));
                 return (IsBlocked)
@@ -68,7 +75,7 @@ namespace LineWars.Model
                     && AttackAction.CanAttack(enemy, true);
             }
 
-            public virtual void ContrAttack([NotNull] ComponentUnit enemy)
+            public void ContrAttack([NotNull] ComponentUnit enemy)
             {
                 if (enemy == null) throw new ArgumentNullException(nameof(enemy));
                 var contrAttackDamage = contrAttackDamageModifier.Modify(AttackAction.Damage);
@@ -77,12 +84,6 @@ namespace LineWars.Model
                 SetBlock(false);
             }
             
-            public override void OnReplenish()
-            {
-                base.OnReplenish();
-                SetBlock(false);
-            }
-
             private void SetBlock(bool value)
             {
                 var before = isBlocked;
@@ -92,6 +93,7 @@ namespace LineWars.Model
             }
 
             public override CommandType GetMyCommandType() => CommandType.Block;
+            public ICommand GenerateCommand() => new EnableBlockCommand(this);
         }
     }
 }

@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    [CreateAssetMenu(fileName = "New ArtilleryAttack", menuName = "UnitActions/Attack/ArtilleryAttack", order = 61)]
-    public sealed class ArtilleryAttackActionData : DistanceUnitAttackActionData
+    //[CreateAssetMenu(fileName = "New ArtilleryAttack", menuName = "UnitActions/Attack/ArtilleryAttack", order = 61)]
+    public class UnitArtilleryAttackAction : DistanceUnitAttackAction
     {
         [SerializeField] private Explosion explosionPrefab;
 
@@ -20,7 +20,7 @@ namespace LineWars.Model
         public class ArtilleryAttackAction : DistanceAttackAction
         {
             private readonly Explosion explosionPrefab;
-            public ArtilleryAttackAction([NotNull] ComponentUnit unit, ArtilleryAttackActionData data) : base(unit, data)
+            public ArtilleryAttackAction([NotNull] ComponentUnit unit, Model.UnitArtilleryAttackAction data) : base(unit, data)
             {
                 explosionPrefab = data.ExplosionPrefab;
             }

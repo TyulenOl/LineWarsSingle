@@ -5,17 +5,17 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    [CreateAssetMenu(fileName = "New BuildRoadAction", menuName = "UnitActions/BuildRoadAction", order = 61)]
-    public class UnitBuildRoadActionData: BaseUnitActionData
+    //[CreateAssetMenu(fileName = "New BuildRoadAction", menuName = "UnitActions/BuildRoadAction", order = 61)]
+    public class UnitBuildRoadAction: BaseUnitAction
     {
         public override ComponentUnit.UnitAction GetAction(ComponentUnit unit) => new ComponentUnit.BuildAction(unit, this);
     }
     
     public sealed partial class ComponentUnit
     {
-        public class BuildAction: UnitAction
+        public class BuildAction: UnitAction, ITargetedAction
         {
-            public BuildAction([NotNull] ComponentUnit unit, UnitBuildRoadActionData data) : base(unit, data)
+            public BuildAction([NotNull] ComponentUnit unit, UnitBuildRoadAction data) : base(unit, data)
             {}
             
             public bool CanUpRoad([NotNull] Edge edge, bool ignoreActionPointsCondition = false) => CanUpRoad(edge, MyUnit.Node, ignoreActionPointsCondition);
@@ -40,6 +40,9 @@ namespace LineWars.Model
             }
             
             public override CommandType GetMyCommandType() => CommandType.Build;
+            
+            public bool IsMyTarget(ITarget target) => target is Edge;
+            public ICommand GenerateCommand(ITarget target) => new UnitUpRoadCommand(this, (Edge)target);
         }
     } 
 }

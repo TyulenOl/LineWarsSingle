@@ -5,8 +5,8 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    [CreateAssetMenu(fileName = "New MeleeAttackAction", menuName = "UnitActions/Attack/MeleeAttack", order = 61)]
-    public class MeleeUnitAttackActionData : BaseUnitAttackActionData
+    //[CreateAssetMenu(fileName = "New MeleeAttackAction", menuName = "UnitActions/Attack/MeleeAttack", order = 61)]
+    public class MeleeUnitAttackAction : BaseUnitAttackAction
     {
         [SerializeField] private UnitBlockerSelector blockerSelector;
 
@@ -28,7 +28,7 @@ namespace LineWars.Model
             private readonly UnitBlockerSelector blockerSelector;
             private readonly bool onslaught;
 
-            public MeleeAttackAction([NotNull] ComponentUnit unit, MeleeUnitAttackActionData data) : base(unit, data)
+            public MeleeAttackAction([NotNull] ComponentUnit unit, MeleeUnitAttackAction data) : base(unit, data)
             {
                 blockerSelector = data.BlockerSelector;
                 onslaught = data.Onslaught;
@@ -76,7 +76,7 @@ namespace LineWars.Model
                 MeleeAttack(enemy);
 
                 if (enemy.IsDied && enemyNode.AllIsFree && onslaught)
-                    UnitsController.ExecuteCommand(new UnitMoveCommand(MyUnit, MyUnit.Node, enemyNode));
+                    UnitsController.ExecuteCommand(new UnitMoveCommand(MyUnit, enemyNode));
             }
 
             private void MeleeAttack(ComponentUnit target)

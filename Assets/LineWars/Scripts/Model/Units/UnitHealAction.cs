@@ -5,29 +5,27 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    [CreateAssetMenu(fileName = "New UnitHealActionData", menuName = "UnitActions/HealAction", order = 61)]
-    public class UnitHealActionData: BaseUnitActionData
+    //[CreateAssetMenu(fileName = "New UnitHealActionData", menuName = "UnitActions/HealAction", order = 61)]
+    public class UnitHealAction: BaseUnitAction
     {
         [field: SerializeField] public bool IsMassHeal { get; private set; }
         [field: SerializeField, Min(0)] public int HealingAmount { get; private set; }
-        [field: SerializeField] public bool HealLocked { get; private set; }
         public override ComponentUnit.UnitAction GetAction(ComponentUnit unit) => new ComponentUnit.HealAction(unit, this);
     }
     
     public sealed partial class ComponentUnit
     {
-        public class HealAction: UnitAction
+        public class HealAction: UnitAction, ITargetedAction
         {
             public bool IsMassHeal { get; private set; }
             public int HealingAmount { get; private set; }
             public bool HealLocked { get; private set; }
             
             
-            public HealAction([NotNull] ComponentUnit unit, UnitHealActionData data) : base(unit, data)
+            public HealAction([NotNull] ComponentUnit unit, UnitHealAction data) : base(unit, data)
             {
                 IsMassHeal = data.IsMassHeal;
                 HealingAmount = data.HealingAmount;
-                HealLocked = data.HealLocked;
             }
 
             public override CommandType GetMyCommandType() => CommandType.Heal;
@@ -62,6 +60,9 @@ namespace LineWars.Model
                 
                 CompleteAndAutoModify();
             }
+
+            public bool IsMyTarget(ITarget target) => target is ComponentUnit;
+            public ICommand GenerateCommand(ITarget target) => new UnitHealCommand(this, (ComponentUnit) target);
         }
     }
 }

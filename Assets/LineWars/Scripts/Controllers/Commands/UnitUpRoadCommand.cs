@@ -5,6 +5,7 @@ namespace LineWars.Model
 {
     public class UnitUpRoadCommand: ICommand
     {
+        private readonly ComponentUnit.BuildAction buildAction;
         private readonly ComponentUnit engineer;
         private readonly Edge edge;
 
@@ -12,17 +13,28 @@ namespace LineWars.Model
         {
             this.engineer = engineer ? engineer : throw new ArgumentNullException(nameof(engineer));
             this.edge = edge ? edge : throw new ArgumentNullException(nameof(edge));
+            
+            buildAction = engineer.TryGetExecutorAction<ComponentUnit.BuildAction>(out var action) 
+                ? action 
+                : throw new ArgumentException($"{nameof(ComponentUnit)} does not contain {nameof(ComponentUnit.BuildAction)}");
+        }
+
+        public UnitUpRoadCommand([NotNull] ComponentUnit.BuildAction buildAction, [NotNull] Edge edge)
+        {
+            this.buildAction = buildAction ?? throw new ArgumentNullException(nameof(buildAction));
+            this.edge = edge ? edge : throw new ArgumentNullException(nameof(edge));
+
+            engineer = this.buildAction.MyUnit;
         }
 
         public void Execute()
         {
-            engineer.GetExecutorAction<ComponentUnit.BuildAction>().UpRoad(edge);
+            buildAction.UpRoad(edge);
         }
 
         public bool CanExecute()
         {
-           return engineer.TryGetExecutorAction<ComponentUnit.BuildAction>(out var action) &&
-                  action.CanUpRoad(edge);
+           return buildAction.CanUpRoad(edge);
         }
 
         public string GetLog()

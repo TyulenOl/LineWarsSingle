@@ -1,28 +1,32 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using JetBrains.Annotations;
 
 namespace LineWars.Model
 {
     public class ContrAttackCommand: ICommand
     {
+        private readonly ComponentUnit.BlockAction blockAction;
         private readonly ComponentUnit attacker;
         private readonly ComponentUnit blocker;
         
         public ContrAttackCommand([NotNull] ComponentUnit attacker, [NotNull] ComponentUnit blocker)
         {
-            this.attacker = attacker;
-            this.blocker = blocker;
+            this.attacker = attacker ? attacker : throw new ArgumentNullException(nameof(attacker));
+            this.blocker = blocker ? blocker : throw new ArgumentNullException(nameof(blocker));
+            
+            blockAction = attacker.TryGetExecutorAction<ComponentUnit.BlockAction>(out var action) 
+                ? action 
+                : throw new ArgumentException($"{nameof(ComponentUnit)} does not contain {nameof(ComponentUnit.BlockAction)}");
         }
         
         public void Execute()
         {
-            attacker.GetExecutorAction<ComponentUnit.ContAttackAction>()
-                .ContrAttack(blocker);
+            blockAction.ContrAttack(blocker);
         }
 
         public bool CanExecute()
         {
-            return attacker.TryGetExecutorAction<ComponentUnit.ContAttackAction>(out var action)
-                   && action.CanContrAttack(blocker);
+            return blockAction.CanContrAttack(blocker);
         }
 
         public string GetLog()

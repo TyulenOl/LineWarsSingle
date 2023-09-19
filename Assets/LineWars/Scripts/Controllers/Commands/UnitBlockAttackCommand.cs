@@ -11,9 +11,9 @@ namespace LineWars.Model
 
         public override string GetLog()
         {
-            if (attacker is MonoBehaviour attackerUnit && defender is MonoBehaviour blockedUnit)
+            if (Attacker is MonoBehaviour attackerUnit && Defender is MonoBehaviour blockedUnit)
                 return $"{blockedUnit.gameObject.name} перехватил атаку от {attackerUnit.gameObject.name}";
-            return $"{defender.GetType()} перехватил атаку от {attacker.GetType()}";
+            return $"{Defender.GetType()} перехватил атаку от {Attacker.GetType()}";
         }
     }
 }

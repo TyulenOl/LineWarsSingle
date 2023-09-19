@@ -4,13 +4,11 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    public abstract class BaseUnitAttackActionData: BaseUnitActionData
+    [DisallowMultipleComponent]
+    public abstract class BaseUnitAttackAction: BaseUnitAction
     {
-        [SerializeField] private bool attackLocked;
         [SerializeField] private int damage;
         [SerializeField] private bool isPenetratingDamage;
-
-        public bool AttackLocked => attackLocked;
         public int Damage => damage;
         public bool IsPenetratingDamage => isPenetratingDamage;
     }
@@ -18,15 +16,14 @@ namespace LineWars.Model
 
     public sealed partial class ComponentUnit
     {
-        public abstract class BaseAttackAction: UnitAction
+        public abstract class BaseAttackAction: UnitAction, ITargetedAction
         {
             public bool AttackLocked { get; protected set; }
             public int Damage { get; protected set; }
             public bool IsPenetratingDamage { get; protected set; }
 
-            protected BaseAttackAction([NotNull] ComponentUnit unit, BaseUnitAttackActionData data) : base(unit, data)
+            protected BaseAttackAction([NotNull] ComponentUnit unit, BaseUnitAttackAction data) : base(unit, data)
             {
-                AttackLocked = data.AttackLocked;
                 Damage = data.Damage;
                 IsPenetratingDamage = data.IsPenetratingDamage;
             }
@@ -60,6 +57,9 @@ namespace LineWars.Model
             
             public virtual void Attack(ComponentUnit unit) {}
             public virtual void Attack(Edge edge) {}
+
+            public bool IsMyTarget(ITarget target) => target is IAlive;
+            public ICommand GenerateCommand(ITarget target) => new UnitAttackCommand(this, (IAlive)target);
         }
     }
 }

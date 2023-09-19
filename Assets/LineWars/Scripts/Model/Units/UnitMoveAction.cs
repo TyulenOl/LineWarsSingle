@@ -6,19 +6,19 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    [CreateAssetMenu(fileName = "New MoveAction", menuName = "UnitActions/MoveAction", order = 61)]
-    public class UnitMoveActionData : BaseUnitActionData
+    //[CreateAssetMenu(fileName = "New MoveAction", menuName = "UnitActions/MoveAction", order = 61)]
+    public class UnitMoveAction : BaseUnitAction
     {
         public override ComponentUnit.UnitAction GetAction(ComponentUnit unit) => new ComponentUnit.MoveAction(unit, this);
     }
     
     public sealed partial class ComponentUnit
     {
-        public class MoveAction : UnitAction
+        public class MoveAction : UnitAction, ITargetedAction
         {
             public override CommandType GetMyCommandType() => CommandType.Move;
 
-            public MoveAction([NotNull] ComponentUnit unit, [NotNull] UnitMoveActionData data) : base(unit, data)
+            public MoveAction([NotNull] ComponentUnit unit, [NotNull] UnitMoveAction data) : base(unit, data)
             {
             }
 
@@ -106,6 +106,11 @@ namespace LineWars.Model
                         Owned.Connect(MyUnit.Owner, MyUnit.myNode);
                 }
             }
+
+            public bool IsMyTarget(ITarget target) => target is Node;
+
+            public ICommand GenerateCommand(ITarget target) => new UnitMoveCommand(this, (Node) target);
+
             #region CallBack
 
              protected virtual void OnCapturingEnemyBase()

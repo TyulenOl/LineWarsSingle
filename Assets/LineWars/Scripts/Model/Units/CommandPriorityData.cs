@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,7 +12,7 @@ namespace LineWars.Model
 
         public IReadOnlyList<CommandType> Priority => commandsPriority;
     }
-
+    
     public enum CommandType
     {
         None,

@@ -25,8 +25,7 @@ namespace LineWars.Model
 
         [Header("Actions Settings")]
         [SerializeField] [Min(0)] private int initialActionPoints;
-        [SerializeField] private List<BaseUnitActionData> serializeActions;
-        
+
         [Header("DEBUG")]
         [SerializeField, ReadOnlyInspector] private Node myNode;
         [SerializeField, ReadOnlyInspector] private UnitDirection unitDirection;
@@ -42,9 +41,11 @@ namespace LineWars.Model
         [field: SerializeField] public UnityEvent<ComponentUnit> Died { get; private set; }
         [field: SerializeField] public UnityEvent<int, int> ActionPointsChanged { get; private set; }
         [field: SerializeField] public UnityEvent AnyActionCompleted { get; private set; }
+        public event Action<UnitAction> CurrentActionCompleted;
         
         private UnitMovementLogic movementLogic;
-        private List<UnitAction> runtimeActions;
+        private Dictionary<CommandType, UnitAction> runtimeActionsDictionary;
+        private IEnumerable<UnitAction> runtimeActions => runtimeActionsDictionary.Values;
         private uint maxPossibleActionRadius;
 
         #region Properties
@@ -124,13 +125,17 @@ namespace LineWars.Model
             
             void InitialiseAllActions()
             {
-                runtimeActions = new List<UnitAction>(serializeActions.Count);
+                var serializeActions = GetComponents<BaseUnitAction>();
+                runtimeActionsDictionary = new Dictionary<CommandType, UnitAction>(serializeActions.Length);
                 foreach (var serializeAction in serializeActions)
                 {
                     ExecutorAction runtimeAction = serializeAction.GetAction(this);
-                    runtimeActions.Add((UnitAction)runtimeAction);
-
-                    runtimeAction.ActionCompleted += () => AnyActionCompleted?.Invoke();
+                    runtimeActionsDictionary.Add(runtimeAction.GetMyCommandType(), (UnitAction)runtimeAction);
+                    runtimeAction.ActionCompleted += () =>
+                    {
+                        AnyActionCompleted?.Invoke();
+                        CurrentActionCompleted?.Invoke((UnitAction)runtimeAction);
+                    };
                 }
                 maxPossibleActionRadius = runtimeActions.Max(x => x.GetPossibleMaxRadius());
             }
@@ -149,6 +154,21 @@ namespace LineWars.Model
         {
             action = GetExecutorAction<T>();
             return action != null;
+        }
+        
+        public bool TryGetCommand(CommandType priorityType, ITarget target, out ICommand command)
+        {
+            
+            if (runtimeActionsDictionary.TryGetValue(priorityType, out var value)
+                && value is ITargetedAction targetedAction
+                && targetedAction.IsMyTarget(target))
+            {
+                command = targetedAction.GenerateCommand(target);
+                return true;
+            }
+
+            command = null;
+            return false;
         }
         
         public bool TryGetNeighbour([NotNullWhen(true)] out ComponentUnit neighbour)
@@ -226,7 +246,7 @@ namespace LineWars.Model
 
         public IEnumerable<(ITarget, CommandType)> GetAllAvailableTargets()
         {
-            return GetAllAvailableTargetsInRange(maxPossibleActionRadius);
+            return GetAllAvailableTargetsInRange(maxPossibleActionRadius + 1);
         }
 
         private IEnumerable<(ITarget, CommandType)> GetAllAvailableTargetsInRange(uint range)
