@@ -60,6 +60,7 @@ namespace LineWars.Model
         [SerializeField] private SpriteRenderer edgeSpriteRenderer;
         [SerializeField] private BoxCollider2D edgeCollider;
 
+        public IReadOnlyDictionary<LineType, LineTypeCharacteristics> LineMap => lineMap;
         public SpriteRenderer SpriteRenderer => edgeSpriteRenderer;
         public BoxCollider2D BoxCollider2D => edgeCollider;
 

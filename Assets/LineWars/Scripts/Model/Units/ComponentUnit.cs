@@ -45,11 +45,12 @@ namespace LineWars.Model
         
         private UnitMovementLogic movementLogic;
         private Dictionary<CommandType, UnitAction> runtimeActionsDictionary;
-        private IEnumerable<UnitAction> runtimeActions => runtimeActionsDictionary.Values;
+        public IEnumerable<UnitAction> RuntimeActions => runtimeActionsDictionary.Values;
         private uint maxPossibleActionRadius;
 
         #region Properties
         public string UnitName => unitName;
+        public int InitialActionPoints => initialActionPoints;
         public int CurrentActionPoints
         {
             get => currentActionPoints;
@@ -137,7 +138,7 @@ namespace LineWars.Model
                         CurrentActionCompleted?.Invoke((UnitAction)runtimeAction);
                     };
                 }
-                maxPossibleActionRadius = runtimeActions.Max(x => x.GetPossibleMaxRadius());
+                maxPossibleActionRadius = RuntimeActions.Max(x => x.GetPossibleMaxRadius());
             }
         }
         
@@ -149,7 +150,7 @@ namespace LineWars.Model
 
         public bool CanMoveOnLineWithType(LineType lineType) => lineType >= MovementLineType;
 
-        public T GetExecutorAction<T>() where T : ExecutorAction => runtimeActions.OfType<T>().FirstOrDefault();
+        public T GetExecutorAction<T>() where T : ExecutorAction => RuntimeActions.OfType<T>().FirstOrDefault();
         public bool TryGetExecutorAction<T>(out T action) where T : ExecutorAction
         {
             action = GetExecutorAction<T>();
@@ -222,7 +223,7 @@ namespace LineWars.Model
         {
             CurrentActionPoints = initialActionPoints;
 
-            foreach (var unitAction in runtimeActions)
+            foreach (var unitAction in RuntimeActions)
                 unitAction.OnReplenish();
         }
         public void TakeDamage(Hit hit)

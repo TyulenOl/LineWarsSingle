@@ -29,6 +29,7 @@ namespace LineWars
         private int currentActorId;
 
         public IReadOnlyList<IActor> Actors => actors.AsReadOnly();
+        public IActor CurrentActor => actors[currentActorId];
         public PhaseType CurrentPhase => ((Phase)stateMachine.CurrentState).Type;
     
         public static PhaseManager Instance {get; private set;}

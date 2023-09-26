@@ -21,7 +21,8 @@ namespace LineWars.Model
         [SerializeField, ReadOnlyInspector] private int income;
         
         [field: SerializeField, ReadOnlyInspector] public Spawn Base { get; private set; }
-        [field: SerializeField, ReadOnlyInspector] private PlayerRules Rules { get;  set; }
+        [field: SerializeField, ReadOnlyInspector] public PlayerRules Rules { get; private set; }
+        [field: SerializeField] public PhaseExecutorsData PhaseExecutorsData { get; private set; }
 
         public PhaseType CurrentPhase { get; private set; }
         public Nation MyNation { get; private set; }
@@ -31,6 +32,7 @@ namespace LineWars.Model
         
         private IEnumerable<Node> MyNodes => myOwned.OfType<Node>();
         protected IEnumerable<ComponentUnit> MyUnits => myOwned.OfType<ComponentUnit>();
+        
 
         public event Action<PhaseType, PhaseType> TurnChanged;
         public event Action<Owned> OwnedAdded;
