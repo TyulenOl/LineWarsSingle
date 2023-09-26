@@ -36,30 +36,29 @@ namespace LineWars.Model
         [SerializeField] private Node firstNode;
         [SerializeField] private Node secondNode;
 
-        [Header("Line Settings")] [SerializeField]
-        private LineType lineType;
+        [Header("Line Settings")] 
+        [SerializeField] private LineType lineType;
 
         [SerializeField, NamedArray("lineType")]
         private List<LineTypeCharacteristics> lineTypeCharacteristics;
 
         [Header("Commands Settings")] 
         [SerializeField] private CommandPriorityData priorityData;
-
+        
+        [Header("References")]
+        [SerializeField] private BoxCollider2D edgeCollider;
+        [SerializeField] private SpriteRenderer edgeSpriteRenderer;
+        
         [Header("DEBUG")] 
         [SerializeField] [ReadOnlyInspector] private int hp;
 
         [field: Header("Events")]
-        [field: SerializeField]
-        public UnityEvent<int, int> HpChanged { get; private set; }
-
+        [field: SerializeField] public UnityEvent<int, int> HpChanged { get; private set; }
         [field: SerializeField] public UnityEvent<LineType, LineType> LineTypeChanged { get; private set; }
 
-        private Dictionary<LineType, LineTypeCharacteristics> lineMap;
         
-        [Header("References")]
-        [SerializeField] private SpriteRenderer edgeSpriteRenderer;
-        [SerializeField] private BoxCollider2D edgeCollider;
 
+        private Dictionary<LineType, LineTypeCharacteristics> lineMap;
         public SpriteRenderer SpriteRenderer => edgeSpriteRenderer;
         public BoxCollider2D BoxCollider2D => edgeCollider;
 
