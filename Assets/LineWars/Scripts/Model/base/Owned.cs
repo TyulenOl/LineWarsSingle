@@ -10,8 +10,10 @@ namespace LineWars.Model
     /// <summary>
     /// класс, который объединяет все принадлежащее (ноды, юнитов и т.д.)
     /// </summary>
-    public abstract class Owned: MonoBehaviour
+    public abstract class Owned: MonoBehaviour, ISerializationCallbackReceiver
     {
+        public ModelOwned ModelOwned { get; private set; }
+
         [Header("Accessory settings")]
         [SerializeField] [ReadOnlyInspector] protected BasePlayer basePlayer;
         public event Action<BasePlayer, BasePlayer> OwnerChanged;
@@ -45,5 +47,10 @@ namespace LineWars.Model
         }
 
         protected virtual void OnReplenish() {}
+        
+        public void OnBeforeSerialize() {}
+        public void OnAfterDeserialize() => ModelOwned = GenerateModel();
+
+        public abstract ModelOwned GenerateModel();
     }
 }

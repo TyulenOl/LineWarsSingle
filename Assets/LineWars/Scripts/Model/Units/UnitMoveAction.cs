@@ -9,20 +9,20 @@ namespace LineWars.Model
     //[CreateAssetMenu(fileName = "New MoveAction", menuName = "UnitActions/MoveAction", order = 61)]
     public class UnitMoveAction : BaseUnitAction
     {
-        public override ComponentUnit.UnitAction GetAction(ComponentUnit unit) => new ComponentUnit.MoveAction(unit, this);
+        public override ModelComponentUnit.UnitAction GetAction(ModelComponentUnit unit) => new ModelComponentUnit.MoveAction(unit, this);
     }
     
-    public sealed partial class ComponentUnit
+    public sealed partial class ModelComponentUnit
     {
         public class MoveAction : UnitAction, ITargetedAction
         {
             public override CommandType GetMyCommandType() => CommandType.Move;
 
-            public MoveAction([NotNull] ComponentUnit unit, [NotNull] UnitMoveAction data) : base(unit, data)
+            public MoveAction([NotNull] ModelComponentUnit unit, [NotNull] UnitMoveAction data) : base(unit, data)
             {
             }
 
-            public bool CanMoveTo([NotNull] Node target, bool ignoreActionPointsCondition = false)
+            public bool CanMoveTo([NotNull] ModelNode target, bool ignoreActionPointsCondition = false)
             {
                 return MyUnit.Node != target
                        && OwnerCondition()
@@ -51,7 +51,7 @@ namespace LineWars.Model
                 }
             }
 
-            public void MoveTo([NotNull] Node target)
+            public void MoveTo([NotNull] ModelNode target)
             {
                 if (MyUnit.Node.LeftUnit == MyUnit)
                     MyUnit.Node.LeftUnit = null;
@@ -60,9 +60,6 @@ namespace LineWars.Model
 
                 InspectNodeForCallback();
                 AssignNewNode();
-
-                MyUnit.movementLogic.MoveTo(target.transform);
-                SfxManager.Instance.Play(ActionSfx);
           
                 CompleteAndAutoModify();
 
@@ -84,32 +81,32 @@ namespace LineWars.Model
 
                 void AssignNewNode()
                 {
-                    MyUnit.myNode = target;
+                    MyUnit.Node = target;
                     if (MyUnit.Size == UnitSize.Large)
                     {
-                        MyUnit.myNode.LeftUnit = MyUnit;
-                        MyUnit.myNode.RightUnit = MyUnit;
+                        MyUnit.Node.LeftUnit = MyUnit;
+                        MyUnit.Node.RightUnit = MyUnit;
                     }
-                    else if (MyUnit.myNode.LeftIsFree && (MyUnit.UnitDirection == UnitDirection.Left ||
-                                                          MyUnit.UnitDirection == UnitDirection.Right && !MyUnit.myNode.RightIsFree))
+                    else if (MyUnit.Node.LeftIsFree && (MyUnit.UnitDirection == UnitDirection.Left ||
+                                                          MyUnit.UnitDirection == UnitDirection.Right && !MyUnit.Node.RightIsFree))
                     {
-                        MyUnit.myNode.LeftUnit = MyUnit;
+                        MyUnit.Node.LeftUnit = MyUnit;
                         MyUnit.UnitDirection = UnitDirection.Left;
                     }
                     else
                     {
-                        MyUnit.myNode.RightUnit = MyUnit;
+                        MyUnit.Node.RightUnit = MyUnit;
                         MyUnit.UnitDirection = UnitDirection.Right;
                     }
 
-                    if (MyUnit.Owner != MyUnit.myNode.Owner)
-                        Owned.Connect(MyUnit.Owner, MyUnit.myNode);
+                    if (MyUnit.Owner != MyUnit.Node.Owner)
+                        Owned.Connect(MyUnit.Owner, MyUnit.Node);
                 }
             }
 
-            public bool IsMyTarget(ITarget target) => target is Node;
+            public bool IsMyTarget(ITarget target) => target is ModelNode;
 
-            public ICommand GenerateCommand(ITarget target) => new UnitMoveCommand(this, (Node) target);
+            public ICommand GenerateCommand(ITarget target) => new UnitMoveCommand(this, (ModelNode) target);
 
             #region CallBack
 

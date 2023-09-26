@@ -15,7 +15,7 @@ namespace LineWars.Model
 
         public bool TryGetCommand(CommandType priorityType, ITarget target, out ICommand command);
 
-        public UnityEvent AnyActionCompleted { get; }
+        public event Action AnyActionCompleted;
         public IEnumerable<(ITarget, CommandType)> GetAllAvailableTargets();
     } 
 }

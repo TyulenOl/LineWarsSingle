@@ -7,7 +7,7 @@ namespace LineWars.Model
     public class UnitBlockerSelector: ScriptableObject
     {
         // как насчет ввести простую систему с очками блока, у кого их больше тот и блокирует удар.
-        public virtual ComponentUnit SelectBlocker(ComponentUnit targetUnit, ComponentUnit neighborUnit)
+        public virtual ModelComponentUnit SelectBlocker(ModelComponentUnit targetUnit, ModelComponentUnit neighborUnit)
         {
             return
                 (new[] {targetUnit, neighborUnit})

@@ -137,7 +137,7 @@ public class GraphTool : EditorTool
         Undo.IncrementCurrentGroup();
 
         var edge = CreateEdge();
-        edge.Initialize(firstNode, secondNode);
+        edge.Initialize(GetNextIndex(edge), firstNode, secondNode);
 
 
         Undo.RecordObject(firstNode, "ConnectNodes");
@@ -155,7 +155,6 @@ public class GraphTool : EditorTool
     private Edge CreateEdge()
     {
         var edge = (Edge) PrefabUtility.InstantiatePrefab(edgePrefab, graph.EdgesParent.transform);
-        edge.Index = GetNextIndex(edge);
         Undo.RegisterCreatedObjectUndo(edge.gameObject, "CreateEdge");
         SceneVisibilityManager.instance.DisablePicking(edge.gameObject, false);
         return edge;

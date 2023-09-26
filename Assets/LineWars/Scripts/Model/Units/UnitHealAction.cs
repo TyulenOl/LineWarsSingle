@@ -10,10 +10,10 @@ namespace LineWars.Model
     {
         [field: SerializeField] public bool IsMassHeal { get; private set; }
         [field: SerializeField, Min(0)] public int HealingAmount { get; private set; }
-        public override ComponentUnit.UnitAction GetAction(ComponentUnit unit) => new ComponentUnit.HealAction(unit, this);
+        public override ModelComponentUnit.UnitAction GetAction(ModelComponentUnit unit) => new ModelComponentUnit.HealAction(unit, this);
     }
     
-    public sealed partial class ComponentUnit
+    public sealed partial class ModelComponentUnit
     {
         public class HealAction: UnitAction, ITargetedAction
         {
@@ -22,7 +22,7 @@ namespace LineWars.Model
             public bool HealLocked { get; private set; }
             
             
-            public HealAction([NotNull] ComponentUnit unit, UnitHealAction data) : base(unit, data)
+            public HealAction([NotNull] ModelComponentUnit unit, UnitHealAction data) : base(unit, data)
             {
                 IsMassHeal = data.IsMassHeal;
                 HealingAmount = data.HealingAmount;
@@ -30,7 +30,7 @@ namespace LineWars.Model
 
             public override CommandType GetMyCommandType() => CommandType.Heal;
             
-            public bool CanHeal([NotNull] ComponentUnit target, bool ignoreActionPointsCondition = false)
+            public bool CanHeal([NotNull] ModelComponentUnit target, bool ignoreActionPointsCondition = false)
             {
                 return !HealLocked 
                        && OwnerCondition()
@@ -51,18 +51,17 @@ namespace LineWars.Model
                 }
             }
 
-            public void Heal([NotNull] ComponentUnit target)
+            public void Heal([NotNull] ModelComponentUnit target)
             {
                 target.HealMe(HealingAmount);
                 if (IsMassHeal && MyUnit.TryGetNeighbour(out var neighbour))
                     neighbour.HealMe(HealingAmount);
-                SfxManager.Instance.Play(ActionSfx);
                 
                 CompleteAndAutoModify();
             }
 
-            public bool IsMyTarget(ITarget target) => target is ComponentUnit;
-            public ICommand GenerateCommand(ITarget target) => new UnitHealCommand(this, (ComponentUnit) target);
+            public bool IsMyTarget(ITarget target) => target is ModelComponentUnit;
+            public ICommand GenerateCommand(ITarget target) => new UnitHealCommand(this, (ModelComponentUnit) target);
         }
     }
 }

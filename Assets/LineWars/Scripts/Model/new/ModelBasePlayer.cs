@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    public abstract class CBasePlayer: IActor, INumbered
+    public abstract class ModelBasePlayer: IActor, INumbered
     {
         public int Index { get; }
         
@@ -39,28 +39,28 @@ namespace LineWars.Model
             }
         }
         
-        public CNode Base { get; }
+        public ModelNode Base { get; }
         public PlayerRules Rules { get;}
         public PhaseType CurrentPhase { get; private set; }
         public Nation MyNation { get; }
 
-        private HashSet<COwned> myOwned = new ();
-        public IEnumerable<CNode> MyNodes => myOwned.OfType<CNode>();
-        public IEnumerable<CComponentUnit> MyUnits => myOwned.OfType<CComponentUnit>();
+        private HashSet<ModelOwned> myOwned = new ();
+        public IEnumerable<ModelNode> MyNodes => myOwned.OfType<ModelNode>();
+        public IEnumerable<ModelComponentUnit> MyUnits => myOwned.OfType<ModelComponentUnit>();
         
         private bool isFirstReplenish = true;
 
         public event Action<PhaseType, PhaseType> TurnChanged;
-        public event Action<COwned> OwnedAdded;
-        public event Action<COwned> OwnedRemoved;
+        public event Action<ModelOwned> OwnedAdded;
+        public event Action<ModelOwned> OwnedRemoved;
         public event Action<int, int> CurrentMoneyChanged;
         public event Action<int, int> IncomeChanged;
         public event Action Defeated; 
-        public IReadOnlyCollection<COwned> OwnedObjects => myOwned;
-        public bool IsMyOwn(COwned owned) => myOwned.Contains(owned);
+        public IReadOnlyCollection<ModelOwned> OwnedObjects => myOwned;
+        public bool IsMyOwn(ModelOwned owned) => myOwned.Contains(owned);
 
 
-        public CBasePlayer(SpawnInfo spawnInfo)
+        public ModelBasePlayer(SpawnInfo spawnInfo)
         {
             Index = spawnInfo.PlayerIndex;
             Base = spawnInfo.SpawnNode.Node;
@@ -86,7 +86,7 @@ namespace LineWars.Model
             }
         }
 
-        public void SpawnUnit(CNode node, UnitType unitType)
+        public void SpawnUnit(ModelNode node, UnitType unitType)
         {
             if (unitType == UnitType.None) return;
             var unitPrefab = GetUnitPrefab(unitType);
@@ -100,7 +100,7 @@ namespace LineWars.Model
             CurrentMoney -= unitPreset.Cost;
         }
 
-        public void AddOwned([NotNull] COwned owned)
+        public void AddOwned([NotNull] ModelOwned owned)
         {
             if (owned == null) throw new ArgumentNullException(nameof(owned));
 
@@ -113,10 +113,10 @@ namespace LineWars.Model
 
             switch (owned)
             {
-                case CNode node:
+                case ModelNode node:
                     BeforeAddOwned(node);
                     break;
-                case CComponentUnit unit:
+                case ModelComponentUnit unit:
                     BeforeAddOwned(unit);
                     break;
             }
@@ -125,29 +125,29 @@ namespace LineWars.Model
             OwnedAdded?.Invoke(owned);
         }
 
-        protected virtual void BeforeAddOwned(CNode node)
+        protected virtual void BeforeAddOwned(ModelNode node)
         {
             var nodeIncome = GetMyIncomeFromNode(node);
             if (!node.IsDirty) CurrentMoney += GetMyCapturingMoneyFromNode(node);
             Income += nodeIncome;
         }
 
-        public int GetMyIncomeFromNode(CNode node)
+        public int GetMyIncomeFromNode(ModelNode node)
         {
             return Mathf.RoundToInt(Rules.IncomeModifier.Modify(node.BaseIncome));
         }
         
-        public int GetMyCapturingMoneyFromNode(CNode node)
+        public int GetMyCapturingMoneyFromNode(ModelNode node)
         {
             return Rules.MoneyForFirstCapturingNode + GetMyIncomeFromNode(node);
         }
 
-        protected virtual void BeforeAddOwned(CComponentUnit unit)
+        protected virtual void BeforeAddOwned(ModelComponentUnit unit)
         {
             
         }
 
-        public void RemoveOwned([NotNull] COwned owned)
+        public void RemoveOwned([NotNull] ModelOwned owned)
         {
             if (owned == null) throw new ArgumentNullException(nameof(owned));
 
@@ -155,10 +155,10 @@ namespace LineWars.Model
 
             switch (owned)
             {
-                case CNode node:
+                case ModelNode node:
                     BeforeRemoveOwned(node);
                     break;
-                case CComponentUnit unit:
+                case ModelComponentUnit unit:
                     BeforeRemoveOwned(unit);
                     break;
             }
@@ -167,7 +167,7 @@ namespace LineWars.Model
             OwnedRemoved?.Invoke(owned);
         }
         
-        protected virtual void BeforeRemoveOwned(CNode node)
+        protected virtual void BeforeRemoveOwned(ModelNode node)
         {
             Income -= Mathf.RoundToInt(Rules.IncomeModifier.Modify(node.BaseIncome));
 
@@ -177,7 +177,7 @@ namespace LineWars.Model
             }
         }
 
-        protected virtual void BeforeRemoveOwned(CComponentUnit unit)
+        protected virtual void BeforeRemoveOwned(ModelComponentUnit unit)
         {
         }
 

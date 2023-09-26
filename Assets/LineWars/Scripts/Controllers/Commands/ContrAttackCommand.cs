@@ -5,18 +5,18 @@ namespace LineWars.Model
 {
     public class ContrAttackCommand: ICommand
     {
-        private readonly ComponentUnit.BlockAction blockAction;
-        private readonly ComponentUnit attacker;
-        private readonly ComponentUnit blocker;
+        private readonly ModelComponentUnit.BlockAction blockAction;
+        private readonly ModelComponentUnit attacker;
+        private readonly ModelComponentUnit blocker;
         
-        public ContrAttackCommand([NotNull] ComponentUnit attacker, [NotNull] ComponentUnit blocker)
+        public ContrAttackCommand([NotNull] ModelComponentUnit attacker, [NotNull] ModelComponentUnit blocker)
         {
-            this.attacker = attacker ? attacker : throw new ArgumentNullException(nameof(attacker));
-            this.blocker = blocker ? blocker : throw new ArgumentNullException(nameof(blocker));
+            this.attacker = attacker ?? throw new ArgumentNullException(nameof(attacker));
+            this.blocker = blocker ?? throw new ArgumentNullException(nameof(blocker));
             
-            blockAction = attacker.TryGetExecutorAction<ComponentUnit.BlockAction>(out var action) 
+            blockAction = attacker.TryGetExecutorAction<ModelComponentUnit.BlockAction>(out var action) 
                 ? action 
-                : throw new ArgumentException($"{nameof(ComponentUnit)} does not contain {nameof(ComponentUnit.BlockAction)}");
+                : throw new ArgumentException($"{nameof(ModelComponentUnit)} does not contain {nameof(ModelComponentUnit.BlockAction)}");
         }
         
         public void Execute()
@@ -31,7 +31,7 @@ namespace LineWars.Model
 
         public string GetLog()
         {
-            return $"Юнит {attacker.gameObject.name} контратаковал юнита {blocker.gameObject.name}";
+            return $"Юнит {attacker} контратаковал юнита {blocker}";
         }
     }
 }
