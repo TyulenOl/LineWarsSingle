@@ -5,22 +5,22 @@ namespace LineWars.Model
 {
     public static class NodeExtension
     {
-        public static bool HasLine(this Node from, Node to)
+        public static bool HasLine(this ModelNode from, ModelNode to)
         {
             return GetLine(from, to) != null;
         }
         
-        public static Edge GetLine(this Node from, Node to)
+        public static ModelEdge GetLine(this ModelNode from, ModelNode to)
         {
             return from.Edges.Intersect(to.Edges).FirstOrDefault();
         }
 
-        public static List<Node> FindShortestPath(this Node start, Node end)
+        public static List<ModelNode> FindShortestPath(this ModelNode start, ModelNode end)
         {
             return Graph.FindShortestPath(start, end);
         }
 
-        public static IEnumerable<ITarget> GetTargetsWithMe(this Node node)
+        public static IEnumerable<ITarget> GetTargetsWithMe(this ModelNode node)
         {
             yield return node;
             if (node.LeftUnit != null)

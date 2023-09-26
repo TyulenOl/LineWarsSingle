@@ -70,13 +70,13 @@ namespace LineWars.Interface
         private void OnExecutorChanged(IExecutor before, IExecutor after)
         {
             if (before != null)
-                before.AnyActionCompleted.RemoveListener(ReDrawCurrentTargets);
+                before.AnyActionCompleted -= ReDrawCurrentTargets;
             
             currentExecutor = after;
             ReDrawCurrentTargets();
             ReDrawAllAvailability(before, after);
             if(currentExecutor == null) return;
-            currentExecutor.AnyActionCompleted.AddListener(ReDrawCurrentTargets);
+            currentExecutor.AnyActionCompleted += ReDrawCurrentTargets;
         }
 
         private void ReDrawAllAvailability(IExecutor before, IExecutor after)

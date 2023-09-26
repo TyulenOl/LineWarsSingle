@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    //[CreateAssetMenu(fileName = "New MeleeAttackAction", menuName = "UnitActions/Attack/MeleeAttack", order = 61)]
     public class MeleeUnitAttackAction : BaseUnitAttackAction
     {
         [SerializeField] private UnitBlockerSelector blockerSelector;
@@ -18,17 +17,17 @@ namespace LineWars.Model
         public UnitBlockerSelector BlockerSelector => blockerSelector;
         public bool Onslaught => onslaught;
 
-        public override ComponentUnit.UnitAction GetAction(ComponentUnit unit) => new ComponentUnit.MeleeAttackAction(unit, this);
+        public override ModelComponentUnit.UnitAction GetAction(ModelComponentUnit unit) => new ModelComponentUnit.MeleeAttackAction(unit, this);
     }
 
-    public sealed partial class ComponentUnit
+    public sealed partial class ModelComponentUnit
     {
         public sealed class MeleeAttackAction : BaseAttackAction
         {
             private readonly UnitBlockerSelector blockerSelector;
             private readonly bool onslaught;
 
-            public MeleeAttackAction([NotNull] ComponentUnit unit, MeleeUnitAttackAction data) : base(unit, data)
+            public MeleeAttackAction([NotNull] ModelComponentUnit unit, MeleeUnitAttackAction data) : base(unit, data)
             {
                 blockerSelector = data.BlockerSelector;
                 onslaught = data.Onslaught;
@@ -36,7 +35,7 @@ namespace LineWars.Model
 
             public override CommandType GetMyCommandType() => CommandType.MeleeAttack;
 
-            public override bool CanAttackForm([NotNull] Node node, [NotNull] ComponentUnit enemy,
+            public override bool CanAttackForm([NotNull] ModelNode node, [NotNull] ModelComponentUnit enemy,
                 bool ignoreActionPointsCondition = false)
             {
                 if (node == null) throw new ArgumentNullException(nameof(node));
@@ -51,7 +50,7 @@ namespace LineWars.Model
                        && (ignoreActionPointsCondition || ActionPointsCondition());
             }
 
-            public override void Attack([NotNull] ComponentUnit enemy)
+            public override void Attack([NotNull] ModelComponentUnit enemy)
             {
                 if (enemy == null) throw new ArgumentNullException(nameof(enemy));
 
@@ -69,7 +68,7 @@ namespace LineWars.Model
                 }
             }
 
-            public void AttackUnitButIgnoreBlock([NotNull] ComponentUnit enemy)
+            public void AttackUnitButIgnoreBlock([NotNull] ModelComponentUnit enemy)
             {
                 if (enemy == null) throw new ArgumentNullException(nameof(enemy));
                 var enemyNode = enemy.Node;
@@ -79,11 +78,9 @@ namespace LineWars.Model
                     UnitsController.ExecuteCommand(new UnitMoveCommand(MyUnit, enemyNode));
             }
 
-            private void MeleeAttack(ComponentUnit target)
+            private void MeleeAttack(ModelComponentUnit target)
             {
                 target.TakeDamage(new Hit(Damage, MyUnit, target, IsPenetratingDamage));
-                SfxManager.Instance.Play(ActionSfx);
-
                 CompleteAndAutoModify();
             }
         }

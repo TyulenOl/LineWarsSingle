@@ -5,15 +5,13 @@ namespace LineWars.Model
 {
     public class BlockAttackCommand: UnitAttackCommand
     {
-        public BlockAttackCommand(ComponentUnit attacker, IAlive defender) : base(attacker, defender)
+        public BlockAttackCommand(ModelComponentUnit attacker, IAlive defender) : base(attacker, defender)
         {
         }
 
         public override string GetLog()
         {
-            if (Attacker is MonoBehaviour attackerUnit && Defender is MonoBehaviour blockedUnit)
-                return $"{blockedUnit.gameObject.name} перехватил атаку от {attackerUnit.gameObject.name}";
-            return $"{Defender.GetType()} перехватил атаку от {Attacker.GetType()}";
+            return $"{Defender} перехватил атаку от {Attacker}";
         }
     }
 }

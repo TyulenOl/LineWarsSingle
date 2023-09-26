@@ -12,6 +12,8 @@ namespace LineWars.Model
     {
         private static Graph Instance { get; set; }
 
+        public static ModelGraph Model { get; private set; }
+
         [field: SerializeField] public GameObject NodesParent { get; set; }
         [field: SerializeField] public GameObject EdgesParent { get; set; }
 
@@ -21,8 +23,10 @@ namespace LineWars.Model
 
         public static IReadOnlyList<Node> AllNodes => Instance != null ? Instance.allNodes : Array.Empty<Node>();
         public static IReadOnlyList<Edge> AllEdges => Instance != null ? Instance.allEdges : Array.Empty<Edge>();
-        public static IReadOnlyList<SpawnInfo> Spawns => Instance != null ? Instance.spawnInfos : Array.Empty<SpawnInfo>();
-        
+
+        public static IReadOnlyList<SpawnInfo> Spawns =>
+            Instance != null ? Instance.spawnInfos : Array.Empty<SpawnInfo>();
+
         private void Awake()
         {
             if (Instance == null)
@@ -86,7 +90,7 @@ namespace LineWars.Model
         {
             if (ownedNodes == null || ownedNodes.Length == 0)
                 yield break;
-            
+
             var closedNodes = new HashSet<Node>();
             var priorityQueue = new PriorityQueue<Node, int>(0);
             foreach (var ownedNode in ownedNodes)
@@ -96,7 +100,7 @@ namespace LineWars.Model
             {
                 var (node, currentVisibility) = priorityQueue.Dequeue();
                 if (closedNodes.Contains(node)) continue;
-                
+
                 closedNodes.Add(node);
                 yield return node;
                 if (currentVisibility == 0) continue;
@@ -110,13 +114,14 @@ namespace LineWars.Model
             }
         }
 
-        public static List<Node> FindShortestPath([NotNull] Node start, [NotNull] Node end)
+        public static List<ModelNode> FindShortestPath([NotNull] ModelNode start, [NotNull] ModelNode end,
+            Func<ModelNode, ModelNode, bool> condition = null)
         {
             if (start == null) throw new ArgumentNullException(nameof(start));
             if (end == null) throw new ArgumentNullException(nameof(end));
 
-            var queue = new Queue<Node>();
-            var track = new Dictionary<Node, Node>();
+            var queue = new Queue<ModelNode>();
+            var track = new Dictionary<ModelNode, ModelNode>();
             queue.Enqueue(start);
             track[start] = null;
             while (queue.Count != 0)
@@ -125,6 +130,7 @@ namespace LineWars.Model
                 foreach (var neighborhood in node.GetNeighbors())
                 {
                     if (track.ContainsKey(neighborhood)) continue;
+                    if (condition != null && !condition(node, neighborhood)) continue;
                     track[neighborhood] = node;
                     queue.Enqueue(neighborhood);
                 }
@@ -133,50 +139,10 @@ namespace LineWars.Model
             }
 
             if (!track.ContainsKey(end))
-                return new List<Node>();
-            
+                return new List<ModelNode>();
+
             var pathItem = end;
-            var result = new List<Node>();
-            while (pathItem != null)
-            {
-                result.Add(pathItem);
-                pathItem = track[pathItem];
-            }
-
-            result.Reverse();
-            return result;
-        }
-        
-        public static List<Node> FindShortestPath([NotNull] Node start, [NotNull] Node end, ComponentUnit unit)
-        {
-            if (start == null) throw new ArgumentNullException(nameof(start));
-            if (end == null) throw new ArgumentNullException(nameof(end));
-            
-            var queue = new Queue<Node>();
-            var track = new Dictionary<Node, Node>();
-            queue.Enqueue(start);
-            track[start] = null;
-            while (queue.Count != 0)
-            {
-                var node = queue.Dequeue();
-                foreach (var neighborhood in node.GetNeighbors())
-                {
-                    if(!unit.CanMoveOnLineWithType(neighborhood.GetLine(node).LineType)) continue;
-                    if(neighborhood != end && !CheckNodeForWalkability(neighborhood, unit)) continue;
-                    if (track.ContainsKey(neighborhood)) continue;
-                    
-                    track[neighborhood] = node;
-                    queue.Enqueue(neighborhood);
-                }
-
-                if (track.ContainsKey(end)) break;
-            }
-
-            if (!track.ContainsKey(end))
-                return new List<Node>();
-            
-            var pathItem = end;
-            var result = new List<Node>();
+            var result = new List<ModelNode>();
             while (pathItem != null)
             {
                 result.Add(pathItem);
@@ -187,11 +153,11 @@ namespace LineWars.Model
             return result;
         }
 
-        public static IEnumerable<Node> GetNodesInRange(Node startNode, uint range)
+        public static IEnumerable<ModelNode> GetNodesInRange(ModelNode startNode, uint range)
         {
-            var queue = new Queue<Node>();
-            var distanceMemory = new Dictionary<Node, uint>();
-            
+            var queue = new Queue<ModelNode>();
+            var distanceMemory = new Dictionary<ModelNode, uint>();
+
             queue.Enqueue(startNode);
             distanceMemory[startNode] = 0;
             while (queue.Count != 0)
@@ -203,24 +169,11 @@ namespace LineWars.Model
                     if (distanceMemory.ContainsKey(neighborhood)) continue;
                     var distanceForNextNode = distanceMemory[node] + 1;
                     if (distanceForNextNode >= range) continue;
-                    
+
                     distanceMemory[neighborhood] = distanceForNextNode;
                     queue.Enqueue(neighborhood);
                 }
             }
-        }
-
-        public static bool CheckNodeForWalkability(Node node, ComponentUnit unit)
-        {
-            if(unit.Size == UnitSize.Large && !(node.LeftUnit == null && node.RightUnit == null)) return false;
-            if (unit.Size == UnitSize.Little)
-            {
-                if (node.LeftUnit != null && node.RightUnit != null) return false;
-                if (node.LeftUnit != null && node.LeftUnit.Owner != unit.Owner) return false;
-                if (node.RightUnit != null && node.RightUnit.Owner != unit.Owner) return false;
-            }
-            
-            return true;
         }
     }
 }

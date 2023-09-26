@@ -5,24 +5,23 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    //[CreateAssetMenu(fileName = "New DistanceAttack", menuName = "UnitActions/Attack/DistanceAttack", order = 61)]
     public class DistanceUnitAttackAction: BaseUnitAttackAction
     {
         [field: SerializeField, Min(0)] public int Distance { get; private set; }
-        public override ComponentUnit.UnitAction GetAction(ComponentUnit unit) => new ComponentUnit.DistanceAttackAction(unit, this);
+        public override ModelComponentUnit.UnitAction GetAction(ModelComponentUnit unit) => new ModelComponentUnit.DistanceAttackAction(unit, this);
     }
     
-    public sealed partial class ComponentUnit
+    public sealed partial class ModelComponentUnit
     {
         public class DistanceAttackAction: BaseAttackAction
         {
             public uint Distance { get; private set; }
-            public DistanceAttackAction([NotNull] ComponentUnit unit, DistanceUnitAttackAction data) : base(unit, data)
+            public DistanceAttackAction([NotNull] ModelComponentUnit unit, DistanceUnitAttackAction data) : base(unit, data)
             {
                 Distance = (uint) data.Distance;
             }
             
-            public override bool CanAttackForm(Node node, ComponentUnit unit, bool ignoreActionPointsCondition = false)
+            public override bool CanAttackForm(ModelNode node, ModelComponentUnit unit, bool ignoreActionPointsCondition = false)
             {
                 return !AttackLocked
                        && Damage > 0
@@ -31,11 +30,9 @@ namespace LineWars.Model
                        && (ignoreActionPointsCondition || ActionPointsCondition());
             }
 
-            public override void Attack(ComponentUnit enemy)
+            public override void Attack(ModelComponentUnit enemy)
             {
                 DistanceAttack(enemy, Damage);
-                SfxManager.Instance.Play(ActionSfx);
-                
                 CompleteAndAutoModify();
             }
 

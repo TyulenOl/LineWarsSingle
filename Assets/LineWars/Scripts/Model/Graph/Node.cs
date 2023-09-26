@@ -12,6 +12,9 @@ namespace LineWars.Model
     [RequireComponent(typeof(RenderNodeV3))]
     public class Node : Owned, ITarget, INumbered
     {
+        public ModelNode Model { get; private set; }
+
+
         [SerializeField] private int index;
         [SerializeField] private List<Edge> edges;
 
