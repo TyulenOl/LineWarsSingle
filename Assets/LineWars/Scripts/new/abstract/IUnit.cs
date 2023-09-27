@@ -1,8 +1,10 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics;
+using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace LineWars.Model
 {
-    public interface IUnit: IOwned, IReadOnlyUnit, IExecutor, IAlive
+    public interface IUnit: IOwned, IReadOnlyUnit, IExecutor
     {
         public new int CurrentHp { get; set; }
         
@@ -13,6 +15,12 @@ namespace LineWars.Model
         public UnitDirection UnitDirection { get; set; }
 
         public new INode Node { get; set; }
+
+        public void HealMe(int value)
+        {
+            if (value < 0) throw new ArgumentException("Heal value less than zero!");
+            CurrentHp += value;
+        }
 
         public bool TryGetNeighbour([NotNullWhen(true)] out IUnit neighbour)
         {

@@ -1,25 +1,29 @@
 ﻿using System;
+using System.Collections.Generic;
 using JetBrains.Annotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace LineWars.Model
 {
-    public class UnitUpRoadCommand: ICommand
+    public class BuildCommand : ICommand
     {
-        private readonly ModelComponentUnit.BuildAction buildAction;
-        private readonly ModelComponentUnit engineer;
-        private readonly ModelEdge edge;
+        private readonly BuildAction buildAction;
+        private readonly IUnit engineer;
+        private readonly IEdge edge;
 
-        public UnitUpRoadCommand([NotNull] ModelComponentUnit engineer, [NotNull] ModelEdge edge)
+        public BuildCommand([NotNull] IUnit engineer, [NotNull] IEdge edge)
         {
             this.engineer = engineer ?? throw new ArgumentNullException(nameof(engineer));
             this.edge = edge ?? throw new ArgumentNullException(nameof(edge));
-            
-            buildAction = engineer.TryGetExecutorAction<ModelComponentUnit.BuildAction>(out var action) 
-                ? action 
-                : throw new ArgumentException($"{nameof(ModelComponentUnit)} does not contain {nameof(ModelComponentUnit.BuildAction)}");
+
+            buildAction = engineer.TryGetExecutorAction<BuildAction>(out var action)
+                ? action
+                : throw new ArgumentException($"{nameof(IUnit)} does not contain {nameof(BuildAction)}");
         }
 
-        public UnitUpRoadCommand([NotNull] ModelComponentUnit.BuildAction buildAction, [NotNull] ModelEdge edge)
+        public BuildCommand([NotNull] BuildAction buildAction, [NotNull] IEdge edge)
         {
             this.buildAction = buildAction ?? throw new ArgumentNullException(nameof(buildAction));
             this.edge = edge ?? throw new ArgumentNullException(nameof(edge));
@@ -34,7 +38,7 @@ namespace LineWars.Model
 
         public bool CanExecute()
         {
-           return buildAction.CanUpRoad(edge);
+            return buildAction.CanUpRoad(edge);
         }
 
         public string GetLog()

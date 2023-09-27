@@ -5,7 +5,7 @@ using UnityEngine;
 namespace LineWars.Model
 {
     [DisallowMultipleComponent]
-    public abstract class BaseUnitAttackAction: BaseUnitAction
+    public abstract class BaseUnitAttackAction: MonoUnitAction
     {
         [SerializeField] private int damage;
         [SerializeField] private bool isPenetratingDamage;

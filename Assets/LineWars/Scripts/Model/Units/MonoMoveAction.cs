@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    public class UnitMoveAction : BaseUnitAction
+    public class MonoMoveAction : MonoUnitAction
     {
         public override UnitAction GetAction(ComponentUnit unit) => new MoveAction(unit, this);
     }

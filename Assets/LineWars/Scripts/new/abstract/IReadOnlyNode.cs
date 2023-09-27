@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace LineWars.Model
 {
-    public interface IReadOnlyNode: INumbered, IReadOnlyTarget, IReadOnlyOwned
+    public interface IReadOnlyNode : INumbered, IReadOnlyTarget, IReadOnlyOwned
     {
         public int Visibility { get; }
         public int ValueOfHidden { get; }
@@ -17,7 +17,7 @@ namespace LineWars.Model
         public bool AllIsFree => LeftIsFree && RightIsFree;
         public bool AnyIsFree => LeftIsFree || RightIsFree;
         public bool IsBase { get; }
-        
+
         public IReadOnlyCollection<IReadOnlyEdge> Edges { get; }
 
         public IReadOnlyEdge GetLine(IReadOnlyNode node) => Edges.Intersect(node.Edges).FirstOrDefault();
@@ -32,5 +32,7 @@ namespace LineWars.Model
                     yield return edge.FirstNode;
             }
         }
+
+        public bool ContainsEdge(IReadOnlyEdge edge) => Edges.Contains(edge);
     }
 }

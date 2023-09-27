@@ -4,7 +4,7 @@ using LineWars.Controllers;
 
 namespace LineWars.Model
 {
-    public abstract class BaseUnitAction: BaseExecutorAction
+    public abstract class MonoUnitAction: BaseExecutorAction
     {
         public override ExecutorAction GetAction(IReadOnlyExecutor executor)
         {

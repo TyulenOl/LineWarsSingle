@@ -244,7 +244,7 @@ namespace LineWars.Model
         {
             gameObject.name = $"Node{Index}";
             var spriteRenderer = GetComponent<SpriteRenderer>();
-            spriteRenderer.sprite = Resources.Load<Sprite>("Sprites/Circle");;
+            spriteRenderer.sprite = Resources.Load<Sprite>("Sprites/Circle");
             GetComponent<Outline2D>().SetActiveOutline(false);
         }
 

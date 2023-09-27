@@ -12,7 +12,7 @@ namespace LineWars
     public partial class Player : BasePlayer
     {
         public static Player LocalPlayer { get; private set; }
-        [SerializeField] private PhaseExecutorsData phaseExecutorsData;
+        [SerializeField] private float pauseAfterTurn;
 
         private IReadOnlyCollection<UnitType> potentialExecutors;
         private bool isTurnMade;
@@ -96,7 +96,16 @@ namespace LineWars
         private void ProcessActionPointsChange(int previousValue, int currentValue)
         {
             if (currentValue <= 0 && CurrentPhase != PhaseType.Idle)
+            {
                 IsTurnMade = true;
+                StartCoroutine(PauseCoroutine());
+            }
+
+            IEnumerator PauseCoroutine()
+            {
+                yield return new WaitForSeconds(pauseAfterTurn);
+                ExecuteTurn(PhaseType.Idle);
+            }
         }
         
         public void FinishTurn()
@@ -107,7 +116,7 @@ namespace LineWars
 
         public IEnumerable<ComponentUnit> GetAllUnitsByPhase(PhaseType phaseType)
         {
-            if (phaseExecutorsData.PhaseToUnits.TryGetValue(phaseType, out var value))
+            if (PhaseExecutorsData.PhaseToUnits.TryGetValue(phaseType, out var value))
             {
                 foreach (var myUnit in MyUnits)
                 {
@@ -176,7 +185,7 @@ namespace LineWars
 
         private bool CanExecutePhase(PhaseType phaseType)
         {
-            var phaseExecutors = phaseExecutorsData.PhaseToUnits[phaseType];
+            var phaseExecutors = PhaseExecutorsData.PhaseToUnits[phaseType];
 
             foreach (var owned in OwnedObjects)
             {

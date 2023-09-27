@@ -19,6 +19,9 @@ namespace LineWars.Model
         private Edge[] allEdges;
         private List<SpawnInfo> spawnInfos;
 
+        public IReadOnlyList<Node> Nodes => allNodes;
+        public IReadOnlyList<Edge> Edges => allEdges;
+
         public static IReadOnlyList<Node> AllNodes => Instance != null ? Instance.allNodes : Array.Empty<Node>();
         public static IReadOnlyList<Edge> AllEdges => Instance != null ? Instance.allEdges : Array.Empty<Edge>();
         public static IReadOnlyList<SpawnInfo> Spawns => Instance != null ? Instance.spawnInfos : Array.Empty<SpawnInfo>();

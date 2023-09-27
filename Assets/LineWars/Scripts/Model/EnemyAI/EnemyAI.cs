@@ -10,7 +10,6 @@ namespace LineWars.Model
 {
     public partial class EnemyAI : BasePlayer
     {
-        [SerializeField] private PhaseExecutorsData executorsData;
         [SerializeField] private EnemyPhaseActions enemyPhaseActions;
         [SerializeField] private EnemyDifficulty difficulty;
         [SerializeField] private float actionCooldown;
@@ -18,7 +17,7 @@ namespace LineWars.Model
 
         private IReadOnlyExecutor currentExecutor;
         private EnemyAIBuySelector buySelector;
-        public IReadOnlyCollection<UnitType> PotentialExecutors => executorsData.PhaseToUnits[CurrentPhase];
+        public IReadOnlyCollection<UnitType> PotentialExecutors => PhaseExecutorsData.PhaseToUnits[CurrentPhase];
 
         protected override void Awake()
         {
@@ -104,7 +103,7 @@ namespace LineWars.Model
 
         private void AddActionsForExecutor(List<EnemyAction> actions, IReadOnlyExecutor executor, PhaseType phase)
         {
-            var unitTypes = executorsData.PhaseToUnits[phase];
+            var unitTypes = PhaseExecutorsData.PhaseToUnits[phase];
             if (executor is ComponentUnit unit && !unitTypes.Contains(unit.Type)) return;
             
             var possibleActionData = enemyPhaseActions.PhasesToActions[phase];
@@ -143,7 +142,7 @@ namespace LineWars.Model
 
         private bool CanExecutePhase(PhaseType phase)
         {
-            var executors = executorsData.PhaseToUnits[phase];
+            var executors = PhaseExecutorsData.PhaseToUnits[phase];
             foreach (var owned in OwnedObjects)
             {
                 if (!(owned is ComponentUnit unit)) continue;
