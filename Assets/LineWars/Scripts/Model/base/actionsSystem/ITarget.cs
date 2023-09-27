@@ -1,11 +1,7 @@
-using UnityEngine;
-using System.Collections.Generic;
-
-namespace LineWars.Model
+﻿namespace LineWars.Model
 {
-    public interface ITarget
+    public interface ITarget: IReadOnlyTarget
     {
-        public CommandPriorityData CommandPriorityData {get;}
+        
     }
 }
-

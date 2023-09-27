@@ -208,7 +208,7 @@ namespace LineWars
                 RecalculateVisibility();
             }
         }
-        private void OnExecuteCommand(IExecutor executor, ITarget target)
+        private void OnExecuteCommand(IReadOnlyExecutor executor, IReadOnlyTarget target)
         {
             RecalculateVisibility();
         }

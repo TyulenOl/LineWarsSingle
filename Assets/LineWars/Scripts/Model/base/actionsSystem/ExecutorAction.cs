@@ -8,14 +8,12 @@ namespace LineWars.Model
     {
         private readonly IntModifier actionModifier;
         private readonly IExecutor myExecutor;
-        protected readonly SFXData ActionSfx;
         public event Action ActionCompleted;
 
         protected ExecutorAction([NotNull] IExecutor unit, [NotNull] BaseExecutorAction data)
         {
             actionModifier = data.ActionModifier;
             myExecutor = unit;
-            ActionSfx = data.ActionSfx;
             
             if (data == null) throw new ArgumentNullException(nameof(data));
             if (myExecutor == null) throw new ArgumentNullException(nameof(unit));
@@ -26,6 +24,12 @@ namespace LineWars.Model
         public virtual void OnReplenish() {}
         
         protected void Complete() => ActionCompleted?.Invoke();
+        
+        protected void CompleteAndAutoModify()
+        {
+            myExecutor.CurrentActionPoints = ModifyActionPoints();
+            Complete();
+        }
 
         public int ModifyActionPoints(int actionPoints) => actionModifier.Modify(actionPoints);
         public int ModifyActionPoints() => ModifyActionPoints(myExecutor.CurrentActionPoints);

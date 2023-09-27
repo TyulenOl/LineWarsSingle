@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using LineWars.Model;
 using TMPro;
 using UnityEngine;

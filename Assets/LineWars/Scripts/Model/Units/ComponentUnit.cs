@@ -9,9 +9,10 @@ using UnityEngine.Events;
 namespace LineWars.Model
 {
     [RequireComponent(typeof(UnitMovementLogic))]
-    public sealed partial class ComponentUnit: Owned, ITarget, IExecutor, IAlive
+    public sealed class ComponentUnit: Owned, IReadOnlyTarget, IReadOnlyExecutor, IAlive, IUnit
     {
         [Header("Units Settings")] 
+        [SerializeField, ReadOnlyInspector] private int index;
         [SerializeField] private string unitName;
 
         [SerializeField, Min(0)] private int maxHp;
@@ -40,7 +41,8 @@ namespace LineWars.Model
         [field: SerializeField] public UnityEvent<int, int> ArmorChanged { get; private set; }
         [field: SerializeField] public UnityEvent<ComponentUnit> Died { get; private set; }
         [field: SerializeField] public UnityEvent<int, int> ActionPointsChanged { get; private set; }
-        [field: SerializeField] public UnityEvent AnyActionCompleted { get; private set; }
+        
+        public event Action AnyActionCompleted;
         public event Action<UnitAction> CurrentActionCompleted;
         
         private UnitMovementLogic movementLogic;
@@ -49,12 +51,14 @@ namespace LineWars.Model
         private uint maxPossibleActionRadius;
 
         #region Properties
+
+        public int Index => index;
         public string UnitName => unitName;
         public int InitialActionPoints => initialActionPoints;
         public int CurrentActionPoints
         {
-            get => currentActionPoints;
-            private set
+            get => currentActionPoints; 
+            set
             {
                 var previousValue = currentActionPoints;
                 currentActionPoints = Mathf.Max(0, value);
@@ -63,12 +67,12 @@ namespace LineWars.Model
         }
 
         public int MaxHp => maxHp;
-        public int Armor => maxArmor;
+        public int MaxArmor => maxArmor;
 
         public int CurrentHp
         {
             get => currentHp;
-            private set
+            set
             {
                 var before = currentHp;
                 currentHp = Mathf.Min(Mathf.Max(0, value), maxHp);
@@ -86,30 +90,41 @@ namespace LineWars.Model
         public int CurrentArmor
         {
             get => currentArmor;
-            private set
+            set
             {
                 var before = currentArmor;
                 currentArmor = Mathf.Max(0, value);
                 ArmorChanged.Invoke(before, currentArmor);
             }
         }
-        
+
+        int IUnit.Visibility { get; set; }
+
         public UnitType Type => unitType;
 
         public UnitDirection UnitDirection
         {
             get => unitDirection;
-            private set
+            set
             {
                 unitDirection = value;
                 UnitDirectionChange?.Invoke(Size, unitDirection);
             }
         }
         
-        public int Visibility => visibility;
+        public int Visibility
+        {
+            get => visibility;
+            set => visibility = value;
+        }
+
         public UnitSize Size => unitSize;
         public LineType MovementLineType => movementLineType;
         public Node Node => myNode;
+        INode IUnit.Node { get; set; }
+        IReadOnlyNode IReadOnlyUnit.Node => Node;
+        
+
         public CommandPriorityData CommandPriorityData => priorityData;
         public bool CanDoAnyAction => currentActionPoints > 0;
         #endregion
@@ -157,7 +172,7 @@ namespace LineWars.Model
             return action != null;
         }
         
-        public bool TryGetCommand(CommandType priorityType, ITarget target, out ICommand command)
+        public bool TryGetCommand(CommandType priorityType, IReadOnlyTarget target, out ICommand command)
         {
             
             if (runtimeActionsDictionary.TryGetValue(priorityType, out var value)
@@ -235,7 +250,7 @@ namespace LineWars.Model
                 CurrentHp -= notBlockedDamage;
 
             if (!IsDied && hit is {IsRangeAttack: false})
-                UnitsController.ExecuteCommand(new ContrAttackCommand(this, hit.Source), false);
+                UnitsController.ExecuteCommand(new UnitContrAttackCommand(this, hit.Source), false);
         }
         
         public void HealMe(int healAmount)
@@ -245,15 +260,15 @@ namespace LineWars.Model
              CurrentHp += healAmount;
         }
 
-        public IEnumerable<(ITarget, CommandType)> GetAllAvailableTargets()
+        public IEnumerable<(IReadOnlyTarget, CommandType)> GetAllAvailableTargets()
         {
             return GetAllAvailableTargetsInRange(maxPossibleActionRadius + 1);
         }
 
-        private IEnumerable<(ITarget, CommandType)> GetAllAvailableTargetsInRange(uint range)
+        private IEnumerable<(IReadOnlyTarget, CommandType)> GetAllAvailableTargetsInRange(uint range)
          {
              var visibilityEdges = new HashSet<Edge>();
-             foreach (var e in Graph.GetNodesInRange(myNode, range))
+             foreach (Node e in Graph.GetNodesInRange(myNode, range))
              {
                  foreach (var target in e.GetTargetsWithMe())
                      yield return (target, UnitsController.Instance.GetCommandTypeBy(this, target));

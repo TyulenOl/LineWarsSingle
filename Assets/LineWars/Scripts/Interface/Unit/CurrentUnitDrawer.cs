@@ -19,7 +19,7 @@ namespace LineWars.Interface
             CommandsManager.Instance.ExecutorChanged.RemoveListener(ExecutorChanged);
         }
 
-        private void ExecutorChanged(IExecutor oldExecutor, IExecutor newExecutor)
+        private void ExecutorChanged(IReadOnlyExecutor oldExecutor, IReadOnlyExecutor newExecutor)
         {
             if (newExecutor is ComponentUnit unit)
             {

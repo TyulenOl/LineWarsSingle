@@ -5,26 +5,26 @@ namespace LineWars.Model
 {
     public class UnitMoveCommand: ICommand
     {
-        private readonly ComponentUnit.MoveAction moveAction;
-        private readonly ComponentUnit unit;
-        private readonly Node start;
-        private readonly Node end;
+        private readonly ModelComponentUnit.MoveAction moveAction;
+        private readonly ModelComponentUnit unit;
+        private readonly ModelNode start;
+        private readonly ModelNode end;
         
-        public UnitMoveCommand([NotNull] ComponentUnit unit, [NotNull] Node end)
+        public UnitMoveCommand([NotNull] ModelComponentUnit unit, [NotNull] ModelNode end)
         {
-            this.unit = unit ? unit : throw new ArgumentNullException(nameof(unit));
-            this.end = end ? end : throw new ArgumentNullException(nameof(end));
+            this.unit = unit ?? throw new ArgumentNullException(nameof(unit));
+            this.end = end ?? throw new ArgumentNullException(nameof(end));
             this.start = unit.Node;
             
-            moveAction = unit.TryGetExecutorAction<ComponentUnit.MoveAction>(out var action) 
+            moveAction = unit.TryGetExecutorAction<ModelComponentUnit.MoveAction>(out var action) 
                 ? action 
-                : throw new ArgumentException($"{nameof(ComponentUnit)} does not contain {nameof(ComponentUnit.MoveAction)}");
+                : throw new ArgumentException($"{nameof(ModelComponentUnit)} does not contain {nameof(ModelComponentUnit.MoveAction)}");
         }
 
-        public UnitMoveCommand([NotNull] ComponentUnit.MoveAction moveAction, [NotNull] Node end)
+        public UnitMoveCommand([NotNull] ModelComponentUnit.MoveAction moveAction, [NotNull] ModelNode end)
         {
             this.moveAction = moveAction ?? throw new ArgumentNullException(nameof(moveAction));
-            this.end = end ? end : throw new ArgumentNullException(nameof(end));
+            this.end = end ?? throw new ArgumentNullException(nameof(end));
             
             unit = this.moveAction.MyUnit;
             start = unit.Node;
@@ -42,7 +42,7 @@ namespace LineWars.Model
 
         public string GetLog()
         {
-            return $"Юнит {unit.gameObject.name} переместился из {start.gameObject.name} в {end.gameObject.name}";
+            return $"Юнит {unit} переместился из {start} в {end}";
         }
     }
 }

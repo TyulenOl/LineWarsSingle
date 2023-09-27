@@ -9,8 +9,8 @@ namespace LineWars.Controllers
     {
         public static CommandsManager Instance { get; private set; }
         
-        private ITarget target;
-        private IExecutor executor;
+        private IReadOnlyTarget target;
+        private IReadOnlyExecutor executor;
 
         private StateMachine stateMachine;
         private CommandsManagerExecutorState executorState;
@@ -18,12 +18,12 @@ namespace LineWars.Controllers
         private CommandsManagerIdleState idleState;
 
 
-        public UnityEvent<ITarget, ITarget> TargetChanged;
-        public UnityEvent<IExecutor, IExecutor> ExecutorChanged;
-        public UnityEvent<IExecutor, ITarget> CommandExecuted;
+        public UnityEvent<IReadOnlyTarget, IReadOnlyTarget> TargetChanged;
+        public UnityEvent<IReadOnlyExecutor, IReadOnlyExecutor> ExecutorChanged;
+        public UnityEvent<IReadOnlyExecutor, IReadOnlyTarget> CommandExecuted;
 
         #region Attributes
-        public ITarget Target
+        public IReadOnlyTarget Target
         {
             get => target;
             private set
@@ -33,7 +33,7 @@ namespace LineWars.Controllers
                 TargetChanged.Invoke(previousTarget, target);
             }
         }
-        public IExecutor Executor 
+        public IReadOnlyExecutor Executor 
         {
             get => executor;
             private set

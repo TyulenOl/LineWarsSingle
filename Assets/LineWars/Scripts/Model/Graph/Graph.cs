@@ -113,13 +113,15 @@ namespace LineWars.Model
             }
         }
 
-        public static List<Node> FindShortestPath([NotNull] Node start, [NotNull] Node end)
+        public static List<INode> FindShortestPath([NotNull] INode start,
+            [NotNull] INode end,
+            Func<INode, INode, bool> condition = null)
         {
             if (start == null) throw new ArgumentNullException(nameof(start));
             if (end == null) throw new ArgumentNullException(nameof(end));
 
-            var queue = new Queue<Node>();
-            var track = new Dictionary<Node, Node>();
+            var queue = new Queue<INode>();
+            var track = new Dictionary<INode, INode>();
             queue.Enqueue(start);
             track[start] = null;
             while (queue.Count != 0)
@@ -128,6 +130,7 @@ namespace LineWars.Model
                 foreach (var neighborhood in node.GetNeighbors())
                 {
                     if (track.ContainsKey(neighborhood)) continue;
+                    if (condition != null && !condition(node, neighborhood)) continue;
                     track[neighborhood] = node;
                     queue.Enqueue(neighborhood);
                 }
@@ -136,10 +139,10 @@ namespace LineWars.Model
             }
 
             if (!track.ContainsKey(end))
-                return new List<Node>();
+                return new List<INode>();
             
             var pathItem = end;
-            var result = new List<Node>();
+            var result = new List<INode>();
             while (pathItem != null)
             {
                 result.Add(pathItem);
@@ -150,50 +153,10 @@ namespace LineWars.Model
             return result;
         }
         
-        public static List<Node> FindShortestPath([NotNull] Node start, [NotNull] Node end, ComponentUnit unit)
+        public static IEnumerable<INode> GetNodesInRange(INode startNode, uint range)
         {
-            if (start == null) throw new ArgumentNullException(nameof(start));
-            if (end == null) throw new ArgumentNullException(nameof(end));
-            
-            var queue = new Queue<Node>();
-            var track = new Dictionary<Node, Node>();
-            queue.Enqueue(start);
-            track[start] = null;
-            while (queue.Count != 0)
-            {
-                var node = queue.Dequeue();
-                foreach (var neighborhood in node.GetNeighbors())
-                {
-                    if(!unit.CanMoveOnLineWithType(neighborhood.GetLine(node).LineType)) continue;
-                    if(neighborhood != end && !CheckNodeForWalkability(neighborhood, unit)) continue;
-                    if (track.ContainsKey(neighborhood)) continue;
-                    
-                    track[neighborhood] = node;
-                    queue.Enqueue(neighborhood);
-                }
-
-                if (track.ContainsKey(end)) break;
-            }
-
-            if (!track.ContainsKey(end))
-                return new List<Node>();
-            
-            var pathItem = end;
-            var result = new List<Node>();
-            while (pathItem != null)
-            {
-                result.Add(pathItem);
-                pathItem = track[pathItem];
-            }
-
-            result.Reverse();
-            return result;
-        }
-
-        public static IEnumerable<Node> GetNodesInRange(Node startNode, uint range)
-        {
-            var queue = new Queue<Node>();
-            var distanceMemory = new Dictionary<Node, uint>();
+            var queue = new Queue<INode>();
+            var distanceMemory = new Dictionary<INode, uint>();
             
             queue.Enqueue(startNode);
             distanceMemory[startNode] = 0;
@@ -211,19 +174,6 @@ namespace LineWars.Model
                     queue.Enqueue(neighborhood);
                 }
             }
-        }
-
-        public static bool CheckNodeForWalkability(Node node, ComponentUnit unit)
-        {
-            if(unit.Size == UnitSize.Large && !(node.LeftUnit == null && node.RightUnit == null)) return false;
-            if (unit.Size == UnitSize.Little)
-            {
-                if (node.LeftUnit != null && node.RightUnit != null) return false;
-                if (node.LeftUnit != null && node.LeftUnit.Owner != unit.Owner) return false;
-                if (node.RightUnit != null && node.RightUnit.Owner != unit.Owner) return false;
-            }
-            
-            return true;
         }
     }
 }
