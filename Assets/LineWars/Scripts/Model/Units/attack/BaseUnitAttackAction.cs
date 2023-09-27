@@ -14,7 +14,7 @@ namespace LineWars.Model
     }
 
 
-    public sealed partial class ComponentUnit
+    public sealed partial class ModelComponentUnit
     {
         public abstract class BaseAttackAction: UnitAction, ITargetedAction
         {
@@ -22,18 +22,18 @@ namespace LineWars.Model
             public int Damage { get; protected set; }
             public bool IsPenetratingDamage { get; protected set; }
 
-            protected BaseAttackAction([NotNull] ComponentUnit unit, BaseUnitAttackAction data) : base(unit, data)
+            protected BaseAttackAction([NotNull] ModelComponentUnit unit, BaseUnitAttackAction data) : base(unit, data)
             {
                 Damage = data.Damage;
                 IsPenetratingDamage = data.IsPenetratingDamage;
             }
             public bool CanAttack(IAlive enemy, bool ignoreActionPointsCondition = false) => CanAttackForm(MyUnit.Node, enemy, ignoreActionPointsCondition);
-            public bool CanAttackForm(Node node, IAlive enemy, bool ignoreActionPointsCondition = false)
+            public bool CanAttackForm(ModelNode node, IAlive enemy, bool ignoreActionPointsCondition = false)
             {
                 return enemy switch
                 {
-                    Edge edge => CanAttackForm(node, edge, ignoreActionPointsCondition),
-                    ComponentUnit unit => CanAttackForm(node, unit, ignoreActionPointsCondition),
+                    ModelEdge edge => CanAttackForm(node, edge, ignoreActionPointsCondition),
+                    ModelComponentUnit unit => CanAttackForm(node, unit, ignoreActionPointsCondition),
                     _ => false
                 };
             }
@@ -42,21 +42,21 @@ namespace LineWars.Model
             {
                 switch (enemy)
                 {
-                    case Edge edge:
+                    case ModelEdge edge:
                         Attack(edge);
                         break;
-                    case ComponentUnit unit:
+                    case ModelComponentUnit unit:
                         Attack(unit);
                         break;
                 }
             }
             
     
-            public virtual bool CanAttackForm(Node node, ComponentUnit unit, bool ignoreActionPointsCondition = false) => false;
-            public virtual bool CanAttackForm(Node node, Edge edge,  bool ignoreActionPointsCondition = false) => false;
+            public virtual bool CanAttackForm(ModelNode node, ModelComponentUnit unit, bool ignoreActionPointsCondition = false) => false;
+            public virtual bool CanAttackForm(ModelNode node, ModelEdge edge,  bool ignoreActionPointsCondition = false) => false;
             
-            public virtual void Attack(ComponentUnit unit) {}
-            public virtual void Attack(Edge edge) {}
+            public virtual void Attack(ModelComponentUnit unit) {}
+            public virtual void Attack(ModelEdge edge) {}
 
             public bool IsMyTarget(IReadOnlyTarget target) => target is IAlive;
             public ICommand GenerateCommand(IReadOnlyTarget target) => new UnitAttackCommand(this, (IAlive)target);

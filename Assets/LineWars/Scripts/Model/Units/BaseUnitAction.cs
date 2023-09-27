@@ -1,5 +1,6 @@
 ﻿using System;
 using JetBrains.Annotations;
+using LineWars.Controllers;
 
 namespace LineWars.Model
 {
@@ -7,19 +8,21 @@ namespace LineWars.Model
     {
         public override ExecutorAction GetAction(IReadOnlyExecutor executor)
         {
-            if (executor is not ComponentUnit unit)
-                throw new ArgumentException($"{nameof(executor)} is not {nameof(ComponentUnit)}!");
-            return GetAction(unit);
+            if (executor is not ModelComponentUnit unit)
+                throw new ArgumentException($"{nameof(executor)} is not {nameof(ModelComponentUnit)}!");
+            var action = GetAction(unit);
+            action.ActionCompleted += () => SfxManager.Instance.Play(ActionSfx);
+            return action;
         }
-        public abstract ComponentUnit.UnitAction GetAction(ComponentUnit unit);
+        public abstract ModelComponentUnit.UnitAction GetAction(ModelComponentUnit unit);
     }
 
-    public sealed partial class ComponentUnit
+    public sealed partial class ModelComponentUnit
     {
         public abstract class UnitAction: ExecutorAction
         {
-            public readonly ComponentUnit MyUnit;
-            protected UnitAction([NotNull] ComponentUnit unit, BaseUnitAction data) : base(unit, data)
+            public readonly ModelComponentUnit MyUnit;
+            protected UnitAction([NotNull] ModelComponentUnit unit, BaseUnitAction data) : base(unit, data)
             {
                 MyUnit = unit;
             }

@@ -13,11 +13,11 @@ namespace LineWars.Model
         public bool Protection => protection;
         public IntModifier ContrAttackDamageModifier => contrAttackDamageModifier;
 
-        public override ComponentUnit.UnitAction GetAction(ComponentUnit unit) =>
-            new ComponentUnit.BlockAction(unit, this);
+        public override ModelComponentUnit.UnitAction GetAction(ModelComponentUnit unit) =>
+            new ModelComponentUnit.BlockAction(unit, this);
     }
     
-    public sealed partial class ComponentUnit
+    public sealed partial class ModelComponentUnit
     {
         public sealed class BlockAction : UnitAction, ISimpleAction
         {
@@ -44,7 +44,7 @@ namespace LineWars.Model
 
             public event Action<bool, bool> CanBlockChanged;
 
-            public BlockAction([NotNull] ComponentUnit unit, UnitBlockAction data) : base(unit, data)
+            public BlockAction([NotNull] ModelComponentUnit unit, UnitBlockAction data) : base(unit, data)
             {
                 Protection = data.Protection;
                 contrAttackDamageModifier = data.ContrAttackDamageModifier;
@@ -67,7 +67,7 @@ namespace LineWars.Model
             }
             
 
-            public bool CanContrAttack([NotNull] ComponentUnit enemy)
+            public bool CanContrAttack([NotNull] ModelComponentUnit enemy)
             {
                 if (enemy == null) throw new ArgumentNullException(nameof(enemy));
                 return (IsBlocked)
@@ -75,7 +75,7 @@ namespace LineWars.Model
                     && AttackAction.CanAttack(enemy, true);
             }
 
-            public void ContrAttack([NotNull] ComponentUnit enemy)
+            public void ContrAttack([NotNull] ModelComponentUnit enemy)
             {
                 if (enemy == null) throw new ArgumentNullException(nameof(enemy));
                 var contrAttackDamage = contrAttackDamageModifier.Modify(AttackAction.Damage);
