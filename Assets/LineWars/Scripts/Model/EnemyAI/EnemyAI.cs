@@ -16,7 +16,7 @@ namespace LineWars.Model
         [SerializeField] private float actionCooldown;
         [SerializeField] private EnemyAIPersonality personality;
 
-        private IExecutor currentExecutor;
+        private IReadOnlyExecutor currentExecutor;
         private EnemyAIBuySelector buySelector;
         public IReadOnlyCollection<UnitType> PotentialExecutors => executorsData.PhaseToUnits[CurrentPhase];
 
@@ -60,7 +60,7 @@ namespace LineWars.Model
             foreach (var owned in OwnedObjects)
             {
                 
-                if (!(owned is IExecutor executor)) continue;
+                if (!(owned is IReadOnlyExecutor executor)) continue;
                 if(executor.CurrentActionPoints <= 0) continue;
                 AddActionsForExecutor(actions, executor, phase);
             }
@@ -102,7 +102,7 @@ namespace LineWars.Model
             }
         }
 
-        private void AddActionsForExecutor(List<EnemyAction> actions, IExecutor executor, PhaseType phase)
+        private void AddActionsForExecutor(List<EnemyAction> actions, IReadOnlyExecutor executor, PhaseType phase)
         {
             var unitTypes = executorsData.PhaseToUnits[phase];
             if (executor is ComponentUnit unit && !unitTypes.Contains(unit.Type)) return;

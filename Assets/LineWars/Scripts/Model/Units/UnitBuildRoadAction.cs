@@ -41,8 +41,8 @@ namespace LineWars.Model
             
             public override CommandType GetMyCommandType() => CommandType.Build;
             
-            public bool IsMyTarget(ITarget target) => target is Edge;
-            public ICommand GenerateCommand(ITarget target) => new UnitUpRoadCommand(this, (Edge)target);
+            public bool IsMyTarget(IReadOnlyTarget target) => target is Edge;
+            public ICommand GenerateCommand(IReadOnlyTarget target) => new UnitUpRoadCommand(this, (Edge)target);
         }
     } 
 }

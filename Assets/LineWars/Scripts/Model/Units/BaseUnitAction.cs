@@ -5,7 +5,7 @@ namespace LineWars.Model
 {
     public abstract class BaseUnitAction: BaseExecutorAction
     {
-        public override ExecutorAction GetAction(IExecutor executor)
+        public override ExecutorAction GetAction(IReadOnlyExecutor executor)
         {
             if (executor is not ComponentUnit unit)
                 throw new ArgumentException($"{nameof(executor)} is not {nameof(ComponentUnit)}!");
@@ -25,12 +25,6 @@ namespace LineWars.Model
             }
             
             public virtual uint GetPossibleMaxRadius() => (uint) MyUnit.CurrentActionPoints;
-            
-            protected void CompleteAndAutoModify()
-            {
-                MyUnit.CurrentActionPoints = ModifyActionPoints();
-                Complete();
-            }
         }
     }
 

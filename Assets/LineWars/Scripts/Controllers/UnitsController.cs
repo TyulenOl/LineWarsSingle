@@ -37,7 +37,7 @@ namespace LineWars
             }
         }
         
-        public bool Action(IExecutor executor, ITarget target)
+        public bool Action(IReadOnlyExecutor executor, IReadOnlyTarget target)
         {
             foreach (var commandType in target.CommandPriorityData.Priority)
             {
@@ -52,7 +52,7 @@ namespace LineWars
             return false;
         }
 
-        public CommandType GetCommandTypeBy(IExecutor executor, ITarget target)
+        public CommandType GetCommandTypeBy(IReadOnlyExecutor executor, IReadOnlyTarget target)
         {
             foreach (var commandType in target.CommandPriorityData.Priority)
             {

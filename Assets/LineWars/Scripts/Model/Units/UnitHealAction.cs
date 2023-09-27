@@ -61,8 +61,8 @@ namespace LineWars.Model
                 CompleteAndAutoModify();
             }
 
-            public bool IsMyTarget(ITarget target) => target is ComponentUnit;
-            public ICommand GenerateCommand(ITarget target) => new UnitHealCommand(this, (ComponentUnit) target);
+            public bool IsMyTarget(IReadOnlyTarget target) => target is ComponentUnit;
+            public ICommand GenerateCommand(IReadOnlyTarget target) => new UnitHealCommand(this, (ComponentUnit) target);
         }
     }
 }

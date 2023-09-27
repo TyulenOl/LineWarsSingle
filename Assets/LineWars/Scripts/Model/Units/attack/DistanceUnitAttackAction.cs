@@ -16,36 +16,36 @@ namespace LineWars.Model
     {
         public class DistanceAttackAction: BaseAttackAction
         {
-            public uint Distance { get; private set; }
-            public DistanceAttackAction([NotNull] ComponentUnit unit, DistanceUnitAttackAction data) : base(unit, data)
-            {
-                Distance = (uint) data.Distance;
-            }
-            
-            public override bool CanAttackForm(Node node, ComponentUnit unit, bool ignoreActionPointsCondition = false)
-            {
-                return !AttackLocked
-                       && Damage > 0
-                       && unit.Owner != MyUnit.Owner
-                       && node.FindShortestPath(unit.Node).Count - 1 <= Distance
-                       && (ignoreActionPointsCondition || ActionPointsCondition());
-            }
-
-            public override void Attack(ComponentUnit enemy)
-            {
-                DistanceAttack(enemy, Damage);
-                SfxManager.Instance.Play(ActionSfx);
-                
-                CompleteAndAutoModify();
-            }
-
-            protected void DistanceAttack(IAlive enemy, int damage)
-            {
-                enemy.TakeDamage(new Hit(damage, MyUnit, enemy, IsPenetratingDamage, true));
-            }
-
-            public override CommandType GetMyCommandType() => CommandType.Fire;
-            public override uint GetPossibleMaxRadius() => Distance;
+            // public uint Distance { get; private set; }
+            // public DistanceAttackAction([NotNull] ComponentUnit unit, DistanceUnitAttackAction data) : base(unit, data)
+            // {
+            //     Distance = (uint) data.Distance;
+            // }
+            //
+            // public override bool CanAttackForm(Node node, ComponentUnit unit, bool ignoreActionPointsCondition = false)
+            // {
+            //     return !AttackLocked
+            //            && Damage > 0
+            //            && unit.Owner != MyUnit.Owner
+            //            && node.FindShortestPath(unit.Node).Count - 1 <= Distance
+            //            && (ignoreActionPointsCondition || ActionPointsCondition());
+            // }
+            //
+            // public override void Attack(ComponentUnit enemy)
+            // {
+            //     DistanceAttack(enemy, Damage);
+            //     SfxManager.Instance.Play(ActionSfx);
+            //     
+            //     CompleteAndAutoModify();
+            // }
+            //
+            // protected void DistanceAttack(IAlive enemy, int damage)
+            // {
+            //     enemy.TakeDamage(new Hit(damage, MyUnit, enemy, IsPenetratingDamage, true));
+            // }
+            //
+            // public override CommandType GetMyCommandType() => CommandType.Fire;
+            // public override uint GetPossibleMaxRadius() => Distance;
         }
     }
 }

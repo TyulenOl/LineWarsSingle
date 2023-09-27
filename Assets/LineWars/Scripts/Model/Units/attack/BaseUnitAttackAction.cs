@@ -58,8 +58,8 @@ namespace LineWars.Model
             public virtual void Attack(ComponentUnit unit) {}
             public virtual void Attack(Edge edge) {}
 
-            public bool IsMyTarget(ITarget target) => target is IAlive;
-            public ICommand GenerateCommand(ITarget target) => new UnitAttackCommand(this, (IAlive)target);
+            public bool IsMyTarget(IReadOnlyTarget target) => target is IAlive;
+            public ICommand GenerateCommand(IReadOnlyTarget target) => new UnitAttackCommand(this, (IAlive)target);
         }
     }
 }

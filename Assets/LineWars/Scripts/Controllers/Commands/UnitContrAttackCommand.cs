@@ -3,13 +3,13 @@ using JetBrains.Annotations;
 
 namespace LineWars.Model
 {
-    public class ContrAttackCommand: ICommand
+    public class UnitContrAttackCommand: ICommand
     {
         private readonly ComponentUnit.BlockAction blockAction;
         private readonly ComponentUnit attacker;
         private readonly ComponentUnit blocker;
         
-        public ContrAttackCommand([NotNull] ComponentUnit attacker, [NotNull] ComponentUnit blocker)
+        public UnitContrAttackCommand([NotNull] ComponentUnit attacker, [NotNull] ComponentUnit blocker)
         {
             this.attacker = attacker ? attacker : throw new ArgumentNullException(nameof(attacker));
             this.blocker = blocker ? blocker : throw new ArgumentNullException(nameof(blocker));

@@ -65,7 +65,7 @@ namespace LineWars.Model
                     if (selectedUnit == enemy)
                         AttackUnitButIgnoreBlock(enemy);
                     else
-                        UnitsController.ExecuteCommand(new BlockAttackCommand(MyUnit, selectedUnit), false);
+                        UnitsController.ExecuteCommand(new UnitBlockAttackCommand(MyUnit, selectedUnit), false);
                 }
             }
 

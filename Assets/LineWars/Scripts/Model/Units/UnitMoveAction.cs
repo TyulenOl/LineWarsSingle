@@ -6,7 +6,6 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    //[CreateAssetMenu(fileName = "New MoveAction", menuName = "UnitActions/MoveAction", order = 61)]
     public class UnitMoveAction : BaseUnitAction
     {
         public override ComponentUnit.UnitAction GetAction(ComponentUnit unit) => new ComponentUnit.MoveAction(unit, this);
@@ -107,9 +106,9 @@ namespace LineWars.Model
                 }
             }
 
-            public bool IsMyTarget(ITarget target) => target is Node;
+            public bool IsMyTarget(IReadOnlyTarget target) => target is Node;
 
-            public ICommand GenerateCommand(ITarget target) => new UnitMoveCommand(this, (Node) target);
+            public ICommand GenerateCommand(IReadOnlyTarget target) => new UnitMoveCommand(this, (Node) target);
 
             #region CallBack
 
