@@ -19,6 +19,7 @@ namespace LineWars.Model
         /// Для оптимизации income всегда хешируется
         /// </summary>
         [SerializeField, ReadOnlyInspector] private int income;
+        [SerializeField] public PhaseExecutorsData PhaseExecutorsData;
         
 
         [field: SerializeField, ReadOnlyInspector] public Node Base { get; private set; }

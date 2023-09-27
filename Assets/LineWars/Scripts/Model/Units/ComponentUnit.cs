@@ -141,7 +141,7 @@ namespace LineWars.Model
             
             void InitialiseAllActions()
             {
-                var serializeActions = GetComponents<BaseUnitAction>();
+                var serializeActions = GetComponents<MonoUnitAction>();
                 runtimeActionsDictionary = new Dictionary<CommandType, UnitAction>(serializeActions.Length);
                 foreach (var serializeAction in serializeActions)
                 {
@@ -250,7 +250,7 @@ namespace LineWars.Model
                 CurrentHp -= notBlockedDamage;
 
             if (!IsDied && hit is {IsRangeAttack: false})
-                UnitsController.ExecuteCommand(new UnitContrAttackCommand(this, hit.Source), false);
+                UnitsController.ExecuteCommand(new ContrAttackCommand(this, hit.Source), false);
         }
         
         public void HealMe(int healAmount)

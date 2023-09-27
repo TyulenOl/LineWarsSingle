@@ -81,7 +81,7 @@ namespace LineWars.Model
         public LineType LineType
         {
             get => lineType;
-            private set
+            set
             {
                 var before = lineType;
                 lineType = value;

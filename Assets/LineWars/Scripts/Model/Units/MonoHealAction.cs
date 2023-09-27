@@ -6,11 +6,11 @@ using UnityEngine;
 namespace LineWars.Model
 {
     //[CreateAssetMenu(fileName = "New UnitHealActionData", menuName = "UnitActions/HealAction", order = 61)]
-    public class UnitHealAction: BaseUnitAction
+    public class MonoHealAction: MonoUnitAction
     {
         [field: SerializeField] public bool IsMassHeal { get; private set; }
         [field: SerializeField, Min(0)] public int HealingAmount { get; private set; }
-        public override ComponentUnit.UnitAction GetAction(ComponentUnit unit) => new ComponentUnit.HealAction(unit, this);
+        public override UnitAction GetAction(ComponentUnit unit) => new HealAction(unit, this);
     }
     
     // public sealed partial class ComponentUnit

@@ -19,7 +19,7 @@ namespace LineWars
         {
             var executor = CommandsManager.Instance.Executor;
             if (executor is ComponentUnit unit)
-                UnitsController.ExecuteCommand(new EnableBlockCommand(unit), false);
+                UnitsController.ExecuteCommand(new BlockCommand(unit), false);
         }
     }
 }

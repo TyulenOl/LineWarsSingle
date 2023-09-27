@@ -6,7 +6,7 @@ namespace LineWars.Model
     {
         public readonly IUnit MyUnit;
             
-        public UnitAction([NotNull] IUnit unit, [NotNull] BaseUnitAction data) : base(unit, data)
+        public UnitAction([NotNull] IUnit unit, [NotNull] MonoUnitAction data) : base(unit, data)
         {
             MyUnit = unit;
         }

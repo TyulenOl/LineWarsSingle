@@ -6,15 +6,15 @@ namespace LineWars.Model
 {
     //[CreateAssetMenu(fileName = "New ContrAttackAction", menuName = "UnitActions/ContrAttackAction", order = 61)]
     [RequireComponent(typeof(BaseUnitAttackAction))]
-    public class UnitBlockAction : BaseUnitAction
+    public class MonoBlockAction : MonoUnitAction
     {
         [SerializeField] private bool protection = false;
         [SerializeField] private IntModifier contrAttackDamageModifier;
         public bool Protection => protection;
         public IntModifier ContrAttackDamageModifier => contrAttackDamageModifier;
 
-        public override ModelComponentUnit.UnitAction GetAction(ModelComponentUnit unit) =>
-            new ModelComponentUnit.BlockAction(unit, this);
+        public override UnitAction GetAction(ComponentUnit unit) =>
+            new BlockAction(unit, this);
     }
     
     // public sealed partial class ModelComponentUnit

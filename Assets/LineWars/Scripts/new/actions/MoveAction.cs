@@ -4,7 +4,7 @@ namespace LineWars.Model
 {
     public class MoveAction: UnitAction, ITargetedAction
     {
-        public MoveAction([NotNull] IUnit unit, [NotNull] UnitMoveAction data) : base(unit, data)
+        public MoveAction([NotNull] IUnit unit, [NotNull] MonoMoveAction data) : base(unit, data)
         {
         }
         

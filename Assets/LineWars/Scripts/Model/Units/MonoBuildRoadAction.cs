@@ -6,9 +6,9 @@ using UnityEngine;
 namespace LineWars.Model
 {
     //[CreateAssetMenu(fileName = "New BuildRoadAction", menuName = "UnitActions/BuildRoadAction", order = 61)]
-    public class UnitBuildRoadAction: BaseUnitAction
+    public class MonoBuildRoadAction: MonoUnitAction
     {
-        public override ComponentUnit.UnitAction GetAction(ComponentUnit unit) => new ComponentUnit.BuildAction(unit, this);
+        public override UnitAction GetAction(ComponentUnit unit) => new BuildAction(unit, this);
     }
     
     // public sealed partial class ComponentUnit

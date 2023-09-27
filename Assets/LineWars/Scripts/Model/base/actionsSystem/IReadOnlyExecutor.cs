@@ -10,6 +10,7 @@ namespace LineWars.Model
         public int CurrentActionPoints {get; }
         public bool CanDoAnyAction { get; }
         public event Action AnyActionCompleted;
+        public event Action<UnitAction> CurrentActionCompleted;
 
         public T GetExecutorAction<T>() where T : ExecutorAction;
         public bool TryGetExecutorAction<T>(out T action) where T : ExecutorAction;

@@ -2,6 +2,7 @@ using LineWars.Model;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using LineWars;
 
 public class UnitPartDrawer : MonoBehaviour
 {

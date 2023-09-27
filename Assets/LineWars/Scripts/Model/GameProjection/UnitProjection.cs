@@ -1,8 +1,9 @@
-using System.Collections.Generic;
+/*using System.Collections.Generic;
 using System.Linq;
 
 namespace LineWars.Model
 {
+
     public class UnitProjection : IReadOnlyUnitProjection
     {
         public ComponentUnit Unit { get; private set; }
@@ -60,3 +61,4 @@ namespace LineWars.Model
         }
     }
 }
+*/

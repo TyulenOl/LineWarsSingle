@@ -1,8 +1,9 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace LineWars.Model
 {
-    public interface IReadOnlyUnit: INumbered, IReadOnlyExecutor
+    public interface IReadOnlyUnit: INumbered, IReadOnlyExecutor, IAlive, IReadOnlyOwned
     {
         public string UnitName { get; }
         public int MaxHp { get; }
@@ -17,6 +18,8 @@ namespace LineWars.Model
         public UnitSize Size { get; }
         public LineType MovementLineType { get; }
         public IReadOnlyNode Node { get; }
+
+
 
         public bool IsDied => CurrentHp <= 0;
 
@@ -40,6 +43,12 @@ namespace LineWars.Model
             }
             
             return false;
+        }
+
+        public bool IsNeighbour(IReadOnlyUnit unit)
+        {
+            if (unit == this) return false;
+            return Node.LeftUnit == unit || Node.RightUnit == unit;
         }
     }
 }
