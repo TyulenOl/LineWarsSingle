@@ -5,17 +5,17 @@ namespace LineWars.Model
 {
     public class EnableBlockCommand: ICommand
     {
-        private readonly ComponentUnit.BlockAction blockAction;
-        private readonly ComponentUnit unit;
-        public EnableBlockCommand([NotNull] ComponentUnit unit)
+        private readonly ModelComponentUnit.BlockAction blockAction;
+        private readonly ModelComponentUnit unit;
+        public EnableBlockCommand([NotNull] ModelComponentUnit unit)
         {
             this.unit = unit;
-            blockAction = unit.TryGetExecutorAction<ComponentUnit.BlockAction>(out var action) 
+            blockAction = unit.TryGetExecutorAction<ModelComponentUnit.BlockAction>(out var action) 
                 ? action 
-                : throw new ArgumentException($"{nameof(ComponentUnit)} does not contain {nameof(ComponentUnit.BlockAction)}");
+                : throw new ArgumentException($"{nameof(ModelComponentUnit)} does not contain {nameof(ModelComponentUnit.BlockAction)}");
         }
 
-        public EnableBlockCommand(ComponentUnit.BlockAction blockAction)
+        public EnableBlockCommand(ModelComponentUnit.BlockAction blockAction)
         {
             this.blockAction = blockAction;
             unit = blockAction.MyUnit;
@@ -33,7 +33,7 @@ namespace LineWars.Model
 
         public string GetLog()
         {
-            return $"Юнит {unit.gameObject.name} встал в защиту";
+            return $"Юнит {unit} встал в защиту";
         }
     }
 }

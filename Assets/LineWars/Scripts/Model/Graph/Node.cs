@@ -10,7 +10,7 @@ namespace LineWars.Model
 {
     [RequireComponent(typeof(Selectable2D))]
     [RequireComponent(typeof(RenderNodeV3))]
-    public class Node : Owned, ITarget, INumbered
+    public class Node : Owned, INode
     {
         [SerializeField] private int index;
         [SerializeField] private List<Edge> edges;
@@ -43,17 +43,17 @@ namespace LineWars.Model
 
         public bool IsBase => ReferenceToSpawn.Node == this;
         public Vector2 Position => transform.position;
+        
         public IReadOnlyCollection<Edge> Edges => edges;
+        IReadOnlyCollection<IEdge> INode.Edges => edges;
+        IReadOnlyCollection<IReadOnlyEdge> IReadOnlyNode.Edges => edges;
+
         public bool LeftIsFree => LeftUnit == null;
         public bool RightIsFree => RightUnit == null;
         public bool AnyIsFree => LeftIsFree || RightIsFree;
         public bool AllIsFree => LeftIsFree && RightIsFree;
 
-        public int Index
-        {
-            get => index;
-            set => index = value;
-        }
+        public int Index => index;
 
         public int Visibility =>
             Math.Max(visibility,
@@ -70,14 +70,31 @@ namespace LineWars.Model
         public ComponentUnit LeftUnit
         {
             get => leftUnit;
-            set { leftUnit = value; }
+            set => leftUnit = value;
         }
+
+        IUnit INode.LeftUnit
+        {
+            get => leftUnit;
+            set => leftUnit = (ComponentUnit)value;
+        }
+        
+        IReadOnlyUnit IReadOnlyNode.LeftUnit => leftUnit;
+
 
         public ComponentUnit RightUnit
         {
             get => rightUnit;
-            set { rightUnit = value; }
+            set => rightUnit = value;
         }
+        
+        IUnit INode.RightUnit
+        {
+            get => leftUnit;
+            set => leftUnit = (ComponentUnit)value;
+        }
+        IReadOnlyUnit IReadOnlyNode.RightUnit => leftUnit;
+        
         public CommandPriorityData CommandPriorityData => priorityData;
         public RenderNodeV3 RenderNodeV3 => renderNodeV3;
 
@@ -134,8 +151,9 @@ namespace LineWars.Model
             return gameObject;
         }
 
-        public void Initialize()
+        public void Initialize(int index)
         {
+            this.index = index;
             edges = new List<Edge>();
         }
 
@@ -193,7 +211,7 @@ namespace LineWars.Model
             {
                 GetComponent<NodeInfoDrawer>().Capture();
             }
-            ReferenceToSpawn = newPlayer != null ? basePlayer.Base : null;
+            ReferenceToSpawn = newPlayer != null ? basePlayer.Base.GetComponent<Spawn>() : null;
             IsDirty = true;
             Redraw();
         }

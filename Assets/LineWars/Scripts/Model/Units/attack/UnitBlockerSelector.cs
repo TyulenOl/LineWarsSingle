@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using LineWars.Scripts;
 using UnityEngine;
 
 namespace LineWars.Model
@@ -7,7 +8,7 @@ namespace LineWars.Model
     public class UnitBlockerSelector: ScriptableObject
     {
         // как насчет ввести простую систему с очками блока, у кого их больше тот и блокирует удар.
-        public virtual ComponentUnit SelectBlocker(ComponentUnit targetUnit, ComponentUnit neighborUnit)
+        public virtual IUnit SelectBlocker(IUnit targetUnit, IUnit neighborUnit)
         {
             return
                 (new[] {targetUnit, neighborUnit})
@@ -17,5 +18,7 @@ namespace LineWars.Model
                 .ThenBy(x=> x.CurrentHp) // Потом того, у кого меньше текущее хп
                 .First();
         }
+        
+        
     }
 }

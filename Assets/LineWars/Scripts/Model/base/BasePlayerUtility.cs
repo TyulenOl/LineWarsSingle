@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using UnityEngine;
 
 namespace LineWars.Model
@@ -50,6 +51,13 @@ namespace LineWars.Model
             unit.name = $"{unit.UnitName}{globalUnitIndex}";
             globalUnitIndex++;
             return unit;
+        }
+        
+        public static int GetCountUnitByType(this BasePlayer player, UnitType type)
+        {
+            return player.OwnedObjects
+                .OfType<ComponentUnit>()
+                .Count(x => x.Type == type);
         }
     }
 }

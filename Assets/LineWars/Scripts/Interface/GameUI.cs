@@ -21,7 +21,7 @@ namespace LineWars.Interface
 
         private List<UnitDrawer> activeUnitDrawersHash = new ();
 
-        private IExecutor currentExecutor;
+        private IReadOnlyExecutor currentExecutor;
         private List<TargetDrawer> currentDrawers = new ();
 
         private void Awake()
@@ -67,19 +67,19 @@ namespace LineWars.Interface
             }
         }
         
-        private void OnExecutorChanged(IExecutor before, IExecutor after)
+        private void OnExecutorChanged(IReadOnlyExecutor before, IReadOnlyExecutor after)
         {
             if (before != null)
-                before.AnyActionCompleted.RemoveListener(ReDrawCurrentTargets);
+                before.AnyActionCompleted -= ReDrawCurrentTargets;
             
             currentExecutor = after;
             ReDrawCurrentTargets();
             ReDrawAllAvailability(before, after);
             if(currentExecutor == null) return;
-            currentExecutor.AnyActionCompleted.AddListener(ReDrawCurrentTargets);
+            currentExecutor.AnyActionCompleted += ReDrawCurrentTargets;
         }
 
-        private void ReDrawAllAvailability(IExecutor before, IExecutor after)
+        private void ReDrawAllAvailability(IReadOnlyExecutor before, IReadOnlyExecutor after)
         {
             var unitsToReDraw = Player.LocalPlayer.GetAllUnitsByPhase(PhaseManager.Instance.CurrentPhase);
             if (after is null)
@@ -127,7 +127,7 @@ namespace LineWars.Interface
             }
         }
 
-        private void ReDrawTargetsIcons(List<(ITarget, CommandType)> targets)
+        private void ReDrawTargetsIcons(List<(IReadOnlyTarget, CommandType)> targets)
         {
             foreach (var valueTuple in targets)
             {

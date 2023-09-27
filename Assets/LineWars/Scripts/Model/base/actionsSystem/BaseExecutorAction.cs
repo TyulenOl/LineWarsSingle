@@ -10,8 +10,6 @@ namespace LineWars.Model
         
         public IntModifier ActionModifier => actionModifier;
 
-        public SFXData ActionSfx => actionSfx;
-
-        public abstract ExecutorAction GetAction(IExecutor executor);
+        public abstract ExecutorAction GetAction(IReadOnlyExecutor executor);
     }
 }

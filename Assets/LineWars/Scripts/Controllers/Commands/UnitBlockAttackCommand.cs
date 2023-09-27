@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    public class BlockAttackCommand: UnitAttackCommand
+    public class UnitBlockAttackCommand: UnitAttackCommand
     {
-        public BlockAttackCommand(ComponentUnit attacker, IAlive defender) : base(attacker, defender)
+        public UnitBlockAttackCommand(ComponentUnit attacker, IAlive defender) : base(attacker, defender)
         {
         }
 
