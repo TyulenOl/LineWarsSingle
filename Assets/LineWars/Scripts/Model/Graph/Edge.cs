@@ -44,11 +44,8 @@ namespace LineWars.Model
         public SpriteRenderer SpriteRenderer => edgeSpriteRenderer;
         public BoxCollider2D BoxCollider2D => edgeCollider;
 
-        public int Index
-        {
-            get => index;
-            set => index = value;
-        }
+        public int Index => index;
+        
 
         public int MaxHp => lineMap.ContainsKey(LineType)
             ? lineMap[LineType].MaxHp
@@ -109,8 +106,9 @@ namespace LineWars.Model
             hp = MaxHp;
         }
         
-        public void Initialize(Node firstNode, Node secondNode)
+        public void Initialize(int index, Node firstNode, Node secondNode)
         {
+            this.index = index;
             this.firstNode = firstNode;
             this.secondNode = secondNode;
         }

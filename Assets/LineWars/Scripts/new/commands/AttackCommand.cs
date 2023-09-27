@@ -18,7 +18,7 @@ namespace LineWars.Model
 
             attackAction = attacker.TryGetExecutorAction<AttackAction>(out var action) 
                 ? action 
-                : throw new ArgumentException($"{nameof(ComponentUnit)} does not contain {nameof(ComponentUnit.BaseAttackAction)}");
+                : throw new ArgumentException($"{Attacker} does not contain {nameof(AttackAction)}");
         }
 
         public AttackCommand([NotNull] AttackAction attackAction, [NotNull] IAlive alive)

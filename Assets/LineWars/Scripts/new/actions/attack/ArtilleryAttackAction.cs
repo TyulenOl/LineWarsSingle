@@ -1,8 +1,8 @@
 ﻿namespace LineWars.Model
 {
-    public class ArtilleryAttack : DistanceAttackAction
+    public class ArtilleryAttackAction : DistanceAttackAction
     {
-        public ArtilleryAttack(IUnit unit, ArtilleryUnitAttackAction data) : base(unit, data)
+        public ArtilleryAttackAction(IUnit unit, ArtilleryUnitAttackAction data) : base(unit, data)
         {
         }
 

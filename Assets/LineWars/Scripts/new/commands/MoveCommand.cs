@@ -18,7 +18,7 @@ namespace LineWars.Model
             
             moveAction = unit.TryGetExecutorAction<MoveAction>(out var action) 
                 ? action 
-                : throw new ArgumentException($"{nameof(ComponentUnit)} does not contain {nameof(ComponentUnit.MoveAction)}");
+                : throw new ArgumentException($"{unit} does not contain {nameof(MoveAction)}");
         }
 
         public MoveCommand([NotNull] MoveAction moveAction, [NotNull] INode end)

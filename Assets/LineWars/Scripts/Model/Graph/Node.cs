@@ -12,9 +12,6 @@ namespace LineWars.Model
     [RequireComponent(typeof(RenderNodeV3))]
     public class Node : Owned, INode
     {
-        public ModelNode Model { get; private set; }
-
-
         [SerializeField] private int index;
         [SerializeField] private List<Edge> edges;
 
@@ -56,11 +53,7 @@ namespace LineWars.Model
         public bool AnyIsFree => LeftIsFree || RightIsFree;
         public bool AllIsFree => LeftIsFree && RightIsFree;
 
-        public int Index
-        {
-            get => index;
-            set => index = value;
-        }
+        public int Index => index;
 
         public int Visibility =>
             Math.Max(visibility,
@@ -158,8 +151,9 @@ namespace LineWars.Model
             return gameObject;
         }
 
-        public void Initialize()
+        public void Initialize(int index)
         {
+            this.index = index;
             edges = new List<Edge>();
         }
 

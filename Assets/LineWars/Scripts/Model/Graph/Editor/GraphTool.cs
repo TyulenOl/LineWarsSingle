@@ -189,8 +189,7 @@ public class GraphTool : EditorTool
 
         var node = (Node) PrefabUtility.InstantiatePrefab(nodePrefab, graph.NodesParent.transform);
         node.transform.position = GetMousePosition2D();
-        node.Initialize();
-        node.Index = GetNextIndex(node);
+        node.Initialize(GetNextIndex(node));
         Selection.activeObject = node.gameObject;
 
         Undo.RegisterCreatedObjectUndo(node.gameObject, "CreateNode");

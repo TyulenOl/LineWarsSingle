@@ -9,7 +9,7 @@ using UnityEngine.Events;
 namespace LineWars.Model
 {
     [RequireComponent(typeof(UnitMovementLogic))]
-    public sealed partial class ComponentUnit: Owned, IReadOnlyTarget, IReadOnlyExecutor, IAlive, IUnit
+    public sealed class ComponentUnit: Owned, IReadOnlyTarget, IReadOnlyExecutor, IAlive, IUnit
     {
         [Header("Units Settings")] 
         [SerializeField, ReadOnlyInspector] private int index;
