@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    public class MeleeUnitAttackAction : BaseUnitAttackAction
+    public class MonoMeleeAttackAction : MonoAttackAction
     {
         [SerializeField] private UnitBlockerSelector blockerSelector;
 
@@ -17,6 +17,6 @@ namespace LineWars.Model
         public UnitBlockerSelector BlockerSelector => blockerSelector;
         public bool Onslaught => onslaught;
 
-        public override UnitAction GetAction(ComponentUnit unit) => new MeleeAttackAction(unit, this);
+        protected override UnitAction GetAction(ComponentUnit unit) => new MeleeAttackAction(unit, this);
     }
 }

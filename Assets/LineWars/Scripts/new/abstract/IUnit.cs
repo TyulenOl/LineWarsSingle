@@ -4,16 +4,12 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace LineWars.Model
 {
-    public interface IUnit: IOwned, IReadOnlyUnit, IExecutor
+    public interface IUnit: IOwned, IReadOnlyUnit, IExecutor, ITarget
     {
         public new int CurrentHp { get; set; }
-        
         public new int CurrentArmor { get; set; }
-        
         public new int Visibility { get; set;}
-
         public UnitDirection UnitDirection { get; set; }
-
         public new INode Node { get; set; }
 
         public void HealMe(int value)

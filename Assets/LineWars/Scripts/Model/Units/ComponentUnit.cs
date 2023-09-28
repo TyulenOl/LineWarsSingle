@@ -9,7 +9,7 @@ using UnityEngine.Events;
 namespace LineWars.Model
 {
     [RequireComponent(typeof(UnitMovementLogic))]
-    public sealed class ComponentUnit: Owned, IReadOnlyTarget, IReadOnlyExecutor, IAlive, IUnit
+    public sealed class ComponentUnit: Owned, IUnit
     {
         [Header("Units Settings")] 
         [SerializeField, ReadOnlyInspector] private int index;
@@ -97,9 +97,6 @@ namespace LineWars.Model
                 ArmorChanged.Invoke(before, currentArmor);
             }
         }
-
-        int IUnit.Visibility { get; set; }
-
         public UnitType Type => unitType;
 
         public UnitDirection UnitDirection
@@ -120,13 +117,30 @@ namespace LineWars.Model
 
         public UnitSize Size => unitSize;
         public LineType MovementLineType => movementLineType;
-        public Node Node => myNode;
-        INode IUnit.Node { get; set; }
-        IReadOnlyNode IReadOnlyUnit.Node => Node;
-        
 
+        public Node Node
+        {
+            get => myNode;
+            private set
+            {
+                if (value == null)
+                    throw new ArgumentException();
+                myNode = value;
+            }
+        }
+
+        INode IUnit.Node
+        {
+            get => myNode;
+            set => Node = (Node)value;
+        }
+        IReadOnlyNode IReadOnlyUnit.Node => myNode;
+        
         public CommandPriorityData CommandPriorityData => priorityData;
         public bool CanDoAnyAction => currentActionPoints > 0;
+
+        public UnitMovementLogic MovementLogic => movementLogic;
+
         #endregion
 
         private void Awake()
@@ -159,7 +173,7 @@ namespace LineWars.Model
         
         public void Initialize(Node node, UnitDirection direction)
          {
-             myNode = node;
+             Node = node;
              UnitDirection = direction;
          }
 
@@ -172,9 +186,8 @@ namespace LineWars.Model
             return action != null;
         }
         
-        public bool TryGetCommand(CommandType priorityType, IReadOnlyTarget target, out ICommand command)
+        public bool TryGetCommand(CommandType priorityType, ITarget target, out ICommand command)
         {
-            
             if (runtimeActionsDictionary.TryGetValue(priorityType, out var value)
                 && value is ITargetedAction targetedAction
                 && targetedAction.IsMyTarget(target))
@@ -186,7 +199,12 @@ namespace LineWars.Model
             command = null;
             return false;
         }
-        
+
+        bool IReadOnlyExecutor.TryGetCommand(CommandType priorityType, IReadOnlyTarget target, out ICommand command)
+        {
+            return TryGetCommand(priorityType, (ITarget) target, out command);
+        }
+
         public bool TryGetNeighbour([NotNullWhen(true)] out ComponentUnit neighbour)
         {
             neighbour = null;
@@ -206,7 +224,6 @@ namespace LineWars.Model
             
             return false;
         }
-        
         public bool IsNeighbour(ComponentUnit unit)
         {
             return myNode.LeftUnit == this && myNode.RightUnit == unit
@@ -267,13 +284,16 @@ namespace LineWars.Model
 
         private IEnumerable<(IReadOnlyTarget, CommandType)> GetAllAvailableTargetsInRange(uint range)
          {
-             var visibilityEdges = new HashSet<Edge>();
-             foreach (Node e in Graph.GetNodesInRange(myNode, range))
+             var visibilityEdges = new HashSet<IEdge>();
+             foreach (var node in Graph.GetNodesInRange(myNode, range))
              {
-                 foreach (var target in e.GetTargetsWithMe())
-                     yield return (target, UnitsController.Instance.GetCommandTypeBy(this, target));
+                 yield return (node, UnitsController.Instance.GetCommandTypeBy(this, node));
+                 if (node.LeftUnit != null)
+                     yield return (node.LeftUnit, UnitsController.Instance.GetCommandTypeBy(this, node.LeftUnit));
+                 if (node.RightUnit != null)
+                     yield return (node.RightUnit, UnitsController.Instance.GetCommandTypeBy(this, node.RightUnit));
                  
-                 foreach (var edge in myNode.Edges)
+                 foreach (var edge in node.Edges)
                  {
                      if (visibilityEdges.Contains(edge)) continue;
                      visibilityEdges.Add(edge);

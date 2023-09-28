@@ -11,7 +11,8 @@ namespace LineWars.Model
         private AttackAction attackAction;
 
         public event Action<bool, bool> CanBlockChanged;
-        public AttackAction AttackAction
+
+        private AttackAction AttackAction
         {
             get
             {
@@ -20,7 +21,7 @@ namespace LineWars.Model
                     if (MyUnit.TryGetExecutorAction<AttackAction>(out var action)) 
                         attackAction = action;
                     else
-                        Debug.LogError("Для контратаки необходимо иметь хотябы атакующий компонент!");
+                        throw new Exception("Для контратаки необходимо иметь хотябы атакующий компонент!");
                 }
                 return attackAction;
             }
@@ -28,6 +29,7 @@ namespace LineWars.Model
 
         public bool Protection { get; private set; }
         public bool IsBlocked => isBlocked || Protection;
+        
         public BlockAction([NotNull] IUnit unit, [NotNull] MonoBlockAction data) : base (unit, data)
         {
             Protection = data.Protection;
@@ -78,6 +80,5 @@ namespace LineWars.Model
 
         public override CommandType GetMyCommandType() => CommandType.Block;
         public ICommand GenerateCommand() => new BlockCommand(this);
-
     }
 }

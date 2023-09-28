@@ -10,7 +10,7 @@ namespace LineWars.Model
         private readonly IExecutor myExecutor;
         public event Action ActionCompleted;
 
-        protected ExecutorAction([NotNull] IExecutor unit, [NotNull] BaseExecutorAction data)
+        protected ExecutorAction([NotNull] IExecutor unit, [NotNull] MonoExecutorAction data)
         {
             actionModifier = data.ActionModifier;
             myExecutor = unit;

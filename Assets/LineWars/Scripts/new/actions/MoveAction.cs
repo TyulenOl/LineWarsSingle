@@ -1,13 +1,16 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace LineWars.Model
 {
-    public class MoveAction: UnitAction, ITargetedAction
+    public class MoveAction : UnitAction, ITargetedAction
     {
+        public event Action<INode> Moved;
+
         public MoveAction([NotNull] IUnit unit, [NotNull] MonoMoveAction data) : base(unit, data)
         {
         }
-        
+
         public bool CanMoveTo([NotNull] IReadOnlyNode target, bool ignoreActionPointsCondition = false)
         {
             return MyUnit.Node != target
@@ -31,8 +34,8 @@ namespace LineWars.Model
 
             bool OwnerCondition()
             {
-                return target.Owner == null 
-                       || target.Owner == MyUnit.Owner 
+                return target.Owner == null
+                       || target.Owner == MyUnit.Owner
                        || target.Owner != MyUnit.Owner && target.AllIsFree;
             }
         }
@@ -40,7 +43,7 @@ namespace LineWars.Model
         public void MoveTo([NotNull] INode target)
         {
             var startNode = MyUnit.Node;
-            
+
             if (startNode.LeftUnit == MyUnit)
                 startNode.LeftUnit = null;
             if (startNode.RightUnit == MyUnit)
@@ -48,8 +51,9 @@ namespace LineWars.Model
 
             InspectNodeForCallback();
             AssignNewNode();
-            
-      
+
+
+            Moved?.Invoke(target);
             CompleteAndAutoModify();
 
             void InspectNodeForCallback()
@@ -92,20 +96,26 @@ namespace LineWars.Model
                     target.ConnectTo(MyUnit.Owner);
             }
         }
-            
-            
+
+
         public override CommandType GetMyCommandType() => CommandType.Move;
         public bool IsMyTarget(ITarget target) => target is INode;
 
         public ICommand GenerateCommand(ITarget target) => new MoveCommand(this, (INode) target);
-        
+
         #region CallBack
 
-        protected virtual void OnCapturingEnemyBase(){}
+        protected virtual void OnCapturingEnemyBase()
+        {
+        }
 
-        protected virtual void OnCapturingEnemyNode(){}
+        protected virtual void OnCapturingEnemyNode()
+        {
+        }
 
-        protected virtual void OnCapturingFreeNode(){}
+        protected virtual void OnCapturingFreeNode()
+        {
+        }
 
         #endregion
     }
