@@ -9,7 +9,7 @@ namespace LineWars.Model
         private readonly UnitBlockerSelector blockerSelector;
         private readonly bool onslaught;
 
-        public MeleeAttackAction([NotNull] IUnit unit, MeleeUnitAttackAction data) : base(unit, data)
+        public MeleeAttackAction([NotNull] IUnit unit, MonoMeleeAttackAction data) : base(unit, data)
         {
             blockerSelector = data.BlockerSelector;
             onslaught = data.Onslaught;

@@ -10,6 +10,7 @@ namespace LineWars.Model
         
         public void AddOwned([NotNull] IOwned owned);
         public void RemoveOwned([NotNull] IOwned owned);
+        
         public void SpawnPreset(UnitBuyPreset preset);
         public bool CanSpawnPreset(UnitBuyPreset preset);
     }

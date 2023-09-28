@@ -2,7 +2,7 @@
 {
     public class ArtilleryAttackAction : DistanceAttackAction
     {
-        public ArtilleryAttackAction(IUnit unit, ArtilleryUnitAttackAction data) : base(unit, data)
+        public ArtilleryAttackAction(IUnit unit, MonoArtilleryAttackAction data) : base(unit, data)
         {
         }
 

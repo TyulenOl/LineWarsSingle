@@ -10,6 +10,7 @@ namespace LineWars.Model
 
         public bool IsIncident(INode node) => IsIncident((IReadOnlyNode) node);
         public INode GetOther(INode node) => (INode)GetOther((IReadOnlyNode) node);
+        
         public void LevelUp()
         {
             LineType = LineTypeHelper.Up(LineType);

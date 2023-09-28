@@ -7,8 +7,8 @@
 
         public void ConnectTo(IBasePlayer basePlayer)
         {
-            SetOwner(basePlayer);
             basePlayer.AddOwned(this);
+            SetOwner(basePlayer);
         }
     }
 }

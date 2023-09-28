@@ -1,13 +1,13 @@
 ﻿namespace LineWars.Model
 {
-    public class DistanceAttackAction: AttackAction
+    public class DistanceAttackAction : AttackAction
     {
         public uint Distance { get; private set; }
-        
-        public DistanceAttackAction(IUnit unit, DistanceUnitAttackAction data) : base(unit, data)
+
+        public DistanceAttackAction(IUnit unit, MonoDistanceAttackAction data) : base(unit, data)
         {
         }
-        
+
         public override bool CanAttackForm(INode node, IUnit enemy, bool ignoreActionPointsCondition = false)
         {
             return !AttackLocked
@@ -27,7 +27,7 @@
         {
             enemy.TakeDamage(new Hit(damage, MyUnit, enemy, IsPenetratingDamage, true));
         }
-        
+
         public override uint GetPossibleMaxRadius() => Distance;
         public override CommandType GetMyCommandType() => CommandType.Fire;
     }

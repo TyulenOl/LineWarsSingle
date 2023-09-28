@@ -8,6 +8,15 @@ namespace LineWars.Model
 {
     public class MonoMoveAction : MonoUnitAction
     {
-        public override UnitAction GetAction(ComponentUnit unit) => new MoveAction(unit, this);
+        protected override UnitAction GetAction(ComponentUnit unit)
+        {
+            var moveAction = new MoveAction(unit, this);
+            moveAction.Moved += node =>
+            {
+                if (node is MonoBehaviour mono)
+                    unit.MovementLogic.MoveTo(mono.transform);
+            };
+            return moveAction;
+        }
     }
 }

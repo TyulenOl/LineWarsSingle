@@ -90,10 +90,10 @@ namespace LineWars.Model
         
         IUnit INode.RightUnit
         {
-            get => leftUnit;
-            set => leftUnit = (ComponentUnit)value;
+            get => rightUnit;
+            set => rightUnit = (ComponentUnit)value;
         }
-        IReadOnlyUnit IReadOnlyNode.RightUnit => leftUnit;
+        IReadOnlyUnit IReadOnlyNode.RightUnit => rightUnit;
         
         public CommandPriorityData CommandPriorityData => priorityData;
         public RenderNodeV3 RenderNodeV3 => renderNodeV3;
@@ -103,8 +103,7 @@ namespace LineWars.Model
             mainCamera = Camera.main;
             IsDirty = ReferenceToSpawn != null;
         }
-
-
+        
         private void Start()
         {
             var nodeInfoDrawer = GetComponent<NodeInfoDrawer>();
