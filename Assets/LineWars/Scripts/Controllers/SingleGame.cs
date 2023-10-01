@@ -74,17 +74,17 @@ namespace LineWars
 
         private void InitializeSpawns()
         {
-            if (Graph.Spawns.Count == 0)
+            if (MonoGraph.Instance.Spawns.Count == 0)
             {
                 Debug.LogError("Игрок не создался, потому что нет точек для его спавна");
                 return;
             }
 
             playerSpawnInfo = playerSpawn
-                ? Graph.Spawns.First(info => info.SpawnNode == playerSpawn)
-                : Graph.Spawns.First();
+                ? MonoGraph.Instance.Spawns.First(info => info.SpawnNode == playerSpawn)
+                : MonoGraph.Instance.Spawns.First();
             
-            spawnInfosStack = Graph.Spawns
+            spawnInfosStack = MonoGraph.Instance.Spawns
                 .Where(x => x != playerSpawnInfo)
                 .ToStack(true);
         }

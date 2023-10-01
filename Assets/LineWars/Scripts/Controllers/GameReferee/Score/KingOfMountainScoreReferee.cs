@@ -29,7 +29,7 @@ namespace LineWars
         
         private void FindMountainNode()
         {
-            var allMountains = Graph.AllNodes
+            var allMountains = MonoGraph.Instance.Nodes
                 .Where(x => x.TryGetComponent<NodeScore>(out var _))
                 .ToList();
             
@@ -37,7 +37,7 @@ namespace LineWars
             if (countOfNodeScore == 0)
             {
                 Debug.LogWarning(@"При победе ""Царь горы"" на карте не было обнаружено ни одной ноды - горы");
-                var randomNode = Graph.AllNodes[Random.Range(0, Graph.AllNodes.Count)];
+                var randomNode = MonoGraph.Instance.Nodes[Random.Range(0, MonoGraph.Instance.Nodes.Count)];
                 randomNode.gameObject.AddComponent<NodeScore>();
                 mountain = randomNode;
             }

@@ -21,12 +21,12 @@ namespace LineWars.Interface
 
         private void ExecutorChanged(IReadOnlyExecutor oldExecutor, IReadOnlyExecutor newExecutor)
         {
-            if (newExecutor is ComponentUnit unit)
+            if (newExecutor is Unit unit)
             {
                 unit.GetComponent<UnitDrawer>().SetUnitAsExecutor(true);
             }
 
-            if (oldExecutor is ComponentUnit oldUnit)
+            if (oldExecutor is Unit oldUnit)
             {
                 if (oldUnit != null) //TODO: Это заплатка дебильная, надо разобраться
                     oldUnit.GetComponent<UnitDrawer>().SetUnitAsExecutor(false);

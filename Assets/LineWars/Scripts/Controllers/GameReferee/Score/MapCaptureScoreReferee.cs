@@ -12,7 +12,7 @@ namespace LineWars
             AssignNodes();
 
 
-            foreach (var node in Graph.AllNodes)
+            foreach (var node in MonoGraph.Instance.Nodes)
             {
                 node.OwnerChanged += (before, after) =>
                 {
@@ -28,7 +28,7 @@ namespace LineWars
         
         private void AssignNodes()
         {
-            foreach (var node in Graph.AllNodes)
+            foreach (var node in MonoGraph.Instance.Nodes)
             {
                 if (!node.TryGetComponent<NodeScore>(out var nodeScore))
                 {

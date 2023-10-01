@@ -1,0 +1,124 @@
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+
+namespace LineWars.Model
+{
+    public class MoveAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> :
+        UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>, 
+        IMoveAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
+    
+        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
+        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
+        where TOwned : class, IOwned<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
+        where TPlayer : class, IBasePlayer<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
+        where TNation : class, INation<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
+    {
+        public MoveAction([NotNull] TUnit unit, [NotNull] MonoMoveAction data) : base(unit, data)
+        {
+        }
+
+        public bool CanMoveTo([NotNull] TNode target, bool ignoreActionPointsCondition = false)
+        {
+            return MyUnit.Node != target
+                   && OwnerCondition()
+                   && SizeCondition()
+                   && LineCondition()
+                   && (ignoreActionPointsCondition || ActionPointsCondition());
+
+            bool SizeCondition()
+            {
+                return MyUnit.Size == UnitSize.Little && target.AnyIsFree
+                       || MyUnit.Size == UnitSize.Large && target.AllIsFree;
+            }
+
+            bool LineCondition()
+            {
+                var line = MyUnit.Node.GetLine(target);
+                return line != null
+                       && MyUnit.CanMoveOnLineWithType(line.LineType);
+            }
+
+            bool OwnerCondition()
+            {
+                return target.Owner == null
+                       || target.Owner == MyUnit.Owner
+                       || target.Owner != MyUnit.Owner && target.AllIsFree;
+            }
+        }
+
+        public void MoveTo([NotNull] TNode target)
+        {
+            var startNode = MyUnit.Node;
+
+            if (startNode.LeftUnit == MyUnit)
+                startNode.LeftUnit = null;
+            if (startNode.RightUnit == MyUnit)
+                startNode.RightUnit = null;
+
+            InspectNodeForCallback();
+            AssignNewNode();
+
+            
+            CompleteAndAutoModify();
+
+            void InspectNodeForCallback()
+            {
+                if (target.Owner == null)
+                {
+                    OnCapturingFreeNode();
+                    return;
+                }
+
+                if (target.Owner != MyUnit.Owner)
+                {
+                    OnCapturingEnemyNode();
+                    if (target.IsBase)
+                        OnCapturingEnemyBase();
+                }
+            }
+
+            void AssignNewNode()
+            {
+                MyUnit.Node = target;
+                if (MyUnit.Size == UnitSize.Large)
+                {
+                    target.LeftUnit = MyUnit;
+                    target.RightUnit = MyUnit;
+                }
+                else if (target.LeftIsFree && (MyUnit.UnitDirection == UnitDirection.Left ||
+                                               MyUnit.UnitDirection == UnitDirection.Right && !target.RightIsFree))
+                {
+                    target.LeftUnit = MyUnit;
+                    MyUnit.UnitDirection = UnitDirection.Left;
+                }
+                else
+                {
+                    target.RightUnit = MyUnit;
+                    MyUnit.UnitDirection = UnitDirection.Right;
+                }
+
+                if (MyUnit.Owner != target.Owner)
+                    target.ConnectTo(MyUnit.Owner);
+            }
+        }
+        
+        public override CommandType GetMyCommandType() => CommandType.Move;
+
+        #region CallBack
+
+        protected virtual void OnCapturingEnemyBase()
+        {
+        }
+
+        protected virtual void OnCapturingEnemyNode()
+        {
+        }
+
+        protected virtual void OnCapturingFreeNode()
+        {
+        }
+
+        #endregion
+    }
+}

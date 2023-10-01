@@ -10,7 +10,7 @@ namespace LineWars.Model
 {
     [RequireComponent(typeof(Selectable2D))]
     [RequireComponent(typeof(RenderNodeV3))]
-    public class Node : Owned, INode
+    public class Node : Owned, INodeForGame<Node, Edge, Unit, Owned, BasePlayer, Nation>
     {
         [SerializeField] private int index;
         [SerializeField] private List<Edge> edges;
@@ -20,8 +20,8 @@ namespace LineWars.Model
         [SerializeField] [Min(0)] private int valueOfHidden;
         [SerializeField] private int baseIncome;
 
-        [SerializeField, ReadOnlyInspector] private ComponentUnit leftUnit;
-        [SerializeField, ReadOnlyInspector] private ComponentUnit rightUnit;
+        [SerializeField, ReadOnlyInspector] private Unit leftUnit;
+        [SerializeField, ReadOnlyInspector] private Unit rightUnit;
 
         [SerializeField] private Outline2D outline;
         [SerializeField] private Selectable2D selectable2D;
@@ -44,9 +44,7 @@ namespace LineWars.Model
         public bool IsBase => ReferenceToSpawn.Node == this;
         public Vector2 Position => transform.position;
         
-        public IReadOnlyCollection<Edge> Edges => edges;
-        IReadOnlyCollection<IEdge> INode.Edges => edges;
-        IReadOnlyCollection<IReadOnlyEdge> IReadOnlyNode.Edges => edges;
+        public IEnumerable<Edge> Edges => edges;
 
         public bool LeftIsFree => LeftUnit == null;
         public bool RightIsFree => RightUnit == null;
@@ -67,33 +65,17 @@ namespace LineWars.Model
 
         public int BaseIncome => baseIncome;
 
-        public ComponentUnit LeftUnit
+        public Unit LeftUnit
         {
             get => leftUnit;
             set => leftUnit = value;
         }
 
-        IUnit INode.LeftUnit
-        {
-            get => leftUnit;
-            set => leftUnit = (ComponentUnit)value;
-        }
-        
-        IReadOnlyUnit IReadOnlyNode.LeftUnit => leftUnit;
-
-
-        public ComponentUnit RightUnit
+        public Unit RightUnit
         {
             get => rightUnit;
             set => rightUnit = value;
         }
-        
-        IUnit INode.RightUnit
-        {
-            get => rightUnit;
-            set => rightUnit = (ComponentUnit)value;
-        }
-        IReadOnlyUnit IReadOnlyNode.RightUnit => rightUnit;
         
         public CommandPriorityData CommandPriorityData => priorityData;
         public RenderNodeV3 RenderNodeV3 => renderNodeV3;
@@ -203,6 +185,7 @@ namespace LineWars.Model
                     yield return edge.FirstNode;
             }
         }
+        
 
         protected override void OnSetOwner(BasePlayer oldPlayer, BasePlayer newPlayer)
         {
