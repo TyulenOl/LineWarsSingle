@@ -11,7 +11,7 @@ namespace LineWars.Model
     /// <summary>
     /// класс, содержащий всю логику, которая объединяет ИИ и игрока
     /// </summary>
-    public abstract class BasePlayer : MonoBehaviour, IBasePlayer, IActor
+    public abstract class BasePlayer : MonoBehaviour, IActor, IBasePlayer<Node, Edge, Unit, Owned, BasePlayer, Nation>
     {
         [field: SerializeField, ReadOnlyInspector] public int Index { get;  private set; }
         [SerializeField, ReadOnlyInspector] private int money;
@@ -23,8 +23,6 @@ namespace LineWars.Model
         
 
         [field: SerializeField, ReadOnlyInspector] public Node Base { get; private set; }
-        INode IBasePlayer.Base => Base;
-        IReadOnlyNode IReadOnlyBasePlayer.Base => Base;
         [field: SerializeField, ReadOnlyInspector] public PlayerRules Rules { get;  set; }
 
         public PhaseType CurrentPhase { get; private set; }
@@ -34,7 +32,7 @@ namespace LineWars.Model
         private bool isFirstReplenish = true;
         
         private IEnumerable<Node> MyNodes => myOwned.OfType<Node>();
-        protected IEnumerable<ComponentUnit> MyUnits => myOwned.OfType<ComponentUnit>();
+        protected IEnumerable<Unit> MyUnits => myOwned.OfType<Unit>();
         
 
         public event Action<PhaseType, PhaseType> TurnChanged;
@@ -44,8 +42,6 @@ namespace LineWars.Model
         public event Action<int, int> IncomeChanged;
         public event Action Defeated; 
         public IReadOnlyCollection<Owned> OwnedObjects => myOwned;
-        IReadOnlyCollection<IOwned> IBasePlayer.OwnedObjects => myOwned;
-        IReadOnlyCollection<IReadOnlyOwned> IReadOnlyBasePlayer.OwnedObjects => myOwned;
         
         public bool IsMyOwn(Owned owned) => myOwned.Contains(owned);
 
@@ -152,7 +148,7 @@ namespace LineWars.Model
                 case Node node:
                     BeforeAddOwned(node);
                     break;
-                case ComponentUnit unit:
+                case Unit unit:
                     BeforeAddOwned(unit);
                     break;
             }
@@ -160,7 +156,6 @@ namespace LineWars.Model
             myOwned.Add(owned);
             OwnedAdded?.Invoke(owned);
         }
-        void IBasePlayer.AddOwned(IOwned owned) => AddOwned((Owned) owned);
 
         protected virtual void BeforeAddOwned(Node node)
         {
@@ -179,7 +174,7 @@ namespace LineWars.Model
             return Rules.MoneyForFirstCapturingNode + GetMyIncomeFromNode(node);
         }
 
-        protected virtual void BeforeAddOwned(ComponentUnit unit)
+        protected virtual void BeforeAddOwned(Unit unit)
         {
             
         }
@@ -195,7 +190,7 @@ namespace LineWars.Model
                 case Node node:
                     BeforeRemoveOwned(node);
                     break;
-                case ComponentUnit unit:
+                case Unit unit:
                     BeforeRemoveOwned(unit);
                     break;
             }
@@ -203,8 +198,6 @@ namespace LineWars.Model
             myOwned.Remove(owned);
             OwnedRemoved?.Invoke(owned);
         }
-
-        void IBasePlayer.RemoveOwned(IOwned owned) => RemoveOwned((Owned)owned);
 
         protected virtual void BeforeRemoveOwned(Node node)
         {
@@ -216,7 +209,7 @@ namespace LineWars.Model
             }
         }
 
-        protected virtual void BeforeRemoveOwned(ComponentUnit unit)
+        protected virtual void BeforeRemoveOwned(Unit unit)
         {
         }
 
@@ -236,7 +229,7 @@ namespace LineWars.Model
             Destroy(gameObject);
         }
         
-        public ComponentUnit GetUnitPrefab(UnitType unitType) => Nation.GetUnitPrefab(unitType);
+        public Unit GetUnitPrefab(UnitType unitType) => Nation.GetUnit(unitType);
 
         public void ExecuteTurn(PhaseType phaseType)
         {

@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace LineWars.Interface
 {
-    [RequireComponent(typeof(ComponentUnit), typeof(TargetDrawer))]
+    [RequireComponent(typeof(Unit), typeof(TargetDrawer))]
     public class UnitDrawer : MonoBehaviour
     {
         [Header("Animate Settings")]
@@ -24,20 +24,20 @@ namespace LineWars.Interface
         [SerializeField] private UnitPartDrawer leftDrawer;
         [SerializeField] private UnitPartDrawer rightDrawer;
 
-        private ComponentUnit unit;
+        private Unit unit;
         private List<UnitPartDrawer> allDrawers;
         private TargetDrawer targetDrawer;
 
         private void Awake()
         {
-            unit = GetComponent<ComponentUnit>();
+            unit = GetComponent<Unit>();
 
             unit.ActionPointsChanged.AddListener((_,newValue) => ExecuteForAllDrawers(drawer =>
             {
                 drawer.ReDrawActivity(newValue != 0);
                 ReDrawCharacteristics();
             }));
-            if (unit.TryGetExecutorAction<BlockAction>(out var action))
+            if (unit.TryGetUnitAction<IBlockAction<Node, Edge, Unit, Owned, BasePlayer, Nation>>(out var action))
                 action.CanBlockChanged += (_,newBool) => ExecuteForAllDrawers(drawer => drawer.ReDrawCanBlock(newBool));
             
             if (leftPart != null)

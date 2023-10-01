@@ -1,7 +1,7 @@
-﻿namespace LineWars.Model
-{
-    public interface IHitCreator
-    {
-        public Hit GenerateHit();
-    }
-}
+﻿// namespace LineWars.Model
+// {
+//     public interface IHitCreator
+//     {
+//         public Hit GenerateHit();
+//     }
+// }

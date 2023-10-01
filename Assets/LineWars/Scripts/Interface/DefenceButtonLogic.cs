@@ -18,8 +18,9 @@ namespace LineWars
         private void OnClick()
         {
             var executor = CommandsManager.Instance.Executor;
-            if (executor is ComponentUnit unit)
-                UnitsController.ExecuteCommand(new BlockCommand(unit), false);
+            if (executor is Unit unit)
+                UnitsController.ExecuteCommand(new BlockCommand<Node, Edge, Unit, Owned, BasePlayer, Nation>
+                    (unit), false);
         }
     }
 }

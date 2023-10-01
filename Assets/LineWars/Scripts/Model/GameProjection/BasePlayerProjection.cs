@@ -9,10 +9,10 @@ namespace LineWars.Model
         public int Money { get; set; }
         public int Income { get; set; }
         public List<Node> Nodes { get; set; }
-        public List<ComponentUnit> Units { get; set; }
+        public List<Unit> Units { get; set; }
 
         public IReadOnlyList<Node> AllNodes => Nodes;
-        public IReadOnlyList<ComponentUnit> AllUnits => Units;
+        public IReadOnlyList<Unit> AllUnits => Units;
 
         public BasePlayerProjection(BasePlayer basePlayer)
         {
@@ -24,8 +24,8 @@ namespace LineWars.Model
                 .Select(owned => (Node) owned)
                 .ToList();
             Units = basePlayer.OwnedObjects
-                .Where(owned => owned is ComponentUnit)
-                .Select(owned => (ComponentUnit)owned)
+                .Where(owned => owned is Unit)
+                .Select(owned => (Unit)owned)
                 .ToList();
         }
 
@@ -35,7 +35,7 @@ namespace LineWars.Model
             Money = basePlayerProjection.Money;
             Income = basePlayerProjection.Income;
             Nodes = new List<Node>(basePlayerProjection.AllNodes);
-            Units = new List<ComponentUnit>(basePlayerProjection.AllUnits);
+            Units = new List<Unit>(basePlayerProjection.AllUnits);
         }
     }
 
@@ -45,7 +45,7 @@ namespace LineWars.Model
         int Money { get; }
         int Income { get; }
         IReadOnlyList<Node> AllNodes { get; }
-        IReadOnlyList<ComponentUnit> AllUnits { get; } 
+        IReadOnlyList<Unit> AllUnits { get; } 
     }
 }
 

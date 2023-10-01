@@ -93,7 +93,7 @@ namespace LineWars.Interface
             }
         }
 
-        public void ReDrawAllAvailability(IEnumerable<ComponentUnit> units, bool isAvailable)
+        public void ReDrawAllAvailability(IEnumerable<Unit> units, bool isAvailable)
         {
             foreach (var unit in units)
             {

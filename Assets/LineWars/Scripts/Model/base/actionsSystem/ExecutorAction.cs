@@ -4,7 +4,7 @@ using LineWars.Controllers;
 
 namespace LineWars.Model
 {
-    public abstract class ExecutorAction
+    public abstract class ExecutorAction: IExecutorAction
     {
         private readonly IntModifier actionModifier;
         private readonly IExecutor myExecutor;
@@ -31,13 +31,13 @@ namespace LineWars.Model
             Complete();
         }
 
-        public int ModifyActionPoints(int actionPoints) => actionModifier.Modify(actionPoints);
-        public int ModifyActionPoints() => ModifyActionPoints(myExecutor.CurrentActionPoints);
+        protected int ModifyActionPoints(int actionPoints) => actionModifier.Modify(actionPoints);
+        protected int ModifyActionPoints() => ModifyActionPoints(myExecutor.CurrentActionPoints);
         
-        public bool ActionPointsCondition(int actionPoints) => ActionPointsCondition(actionModifier, actionPoints);
-        public bool ActionPointsCondition() => ActionPointsCondition(actionModifier, myExecutor.CurrentActionPoints);
+        protected bool ActionPointsCondition(int actionPoints) => ActionPointsCondition(actionModifier, actionPoints);
+        protected bool ActionPointsCondition() => ActionPointsCondition(actionModifier, myExecutor.CurrentActionPoints);
         
-        public static bool ActionPointsCondition(IntModifier modifier, int actionPoints) =>
+        protected static bool ActionPointsCondition(IntModifier modifier, int actionPoints) =>
             actionPoints > 0 && modifier != null && modifier.Modify(actionPoints) >= 0;
     }
 }

@@ -80,14 +80,14 @@ namespace LineWars
 
         private void OnOwnedAdded(Owned owned)
         {
-            if(!(owned is ComponentUnit unit)) return;
+            if(!(owned is Unit unit)) return;
             unit.ActionPointsChanged.AddListener(ProcessActionPointsChange);
             unit.Died.AddListener(UnitOnDied);
         }
 
         private void OnOwnerRemoved(Owned owned)
         {
-            if(!(owned is ComponentUnit unit)) return;
+            if(!(owned is Unit unit)) return;
             unit.ActionPointsChanged.RemoveListener(ProcessActionPointsChange);
             if (!unit.IsDied)
                 unit.Died.RemoveListener(UnitOnDied);
@@ -114,7 +114,7 @@ namespace LineWars
             ExecuteTurn(PhaseType.Idle);
         }
 
-        public IEnumerable<ComponentUnit> GetAllUnitsByPhase(PhaseType phaseType)
+        public IEnumerable<Unit> GetAllUnitsByPhase(PhaseType phaseType)
         {
             if (PhaseExecutorsData.PhaseToUnits.TryGetValue(phaseType, out var value))
             {
@@ -189,7 +189,7 @@ namespace LineWars
 
             foreach (var owned in OwnedObjects)
             {
-                if(!(owned is ComponentUnit unit)) continue;
+                if(!(owned is Unit unit)) continue;
                 if(phaseExecutors.Contains(unit.Type) && unit.CurrentActionPoints > 0)
                     return true;
             }
@@ -199,7 +199,7 @@ namespace LineWars
 
         #endregion
         
-        private void UnitOnDied(ComponentUnit diedUnit)
+        private void UnitOnDied(Unit diedUnit)
         {
             StartCoroutine(UnitOnDiedCoroutine());
             IEnumerator UnitOnDiedCoroutine()
@@ -215,13 +215,13 @@ namespace LineWars
 
         public void RecalculateVisibility(bool useLerp = true)
         {
-            var visibilityMap = Graph.GetVisibilityInfo(this);
+            var visibilityMap = MonoGraph.Instance.GetVisibilityInfo(this);
             foreach (var (node, visibility) in visibilityMap)
             {
                 if (useLerp)
-                    node.RenderNodeV3.SetVisibilityGradually(visibility ? 1 : 0);
+                    ((Node)node).RenderNodeV3.SetVisibilityGradually(visibility ? 1 : 0);
                 else
-                    node.RenderNodeV3.SetVisibilityInstantly(visibility ? 1 : 0);
+                    ((Node)node).RenderNodeV3.SetVisibilityInstantly(visibility ? 1 : 0);
             }
         }
     }

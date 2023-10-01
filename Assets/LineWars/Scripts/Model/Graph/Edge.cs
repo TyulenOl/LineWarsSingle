@@ -8,7 +8,7 @@ using UnityEngine.Events;
 namespace LineWars.Model
 {
     public class Edge : MonoBehaviour,
-        IEdge,
+        IEdgeForGame<Node, Edge, Unit, Owned, BasePlayer, Nation>,
         ISerializationCallbackReceiver
     {
         [Header("Graph Settings")]
@@ -54,15 +54,11 @@ namespace LineWars.Model
 
         public Node FirstNode => firstNode;
         public Node SecondNode => secondNode;
-        INode IEdge.FirstNode => firstNode;
-        INode IEdge.SecondNode => secondNode;
-        IReadOnlyNode IReadOnlyEdge.FirstNode => firstNode;
-        IReadOnlyNode IReadOnlyEdge.SecondNode => secondNode;
 
         public int CurrentHp
         {
             get => hp;
-            private set
+            set
             {
                 var before = hp;
 
@@ -77,7 +73,7 @@ namespace LineWars.Model
                 HpChanged.Invoke(before, hp);
             }
         }
-
+        
         public LineType LineType
         {
             get => lineType;
@@ -112,11 +108,6 @@ namespace LineWars.Model
             this.index = index;
             this.firstNode = firstNode;
             this.secondNode = secondNode;
-        }
-
-        public void TakeDamage(Hit hit)
-        {
-            CurrentHp -= hit.Damage;
         }
         
         public void LevelUp()

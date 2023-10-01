@@ -14,7 +14,7 @@ public class GraphTool : EditorTool
 {
     private Edge edgePrefab;
     private Node nodePrefab;
-    private Graph graph;
+    private MonoGraph graph;
 
 
     private SelectionListener<Node> nodeListener;
@@ -72,8 +72,8 @@ public class GraphTool : EditorTool
     private void AssignGraph()
     {
         var graphObj = GameObject.Find("Graph") ?? new GameObject("Graph");
-        graph = graphObj.GetComponent<Graph>() ??
-                graphObj.AddComponent<Graph>();
+        graph = graphObj.GetComponent<MonoGraph>() ??
+                graphObj.AddComponent<MonoGraph>();
 
         if (graph.NodesParent == null)
         {

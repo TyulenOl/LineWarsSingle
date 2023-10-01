@@ -1,7 +1,7 @@
-﻿namespace LineWars.Model
-{
-    public interface IHitHandler
-    {
-        public void Accept(Hit hit);
-    }
-}
+﻿// namespace LineWars.Model
+// {
+//     public interface IHitHandler
+//     {
+//         public void Accept(Hit hit);
+//     }
+// }
