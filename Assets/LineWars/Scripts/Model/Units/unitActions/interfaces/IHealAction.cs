@@ -1,10 +1,10 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using LineWars.Model.unitActions;
 
 namespace LineWars.Model
 {
     public interface IHealAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> : 
-        IUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
+        IUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>,
+        ITargetedAction
     
         where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> 

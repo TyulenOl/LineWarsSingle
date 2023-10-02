@@ -7,7 +7,8 @@ namespace LineWars.Model
 {
     public abstract class AttackAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> :
         UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>,
-        IAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
+        IAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>,
+        ITargetedAction
     
         where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
@@ -65,6 +66,13 @@ namespace LineWars.Model
 
         public virtual void Attack(TEdge edge)
         {
+        }
+
+        public bool IsMyTarget(ITarget target) => target is IAlive;
+
+        public ICommand GenerateCommand(ITarget target)
+        {
+            return new AttackCommand<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>(this, (IAlive) target);
         }
     }
 }

@@ -1,6 +1,5 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using LineWars.Model.unitActions;
+﻿using System.Diagnostics.CodeAnalysis;
+
 
 namespace LineWars.Model
 {

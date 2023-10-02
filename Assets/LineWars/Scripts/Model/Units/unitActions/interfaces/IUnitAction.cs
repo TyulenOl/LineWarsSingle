@@ -1,4 +1,4 @@
-﻿namespace LineWars.Model.unitActions
+﻿namespace LineWars.Model
 {
     public interface IUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> : 
         IExecutorAction

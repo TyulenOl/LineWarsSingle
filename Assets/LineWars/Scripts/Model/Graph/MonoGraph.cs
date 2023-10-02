@@ -8,7 +8,8 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    public class MonoGraph : MonoBehaviour, IGraphForGame<Node, Edge, Unit, Owned, BasePlayer, Nation>
+    public class MonoGraph : MonoBehaviour,
+        IGraphForGame<Node, Edge, Unit, Owned, BasePlayer, Nation>
     {
         private GraphForGame<Node, Edge, Unit, Owned, BasePlayer, Nation> modelGraph;
         public static MonoGraph Instance { get; set; }

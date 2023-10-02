@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using LineWars.Extensions.Attributes;
-using LineWars.Model.unitActions;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -13,8 +12,8 @@ namespace LineWars.Model
     [RequireComponent(typeof(UnitMovementLogic))]
     public sealed class Unit : Owned, IUnit<Node, Edge, Unit, Owned, BasePlayer, Nation>
     {
-        [Header("Units Settings")] [SerializeField, ReadOnlyInspector]
-        private int index;
+        [Header("Units Settings")] 
+        [SerializeField, ReadOnlyInspector] private int index;
 
         [SerializeField] private string unitName;
 
@@ -41,22 +40,20 @@ namespace LineWars.Model
 
         [field: Header("Events")]
         [field: SerializeField] public UnityEvent<UnitSize, UnitDirection> UnitDirectionChange { get; private set; }
-
         [field: SerializeField] public UnityEvent<int, int> HpChanged { get; private set; }
         [field: SerializeField] public UnityEvent<int, int> ArmorChanged { get; private set; }
         [field: SerializeField] public UnityEvent<Unit> Died { get; private set; }
         [field: SerializeField] public UnityEvent<int, int> ActionPointsChanged { get; private set; }
 
         public event Action AnyActionCompleted;
-        public event Action<ExecutorAction> CurrentActionCompleted;
+        public event Action<IExecutorAction> CurrentActionCompleted;
 
         private UnitMovementLogic movementLogic;
-        private Dictionary<CommandType, IUnitAction<Node, Edge, Unit, Owned, BasePlayer, Nation>> runtimeActionsDictionary;
-        public IEnumerable<IUnitAction<Node, Edge, Unit, Owned, BasePlayer, Nation>> RuntimeActions => runtimeActionsDictionary.Values;
+        private Dictionary<CommandType, MonoUnitAction> runtimeActionsDictionary;
+        public IEnumerable<MonoUnitAction> Actions => runtimeActionsDictionary.Values;
         private uint maxPossibleActionRadius;
 
         #region Properties
-
         public int Index => index;
         public string UnitName => unitName;
         public int InitialActionPoints => initialActionPoints;
@@ -151,16 +148,27 @@ namespace LineWars.Model
 
             movementLogic = GetComponent<UnitMovementLogic>();
 
-            StartCoroutine(InitialiseAllActions());
+            InitialiseAllActions();
 
-            IEnumerator InitialiseAllActions()
+            void InitialiseAllActions()
             {
-                yield return null;
-                var serializeActions = GetComponents<MonoUnitAction>();
+                var serializeActions = 
+                    GetComponents<MonoUnitAction>()
+                        .OrderByDescending(x => x.InitializePriority)
+                        .ToArray();
+                runtimeActionsDictionary = new Dictionary<CommandType, MonoUnitAction>(serializeActions.Length);
                 foreach (var serializeAction in serializeActions)
+                {
+                    serializeAction.Initialize();
                     runtimeActionsDictionary.Add(serializeAction.GetMyCommandType(), serializeAction);
+                    serializeAction.ActionCompleted += () =>
+                    {
+                        AnyActionCompleted?.Invoke();
+                        CurrentActionCompleted?.Invoke(serializeAction);
+                    };
+                }
                 
-                maxPossibleActionRadius = RuntimeActions.Max(x => x.GetPossibleMaxRadius());
+                maxPossibleActionRadius = Actions.Max(x => x.GetPossibleMaxRadius());
             }
         }
 
@@ -173,7 +181,7 @@ namespace LineWars.Model
         public bool CanMoveOnLineWithType(LineType lineType) => lineType >= MovementLineType;
 
         public T GetUnitAction<T>() where T : IUnitAction<Node, Edge, Unit, Owned, BasePlayer, Nation> 
-            => RuntimeActions.OfType<T>().FirstOrDefault();
+            => Actions.OfType<T>().FirstOrDefault();
 
         public bool TryGetUnitAction<T>(out T action) where T : IUnitAction<Node, Edge, Unit, Owned, BasePlayer, Nation>
         {
@@ -251,7 +259,7 @@ namespace LineWars.Model
         {
             CurrentActionPoints = initialActionPoints;
 
-            foreach (var unitAction in RuntimeActions)
+            foreach (var unitAction in Actions)
                 unitAction.OnReplenish();
         }
 
