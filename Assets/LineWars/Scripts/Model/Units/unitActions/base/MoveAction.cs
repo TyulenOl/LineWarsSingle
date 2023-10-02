@@ -5,7 +5,8 @@ namespace LineWars.Model
 {
     public class MoveAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> :
         UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>, 
-        IMoveAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
+        IMoveAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>,
+        ITargetedAction
     
         where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
@@ -104,6 +105,13 @@ namespace LineWars.Model
         }
         
         public override CommandType GetMyCommandType() => CommandType.Move;
+
+        public bool IsMyTarget(ITarget target) => target is TNode;
+
+        public ICommand GenerateCommand(ITarget target)
+        {
+            return new MoveCommand<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>(this, (TNode) target);
+        }
 
         #region CallBack
 

@@ -17,7 +17,6 @@ namespace LineWars.Model
         where TNation: class, INation<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
         #endregion
     {
-        public int CurrentHp { get; set; }
         public LineType LineType { get; set; }
     }
 }

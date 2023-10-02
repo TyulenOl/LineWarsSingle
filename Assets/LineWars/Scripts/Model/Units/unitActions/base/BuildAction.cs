@@ -6,7 +6,8 @@ namespace LineWars.Model
 {
     public class BuildAction <TNode, TEdge, TUnit, TOwned, TPlayer, TNation> :
         UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>, 
-        IBuildAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> 
+        IBuildAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>,
+        ITargetedAction
     
         where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
@@ -41,5 +42,11 @@ namespace LineWars.Model
             CompleteAndAutoModify();
         }
         public override CommandType GetMyCommandType() => CommandType.Build;
+        public bool IsMyTarget(ITarget target) => target is TEdge;
+
+        public ICommand GenerateCommand(ITarget target)
+        {
+            return new BuildCommand<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>(this, (TEdge)target);
+        }
     }
 }

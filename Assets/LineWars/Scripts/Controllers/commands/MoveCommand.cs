@@ -5,6 +5,7 @@ namespace LineWars.Model
 {
     public class MoveCommand<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>:
         ICommand
+    
         where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
         where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
@@ -12,7 +13,7 @@ namespace LineWars.Model
         where TPlayer : class, IBasePlayer<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
         where TNation : class, INation<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
     {
-        private readonly MoveAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> moveAction;
+        private readonly IMoveAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> moveAction;
         private readonly TUnit unit;
         private readonly TNode start;
         private readonly TNode end;
@@ -23,12 +24,14 @@ namespace LineWars.Model
             this.end = end ?? throw new ArgumentNullException(nameof(end));
             this.start = unit.Node;
             
-            moveAction = unit.TryGetUnitAction<MoveAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>>(out var action) 
+            moveAction = unit.TryGetUnitAction<IMoveAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>>(out var action) 
                 ? action 
-                : throw new ArgumentException($"{unit} does not contain {nameof(MoveAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>)}");
+                : throw new ArgumentException($"{unit} does not contain {nameof(IMoveAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>)}");
         }
 
-        public MoveCommand([NotNull] MoveAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> moveAction, [NotNull] TNode end)
+        public MoveCommand(
+            [NotNull] IMoveAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> moveAction, 
+            [NotNull] TNode end)
         {
             this.moveAction = moveAction ?? throw new ArgumentNullException(nameof(moveAction));
             this.end = end ?? throw new ArgumentNullException(nameof(end));

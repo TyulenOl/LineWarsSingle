@@ -2,6 +2,7 @@
 {
     public class BlockAttackCommand<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> :
         AttackCommand<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
+    
         where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
         where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>

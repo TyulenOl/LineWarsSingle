@@ -9,6 +9,7 @@ namespace LineWars.Model
 {
     public class HealCommand<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>:
         ICommand
+    
         where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
         where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
@@ -16,7 +17,7 @@ namespace LineWars.Model
         where TPlayer : class, IBasePlayer<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
         where TNation : class, INation<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
     {
-        private readonly HealAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> healAction;
+        private readonly IHealAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> healAction;
         private readonly TUnit doctor;
         private readonly TUnit unit;
 
@@ -25,12 +26,14 @@ namespace LineWars.Model
             this.doctor = doctor ?? throw new ArgumentNullException(nameof(doctor));
             this.unit = unit ?? throw new ArgumentNullException(nameof(unit));
 
-            healAction = doctor.TryGetUnitAction<HealAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>>(out var action)
+            healAction = doctor.TryGetUnitAction<IHealAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>>(out var action)
                 ? action
-                : throw new ArgumentException($"{nameof(TUnit)} does not contain {nameof(HealAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>)}");
+                : throw new ArgumentException($"{nameof(TUnit)} does not contain {nameof(IHealAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>)}");
         }
 
-        public HealCommand([NotNull] HealAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> healAction, [NotNull] TUnit unit)
+        public HealCommand(
+            [NotNull] IHealAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> healAction,
+            [NotNull] TUnit unit)
         {
             this.healAction = healAction ?? throw new ArgumentNullException(nameof(healAction));
             this.unit = unit ?? throw new ArgumentNullException(nameof(unit));

@@ -4,6 +4,7 @@ namespace LineWars.Model
 {
     public class SpawnPresetCommand<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>:
         ICommand
+    
         where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
         where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>

@@ -8,7 +8,7 @@ namespace LineWars.Model
         public int CurrentActionPoints {get; }
         public bool CanDoAnyAction { get; }
         public event Action AnyActionCompleted;
-        public event Action<ExecutorAction> CurrentActionCompleted;
+        public event Action<IExecutorAction> CurrentActionCompleted;
         
         public bool TryGetCommand(CommandType priorityType, IReadOnlyTarget target, out ICommand command);
         public IEnumerable<(IReadOnlyTarget, CommandType)> GetAllAvailableTargets();

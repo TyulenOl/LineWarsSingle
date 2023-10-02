@@ -5,8 +5,9 @@ using DataStructures.PriorityQueue;
 
 namespace LineWars.Model
 {
-    public class GraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        : Graph<TNode, TEdge>, IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
+    public class GraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> :
+            Graph<TNode, TEdge>,
+            IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
     
         #region Сonstraints
         where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>

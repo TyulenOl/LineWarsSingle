@@ -9,6 +9,7 @@ namespace LineWars.Model
 {
     public class BlockCommand<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> :
         ICommand
+    
         where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
         where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
@@ -16,19 +17,18 @@ namespace LineWars.Model
         where TPlayer : class, IBasePlayer<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
         where TNation : class, INation<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
     {
-        private readonly BlockAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> blockAction;
+        private readonly IBlockAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> blockAction;
         private readonly TUnit unit;
 
         public BlockCommand([NotNull] TUnit unit)
         {
             this.unit = unit;
-            blockAction =
-                unit.TryGetUnitAction<BlockAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>>(out var action)
+            blockAction = unit.TryGetUnitAction<IBlockAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>>(out var action)
                     ? action
-                    : throw new ArgumentException($"{nameof(TUnit)} does not contain {nameof(BlockAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>)}");
+                    : throw new ArgumentException($"{nameof(TUnit)} does not contain {nameof(IBlockAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>)}");
         }
 
-        public BlockCommand(BlockAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> blockAction)
+        public BlockCommand(IBlockAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> blockAction)
         {
             this.blockAction = blockAction;
             unit = blockAction.MyUnit;

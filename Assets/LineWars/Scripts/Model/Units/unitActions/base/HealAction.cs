@@ -6,7 +6,8 @@ namespace LineWars.Model
 {
     public class HealAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> :
         UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>, 
-        IHealAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> 
+        IHealAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>,
+        ITargetedAction
     
         where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
@@ -57,5 +58,12 @@ namespace LineWars.Model
         }
 
         public override CommandType GetMyCommandType() => CommandType.Heal;
+
+        public bool IsMyTarget(ITarget target) => target is TUnit;
+
+        public ICommand GenerateCommand(ITarget target)
+        {
+            return new HealCommand<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>(this, (TUnit) target);
+        }
     }
 }
