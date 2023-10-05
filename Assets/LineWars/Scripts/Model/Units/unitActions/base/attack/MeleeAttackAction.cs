@@ -4,16 +4,17 @@ using LineWars.Controllers;
 
 namespace LineWars.Model
 {
-    public sealed class MeleeAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> :
-        AttackAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>,
-        IMeleeAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
+    public sealed class MeleeAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> :
+        AttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>,
+        IMeleeAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>
     
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TOwned : class, IOwned<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TPlayer : class, IBasePlayer<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TNation : class, INation<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
+        #region Сonstraints
+        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer> 
+        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
+        where TOwned : class, IOwned<TNode, TEdge, TUnit, TOwned, TPlayer>
+        where TPlayer: class, IBasePlayer<TNode, TEdge, TUnit, TOwned, TPlayer>
+        #endregion 
     {
         private readonly UnitBlockerSelector blockerSelector;
         private readonly bool onslaught;
@@ -51,11 +52,11 @@ namespace LineWars.Model
             // иначе выбрать того, кто будет блокировать урон
             else
             {
-                var selectedUnit = blockerSelector.SelectBlocker<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>(enemy, neighbour);
+                var selectedUnit = blockerSelector.SelectBlocker<TNode, TEdge, TUnit, TOwned, TPlayer>(enemy, neighbour);
                 if (selectedUnit == enemy)
                     AttackUnitButIgnoreBlock(enemy);
                 else
-                    UnitsController.ExecuteCommand(new BlockAttackCommand<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>(MyUnit, selectedUnit), false);
+                    UnitsController.ExecuteCommand(new BlockAttackCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(MyUnit, selectedUnit), false);
             }
         }
 
@@ -66,7 +67,7 @@ namespace LineWars.Model
             MeleeAttack(enemy);
 
             if (enemy.IsDied && enemyNode.AllIsFree && onslaught)
-                UnitsController.ExecuteCommand(new MoveCommand<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>(MyUnit, enemyNode));
+                UnitsController.ExecuteCommand(new MoveCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(MyUnit, enemyNode));
         }
 
         private void MeleeAttack(TUnit target)

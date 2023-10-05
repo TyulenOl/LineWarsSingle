@@ -10,7 +10,7 @@ namespace LineWars.Model
     /// <summary>
     /// класс, который объединяет все принадлежащее (ноды, юнитов и т.д.)
     /// </summary>
-    public abstract class Owned: MonoBehaviour, IOwned<Node, Edge, Unit, Owned, BasePlayer, Nation>
+    public abstract class Owned: MonoBehaviour, IOwned<Node, Edge, Unit, Owned, BasePlayer>
     {
         [Header("Accessory settings")]
         [SerializeField] [ReadOnlyInspector] protected BasePlayer basePlayer;

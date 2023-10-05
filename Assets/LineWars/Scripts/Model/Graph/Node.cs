@@ -10,7 +10,7 @@ namespace LineWars.Model
 {
     [RequireComponent(typeof(Selectable2D))]
     [RequireComponent(typeof(RenderNodeV3))]
-    public class Node : Owned, INodeForGame<Node, Edge, Unit, Owned, BasePlayer, Nation>
+    public class Node : Owned, INodeForGame<Node, Edge, Unit, Owned, BasePlayer>
     {
         [SerializeField] private int index;
         [SerializeField] private List<Edge> edges;
@@ -51,7 +51,7 @@ namespace LineWars.Model
         public bool AnyIsFree => LeftIsFree || RightIsFree;
         public bool AllIsFree => LeftIsFree && RightIsFree;
 
-        public int Index => index;
+        public int Id => index;
 
         public int Visibility =>
             Math.Max(visibility,
@@ -215,7 +215,7 @@ namespace LineWars.Model
             }
             else
             {
-                gameObject.name = $"Node{Index} Group with {ReferenceToSpawn.GroupName}";
+                gameObject.name = $"Node{Id} Group with {ReferenceToSpawn.GroupName}";
                 var spriteRenderer = GetComponent<SpriteRenderer>();
                 spriteRenderer.sprite = ReferenceToSpawn.GroupSprite;
                 
@@ -224,7 +224,7 @@ namespace LineWars.Model
         
         private void DrawToDefault()
         {
-            gameObject.name = $"Node{Index}";
+            gameObject.name = $"Node{Id}";
             var spriteRenderer = GetComponent<SpriteRenderer>();
             spriteRenderer.sprite = Resources.Load<Sprite>("Sprites/Circle");
             GetComponent<Outline2D>().SetActiveOutline(false);

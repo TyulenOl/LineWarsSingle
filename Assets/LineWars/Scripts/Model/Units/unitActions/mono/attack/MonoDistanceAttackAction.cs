@@ -6,10 +6,10 @@ using UnityEngine;
 namespace LineWars.Model
 {
     public class MonoDistanceAttackAction : MonoAttackAction,
-        IDistanceAttackAction<Node, Edge, Unit, Owned, BasePlayer, Nation>
+        IDistanceAttackAction<Node, Edge, Unit, Owned, BasePlayer>
     {
-        private DistanceAttackAction<Node, Edge, Unit, Owned, BasePlayer, Nation> DistanceAttack
-            => (DistanceAttackAction<Node, Edge, Unit, Owned, BasePlayer, Nation>) ExecutorAction;
+        private DistanceAttackAction<Node, Edge, Unit, Owned, BasePlayer> DistanceAttack
+            => (DistanceAttackAction<Node, Edge, Unit, Owned, BasePlayer>) ExecutorAction;
         
         [field: SerializeField, Min(0)] public int InitialDistance { get; private set; }
         public uint Distance => DistanceAttack.Distance;
@@ -17,7 +17,7 @@ namespace LineWars.Model
         
         protected override ExecutorAction GetAction()
         {
-            return new DistanceAttackAction<Node, Edge, Unit, Owned, BasePlayer, Nation>(GetComponent<Unit>(), this, MonoGraph.Instance);
+            return new DistanceAttackAction<Node, Edge, Unit, Owned, BasePlayer>(GetComponent<Unit>(), this, MonoGraph.Instance);
         }
     }
 }

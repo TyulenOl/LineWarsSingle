@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using UnityEngine;
 
 namespace LineWars.Model
 {
-    public class AttackCommand<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>:
+    public class AttackCommand<TNode, TEdge, TUnit, TOwned, TPlayer>:
         ICommand
     
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TOwned : class, IOwned<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TPlayer : class, IBasePlayer<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TNation : class, INation<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
+        #region Сonstraints
+        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer> 
+        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
+        where TOwned : class, IOwned<TNode, TEdge, TUnit, TOwned, TPlayer>
+        where TPlayer: class, IBasePlayer<TNode, TEdge, TUnit, TOwned, TPlayer>
+        #endregion 
     {
-        private readonly IAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> attackAction;
+        private readonly IAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> attackAction;
 
         protected readonly TUnit Attacker;
         protected readonly IAlive Defender;
@@ -24,13 +24,13 @@ namespace LineWars.Model
             Attacker = attacker ?? throw new ArgumentNullException(nameof(attacker));
             Defender = defender ?? throw new ArgumentNullException(nameof(defender));
 
-            attackAction = attacker.TryGetUnitAction<IAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>>(out var action) 
+            attackAction = attacker.TryGetUnitAction<IAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>>(out var action) 
                 ? action 
-                : throw new ArgumentException($"{Attacker} does not contain {nameof(IAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>)}");
+                : throw new ArgumentException($"{Attacker} does not contain {nameof(IAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>)}");
         }
 
         public AttackCommand(
-            [NotNull] IAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> attackAction,
+            [NotNull] IAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> attackAction,
             [NotNull] IAlive alive)
         {
             this.attackAction = attackAction ?? throw new ArgumentNullException(nameof(attackAction));

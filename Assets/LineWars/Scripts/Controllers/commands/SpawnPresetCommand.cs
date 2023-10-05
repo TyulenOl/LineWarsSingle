@@ -1,16 +1,14 @@
-﻿using System.Numerics;
-
+﻿
 namespace LineWars.Model
 {
-    public class SpawnPresetCommand<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>:
+    public class SpawnPresetCommand<TNode, TEdge, TUnit, TOwned, TPlayer>:
         ICommand
     
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TOwned : class, IOwned<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TPlayer : class, IBasePlayer<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TNation : class, INation<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
+        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
+        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
+        where TOwned : class, IOwned<TNode, TEdge, TUnit, TOwned, TPlayer>
+        where TPlayer : class, IBasePlayer<TNode, TEdge, TUnit, TOwned, TPlayer>
     {
         private readonly TPlayer player;
         private readonly UnitBuyPreset unitPreset;

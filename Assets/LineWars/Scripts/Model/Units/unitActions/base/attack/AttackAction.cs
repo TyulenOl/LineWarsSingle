@@ -5,17 +5,17 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace LineWars.Model
 {
-    public abstract class AttackAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> :
-        UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>,
-        IAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>,
-        ITargetedAction
+    public abstract class AttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> :
+        UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>,
+        IAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>
     
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TOwned : class, IOwned<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TPlayer : class, IBasePlayer<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TNation : class, INation<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
+        #region Сonstraints
+        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer> 
+        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
+        where TOwned : class, IOwned<TNode, TEdge, TUnit, TOwned, TPlayer>
+        where TPlayer: class, IBasePlayer<TNode, TEdge, TUnit, TOwned, TPlayer>
+        #endregion 
     {
         public bool AttackLocked { get; protected set; }
         public int Damage { get; protected set; }
@@ -72,7 +72,7 @@ namespace LineWars.Model
 
         public ICommand GenerateCommand(ITarget target)
         {
-            return new AttackCommand<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>(this, (IAlive) target);
+            return new AttackCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this, (IAlive) target);
         }
     }
 }

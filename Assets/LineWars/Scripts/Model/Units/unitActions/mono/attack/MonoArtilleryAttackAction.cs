@@ -5,10 +5,10 @@ using UnityEngine;
 namespace LineWars.Model
 {
     public class MonoArtilleryAttackAction : MonoDistanceAttackAction,
-        IArtilleryAttackAction<Node, Edge, Unit, Owned, BasePlayer, Nation>
+        IArtilleryAttackAction<Node, Edge, Unit, Owned, BasePlayer>
     {
-        private ArtilleryAttackAction<Node, Edge, Unit, Owned, BasePlayer, Nation> AttackAction
-            => (ArtilleryAttackAction<Node, Edge, Unit, Owned, BasePlayer, Nation>) ExecutorAction;
+        private ArtilleryAttackAction<Node, Edge, Unit, Owned, BasePlayer> AttackAction
+            => (ArtilleryAttackAction<Node, Edge, Unit, Owned, BasePlayer>) ExecutorAction;
         
         [SerializeField] private Explosion explosionPrefab;
 
@@ -26,7 +26,7 @@ namespace LineWars.Model
 
         protected override ExecutorAction GetAction()
         {
-            return new ArtilleryAttackAction<Node, Edge, Unit, Owned, BasePlayer, Nation>(Unit, this, MonoGraph.Instance);
+            return new ArtilleryAttackAction<Node, Edge, Unit, Owned, BasePlayer>(Unit, this, MonoGraph.Instance);
         }
     }
 }

@@ -22,7 +22,7 @@ namespace LineWars
         [Header("Debug")] 
         [SerializeField] private bool isAI;
 
-        private List<BasePlayer> allPlayers = new ();
+        private readonly List<BasePlayer> allPlayers = new ();
         private Player player;
         
 
@@ -71,6 +71,7 @@ namespace LineWars
             GameReferee.Instance.Wined += WinGame;
             GameReferee.Instance.Losed += LoseGame;
         }
+        
 
         private void InitializeSpawns()
         {

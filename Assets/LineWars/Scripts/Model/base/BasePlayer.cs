@@ -11,7 +11,7 @@ namespace LineWars.Model
     /// <summary>
     /// класс, содержащий всю логику, которая объединяет ИИ и игрока
     /// </summary>
-    public abstract class BasePlayer : MonoBehaviour, IActor, IBasePlayer<Node, Edge, Unit, Owned, BasePlayer, Nation>
+    public abstract class BasePlayer : MonoBehaviour, IActor, IBasePlayer<Node, Edge, Unit, Owned, BasePlayer>
     {
         [field: SerializeField, ReadOnlyInspector] public int Index { get;  private set; }
         [SerializeField, ReadOnlyInspector] private int money;

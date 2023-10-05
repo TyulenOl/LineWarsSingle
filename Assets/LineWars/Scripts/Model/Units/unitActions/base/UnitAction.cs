@@ -3,16 +3,17 @@
 
 namespace LineWars.Model
 {
-    public abstract class UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> :
+    public abstract class UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer> :
         ExecutorAction,
-        IUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
+        IUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>
     
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TOwned : class, IOwned<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TPlayer : class, IBasePlayer<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TNation : class, INation<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
+        #region Сonstraints
+        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer> 
+        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
+        where TOwned : class, IOwned<TNode, TEdge, TUnit, TOwned, TPlayer>
+        where TPlayer: class, IBasePlayer<TNode, TEdge, TUnit, TOwned, TPlayer>
+        #endregion 
     {
         public TUnit MyUnit { get; }
 
