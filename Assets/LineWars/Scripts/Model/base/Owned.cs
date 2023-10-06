@@ -10,7 +10,7 @@ namespace LineWars.Model
     /// <summary>
     /// класс, который объединяет все принадлежащее (ноды, юнитов и т.д.)
     /// </summary>
-    public abstract class Owned: MonoBehaviour, IOwned<Node, Edge, Unit, Owned, BasePlayer>
+    public abstract class Owned: MonoBehaviour, IOwned<Owned, BasePlayer>
     {
         [Header("Accessory settings")]
         [SerializeField] [ReadOnlyInspector] protected BasePlayer basePlayer;
@@ -23,19 +23,28 @@ namespace LineWars.Model
             set => SetOwner(value);
         }
         
-        public void SetOwner([MaybeNull]BasePlayer newBasePlayer)
+        private void SetOwner([MaybeNull]BasePlayer newBasePlayer)
         {
-            
             var temp = basePlayer;
             basePlayer = newBasePlayer;
             OnSetOwner(temp, newBasePlayer);
             OwnerChanged?.Invoke(temp, newBasePlayer);
         }
 
+        public void ConnectTo(BasePlayer basePlayer) => Connect(basePlayer, this);
         public static void Connect(BasePlayer basePlayer, Owned owned)
         {
+            var otherOwner = owned.Owner;
+            if (otherOwner != null)
+            {
+                owned.Owner = null;
+                if (otherOwner != basePlayer)
+                    otherOwner.RemoveOwned(owned);
+            }
+        
+            
             basePlayer.AddOwned(owned);
-            owned.SetOwner(basePlayer);
+            owned.Owner = basePlayer;
         }
         
         protected virtual void OnDisable()

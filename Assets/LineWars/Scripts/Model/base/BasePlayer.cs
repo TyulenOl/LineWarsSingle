@@ -11,7 +11,7 @@ namespace LineWars.Model
     /// <summary>
     /// класс, содержащий всю логику, которая объединяет ИИ и игрока
     /// </summary>
-    public abstract class BasePlayer : MonoBehaviour, IActor, IBasePlayer<Node, Edge, Unit, Owned, BasePlayer>
+    public abstract class BasePlayer : MonoBehaviour, IActor, IBasePlayer<Owned, BasePlayer>
     {
         [field: SerializeField, ReadOnlyInspector] public int Index { get;  private set; }
         [SerializeField, ReadOnlyInspector] private int money;
@@ -135,12 +135,10 @@ namespace LineWars.Model
         public void AddOwned([NotNull] Owned owned)
         {
             if (owned == null) throw new ArgumentNullException(nameof(owned));
-
-            if (owned.Owner != null && owned.Owner == this)
-                return;
-            if (owned.Owner != null && owned.Owner != this)
+            
+            if (owned.Owner != null)
             {
-                owned.Owner.RemoveOwned(owned);
+                throw new InvalidOperationException();
             }
 
             switch (owned)
@@ -223,7 +221,7 @@ namespace LineWars.Model
             foreach (var unit in MyUnits.ToList())
                 Destroy(unit.gameObject);
             foreach (var node in MyNodes.ToList()) 
-                node.SetOwner(null);
+                node.Owner = null;
 
             myOwned = new HashSet<Owned>();
             Destroy(gameObject);
