@@ -8,7 +8,7 @@ using UnityEngine.Events;
 namespace LineWars.Model
 {
     public class Edge : MonoBehaviour,
-        IEdgeForGame<Node, Edge, Unit, Owned, BasePlayer, Nation>,
+        IEdgeForGame<Node, Edge, Unit, Owned, BasePlayer>,
         ISerializationCallbackReceiver
     {
         [Header("Graph Settings")]
@@ -45,7 +45,7 @@ namespace LineWars.Model
         public SpriteRenderer SpriteRenderer => edgeSpriteRenderer;
         public BoxCollider2D BoxCollider2D => edgeCollider;
 
-        public int Index => index;
+        public int Id => index;
         
 
         public int MaxHp => lineMap.ContainsKey(LineType)
@@ -117,7 +117,7 @@ namespace LineWars.Model
 
         public void Redraw()
         {
-            name = $"Edge{Index} from {(FirstNode ? FirstNode.name : "Null")} to {(SecondNode ? SecondNode.name : "None")}";
+            name = $"Edge{Id} from {(FirstNode ? FirstNode.name : "Null")} to {(SecondNode ? SecondNode.name : "None")}";
             RedrawLine();
             AlineCollider();
         }

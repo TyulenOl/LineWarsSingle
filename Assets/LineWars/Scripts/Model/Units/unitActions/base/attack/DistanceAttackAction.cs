@@ -3,23 +3,24 @@ using JetBrains.Annotations;
 
 namespace LineWars.Model
 {
-    public class DistanceAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> :
-        AttackAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>,
-        IDistanceAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
+    public class DistanceAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> :
+        AttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>,
+        IDistanceAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>
     
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TOwned : class, IOwned<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TPlayer : class, IBasePlayer<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TNation : class, INation<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
+        #region Сonstraints
+        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer> 
+        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
+        where TOwned : class, IOwned<TOwned, TPlayer>
+        where TPlayer: class, IBasePlayer<TOwned, TPlayer>
+        #endregion 
     {
-        protected IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> Graph;
+        protected readonly IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer> Graph;
         public uint Distance { get; private set; }
 
         public DistanceAttackAction(TUnit unit,
             MonoDistanceAttackAction data,
-            [NotNull] IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> graph) : base(unit, data)
+            [NotNull] IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer> graph) : base(unit, data)
         {
             this.Graph = graph ?? throw new ArgumentNullException(nameof(graph));
         }

@@ -1,5 +1,4 @@
-﻿using LineWars.Model;
-
+﻿
 namespace LineWars.Model
 {
     //команды нужны, чтобы сохранять контекст,

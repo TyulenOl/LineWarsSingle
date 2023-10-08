@@ -1,26 +1,20 @@
-﻿using System;
-using JetBrains.Annotations;
-using LineWars.Controllers;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace LineWars.Model
 {
     public class MonoMeleeAttackAction : MonoAttackAction,
-        IMeleeAttackAction<Node, Edge, Unit, Owned, BasePlayer, Nation>
+        IMeleeAttackAction<Node, Edge, Unit, Owned, BasePlayer>
     {
-        [SerializeField] private UnitBlockerSelector initialBlockerSelector;
-
+        [field: SerializeField] public UnitBlockerSelector InitialBlockerSelector { get; private set; }
+        
         /// <summary>
         /// указывет на то, нужно ли захватывать точку после атаки
         /// </summary>
-        [SerializeField] private bool initialOnslaught = true;
-
-        public UnitBlockerSelector InitialBlockerSelector => initialBlockerSelector;
-        public bool InitialOnslaught => initialOnslaught;
+        [field: SerializeField] public bool InitialOnslaught { get; private set; }
 
         protected override ExecutorAction GetAction()
         {
-            return new MeleeAttackAction<Node, Edge, Unit, Owned, BasePlayer, Nation>(GetComponent<Unit>(), this);
+            return new MeleeAttackAction<Node, Edge, Unit, Owned, BasePlayer>(GetComponent<Unit>(), this);
         }
     }
 }

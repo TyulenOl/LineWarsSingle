@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using LineWars.Interface;
+﻿using System.Linq;
 using UnityEngine;
 
 namespace LineWars.Model

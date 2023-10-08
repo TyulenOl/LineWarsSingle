@@ -4,11 +4,11 @@ using UnityEngine;
 namespace LineWars.Model
 {
     public class MonoMoveAction : MonoUnitAction,
-        IMoveAction<Node, Edge, Unit, Owned, BasePlayer, Nation>
+        IMoveAction<Node, Edge, Unit, Owned, BasePlayer>
     {
         [SerializeField] private SFXData moveSfx;
-        private MoveAction<Node, Edge, Unit, Owned, BasePlayer, Nation> MoveAction =>
-            (MoveAction<Node, Edge, Unit, Owned, BasePlayer, Nation>) ExecutorAction;
+        private MoveAction<Node, Edge, Unit, Owned, BasePlayer> MoveAction =>
+            (MoveAction<Node, Edge, Unit, Owned, BasePlayer>) ExecutorAction;
         
         public bool CanMoveTo(Node target, bool ignoreActionPointsCondition = false) => 
             MoveAction.CanMoveTo(target, ignoreActionPointsCondition);
@@ -24,12 +24,12 @@ namespace LineWars.Model
 
         public ICommand GenerateCommand(ITarget target)
         {
-            return new MoveCommand<Node, Edge, Unit, Owned, BasePlayer, Nation>(this, (Node) target);
+            return new MoveCommand<Node, Edge, Unit, Owned, BasePlayer>(this, (Node) target);
         }
         
         protected override ExecutorAction GetAction()
         {
-            var action = new MoveAction<Node, Edge, Unit, Owned, BasePlayer, Nation>(Unit, this);
+            var action = new MoveAction<Node, Edge, Unit, Owned, BasePlayer>(Unit, this);
             return action;
         }
     }

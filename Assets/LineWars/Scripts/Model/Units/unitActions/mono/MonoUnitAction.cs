@@ -5,12 +5,12 @@ namespace LineWars.Model
 {
     [RequireComponent(typeof(Unit))]
     public abstract class MonoUnitAction: MonoExecutorAction,
-        IUnitAction<Node, Edge, Unit, Owned, BasePlayer, Nation>
+        IUnitAction<Node, Edge, Unit, Owned, BasePlayer>
     {
         protected Unit Unit => (Unit)Executor;
 
-        private UnitAction<Node, Edge, Unit, Owned, BasePlayer, Nation> UnitAction
-            => (UnitAction<Node, Edge, Unit, Owned, BasePlayer, Nation>) ExecutorAction;
+        private UnitAction<Node, Edge, Unit, Owned, BasePlayer> UnitAction
+            => (UnitAction<Node, Edge, Unit, Owned, BasePlayer>) ExecutorAction;
 
         public Unit MyUnit => UnitAction.MyUnit;
         public uint GetPossibleMaxRadius() => UnitAction.GetPossibleMaxRadius();

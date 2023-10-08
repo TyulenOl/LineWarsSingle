@@ -2,17 +2,15 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using DataStructures.PriorityQueue;
-using LineWars.Extensions;
 using UnityEngine;
 
 namespace LineWars.Model
 {
     public class MonoGraph : MonoBehaviour,
-        IGraphForGame<Node, Edge, Unit, Owned, BasePlayer, Nation>
+        IGraphForGame<Node, Edge, Unit, Owned, BasePlayer>
     {
-        private GraphForGame<Node, Edge, Unit, Owned, BasePlayer, Nation> modelGraph;
-        public static MonoGraph Instance { get; set; }
+        private GraphForGame<Node, Edge, Unit, Owned, BasePlayer> modelGraph;
+        public static MonoGraph Instance { get; private set; }
 
         [field: SerializeField] public GameObject NodesParent { get; set; }
         [field: SerializeField] public GameObject EdgesParent { get; set; }
@@ -42,7 +40,7 @@ namespace LineWars.Model
             allNodes = FindObjectsOfType<Node>();
             allEdges = FindObjectsOfType<Edge>();
             GenerateSpawnInfo();
-            modelGraph = new GraphForGame<Node, Edge, Unit, Owned, BasePlayer, Nation>(allNodes, allEdges);
+            modelGraph = new GraphForGame<Node, Edge, Unit, Owned, BasePlayer>(allNodes, allEdges);
         }
 
         private void GenerateSpawnInfo()

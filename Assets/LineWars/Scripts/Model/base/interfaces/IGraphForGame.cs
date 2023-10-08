@@ -1,8 +1,11 @@
-﻿namespace LineWars.Model
+﻿using System.Collections.Generic;
+using System.Linq;
+
+namespace LineWars.Model
 {
-    public interface IArtilleryAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> : 
-        IDistanceAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>
-    
+    public interface IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
+        : IGraph<TNode, TEdge>
+        
         #region Сonstraints
         where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer> 
@@ -11,6 +14,6 @@
         where TPlayer: class, IBasePlayer<TOwned, TPlayer>
         #endregion 
     {
-        
+        public Dictionary<TNode, bool> GetVisibilityInfo(TPlayer player);
     }
 }

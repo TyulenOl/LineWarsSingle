@@ -6,22 +6,19 @@ namespace LineWars.Model
 {
     [DisallowMultipleComponent]
     public abstract class MonoAttackAction : MonoUnitAction,
-        IAttackAction<Node, Edge, Unit, Owned, BasePlayer, Nation>
+        IAttackAction<Node, Edge, Unit, Owned, BasePlayer>
     {
-        private AttackAction<Node, Edge, Unit, Owned, BasePlayer, Nation> AttackAction
-            => (AttackAction<Node, Edge, Unit, Owned, BasePlayer, Nation>) ExecutorAction;
+        private AttackAction<Node, Edge, Unit, Owned, BasePlayer> AttackAction
+            => (AttackAction<Node, Edge, Unit, Owned, BasePlayer>) ExecutorAction;
 
         [SerializeField] protected SFXData attackSfx;
-        [SerializeField] private int initialDamage;
-        [SerializeField] private bool initialIsPenetratingDamage;
-        public int InitialDamage => initialDamage;
-        public bool InitialIsPenetratingDamage => initialIsPenetratingDamage;
+        [field: SerializeField] public int InitialDamage { get; private set; }
+        [field: SerializeField] public bool InitialIsPenetratingDamage { get; private set; }
 
 
         public int Damage => AttackAction.Damage;
         public bool IsPenetratingDamage => AttackAction.IsPenetratingDamage;
-        public bool AttackLocked => AttackAction.AttackLocked;
-
+        
 
         public virtual bool CanAttack(IAlive enemy, bool ignoreActionPointsCondition = false) =>
             AttackAction.CanAttack(enemy, ignoreActionPointsCondition);
@@ -35,7 +32,7 @@ namespace LineWars.Model
         public bool IsMyTarget(ITarget target) => AttackAction.IsMyTarget(target);
         public ICommand GenerateCommand(ITarget target)
         {
-            return new AttackCommand<Node, Edge, Unit, Owned, BasePlayer, Nation>(this, (IAlive) target);
+            return new AttackCommand<Node, Edge, Unit, Owned, BasePlayer>(this, (IAlive) target);
         }
     }
 }

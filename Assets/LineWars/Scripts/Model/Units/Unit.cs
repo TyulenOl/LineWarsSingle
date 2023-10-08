@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using LineWars.Extensions.Attributes;
 using UnityEngine;
@@ -10,7 +8,7 @@ using UnityEngine.Events;
 namespace LineWars.Model
 {
     [RequireComponent(typeof(UnitMovementLogic))]
-    public sealed class Unit : Owned, IUnit<Node, Edge, Unit, Owned, BasePlayer, Nation>
+    public sealed class Unit : Owned, IUnit<Node, Edge, Unit, Owned, BasePlayer>
     {
         [Header("Units Settings")] 
         [SerializeField, ReadOnlyInspector] private int index;
@@ -54,7 +52,7 @@ namespace LineWars.Model
         private uint maxPossibleActionRadius;
 
         #region Properties
-        public int Index => index;
+        public int Id => index;
         public string UnitName => unitName;
         public int InitialActionPoints => initialActionPoints;
 
@@ -152,8 +150,7 @@ namespace LineWars.Model
 
             void InitialiseAllActions()
             {
-                var serializeActions = 
-                    GetComponents<MonoUnitAction>()
+                var serializeActions = GetComponents<MonoUnitAction>()
                         .OrderByDescending(x => x.InitializePriority)
                         .ToArray();
                 runtimeActionsDictionary = new Dictionary<CommandType, MonoUnitAction>(serializeActions.Length);
@@ -178,12 +175,10 @@ namespace LineWars.Model
             UnitDirection = direction;
         }
 
-        public bool CanMoveOnLineWithType(LineType lineType) => lineType >= MovementLineType;
-
-        public T GetUnitAction<T>() where T : IUnitAction<Node, Edge, Unit, Owned, BasePlayer, Nation> 
+        public T GetUnitAction<T>() where T : IUnitAction<Node, Edge, Unit, Owned, BasePlayer> 
             => Actions.OfType<T>().FirstOrDefault();
 
-        public bool TryGetUnitAction<T>(out T action) where T : IUnitAction<Node, Edge, Unit, Owned, BasePlayer, Nation>
+        public bool TryGetUnitAction<T>(out T action) where T : IUnitAction<Node, Edge, Unit, Owned, BasePlayer>
         {
             action = GetUnitAction<T>();
             return action != null;
@@ -207,34 +202,7 @@ namespace LineWars.Model
         {
             return TryGetCommand(priorityType, (ITarget) target, out command);
         }
-
-        public bool TryGetNeighbour([NotNullWhen(true)] out Unit neighbour)
-        {
-            neighbour = null;
-            if (Size == UnitSize.Large)
-                return false;
-            if (myNode.LeftUnit == this && myNode.RightUnit != null)
-            {
-                neighbour = myNode.RightUnit;
-                return true;
-            }
-
-            if (myNode.RightUnit == this && myNode.LeftUnit != null)
-            {
-                neighbour = myNode.LeftUnit;
-                return true;
-            }
-
-            return false;
-        }
-
-        public bool IsNeighbour(Unit unit)
-        {
-            return myNode.LeftUnit == this && myNode.RightUnit == unit
-                   || myNode.RightUnit == this && myNode.LeftUnit == unit;
-        }
-
-
+        
         private void OnDied()
         {
             if (unitSize == UnitSize.Large)

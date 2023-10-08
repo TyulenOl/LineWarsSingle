@@ -4,7 +4,7 @@
     {
         public static int GetDamage(this Unit unit)
         {
-            return unit.TryGetUnitAction<IAttackAction<Node, Edge, Unit, Owned, BasePlayer, Nation>>(out var action)
+            return unit.TryGetUnitAction<MonoAttackAction>(out var action)
                 ? action.Damage
                 : 0;
         }

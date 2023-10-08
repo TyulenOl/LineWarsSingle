@@ -3,17 +3,17 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace LineWars.Model
 {
-    public class MoveAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> :
-        UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>, 
-        IMoveAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>,
-        ITargetedAction
+    public class MoveAction<TNode, TEdge, TUnit, TOwned, TPlayer> :
+        UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>, 
+        IMoveAction<TNode, TEdge, TUnit, TOwned, TPlayer>
     
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TOwned : class, IOwned<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TPlayer : class, IBasePlayer<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TNation : class, INation<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
+        #region Сonstraints
+        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer> 
+        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
+        where TOwned : class, IOwned<TOwned, TPlayer>
+        where TPlayer: class, IBasePlayer<TOwned, TPlayer>
+        #endregion 
     {
         public MoveAction([NotNull] TUnit unit, [NotNull] MonoMoveAction data) : base(unit, data)
         {
@@ -110,7 +110,7 @@ namespace LineWars.Model
 
         public ICommand GenerateCommand(ITarget target)
         {
-            return new MoveCommand<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>(this, (TNode) target);
+            return new MoveCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this, (TNode) target);
         }
 
         #region CallBack

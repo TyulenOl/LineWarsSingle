@@ -4,11 +4,11 @@ using UnityEngine;
 namespace LineWars.Model
 {
     public class MonoBuildRoadAction: MonoUnitAction,
-        IBuildAction<Node, Edge, Unit, Owned, BasePlayer, Nation>
+        IBuildAction<Node, Edge, Unit, Owned, BasePlayer>
     {
         [SerializeField] private SFXData buildSfx;
-        private BuildAction<Node, Edge, Unit, Owned, BasePlayer, Nation> BuildAction
-            => (BuildAction<Node, Edge, Unit, Owned, BasePlayer, Nation>) ExecutorAction;
+        private BuildAction<Node, Edge, Unit, Owned, BasePlayer> BuildAction
+            => (BuildAction<Node, Edge, Unit, Owned, BasePlayer>) ExecutorAction;
 
         public bool CanUpRoad(Edge edge, bool ignoreActionPointsCondition = false) =>
             BuildAction.CanUpRoad(edge, ignoreActionPointsCondition);
@@ -22,12 +22,12 @@ namespace LineWars.Model
         public bool IsMyTarget(ITarget target) => BuildAction.IsMyTarget(target);
         public ICommand GenerateCommand(ITarget target)
         {
-            return new BuildCommand<Node, Edge, Unit, Owned, BasePlayer, Nation>(this, (Edge) target);
+            return new BuildCommand<Node, Edge, Unit, Owned, BasePlayer>(this, (Edge) target);
         }
 
         protected override ExecutorAction GetAction()
         {
-            return new BuildAction<Node, Edge, Unit, Owned, BasePlayer, Nation>(Unit, this);
+            return new BuildAction<Node, Edge, Unit, Owned, BasePlayer>(Unit, this);
         }
     }
 }

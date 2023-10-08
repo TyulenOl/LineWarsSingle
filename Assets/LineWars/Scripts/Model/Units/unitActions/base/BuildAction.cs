@@ -4,17 +4,17 @@ using System.Linq;
 
 namespace LineWars.Model
 {
-    public class BuildAction <TNode, TEdge, TUnit, TOwned, TPlayer, TNation> :
-        UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>, 
-        IBuildAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>,
-        ITargetedAction
+    public class BuildAction <TNode, TEdge, TUnit, TOwned, TPlayer> :
+        UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>, 
+        IBuildAction<TNode, TEdge, TUnit, TOwned, TPlayer>
     
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TOwned : class, IOwned<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TPlayer : class, IBasePlayer<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TNation : class, INation<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
+        #region Сonstraints
+        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer> 
+        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
+        where TOwned : class, IOwned<TOwned, TPlayer>
+        where TPlayer: class, IBasePlayer<TOwned, TPlayer>
+        #endregion 
     {
         public BuildAction([NotNull] TUnit unit, [NotNull] MonoBuildRoadAction data) : base(unit, data)
         {
@@ -23,8 +23,7 @@ namespace LineWars.Model
         public bool CanUpRoad([NotNull] TEdge edge, bool ignoreActionPointsCondition = false)
             => CanUpRoad(edge, MyUnit.Node, ignoreActionPointsCondition);
 
-        public bool CanUpRoad([NotNull] TEdge edge, [NotNull] TNode node,
-            bool ignoreActionPointsCondition = false)
+        public bool CanUpRoad([NotNull] TEdge edge, [NotNull] TNode node, bool ignoreActionPointsCondition = false)
         {
             if (edge == null) throw new ArgumentNullException(nameof(edge));
             if (node == null) throw new ArgumentNullException(nameof(node));
@@ -46,7 +45,7 @@ namespace LineWars.Model
 
         public ICommand GenerateCommand(ITarget target)
         {
-            return new BuildCommand<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>(this, (TEdge)target);
+            return new BuildCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this, (TEdge)target);
         }
     }
 }

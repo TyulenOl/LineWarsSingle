@@ -266,11 +266,11 @@ public class GraphTool : EditorTool
     {
         var objects = FindObjectsOfType<T>()
             .Where(x => x != obj)
-            .OrderBy(x => x.Index);
+            .OrderBy(x => x.Id);
         var nextIndex = 0;
         foreach (var o in objects)
         {
-            if (o.Index == nextIndex)
+            if (o.Id == nextIndex)
                 nextIndex++;
             else
                 return nextIndex;

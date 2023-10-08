@@ -8,7 +8,7 @@ namespace LineWars.Model
 {
     [CreateAssetMenu(fileName = "new Nation", menuName = "Data/Create Nation", order = 50)]
     [Serializable]
-    public class Nation: ScriptableObject, INation<Node, Edge, Unit, Owned, BasePlayer, Nation>
+    public class Nation: ScriptableObject
     {
         [SerializeField] private NationEconomicLogic nationEconomicLogic;
         [field: SerializeField] public SerializedDictionary<UnitType, Unit> UnitTypeUnitPairs { get; private set; } = new();

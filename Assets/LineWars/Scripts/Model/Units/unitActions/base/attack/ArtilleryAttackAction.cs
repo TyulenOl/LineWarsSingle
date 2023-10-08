@@ -1,19 +1,20 @@
 ﻿namespace LineWars.Model
 {
-    public class ArtilleryAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> :
-        DistanceAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>,
-        IArtilleryAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
+    public class ArtilleryAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> :
+        DistanceAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>,
+        IArtilleryAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>
     
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TOwned : class, IOwned<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TPlayer : class, IBasePlayer<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TNation : class, INation<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
+        #region Сonstraints
+        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer> 
+        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
+        where TOwned : class, IOwned<TOwned, TPlayer>
+        where TPlayer: class, IBasePlayer<TOwned, TPlayer>
+        #endregion 
     {
         public ArtilleryAttackAction(TUnit unit,
             MonoArtilleryAttackAction data, 
-            IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> graph) : base(unit, data, graph)
+            IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer> graph) : base(unit, data, graph)
         {
      
         }

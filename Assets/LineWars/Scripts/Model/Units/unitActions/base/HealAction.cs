@@ -4,17 +4,17 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace LineWars.Model
 {
-    public class HealAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> :
-        UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>, 
-        IHealAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>,
-        ITargetedAction
+    public class HealAction<TNode, TEdge, TUnit, TOwned, TPlayer> :
+        UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>, 
+        IHealAction<TNode, TEdge, TUnit, TOwned, TPlayer>
     
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TOwned : class, IOwned<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TPlayer : class, IBasePlayer<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TNation : class, INation<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
+        #region Сonstraints
+        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer> 
+        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
+        where TOwned : class, IOwned<TOwned, TPlayer>
+        where TPlayer: class, IBasePlayer<TOwned, TPlayer>
+        #endregion 
     {
         public bool IsMassHeal { get; private set; }
         public int HealingAmount { get; private set; }
@@ -63,7 +63,7 @@ namespace LineWars.Model
 
         public ICommand GenerateCommand(ITarget target)
         {
-            return new HealCommand<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>(this, (TUnit) target);
+            return new HealCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this, (TUnit) target);
         }
     }
 }

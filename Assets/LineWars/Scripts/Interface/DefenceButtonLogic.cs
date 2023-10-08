@@ -19,7 +19,7 @@ namespace LineWars
         {
             var executor = CommandsManager.Instance.Executor;
             if (executor is Unit unit)
-                UnitsController.ExecuteCommand(new BlockCommand<Node, Edge, Unit, Owned, BasePlayer, Nation>
+                UnitsController.ExecuteCommand(new BlockCommand<Node, Edge, Unit, Owned, BasePlayer>
                     (unit), false);
         }
     }

@@ -4,30 +4,31 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    public class BlockAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> :
-        UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>, 
-        IBlockAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
+    public class BlockAction<TNode, TEdge, TUnit, TOwned, TPlayer> :
+        UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>, 
+        IBlockAction<TNode, TEdge, TUnit, TOwned, TPlayer>
     
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TOwned : class, IOwned<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TPlayer : class, IBasePlayer<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
-        where TNation : class, INation<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>
+        #region Сonstraints
+        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer> 
+        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
+        where TOwned : class, IOwned<TOwned, TPlayer>
+        where TPlayer: class, IBasePlayer<TOwned, TPlayer>
+        #endregion 
     {
         private bool isBlocked;
         private readonly IntModifier contrAttackDamageModifier;
-        private AttackAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> attackAction;
+        private AttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> attackAction;
 
         public event Action<bool, bool> CanBlockChanged;
 
-        private AttackAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation> AttackAction
+        private AttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> AttackAction
         {
             get
             {
                 if (attackAction == null)
                 {
-                    if (MyUnit.TryGetUnitAction<AttackAction<TNode, TEdge, TUnit, TOwned, TPlayer, TNation>>(out var action)) 
+                    if (MyUnit.TryGetUnitAction<AttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>>(out var action)) 
                         attackAction = action;
                     else
                         throw new Exception("Для контратаки необходимо иметь хотябы атакующий компонент!");
@@ -36,12 +37,12 @@ namespace LineWars.Model
             }
         }
 
-        public bool InitialProtection { get; private set; }
-        public bool IsBlocked => isBlocked || InitialProtection;
+        public bool Protection { get; private set; }
+        public bool IsBlocked => isBlocked || Protection;
         
         public BlockAction([NotNull] TUnit unit, [NotNull] MonoBlockAction data) : base (unit, data)
         {
-            InitialProtection = data.InitialProtection;
+            Protection = data.InitialProtection;
             contrAttackDamageModifier = data.InitialContrAttackDamageModifier;
             unit.CurrentActionCompleted += (unitAction) =>
             {
