@@ -20,6 +20,10 @@ namespace LineWars.Model
         {
         }
 
+        public BuildAction([NotNull] TUnit unit, [NotNull] BuildAction<TNode, TEdge, TUnit, TOwned, TPlayer> data) : base(unit, data)
+        {
+        }
+
         public bool CanUpRoad([NotNull] TEdge edge, bool ignoreActionPointsCondition = false)
             => CanUpRoad(edge, MyUnit.Node, ignoreActionPointsCondition);
 

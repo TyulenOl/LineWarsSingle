@@ -19,11 +19,10 @@ namespace LineWars.Model
         /// Для оптимизации income всегда хешируется
         /// </summary>
         [SerializeField, ReadOnlyInspector] private int income;
-        [SerializeField] public PhaseExecutorsData PhaseExecutorsData;
-        
 
+        [field:SerializeField] public PhaseExecutorsData PhaseExecutorsData { get; private set; }
         [field: SerializeField, ReadOnlyInspector] public Node Base { get; private set; }
-        [field: SerializeField, ReadOnlyInspector] public PlayerRules Rules { get;  set; }
+        [field: SerializeField, ReadOnlyInspector] public PlayerRules Rules { get; set; }
 
         public PhaseType CurrentPhase { get; private set; }
         public Nation Nation { get; private set; }
@@ -34,7 +33,6 @@ namespace LineWars.Model
         private IEnumerable<Node> MyNodes => myOwned.OfType<Node>();
         protected IEnumerable<Unit> MyUnits => myOwned.OfType<Unit>();
         
-
         public event Action<PhaseType, PhaseType> TurnChanged;
         public event Action<Owned> OwnedAdded;
         public event Action<Owned> OwnedRemoved;

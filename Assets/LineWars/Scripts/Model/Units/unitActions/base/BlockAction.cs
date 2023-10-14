@@ -52,6 +52,18 @@ namespace LineWars.Model
             };
         }
 
+        public BlockAction([NotNull] TUnit unit, [NotNull] BlockAction<TNode, TEdge, TUnit, TOwned, TPlayer> data) : base(unit, data)
+        {
+            Protection = data.Protection;
+            contrAttackDamageModifier = data.contrAttackDamageModifier;
+            unit.CurrentActionCompleted += (unitAction) =>
+            {
+                if (unitAction == this)
+                    return;
+                SetBlock(false);
+            };
+        }
+
         public bool CanBlock()
         {
             return ActionPointsCondition();

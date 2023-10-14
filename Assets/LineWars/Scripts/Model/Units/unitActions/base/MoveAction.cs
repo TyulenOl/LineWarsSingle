@@ -19,6 +19,10 @@ namespace LineWars.Model
         {
         }
 
+        public MoveAction([NotNull] TUnit unit, [NotNull] MoveAction<TNode, TEdge, TUnit, TOwned, TPlayer> data) : base(unit, data)
+        {
+        }
+
         public bool CanMoveTo([NotNull] TNode target, bool ignoreActionPointsCondition = false)
         {
             return MyUnit.Node != target

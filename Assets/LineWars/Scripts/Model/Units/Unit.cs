@@ -136,6 +136,8 @@ namespace LineWars.Model
 
         public UnitMovementLogic MovementLogic => movementLogic;
 
+        public int MaxActionPoints => initialActionPoints;
+
         #endregion
 
         private void Awake()

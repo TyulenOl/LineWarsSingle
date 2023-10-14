@@ -10,6 +10,7 @@ namespace LineWars.Model
         #endregion
 
     {
+        public PhaseExecutorsData PhaseExecutorsData { get; }
         public IReadOnlyCollection<TOwned> OwnedObjects { get; }
         
         public void AddOwned([NotNull] TOwned owned);

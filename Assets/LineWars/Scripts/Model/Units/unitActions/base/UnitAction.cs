@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 
 namespace LineWars.Model
@@ -22,6 +23,14 @@ namespace LineWars.Model
             MyUnit = unit;
         }
 
+        public UnitAction([NotNull] TUnit unit, [NotNull] UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer> data) 
+            : base(unit, data)
+        {
+            MyUnit = unit;
+        }
+
         public virtual uint GetPossibleMaxRadius() => (uint) MyUnit.CurrentActionPoints;
+        //public abstract UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer> GetCopy();
+       
     }
 }

@@ -17,7 +17,6 @@ namespace LineWars.Model
 
         private IReadOnlyExecutor currentExecutor;
         private EnemyAIBuySelector buySelector;
-        public IReadOnlyCollection<UnitType> PotentialExecutors => PhaseExecutorsData.PhaseToUnits[CurrentPhase];
 
         protected override void Awake()
         {
