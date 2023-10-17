@@ -22,7 +22,13 @@ namespace LineWars.Model
             MonoDistanceAttackAction data,
             [NotNull] IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer> graph) : base(unit, data)
         {
-            this.Graph = graph ?? throw new ArgumentNullException(nameof(graph));
+            Graph = graph ?? throw new ArgumentNullException(nameof(graph));
+        }
+
+        public DistanceAttackAction(TUnit unit, DistanceAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> data,
+            [NotNull] IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer> graph) : base(unit, data)
+        {
+            Graph = graph ?? throw new ArgumentNullException(nameof(graph));
         }
 
         public override bool CanAttackFrom(TNode node, TUnit enemy, bool ignoreActionPointsCondition = false)
@@ -47,5 +53,10 @@ namespace LineWars.Model
 
         public override uint GetPossibleMaxRadius() => Distance;
         public override CommandType GetMyCommandType() => CommandType.Fire;
+
+        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor)
+        {
+            visitor.Visit(this);
+        }
     }
 }

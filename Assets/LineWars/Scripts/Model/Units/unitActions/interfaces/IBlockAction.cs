@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace LineWars.Model
 {
     public interface IBlockAction<TNode, TEdge, TUnit, TOwned, TPlayer>:
-        IUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>
+        IUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>, ISimpleAction
     
         #region Сonstraints
         where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>

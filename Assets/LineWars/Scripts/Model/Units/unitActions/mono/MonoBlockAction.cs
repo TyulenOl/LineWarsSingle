@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JetBrains.Annotations;
+using System;
 using UnityEngine;
 
 namespace LineWars.Model
@@ -30,6 +31,16 @@ namespace LineWars.Model
             var action = new BlockAction<Node, Edge, Unit, Owned, BasePlayer>(GetComponent<Unit>(), this);
             action.CanBlockChanged += (before, after) => CanBlockChanged?.Invoke(before, after); 
             return action;
+        }
+
+        public ICommand GenerateCommand()
+        {
+            return new BlockCommand<Node, Edge, Unit, Owned, BasePlayer>(this);
+        }
+
+        public override void Accept(IMonoUnitVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }

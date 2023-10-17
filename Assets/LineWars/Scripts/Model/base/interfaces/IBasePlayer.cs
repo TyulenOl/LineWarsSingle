@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace LineWars.Model
 {
-    public interface IBasePlayer<TOwned, TPlayer>
+    public interface IBasePlayer<TOwned, TPlayer> : INumbered
         #region Сonstraints
         where TOwned : class, IOwned<TOwned, TPlayer>
         where TPlayer: class, IBasePlayer<TOwned, TPlayer>

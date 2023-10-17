@@ -14,5 +14,6 @@ namespace LineWars.Model
 
         public Unit MyUnit => UnitAction.MyUnit;
         public uint GetPossibleMaxRadius() => UnitAction.GetPossibleMaxRadius();
+        public abstract void Accept(IMonoUnitVisitor visitor);
     }
 }

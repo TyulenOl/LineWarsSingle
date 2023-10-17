@@ -16,5 +16,10 @@ namespace LineWars.Model
         {
             return new MeleeAttackAction<Node, Edge, Unit, Owned, BasePlayer>(GetComponent<Unit>(), this);
         }
+
+        public override void Accept(IMonoUnitVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
     }
 }

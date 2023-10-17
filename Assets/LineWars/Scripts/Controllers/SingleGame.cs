@@ -1,4 +1,5 @@
 ﻿using System;
+using DataStructures;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
@@ -22,14 +23,13 @@ namespace LineWars
         [Header("Debug")] 
         [SerializeField] private bool isAI;
 
-        private readonly List<BasePlayer> allPlayers = new ();
+        public readonly IndexList<BasePlayer> AllPlayers = new IndexList<BasePlayer> (); //сру и не стесняюсь!
         private Player player;
         
 
         private Stack<SpawnInfo> spawnInfosStack;
         private SpawnInfo playerSpawnInfo;
-
-        public IReadOnlyList<BasePlayer> AllPlayers => allPlayers;
+        
         public SceneName MyScene => (SceneName) SceneManager.GetActiveScene().buildIndex;
         private bool HasSpawnPoint() => spawnInfosStack.Count > 0;
         private SpawnInfo GetSpawnPoint() => spawnInfosStack.Pop();
@@ -67,7 +67,9 @@ namespace LineWars
         {
             if (GameReferee.Instance == null)
                 Debug.LogError($"Нет {nameof(GameReferee)} на данной сцене");
-            GameReferee.Instance.Initialize(Player.LocalPlayer, allPlayers.Where(x => x != Player.LocalPlayer));
+            GameReferee.Instance.Initialize(Player.LocalPlayer, AllPlayers
+                .Select(x => x.Value)
+                .Where(x => x != Player.LocalPlayer));
             GameReferee.Instance.Wined += WinGame;
             GameReferee.Instance.Losed += LoseGame;
         }
@@ -93,7 +95,6 @@ namespace LineWars
         private void InitializePlayer()
         { 
             player = playerInitializer.Initialize<Player>(playerSpawnInfo);
-            allPlayers.Add(player);
             player.RecalculateVisibility(false);
         }
         
@@ -107,7 +108,7 @@ namespace LineWars
                     ? playerInitializer.Initialize<EnemyAI>(spawnPoint)
                     : playerInitializer.Initialize<TestActor>(spawnPoint); 
 
-                allPlayers.Add(enemy);
+                AllPlayers.Add(enemy);
             }
         }
         

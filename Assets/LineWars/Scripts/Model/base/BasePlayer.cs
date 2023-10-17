@@ -13,7 +13,8 @@ namespace LineWars.Model
     /// </summary>
     public abstract class BasePlayer : MonoBehaviour, IActor, IBasePlayer<Owned, BasePlayer>
     {
-        [field: SerializeField, ReadOnlyInspector] public int Index { get;  private set; }
+        
+        [field: SerializeField, ReadOnlyInspector] public int Id { get;  private set; }
         [SerializeField, ReadOnlyInspector] private int money;
         /// <summary>
         /// Для оптимизации income всегда хешируется
@@ -26,6 +27,7 @@ namespace LineWars.Model
 
         public PhaseType CurrentPhase { get; private set; }
         public Nation Nation { get; private set; }
+        
 
         private HashSet<Owned> myOwned;
         private bool isFirstReplenish = true;
@@ -92,7 +94,8 @@ namespace LineWars.Model
         public virtual void Initialize(SpawnInfo spawnInfo)
         {
             name = $"{GetType().Name}{spawnInfo.PlayerIndex} {spawnInfo.SpawnNode.name}";
-            Index = spawnInfo.PlayerIndex;
+            Id = spawnInfo.PlayerIndex;
+            SingleGame.Instance.AllPlayers.Add(Id, this);
             Base = spawnInfo.SpawnNode.Node;
             Rules = spawnInfo.SpawnNode.Rules ? spawnInfo.SpawnNode.Rules : PlayerRules.DefaultRules;
 

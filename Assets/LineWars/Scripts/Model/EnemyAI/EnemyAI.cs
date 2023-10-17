@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DataStructures;
-using LineWars.Controllers;
 using UnityEngine;
 
 namespace LineWars.Model

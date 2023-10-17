@@ -18,6 +18,12 @@
         {
      
         }
+        public ArtilleryAttackAction(TUnit unit,
+            ArtilleryAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> data,
+            IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer> graph) : base(unit, data, graph)
+        {
+
+        }
 
         public override bool CanAttackFrom(TNode node, TEdge edge, bool ignoreActionPointsCondition = false)
         {
@@ -52,5 +58,10 @@
         }
 
         public override CommandType GetMyCommandType() => CommandType.Explosion;
+
+        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor)
+        {
+            visitor.Visit(this);
+        }
     }
 }

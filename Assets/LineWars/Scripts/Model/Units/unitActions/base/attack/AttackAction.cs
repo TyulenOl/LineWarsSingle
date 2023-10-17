@@ -8,13 +8,13 @@ namespace LineWars.Model
     public abstract class AttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> :
         UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>,
         IAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>
-    
+
         #region Сonstraints
         where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer> 
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
         where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
         where TOwned : class, IOwned<TOwned, TPlayer>
-        where TPlayer: class, IBasePlayer<TOwned, TPlayer>
+        where TPlayer : class, IBasePlayer<TOwned, TPlayer>
         #endregion 
     {
         public bool AttackLocked { get; protected set; }
@@ -25,6 +25,12 @@ namespace LineWars.Model
         {
             Damage = data.InitialDamage;
             IsPenetratingDamage = data.InitialIsPenetratingDamage;
+        }
+
+        protected AttackAction([NotNull] TUnit unit, AttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> data) : base(unit, data)
+        {
+            Damage = data.Damage;
+            IsPenetratingDamage = data.IsPenetratingDamage;
         }
 
         public bool CanAttack(IAlive enemy, bool ignoreActionPointsCondition = false) =>

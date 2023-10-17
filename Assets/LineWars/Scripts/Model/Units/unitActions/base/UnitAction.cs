@@ -30,7 +30,8 @@ namespace LineWars.Model
         }
 
         public virtual uint GetPossibleMaxRadius() => (uint) MyUnit.CurrentActionPoints;
-        //public abstract UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer> GetCopy();
+
+        public abstract void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor);
        
     }
 }
