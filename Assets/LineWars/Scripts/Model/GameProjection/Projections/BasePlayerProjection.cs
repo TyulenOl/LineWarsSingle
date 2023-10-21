@@ -12,6 +12,7 @@ namespace LineWars.Model
         private HashSet<OwnedProjection> ownedObjects;
         public int Id { get; private set; }
         public BasePlayer Original { get; private set; }
+        public GameProjection Game { get; set; }
         public NodeProjection Base
         {
             get => baseProjection;
@@ -25,12 +26,13 @@ namespace LineWars.Model
         }
         public PlayerRules Rules { get; private set; }
         public PhaseExecutorsData PhaseExecutorsData { get; private set; }
+        public NationEconomicLogic EconomicLogic { get; private set; } 
         public int Income { get; set; }
         public int CurrentMoney { get; set; }
         public IReadOnlyCollection<OwnedProjection> OwnedObjects => ownedObjects;
 
         public BasePlayerProjection(PlayerRules rules, 
-            int income, int currentMoney, PhaseExecutorsData executorsData, BasePlayer original = null,
+            int income, int currentMoney, PhaseExecutorsData executorsData, NationEconomicLogic economicLogic, BasePlayer original = null,
             IReadOnlyCollection<OwnedProjection> ownedObjects = null, NodeProjection playerBase = null)
         {
             Original = original;
@@ -39,6 +41,7 @@ namespace LineWars.Model
             Income = income;
             CurrentMoney = currentMoney;
             PhaseExecutorsData = executorsData;
+            EconomicLogic = economicLogic;
             if(ownedObjects != null) 
                 this.ownedObjects = new HashSet<OwnedProjection>(ownedObjects);
             else 
@@ -46,13 +49,13 @@ namespace LineWars.Model
         }
 
        public BasePlayerProjection(BasePlayer original, IReadOnlyCollection<OwnedProjection> ownedObjects = null, NodeProjection playerBase = null)
-            : this(original.Rules, original.Income, original.CurrentMoney, original.PhaseExecutorsData, original, ownedObjects, playerBase)
+            : this(original.Rules, original.Income, original.CurrentMoney, original.PhaseExecutorsData, original.EconomicLogic, original, ownedObjects, playerBase)
         {
         }
 
         public BasePlayerProjection(IReadOnlyBasePlayerProjection playerProjection)
              : this(playerProjection.Rules, playerProjection.Income, playerProjection.CurrentMoney,
-                   playerProjection.PhaseExecutorsData, playerProjection.Original,
+                   playerProjection.PhaseExecutorsData, playerProjection.EconomicLogic, playerProjection.Original,
                    playerProjection.OwnedObjects, playerProjection.Base)
         { }
 
@@ -76,7 +79,7 @@ namespace LineWars.Model
 
         public bool CanSpawnPreset(UnitBuyPreset preset)
         {
-            throw new NotImplementedException();
+            return Base.LeftUnit == null && Base.RightUnit == null;
         }
 
         public void RemoveOwned([NotNull] OwnedProjection owned)
@@ -89,7 +92,7 @@ namespace LineWars.Model
 
         public void SpawnPreset(UnitBuyPreset preset)
         {
-            throw new NotImplementedException();
+            var leftUnit = preset.FirstUnitType; // СПРОСИТЬ У ПАШИ
         }
     }
 
@@ -99,6 +102,7 @@ namespace LineWars.Model
         public NodeProjection Base { get; }
         public PlayerRules Rules { get; }
         public PhaseExecutorsData PhaseExecutorsData { get; }  
+        public NationEconomicLogic EconomicLogic { get; }
         public IReadOnlyCollection<OwnedProjection> OwnedObjects { get; }
         public int Income { get; }
         public int CurrentMoney { get; }

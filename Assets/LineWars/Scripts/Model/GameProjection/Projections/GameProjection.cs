@@ -33,12 +33,14 @@ namespace LineWars.Model
             {
                 PlayersIndexList.Add(player.Id, player);
                 playersSequence.Add(player.Id);
+                player.Game = this;
             }
 
             Graph = graph;
             CurrentPhase = phase;
             CurrentPlayerPosition = playerPosition;
             PhaseOrder = orderData;
+
         }
 
         public GameProjection(IReadOnlyGameProjection projection)

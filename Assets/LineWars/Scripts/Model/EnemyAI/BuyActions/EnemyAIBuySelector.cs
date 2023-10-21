@@ -16,7 +16,7 @@ namespace LineWars.Model
                 buyPreset = null;
                 if (!enemyAI.Base.AllIsFree) return false;
 
-                var allPresets = enemyAI.Nation.NationEconomicLogic.UnitBuyPresets;
+                var allPresets = enemyAI.Nation.NationEconomicLogic;
                 var currentMoney = enemyAI.CurrentMoney;
                 float income = enemyAI.Income;
                 var personality = enemyAI.personality;

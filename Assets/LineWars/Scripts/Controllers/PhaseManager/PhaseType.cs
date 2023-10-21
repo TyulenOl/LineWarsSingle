@@ -36,7 +36,7 @@ namespace LineWars
 
         public static PhaseType Next(PhaseType type, PhaseOrderData orderData)
         {
-            if (type == PhaseType.Idle) throw new ArgumentException("Idle Phase has not next Phases!"); 
+            if (type == PhaseType.Idle) throw new ArgumentException("Idle Phase don't have next Phases!"); 
             var index = orderData.FindIndex(type);
             if (index == -1) throw new ArgumentException("Order Data doesn't contains given PhaseType!");
 

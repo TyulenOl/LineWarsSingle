@@ -35,6 +35,24 @@ namespace LineWars.Model
                 UnitsIndexList.Add(node.LeftUnit.Id, node.LeftUnit);
             if (node.RightUnit != null)
                 UnitsIndexList.Add(node.RightUnit.Id, node.RightUnit);
+            node.UnitAdded += OnUnitAdded;
+        }
+
+        private void OnUnitAdded(UnitProjection unit)
+        {
+            if(UnitsIndexList.ContainsKey(unit.Id)) return;
+            else
+            {
+                if (unit.HasId)
+                {
+                    UnitsIndexList.Add(unit.Id, unit);
+                }
+                else
+                {
+                    var id = UnitsIndexList.Add(unit);
+                    unit.SetId(id);
+                }
+            }
         }
 
         public static GraphProjection GetCopy(IReadOnlyGraphProjection projection, 

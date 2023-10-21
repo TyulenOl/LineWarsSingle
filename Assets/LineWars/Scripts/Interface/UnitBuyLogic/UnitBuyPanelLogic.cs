@@ -25,7 +25,7 @@ namespace LineWars.Interface
 
         private void GeneratePresets()
         {
-            var presets = nation.NationEconomicLogic.UnitBuyPresets;
+            var presets = nation.NationEconomicLogic;
             foreach (var preset in presets)
             {
                 var presetDrawer = Instantiate(presetDrawerPrefab.gameObject, presetsLayoutGroup.transform)

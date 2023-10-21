@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AYellowpaper.SerializedCollections.KeysGenerators;
+using System;
 using System.Collections.Generic;
 
 namespace LineWars.Model
@@ -9,6 +10,8 @@ namespace LineWars.Model
         IReadOnlyNodeProjection, INumbered
     {
         private List<EdgeProjection> edges;
+        private UnitProjection leftUnit;
+        private UnitProjection rightUnit;
         public Node Original { get; private set; }
         public GraphProjection Graph { get; private set; }
         public CommandPriorityData CommandPriorityData { get; private set; }
@@ -18,9 +21,26 @@ namespace LineWars.Model
         public int Visibility { get; private set; }
         public int ValueOfHidden { get; private set; }
 
-        public UnitProjection LeftUnit { get; set; }
-        public UnitProjection RightUnit { get; set; }
+        public UnitProjection LeftUnit 
+        {
+            get => leftUnit;
+            set
+            {
+                leftUnit = value;
+                UnitAdded?.Invoke(value);
+            } 
+        }
+        public UnitProjection RightUnit
+        {
+            get => rightUnit;
+            set
+            {
+                rightUnit = value;
+                UnitAdded?.Invoke(value);
+            }
+        }
 
+        public Action<UnitProjection> UnitAdded;
         public NodeProjection(CommandPriorityData commandPriorityData,
             bool isBase, int index, int visibility,
             int valueOfHidden, Node original = null,
@@ -32,12 +52,11 @@ namespace LineWars.Model
             Id = index;
             Visibility = visibility;
             ValueOfHidden = valueOfHidden;
-            LeftUnit = leftUnit;
-            RightUnit = rightUnit;
+            this.leftUnit = leftUnit;
+            this.rightUnit = rightUnit;
             Original = original;
             edges = edgeProjections == null ? 
                 new List<EdgeProjection>() : new List<EdgeProjection>(edgeProjections);
-
         }
 
         public NodeProjection(IReadOnlyNodeProjection node, IEnumerable<EdgeProjection> edges = null,
@@ -53,11 +72,6 @@ namespace LineWars.Model
             : this(original.CommandPriorityData, original.IsBase, original.Id, 
                   original.Visibility, original.ValueOfHidden, original, edgeProjections, leftUnit, rightUnit)
         {
-        }
-
-        public void InitializeUnits()
-        {
-
         }
 
         public IEnumerable<NodeProjection> GetNeighbors()

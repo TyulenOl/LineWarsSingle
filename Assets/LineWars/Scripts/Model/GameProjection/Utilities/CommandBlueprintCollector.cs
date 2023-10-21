@@ -33,7 +33,13 @@ namespace LineWars.Model
 
         private static void CollectBuyState(List<ICommandBlueprint> commands, GameProjection gameProjection)
         {
-            throw new NotImplementedException();  
+            var currentPlayer = gameProjection.CurrentPlayer;
+            foreach(var preset in currentPlayer.EconomicLogic)
+            {
+                var newCommand = new SpawnPresetCommandBlueprint(currentPlayer.Id, preset);
+                commands.Add(newCommand);
+            }
+
         }
 
         private static void CollectArtilleryState(List<ICommandBlueprint> commands, GameProjection gameProjection)

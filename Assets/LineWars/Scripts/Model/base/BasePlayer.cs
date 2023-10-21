@@ -22,6 +22,7 @@ namespace LineWars.Model
         [SerializeField, ReadOnlyInspector] private int income;
 
         [field:SerializeField] public PhaseExecutorsData PhaseExecutorsData { get; private set; }
+        [field:SerializeField] public NationEconomicLogic EconomicLogic { get; private set; }  
         [field: SerializeField, ReadOnlyInspector] public Node Base { get; private set; }
         [field: SerializeField, ReadOnlyInspector] public PlayerRules Rules { get; set; }
 
