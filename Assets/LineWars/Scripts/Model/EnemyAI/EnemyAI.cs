@@ -49,7 +49,10 @@ namespace LineWars.Model
             }
         }
 
+        public void ExecuteTurn(PhaseType phase)
+        {
 
+        }
 
 
         #endregion
