@@ -13,20 +13,22 @@ namespace LineWars.Model
     /// </summary>
     public abstract class BasePlayer : MonoBehaviour, IActor, IBasePlayer<Owned, BasePlayer>
     {
-        [field: SerializeField, ReadOnlyInspector] public int Index { get;  private set; }
+        
+        [field: SerializeField, ReadOnlyInspector] public int Id { get;  private set; }
         [SerializeField, ReadOnlyInspector] private int money;
         /// <summary>
         /// Для оптимизации income всегда хешируется
         /// </summary>
         [SerializeField, ReadOnlyInspector] private int income;
-        [SerializeField] public PhaseExecutorsData PhaseExecutorsData;
-        
 
+        [field:SerializeField] public PhaseExecutorsData PhaseExecutorsData { get; private set; }
+        [field:SerializeField] public NationEconomicLogic EconomicLogic { get; private set; }  
         [field: SerializeField, ReadOnlyInspector] public Node Base { get; private set; }
-        [field: SerializeField, ReadOnlyInspector] public PlayerRules Rules { get;  set; }
+        [field: SerializeField, ReadOnlyInspector] public PlayerRules Rules { get; set; }
 
         public PhaseType CurrentPhase { get; private set; }
         public Nation Nation { get; private set; }
+        
 
         private HashSet<Owned> myOwned;
         private bool isFirstReplenish = true;
@@ -34,7 +36,6 @@ namespace LineWars.Model
         private IEnumerable<Node> MyNodes => myOwned.OfType<Node>();
         protected IEnumerable<Unit> MyUnits => myOwned.OfType<Unit>();
         
-
         public event Action<PhaseType, PhaseType> TurnChanged;
         public event Action<Owned> OwnedAdded;
         public event Action<Owned> OwnedRemoved;
@@ -94,7 +95,8 @@ namespace LineWars.Model
         public virtual void Initialize(SpawnInfo spawnInfo)
         {
             name = $"{GetType().Name}{spawnInfo.PlayerIndex} {spawnInfo.SpawnNode.name}";
-            Index = spawnInfo.PlayerIndex;
+            Id = spawnInfo.PlayerIndex;
+            SingleGame.Instance.AllPlayers.Add(Id, this);
             Base = spawnInfo.SpawnNode.Node;
             Rules = spawnInfo.SpawnNode.Rules ? spawnInfo.SpawnNode.Rules : PlayerRules.DefaultRules;
 

@@ -25,6 +25,13 @@ namespace LineWars.Model
             onslaught = data.InitialOnslaught;
         }
 
+        public MeleeAttackAction([NotNull] TUnit unit, MeleeAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> data) 
+            : base(unit, data)
+        {
+            blockerSelector = data.blockerSelector;
+            onslaught = data.onslaught;
+        }
+
         public override CommandType GetMyCommandType() => CommandType.MeleeAttack;
 
         public override bool CanAttackFrom([NotNull] TNode node, [NotNull] TUnit enemy,
@@ -74,6 +81,11 @@ namespace LineWars.Model
         {
             target.CurrentHp -= Damage;
             CompleteAndAutoModify();
+        }
+
+        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }

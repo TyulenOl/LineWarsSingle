@@ -29,5 +29,10 @@ namespace LineWars.Model
         {
             return new BuildAction<Node, Edge, Unit, Owned, BasePlayer>(Unit, this);
         }
+
+        public override void Accept(IMonoUnitVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
     }
 }

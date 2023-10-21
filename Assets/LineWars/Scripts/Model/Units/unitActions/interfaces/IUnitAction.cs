@@ -12,6 +12,8 @@
         #endregion 
     {
         public TUnit MyUnit { get; }
+
+        //public abstract T GetCopy<T>() where T : IUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>;
         public uint GetPossibleMaxRadius();
     }
 }

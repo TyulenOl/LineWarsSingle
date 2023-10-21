@@ -8,7 +8,7 @@
         #endregion
     {
         public TPlayer Owner { get; set; }
-
+        public void Replenish();
         public void ConnectTo(TPlayer basePlayer);
     }
 }

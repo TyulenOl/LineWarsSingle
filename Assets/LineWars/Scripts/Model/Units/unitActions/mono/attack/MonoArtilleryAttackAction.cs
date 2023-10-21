@@ -28,5 +28,10 @@ namespace LineWars.Model
         {
             return new ArtilleryAttackAction<Node, Edge, Unit, Owned, BasePlayer>(Unit, this, MonoGraph.Instance);
         }
+
+        public override void Accept(IMonoUnitVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
     }
 }

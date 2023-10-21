@@ -39,7 +39,7 @@ namespace LineWars
         
         public bool Action(IReadOnlyExecutor executor, IReadOnlyTarget target)
         {
-            foreach (var commandType in target.CommandPriorityData.Priority)
+            foreach (var commandType in target.CommandPriorityData)
             {
                 if (executor.TryGetCommand(commandType, target, out var command)
                     && command.CanExecute())
@@ -54,7 +54,7 @@ namespace LineWars
 
         public CommandType GetCommandTypeBy(IReadOnlyExecutor executor, IReadOnlyTarget target)
         {
-            foreach (var commandType in target.CommandPriorityData.Priority)
+            foreach (var commandType in target.CommandPriorityData)
             {
                 if (executor.TryGetCommand(commandType, target, out var command)
                     && command.CanExecute())

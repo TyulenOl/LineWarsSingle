@@ -20,6 +20,10 @@ namespace LineWars.Model
         {
         }
 
+        public BuildAction([NotNull] TUnit unit, [NotNull] BuildAction<TNode, TEdge, TUnit, TOwned, TPlayer> data) : base(unit, data)
+        {
+        }
+
         public bool CanUpRoad([NotNull] TEdge edge, bool ignoreActionPointsCondition = false)
             => CanUpRoad(edge, MyUnit.Node, ignoreActionPointsCondition);
 
@@ -46,6 +50,11 @@ namespace LineWars.Model
         public ICommand GenerateCommand(ITarget target)
         {
             return new BuildCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this, (TEdge)target);
+        }
+
+        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }

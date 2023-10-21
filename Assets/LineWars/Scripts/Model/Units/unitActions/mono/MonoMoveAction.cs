@@ -32,5 +32,10 @@ namespace LineWars.Model
             var action = new MoveAction<Node, Edge, Unit, Owned, BasePlayer>(Unit, this);
             return action;
         }
+
+        public override void Accept(IMonoUnitVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
     }
 }

@@ -31,7 +31,7 @@ namespace LineWars.Model
                     if (MyUnit.TryGetUnitAction<AttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>>(out var action)) 
                         attackAction = action;
                     else
-                        throw new Exception("Для контратаки необходимо иметь хотябы атакующий компонент!");
+                        throw new Exception("Для контратаки необходимо иметь хотя бы атакующий компонент!");
                 }
                 return attackAction;
             }
@@ -44,6 +44,18 @@ namespace LineWars.Model
         {
             Protection = data.InitialProtection;
             contrAttackDamageModifier = data.InitialContrAttackDamageModifier;
+            unit.CurrentActionCompleted += (unitAction) =>
+            {
+                if (unitAction == this)
+                    return;
+                SetBlock(false);
+            };
+        }
+
+        public BlockAction([NotNull] TUnit unit, [NotNull] BlockAction<TNode, TEdge, TUnit, TOwned, TPlayer> data) : base(unit, data)
+        {
+            Protection = data.Protection;
+            contrAttackDamageModifier = data.contrAttackDamageModifier;
             unit.CurrentActionCompleted += (unitAction) =>
             {
                 if (unitAction == this)
@@ -89,5 +101,15 @@ namespace LineWars.Model
         }
 
         public override CommandType GetMyCommandType() => CommandType.Block;
+
+        public ICommand GenerateCommand()
+        {
+            return new BlockCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this);
+        }
+
+        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor)
+        {
+            visitor.Visit(this);
+        }
     }
 }

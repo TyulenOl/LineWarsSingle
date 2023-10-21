@@ -19,6 +19,10 @@ namespace LineWars.Model
         {
         }
 
+        public MoveAction([NotNull] TUnit unit, [NotNull] MoveAction<TNode, TEdge, TUnit, TOwned, TPlayer> data) : base(unit, data)
+        {
+        }
+
         public bool CanMoveTo([NotNull] TNode target, bool ignoreActionPointsCondition = false)
         {
             return MyUnit.Node != target
@@ -111,6 +115,11 @@ namespace LineWars.Model
         public ICommand GenerateCommand(ITarget target)
         {
             return new MoveCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this, (TNode) target);
+        }
+
+        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor)
+        {
+            visitor.Visit(this);
         }
 
         #region CallBack

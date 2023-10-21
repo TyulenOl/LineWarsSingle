@@ -19,5 +19,10 @@ namespace LineWars.Model
         {
             return new DistanceAttackAction<Node, Edge, Unit, Owned, BasePlayer>(GetComponent<Unit>(), this, MonoGraph.Instance);
         }
+
+        public override void Accept(IMonoUnitVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
     }
 }
