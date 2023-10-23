@@ -12,14 +12,14 @@ namespace LineWars.Model
         private List<EdgeProjection> edges;
         private UnitProjection leftUnit;
         private UnitProjection rightUnit;
-        public Node Original { get; private set; }
-        public GraphProjection Graph { get; private set; }
+        public Node Original { get; private set; } 
         public CommandPriorityData CommandPriorityData { get; private set; }
         public IEnumerable<EdgeProjection> Edges => edges;
         public bool IsBase { get; private set; }
         public int Id { get; private set; }
         public int Visibility { get; private set; }
         public int ValueOfHidden { get; private set; }
+
 
         public UnitProjection LeftUnit 
         {
@@ -28,6 +28,8 @@ namespace LineWars.Model
             {
                 leftUnit = value;
                 UnitAdded?.Invoke(value);
+                if(value != null)
+                    Owner = value.Owner;
             } 
         }
         public UnitProjection RightUnit
@@ -37,6 +39,8 @@ namespace LineWars.Model
             {
                 rightUnit = value;
                 UnitAdded?.Invoke(value);
+                if (value != null)
+                    Owner = value.Owner;
             }
         }
 
@@ -92,14 +96,13 @@ namespace LineWars.Model
         }
     }
 
-    public interface IReadOnlyNodeProjection
+    public interface IReadOnlyNodeProjection : INumbered
     {
         public Node Original { get; }
-        public GraphProjection Graph { get; }
+        public BasePlayerProjection Owner { get; }
         public CommandPriorityData CommandPriorityData { get; }
         public IEnumerable<EdgeProjection> Edges { get; }
         public bool IsBase { get; }
-        public int Id { get; }
         public int Visibility { get; }
         public int ValueOfHidden { get; }
 

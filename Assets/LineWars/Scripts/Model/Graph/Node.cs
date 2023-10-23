@@ -39,7 +39,8 @@ namespace LineWars.Model
         /// </summary>
         public bool IsDirty { get; private set; }
 
-        public bool IsBase => ReferenceToSpawn.Node == this;
+        public bool IsBase => ReferenceToSpawn != null && ReferenceToSpawn.Node == this;
+
         public Vector2 Position => transform.position;
         
         public IEnumerable<Edge> Edges => edges;

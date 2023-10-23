@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace LineWars.Model
 {
@@ -9,7 +10,6 @@ namespace LineWars.Model
         public static List<ICommandBlueprint> CollectAllCommands(GameProjection gameProjection)
         {
             var commands = new List<ICommandBlueprint>();
-
             switch (gameProjection.CurrentPhase)
             {
                 case PhaseType.Buy:

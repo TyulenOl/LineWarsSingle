@@ -12,7 +12,8 @@ namespace LineWars.Model
     {
         private Dictionary<CommandType, UnitAction<NodeProjection, EdgeProjection,
             UnitProjection, OwnedProjection,
-            BasePlayerProjection>> actionsDictionary;
+            BasePlayerProjection>> actionsDictionary 
+            = new Dictionary<CommandType, UnitAction<NodeProjection, EdgeProjection, UnitProjection, OwnedProjection, BasePlayerProjection>>();
         private IEnumerable<MonoUnitAction> monoActions;
 
         private IEnumerable<UnitAction<NodeProjection, EdgeProjection,
@@ -51,6 +52,7 @@ namespace LineWars.Model
         public UnitProjection(string unitName, 
             int maxHp, 
             int maxArmor,
+            int maxActionPoints,
             int visibility, 
             UnitType type, 
             UnitSize size, 
@@ -60,8 +62,8 @@ namespace LineWars.Model
             UnitDirection unitDirection, 
             IEnumerable<MonoUnitAction> actions,
             int currentActionPoints,
-            bool hasId,
             int id,
+            bool hasId,
             Unit original = null,
             NodeProjection node = null)
         {
@@ -79,15 +81,16 @@ namespace LineWars.Model
             CurrentActionPoints = currentActionPoints;
             Original = original;
             monoActions = actions;
+            MaxActionPoints = maxActionPoints;
 
-
-            HasId = hasId;
             Id = id;
+            HasId = hasId;
         }
 
         public UnitProjection(string unitName,
             int maxHp,
             int maxArmor,
+            int maxActionPoints,
             int visibility,
             UnitType type,
             UnitSize size,
@@ -99,8 +102,8 @@ namespace LineWars.Model
             UnitProjection, OwnedProjection,
             BasePlayerProjection>> actions,
             int currentActionPoints,
-            bool hasId,
             int id,
+            bool hasId,
             Unit original = null,
             NodeProjection node = null)
         {
@@ -118,30 +121,31 @@ namespace LineWars.Model
             CurrentActionPoints = currentActionPoints;
             Original = original;
             unitActions = actions;
+            MaxActionPoints = maxActionPoints;
 
-            HasId = hasId;
             Id = id;
+            HasId = hasId;
         }
 
         public UnitProjection(IReadOnlyUnitProjection unit, NodeProjection node = null)
-            : this(unit.UnitName, unit.MaxHp, unit.MaxArmor, unit.Visibility, unit.Type, unit.Size,
+            : this(unit.UnitName, unit.MaxHp, unit.MaxArmor, unit.MaxActionPoints, unit.Visibility, unit.Type, unit.Size,
                   unit.MovementLineType, unit.CommandPriorityData, unit.CurrentArmor, unit.UnitDirection,
-                  unit.ActionsDictionary.Values, unit.CurrentActionPoints, true, unit.Id, unit.Original, node)
+                  unit.ActionsDictionary.Values, unit.CurrentActionPoints, unit.Id, unit.HasId, unit.Original, node)
         {
         }
 
         public UnitProjection(Unit original, NodeProjection node = null) 
-            : this(original.UnitName, original.MaxHp, original.MaxArmor, original.Visibility, original.Type, 
+            : this(original.UnitName, original.MaxHp, original.MaxArmor, original.MaxActionPoints, original.Visibility, original.Type, 
                   original.Size, original.MovementLineType, original.CommandPriorityData, original.CurrentArmor, 
-                  original.UnitDirection, original.Actions, original.CurrentActionPoints, true, original.Id, original, node)
+                  original.UnitDirection, original.Actions, original.CurrentActionPoints, original.Id, true, original, node)
         {
 
         }
 
         public void SetId(int id)
         {
-            HasId = true; 
             Id = id;
+            HasId = true;
         }
 
         public void InitializeActions(GraphProjection graphProjection)
@@ -224,7 +228,7 @@ namespace LineWars.Model
         }
     }
 
-    public interface IReadOnlyUnitProjection
+    public interface IReadOnlyUnitProjection : INumbered
     {
         public Unit Original { get; }
         public string UnitName { get; }
@@ -235,7 +239,7 @@ namespace LineWars.Model
         public UnitType Type { get; }
         public UnitSize Size { get; }
         public LineType MovementLineType { get; }
-        public int Id { get; }
+        public bool HasId { get; }
         public CommandPriorityData CommandPriorityData { get; }
         public bool CanDoAnyAction => CurrentActionPoints > 0;
 

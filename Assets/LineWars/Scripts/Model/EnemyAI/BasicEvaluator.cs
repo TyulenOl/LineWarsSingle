@@ -44,7 +44,7 @@ namespace LineWars.Model
                 }
                 unitScore++;
             }
-
+            Debug.Log($"{nodeScore} {unitScore} {moneyScore}");
             return nodeScore * nodesMultiplier + unitScore * unitsMultiplier + moneyScore * moneyMultiplier;
         }
     }
