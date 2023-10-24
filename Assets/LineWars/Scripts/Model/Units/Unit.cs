@@ -149,7 +149,7 @@ namespace LineWars.Model
             movementLogic = GetComponent<UnitMovementLogic>();
 
             InitialiseAllActions();
-
+            index = SingleGame.Instance.AllUnits.Add(this);
             void InitialiseAllActions()
             {
                 var serializeActions = GetComponents<MonoUnitAction>()
@@ -222,6 +222,7 @@ namespace LineWars.Model
             }
 
             Owner.RemoveOwned(this);
+            SingleGame.Instance.AllUnits.Remove(this);
             Destroy(gameObject);
         }
 

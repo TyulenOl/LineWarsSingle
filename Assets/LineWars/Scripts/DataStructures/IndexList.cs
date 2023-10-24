@@ -19,6 +19,7 @@ namespace DataStructures
             lastIndex = 0;
             indexToObject = new Dictionary<int, T>();
             objectToIndex = new Dictionary<T, int>();
+            indexesSet = new HashSet<int>();    
         }
 
         public IndexList(IReadOnlyDictionary<int, T> dict)

@@ -42,13 +42,12 @@
         { }   
     }
 
-    public interface IReadOnlyEdgeProjection
+    public interface IReadOnlyEdgeProjection : INumbered
     {
         public Edge Original { get; }
         public CommandPriorityData CommandPriorityData { get; }
         public NodeProjection FirstNode { get; }
         public NodeProjection SecondNode { get; }
-        public int Id { get; }
         public int CurrentHp { get; }
         public LineType LineType { get; }
     }

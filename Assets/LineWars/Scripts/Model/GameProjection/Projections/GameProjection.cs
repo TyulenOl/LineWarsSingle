@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace LineWars.Model
 {
@@ -9,47 +10,44 @@ namespace LineWars.Model
     { 
         private static int cycleTurnFailCounter = 1000;
         private List<int> playersSequence;
+        private Dictionary<BasePlayer, BasePlayerProjection> originalToProjectionPlayers;
         public GraphProjection Graph { get; private set; }
-        public PhaseType CurrentPhase { get; private set; }    
+        public PhaseType CurrentPhase { get; private set; }     
         public PhaseOrderData PhaseOrder { get; private set; }
         public int CurrentPlayerPosition { get; private set; }
         public IndexList<BasePlayerProjection> PlayersIndexList { get; private set; }
 
-        public BasePlayerProjection CurrentPlayer => this.CurrentPlayer;
+        public BasePlayerProjection CurrentPlayer => 
+            PlayersIndexList[playersSequence[CurrentPlayerPosition]];
         public IReadOnlyList<int> PlayersSequence => playersSequence;
-        IReadOnlyIndexList<BasePlayerProjection> IReadOnlyGameProjection.PlayersIndexList => PlayersIndexList;
-
+        IReadOnlyIndexList<BasePlayerProjection> IReadOnlyGameProjection.PlayersIndexList 
+            => PlayersIndexList;
 
         public IndexList<NodeProjection> NodesIndexList => Graph.NodesIndexList;
         public IndexList<EdgeProjection> EdgesIndexList => Graph.EdgesIndexList;
         public IndexList<UnitProjection> UnitsIndexList => Graph.UnitsIndexList;
+        public IReadOnlyDictionary<BasePlayer, BasePlayerProjection> OriginalToProjectionPlayers 
+            => originalToProjectionPlayers;
 
-        public GameProjection(IEnumerable<BasePlayerProjection> players, GraphProjection graph, 
+        public GameProjection(IEnumerable<BasePlayerProjection> players, GraphProjection graph,
             PhaseType phase, int playerPosition, PhaseOrderData orderData)
         {
+            originalToProjectionPlayers = new Dictionary<BasePlayer, BasePlayerProjection>();
             PlayersIndexList = new IndexList<BasePlayerProjection>();
             playersSequence = new List<int>();
-            foreach(var player in players)
+            foreach (var player in players)
             {
                 PlayersIndexList.Add(player.Id, player);
                 playersSequence.Add(player.Id);
                 player.Game = this;
+                originalToProjectionPlayers[player.Original] = player;
             }
 
             Graph = graph;
             CurrentPhase = phase;
             CurrentPlayerPosition = playerPosition;
             PhaseOrder = orderData;
-
         }
-
-        public GameProjection(IReadOnlyGameProjection projection)
-            => GetCopy(projection);
-
-        public GameProjection(IEnumerable<BasePlayer> players, MonoGraph graph,
-            PhaseManager phaseManager) 
-            => GetProjectionFromMono(players, graph, phaseManager);
-
         public void SimulateReplenish()
         {
             foreach(var player in PlayersIndexList.Values)
@@ -80,7 +78,7 @@ namespace LineWars.Model
 
                 failCounter++;
                 if (failCounter > cycleTurnFailCounter)
-                    throw new ArgumentException("Failed to find new player");
+                    throw new ArgumentException($"Failed to find new player {phase}");
             }
 
             return tempPlayerPosition;
@@ -106,13 +104,13 @@ namespace LineWars.Model
 
                 failCounter++;
                 if (failCounter > cycleTurnFailCounter)
-                    throw new ArgumentException("GameProjection failed to cycle turn!");
+                    throw new ArgumentException($"GameProjection failed to cycle turn! {currentPhase}");
             }
 
             return tempPhase;
         }
 
-        private bool IsUnitPhaseAvailable(PhaseType phase) 
+        public bool IsUnitPhaseAvailable(PhaseType phase) 
         {
             foreach(var player in PlayersIndexList.Values)
             {
@@ -122,7 +120,7 @@ namespace LineWars.Model
             return false;
         }
 
-        private bool CanPlayerPlayTurn(BasePlayerProjection player, PhaseType phase)
+        public bool CanPlayerPlayTurn(BasePlayerProjection player, PhaseType phase)
         {
             foreach(var owned in player.OwnedObjects)
             {
@@ -145,9 +143,18 @@ namespace LineWars.Model
             {
                 var newPlayerProjection = new BasePlayerProjection(oldPlayer);
                 newPlayerList.Add(newPlayerProjection);
+                oldPlayersToNew[oldPlayer] = newPlayerProjection;
+
             }
 
             var newGraphProjection = GraphProjection.GetCopy(oldProjection.Graph, oldPlayersToNew);
+
+            foreach(var oldNewPlayerPair in oldPlayersToNew)
+            {
+                var baseId = oldNewPlayerPair.Key.Base.Id;
+                var newBase = newGraphProjection.NodesIndexList[baseId];
+                oldNewPlayerPair.Value.Base = newBase;
+            }
             return new GameProjection(newPlayerList, newGraphProjection, oldProjection.CurrentPhase, 
                 oldProjection.CurrentPlayerPosition, oldProjection.PhaseOrder);
         }

@@ -1,5 +1,6 @@
 ﻿using DataStructures;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace LineWars.Model
 {
@@ -17,8 +18,9 @@ namespace LineWars.Model
         { 
             NodesIndexList = new IndexList<NodeProjection>();
             EdgesIndexList = new IndexList<EdgeProjection>();
+            UnitsIndexList = new IndexList<UnitProjection>();
 
-            foreach(var node in nodes)
+            foreach (var node in nodes)
                 AddNode(node);
 
             foreach(var edge in edges)
@@ -31,6 +33,7 @@ namespace LineWars.Model
         private void AddNode(NodeProjection node)
         {
             NodesIndexList.Add(node.Id, node);
+            node.OwnerChanged += OnNodeOwnerChanged;
             if (node.LeftUnit != null)
                 UnitsIndexList.Add(node.LeftUnit.Id, node.LeftUnit);
             if (node.RightUnit != null)
@@ -40,6 +43,7 @@ namespace LineWars.Model
 
         private void OnUnitAdded(UnitProjection unit)
         {
+            if(unit == null) return;
             if(UnitsIndexList.ContainsKey(unit.Id)) return;
             else
             {
@@ -161,6 +165,14 @@ namespace LineWars.Model
                 unitProjection.ConnectTo(ownerProjection);
                 return unitProjection;
             }
+        }
+
+        private void OnNodeOwnerChanged(OwnedProjection node, BasePlayerProjection oldOwner, BasePlayerProjection newOwner)
+        {
+            if(oldOwner != null)
+                oldOwner.RemoveOwned(node);
+            if(newOwner != null)
+                newOwner.AddOwned(node);
         }
     }
 

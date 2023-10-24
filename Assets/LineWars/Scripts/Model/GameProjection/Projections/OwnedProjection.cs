@@ -1,10 +1,24 @@
-﻿namespace LineWars.Model
+﻿using System;
+
+namespace LineWars.Model
 {
     public abstract class OwnedProjection
         : IOwned<OwnedProjection, BasePlayerProjection>
     {
-        public BasePlayerProjection Owner { get; set; }
+        private BasePlayerProjection owner;
+        public BasePlayerProjection Owner 
+        {
+            get => owner;
+            set
+            {
+                var oldOwner = owner;
+                owner = value;
+                if (oldOwner != owner)
+                    OwnerChanged?.Invoke(this, oldOwner, value);
+            }
+        }
 
+        public Action<OwnedProjection, BasePlayerProjection, BasePlayerProjection> OwnerChanged;
         public void ConnectTo(BasePlayerProjection basePlayer)
         {
             

@@ -19,6 +19,12 @@ namespace LineWars.Model
 
             set
             {
+                if(value == null)
+                {
+                    baseProjection = value;
+                    return;
+                }
+
                 if (value.Owner != this) throw new ArgumentException();
 
                 baseProjection = value;
@@ -32,7 +38,7 @@ namespace LineWars.Model
         public IReadOnlyCollection<OwnedProjection> OwnedObjects => ownedObjects;
 
         public BasePlayerProjection(PlayerRules rules, 
-            int income, int currentMoney, PhaseExecutorsData executorsData, NationEconomicLogic economicLogic, BasePlayer original = null,
+            int income, int currentMoney, PhaseExecutorsData executorsData, NationEconomicLogic economicLogic, int id, BasePlayer original = null,
             IReadOnlyCollection<OwnedProjection> ownedObjects = null, NodeProjection playerBase = null)
         {
             Original = original;
@@ -42,6 +48,7 @@ namespace LineWars.Model
             CurrentMoney = currentMoney;
             PhaseExecutorsData = executorsData;
             EconomicLogic = economicLogic;
+            Id = id;
             if(ownedObjects != null) 
                 this.ownedObjects = new HashSet<OwnedProjection>(ownedObjects);
             else 
@@ -49,14 +56,14 @@ namespace LineWars.Model
         }
 
        public BasePlayerProjection(BasePlayer original, IReadOnlyCollection<OwnedProjection> ownedObjects = null, NodeProjection playerBase = null)
-            : this(original.Rules, original.Income, original.CurrentMoney, original.PhaseExecutorsData, original.EconomicLogic, original, ownedObjects, playerBase)
+            : this(original.Rules, original.Income, original.CurrentMoney, original.PhaseExecutorsData, original.EconomicLogic, original.Id, original, ownedObjects, playerBase)
         {
         }
 
-        public BasePlayerProjection(IReadOnlyBasePlayerProjection playerProjection)
+        public BasePlayerProjection(IReadOnlyBasePlayerProjection playerProjection, IReadOnlyCollection<OwnedProjection> ownedObjects = null, NodeProjection playerBase = null)
              : this(playerProjection.Rules, playerProjection.Income, playerProjection.CurrentMoney,
-                   playerProjection.PhaseExecutorsData, playerProjection.EconomicLogic, playerProjection.Original,
-                   playerProjection.OwnedObjects, playerProjection.Base)
+                   playerProjection.PhaseExecutorsData, playerProjection.EconomicLogic, playerProjection.Id, playerProjection.Original,
+                   ownedObjects, playerBase)
         { }
 
         public void SimulateReplenish()
@@ -92,7 +99,7 @@ namespace LineWars.Model
 
         public void SpawnPreset(UnitBuyPreset preset)
         {
-            var leftUnit = preset.FirstUnitType; // СПРОСИТЬ У ПАШИ
+            var leftUnit = preset.FirstUnitType;
         }
     }
 
