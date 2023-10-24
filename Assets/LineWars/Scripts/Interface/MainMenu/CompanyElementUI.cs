@@ -13,7 +13,6 @@ namespace LineWars
         [SerializeField] private TMP_Text companyDescription;
         [SerializeField] private Image companyImage;
         [SerializeField] private TMP_Text missionsProgress;
-        [SerializeField] private TMP_Text companyNation;
         [SerializeField] private Button companyElementButton;
 
         private Action<CompanyState> clicked;
@@ -26,12 +25,14 @@ namespace LineWars
 
         private void OnEnable()
         {
-            companyElementButton.onClick.AddListener(OnClick);
+            if(companyElementButton != null)
+                companyElementButton.onClick.AddListener(OnClick);
         }
 
         private void OnDisable()
         {
-            companyElementButton.onClick.RemoveListener(OnClick);
+            if(companyElementButton != null)
+                companyElementButton.onClick.RemoveListener(OnClick);
         }
 
         private void OnClick() => clicked?.Invoke(currentState);
@@ -51,11 +52,8 @@ namespace LineWars
             if (missionsProgress == null)
                 Debug.LogError($"{nameof(missionsProgress)} is null on {name}");
 
-            if (companyNation == null)
-                Debug.LogError($"{nameof(companyNation)} is null on {name}");
-
-            if (companyElementButton == null)
-                Debug.LogError($"{nameof(companyElementButton)} is null on {name}");
+            //if (companyElementButton == null)
+                //Debug.LogError($"{nameof(companyElementButton)} is null on {name}");
         }
 
         public void Initialize(CompanyState companyState, Action<CompanyState> clicked)
@@ -75,7 +73,6 @@ namespace LineWars
 
             var allMissionCount = companyState.missionStates.Count;
             missionsProgress.text = $"{finishMissionsCount}/{allMissionCount}";
-            companyNation.text = NationHelper.GetNationName(data.Nation);
 
             this.clicked = clicked;
         }
