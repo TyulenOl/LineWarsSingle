@@ -16,29 +16,30 @@ namespace LineWars
 
         public PhaseType Phase => phase;
         public IReadOnlyCollection<UnitType> Executors => executors;
-    } 
+    }
 
     [CreateAssetMenu(fileName = "New Phase Executors", menuName = "Phase Executors Data")]
     public class PhaseExecutorsData : ScriptableObject
     {
+        private Dictionary<PhaseType, IReadOnlyCollection<UnitType>> phaseToUnits;
         [NamedArray("phase")][SerializeField] private List<ExecutorsForPhase> executorsForPhases;
 
-        public Dictionary<PhaseType, IReadOnlyCollection<UnitType>> PhaseToUnits {get; private set;}
+        public IReadOnlyDictionary<PhaseType, IReadOnlyCollection<UnitType>> PhaseToUnits => phaseToUnits;
 
-        private void OnEnable() 
+        private void OnEnable()
         {
             CheckValidity();
-            PhaseToUnits = new Dictionary<PhaseType, IReadOnlyCollection<UnitType>>();
-            
-            PhaseToUnits = executorsForPhases.ToDictionary((obj) => obj.Phase, (obj) => obj.Executors);
+            phaseToUnits = new Dictionary<PhaseType, IReadOnlyCollection<UnitType>>();
+
+            phaseToUnits = executorsForPhases.ToDictionary((obj) => obj.Phase, (obj) => obj.Executors);
         }
 
         private void CheckValidity()
         {
-            foreach(PhaseType phase in Enum.GetValues(typeof(PhaseType)))
+            foreach (PhaseType phase in Enum.GetValues(typeof(PhaseType)))
             {
                 var phaseOccurrences = executorsForPhases.Count((obj) => obj.Phase == phase);
-                switch(phaseOccurrences)
+                switch (phaseOccurrences)
                 {
                     case > 1:
                         Debug.LogError($"{name}: there is more than one data for {phase} phase");
@@ -50,6 +51,8 @@ namespace LineWars
                 }
             }
         }
+
+        public IReadOnlyCollection<UnitType> this[PhaseType type] => PhaseToUnits[type];
     }
 }
 

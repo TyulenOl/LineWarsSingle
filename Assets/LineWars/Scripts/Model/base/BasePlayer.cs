@@ -11,27 +11,31 @@ namespace LineWars.Model
     /// <summary>
     /// класс, содержащий всю логику, которая объединяет ИИ и игрока
     /// </summary>
-    public abstract class BasePlayer : MonoBehaviour, IActor
+    public abstract class BasePlayer : MonoBehaviour, IActor, IBasePlayer<Owned, BasePlayer>
     {
-        [field: SerializeField, ReadOnlyInspector] public int Index { get; private set; }
+        
+        [field: SerializeField, ReadOnlyInspector] public int Id { get;  private set; }
         [SerializeField, ReadOnlyInspector] private int money;
         /// <summary>
         /// Для оптимизации income всегда хешируется
         /// </summary>
         [SerializeField, ReadOnlyInspector] private int income;
-        
-        [field: SerializeField, ReadOnlyInspector] public Spawn Base { get; private set; }
-        [field: SerializeField, ReadOnlyInspector] private PlayerRules Rules { get;  set; }
+
+        [field:SerializeField] public PhaseExecutorsData PhaseExecutorsData { get; private set; }
+        [field:SerializeField] public NationEconomicLogic EconomicLogic { get; private set; }  
+        [field: SerializeField, ReadOnlyInspector] public Node Base { get; private set; }
+        [field: SerializeField, ReadOnlyInspector] public PlayerRules Rules { get; set; }
 
         public PhaseType CurrentPhase { get; private set; }
-        public Nation MyNation { get; private set; }
+        public Nation Nation { get; private set; }
+        
 
         private HashSet<Owned> myOwned;
         private bool isFirstReplenish = true;
         
         private IEnumerable<Node> MyNodes => myOwned.OfType<Node>();
-        protected IEnumerable<ComponentUnit> MyUnits => myOwned.OfType<ComponentUnit>();
-
+        protected IEnumerable<Unit> MyUnits => myOwned.OfType<Unit>();
+        
         public event Action<PhaseType, PhaseType> TurnChanged;
         public event Action<Owned> OwnedAdded;
         public event Action<Owned> OwnedRemoved;
@@ -39,6 +43,7 @@ namespace LineWars.Model
         public event Action<int, int> IncomeChanged;
         public event Action Defeated; 
         public IReadOnlyCollection<Owned> OwnedObjects => myOwned;
+        
         public bool IsMyOwn(Owned owned) => myOwned.Contains(owned);
 
         public int CurrentMoney
@@ -90,13 +95,14 @@ namespace LineWars.Model
         public virtual void Initialize(SpawnInfo spawnInfo)
         {
             name = $"{GetType().Name}{spawnInfo.PlayerIndex} {spawnInfo.SpawnNode.name}";
-            Index = spawnInfo.PlayerIndex;
-            Base = spawnInfo.SpawnNode;
+            Id = spawnInfo.PlayerIndex;
+            SingleGame.Instance.AllPlayers.Add(Id, this);
+            Base = spawnInfo.SpawnNode.Node;
             Rules = spawnInfo.SpawnNode.Rules ? spawnInfo.SpawnNode.Rules : PlayerRules.DefaultRules;
 
             CurrentMoney = Rules.StartMoney;
             Income = Rules.DefaultIncome;
-            MyNation = spawnInfo.SpawnNode.Nation;
+            Nation = spawnInfo.SpawnNode.Nation;
         }
 
         public bool CanSpawnPreset(UnitBuyPreset preset)
@@ -105,7 +111,7 @@ namespace LineWars.Model
 
             bool NodeConditional()
             {
-                return Base.Node.AllIsFree;
+                return Base.AllIsFree;
             }
 
             bool MoneyConditional()
@@ -123,20 +129,18 @@ namespace LineWars.Model
 
         public void SpawnPreset(UnitBuyPreset unitPreset)
         {
-            SpawnUnit(Base.Node, unitPreset.FirstUnitType);
-            SpawnUnit(Base.Node, unitPreset.SecondUnitType);
+            SpawnUnit(Base, unitPreset.FirstUnitType);
+            SpawnUnit(Base, unitPreset.SecondUnitType);
             CurrentMoney -= unitPreset.Cost;
         }
 
         public void AddOwned([NotNull] Owned owned)
         {
             if (owned == null) throw new ArgumentNullException(nameof(owned));
-
-            if (owned.Owner != null && owned.Owner == this)
-                return;
-            if (owned.Owner != null && owned.Owner != this)
+            
+            if (owned.Owner != null)
             {
-                owned.Owner.RemoveOwned(owned);
+                throw new InvalidOperationException();
             }
 
             switch (owned)
@@ -144,7 +148,7 @@ namespace LineWars.Model
                 case Node node:
                     BeforeAddOwned(node);
                     break;
-                case ComponentUnit unit:
+                case Unit unit:
                     BeforeAddOwned(unit);
                     break;
             }
@@ -170,7 +174,7 @@ namespace LineWars.Model
             return Rules.MoneyForFirstCapturingNode + GetMyIncomeFromNode(node);
         }
 
-        protected virtual void BeforeAddOwned(ComponentUnit unit)
+        protected virtual void BeforeAddOwned(Unit unit)
         {
             
         }
@@ -186,7 +190,7 @@ namespace LineWars.Model
                 case Node node:
                     BeforeRemoveOwned(node);
                     break;
-                case ComponentUnit unit:
+                case Unit unit:
                     BeforeRemoveOwned(unit);
                     break;
             }
@@ -194,18 +198,18 @@ namespace LineWars.Model
             myOwned.Remove(owned);
             OwnedRemoved?.Invoke(owned);
         }
-        
+
         protected virtual void BeforeRemoveOwned(Node node)
         {
             Income -= Mathf.RoundToInt(Rules.IncomeModifier.Modify(node.BaseIncome));
 
-            if (node == Base.Node)
+            if (node == Base)
             {
                 Defeat();
             }
         }
 
-        protected virtual void BeforeRemoveOwned(ComponentUnit unit)
+        protected virtual void BeforeRemoveOwned(Unit unit)
         {
         }
 
@@ -219,13 +223,13 @@ namespace LineWars.Model
             foreach (var unit in MyUnits.ToList())
                 Destroy(unit.gameObject);
             foreach (var node in MyNodes.ToList()) 
-                node.SetOwner(null);
+                node.Owner = null;
 
             myOwned = new HashSet<Owned>();
             Destroy(gameObject);
         }
         
-        public ComponentUnit GetUnitPrefab(UnitType unitType) => MyNation.GetUnitPrefab(unitType);
+        public Unit GetUnitPrefab(UnitType unitType) => Nation.GetUnit(unitType);
 
         public void ExecuteTurn(PhaseType phaseType)
         {

@@ -11,19 +11,18 @@ namespace LineWars.Scripts.Controllers
         [SerializeField] private float speedDampening = 15;
         [SerializeField] private float zoomDampening = 6f;
         [SerializeField] private float zoomStepSize = 2f;
-        [SerializeField] private float maxHeight = 10f;
         [SerializeField] private float minHeight = 3f;
-        
-        [Header("Paddings")]
-        [SerializeField] private float paddingsTop;
+
+        [Header("Paddings")] [SerializeField] private float paddingsTop;
         [SerializeField] private float paddingsRight;
         [SerializeField] private float paddingsBottom;
         [SerializeField] private float paddingsLeft;
 
-
+        private Canvas canvas;
         private Camera mainCamera;
         private Transform cameraTransform;
 
+        private float maxHeight;
         private Vector2 horizontalVelocity;
         private Vector2 pivotPoint;
         private Vector3 lastPosition;
@@ -37,10 +36,9 @@ namespace LineWars.Scripts.Controllers
         {
             mainCamera = Camera.main;
             if (mainCamera != null)
-            {
                 cameraTransform = mainCamera.GetComponent<Transform>();
-                zoomValue = mainCamera.orthographicSize;
-            }
+
+            canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
         }
 
         private void Start()
@@ -50,6 +48,12 @@ namespace LineWars.Scripts.Controllers
             var bounds = Map.MapSpriteRenderer.bounds;
             mapPointMax = bounds.max;
             mapPointMin = bounds.min;
+
+            maxHeight = Mathf.Min((mapPointMax - mapPointMin).x / (2 * mainCamera.aspect),
+                (mapPointMax - mapPointMin).y / 2);
+
+            mainCamera.orthographicSize = Mathf.Clamp(mainCamera.orthographicSize, minHeight, maxHeight);
+            zoomValue = mainCamera.orthographicSize;
         }
 
         private void Update()
@@ -158,13 +162,24 @@ namespace LineWars.Scripts.Controllers
             var camHalfHeight = mainCamera.orthographicSize;
             float camHalfWidth = mainCamera.aspect * camHalfHeight;
 
+            var maxPaddingCorner = new Vector2(FromScreenToWorld(paddingsRight), FromScreenToWorld(paddingsTop)) *
+                                   canvas.scaleFactor;
+            var minPaddingCorner = new Vector2(FromScreenToWorld(paddingsLeft), FromScreenToWorld(paddingsBottom)) *
+                                   canvas.scaleFactor;
+
             var halfSizeCamera = new Vector2(camHalfWidth, camHalfHeight);
-            var maxLimitPoint = mapPointMax - halfSizeCamera - (new Vector2(paddingsRight, paddingsTop));
-            var minLimitPoint = mapPointMin + halfSizeCamera + (new Vector2(paddingsLeft, paddingsBottom));
+            var maxLimitPoint = mapPointMax - halfSizeCamera + maxPaddingCorner;
+            var minLimitPoint = mapPointMin + halfSizeCamera - minPaddingCorner;
 
             return new Vector3(Mathf.Clamp(position.x, minLimitPoint.x, maxLimitPoint.x),
                 Mathf.Clamp(position.y, minLimitPoint.y, maxLimitPoint.y),
                 cameraTransform.position.z);
+        }
+
+        private float FromScreenToWorld(float value)
+        {
+            var valueInWorld = mainCamera.ScreenToWorldPoint(new Vector3(0, value)).y;
+            return -(cameraTransform.position.y - mainCamera.orthographicSize - valueInWorld);
         }
     }
 }

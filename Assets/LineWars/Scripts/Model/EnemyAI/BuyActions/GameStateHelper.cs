@@ -10,15 +10,15 @@ namespace LineWars.Model
 
         public float GetPercentOfMapCaptureInVisibilityAreaFor(BasePlayer basePlayer)
         {
-            var visibilityMap = Graph.GetVisibilityInfo(basePlayer);
+            var visibilityMap = MonoGraph.Instance.GetVisibilityInfo(basePlayer);
             return GetPercentOfMapCapture(x => visibilityMap[x]);
         }
         public float GetPercentOfMapCapture([NotNull] Func<Node, bool> nodeSelectCondition)
         {
             if (nodeSelectCondition == null) throw new ArgumentNullException(nameof(nodeSelectCondition));
 
-            float allNodesCount = Graph.AllNodes.Count;
-            float captureNodesCount = Graph.AllNodes
+            float allNodesCount = MonoGraph.Instance.Nodes.Count();
+            float captureNodesCount = MonoGraph.Instance.Nodes
                 .Where(nodeSelectCondition)
                 .Count(x => x.Owner != null);
             return captureNodesCount / allNodesCount;

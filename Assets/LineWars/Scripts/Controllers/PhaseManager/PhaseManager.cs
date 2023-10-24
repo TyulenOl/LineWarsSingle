@@ -11,7 +11,7 @@ namespace LineWars
     {
         private List<IActor> actors;
 
-        [SerializeField] private PhaseOrderData orderData;
+        [field: SerializeField] public PhaseOrderData OrderData { get; protected set; }
         
         public event Action<IActor, PhaseType, PhaseType> ActorTurnChanged;
 
@@ -29,6 +29,7 @@ namespace LineWars
         private int currentActorId;
 
         public IReadOnlyList<IActor> Actors => actors.AsReadOnly();
+        public IActor CurrentActor => actors[currentActorId];
         public PhaseType CurrentPhase => ((Phase)stateMachine.CurrentState).Type;
     
         public static PhaseManager Instance {get; private set;}
@@ -69,7 +70,7 @@ namespace LineWars
         public void StartGame()
         {
             Debug.Log("Game Started!");
-            stateMachine.SetState(typeToPhase[orderData.Order[0]]);
+            stateMachine.SetState(typeToPhase[OrderData.Order[0]]);
         }
 
         public void RegisterActor(IActor actor)
@@ -125,15 +126,15 @@ namespace LineWars
 
         private void InitializeTransitions()
         {
-            for(var i = 0; i < orderData.Order.Count - 1; i++)
+            for(var i = 0; i < OrderData.Order.Count - 1; i++)
             {
-                var from = typeToPhase[orderData.Order[i]];
-                var to = typeToPhase[orderData.Order[i + 1]];
+                var from = typeToPhase[OrderData.Order[i]];
+                var to = typeToPhase[OrderData.Order[i + 1]];
                 stateMachine.AddTransition(from, to, () => from.AreActorsDone);
             }
 
-            var firstState = typeToPhase[orderData.Order[0]];
-            var lastState = typeToPhase[orderData.Order[orderData.Order.Count - 1]];
+            var firstState = typeToPhase[OrderData.Order[0]];
+            var lastState = typeToPhase[OrderData.Order[OrderData.Order.Count - 1]];
             stateMachine.AddTransition(lastState, firstState, () => lastState.AreActorsDone);
         }
 

@@ -8,20 +8,20 @@ namespace  LineWars.Model
 {
     public abstract class EnemyActionData : ScriptableObject
     {
-        public abstract void AddAllPossibleActions(List<EnemyAction> list, EnemyAI basePlayer, IExecutor executor);
+        public abstract void AddAllPossibleActions(List<EnemyAction> list, EnemyAI basePlayer, IReadOnlyExecutor executor);
     }
 
     public abstract class EnemyAction : IComparable
     {
         protected readonly EnemyAI basePlayer;
-        protected readonly IExecutor executor;
+        protected readonly IReadOnlyExecutor executor;
         protected float score;
 
         public event Action<EnemyAction> ActionCompleted;
         
-        public IExecutor Executor => executor;
+        public IReadOnlyExecutor Executor => executor;
         public float Score => score;
-        public EnemyAction(EnemyAI basePlayer, IExecutor executor)
+        public EnemyAction(EnemyAI basePlayer, IReadOnlyExecutor executor)
         {
             this.basePlayer = basePlayer;
             this.executor = executor;

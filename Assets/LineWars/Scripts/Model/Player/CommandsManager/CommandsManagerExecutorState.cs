@@ -30,11 +30,11 @@ namespace LineWars.Controllers
             {
                 if(!(newObject.TryGetComponent<Owned>(out Owned owned))) return;
                 if(!Player.LocalPlayer.IsMyOwn(owned)) return;
-                if(!(newObject.TryGetComponent<IExecutor>(out IExecutor executor))) return;
+                if(!(newObject.TryGetComponent<IReadOnlyExecutor>(out IReadOnlyExecutor executor))) return;
         
                 if(!Player.LocalPlayer.OwnedObjects.Contains(owned))
                     return;
-                if(executor is ComponentUnit unit 
+                if(executor is Unit unit 
                 && !Player.LocalPlayer.PotentialExecutors.Contains(unit.Type)) 
                     return;
                 if(executor.CurrentActionPoints <= 0)

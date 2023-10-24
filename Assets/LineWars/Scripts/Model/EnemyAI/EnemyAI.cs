@@ -2,23 +2,21 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using DataStructures;
-using LineWars.Controllers;
 using UnityEngine;
+
 
 namespace LineWars.Model
 {
     public partial class EnemyAI : BasePlayer
     {
-        [SerializeField] private PhaseExecutorsData executorsData;
-        [SerializeField] private EnemyPhaseActions enemyPhaseActions;
         [SerializeField] private EnemyDifficulty difficulty;
         [SerializeField] private float actionCooldown;
         [SerializeField] private EnemyAIPersonality personality;
+        [SerializeField] private GameEvaluator gameEvaluator;
+        [SerializeField] private int depth;
 
-        private IExecutor currentExecutor;
+        private IReadOnlyExecutor currentExecutor;
         private EnemyAIBuySelector buySelector;
-        public IReadOnlyCollection<UnitType> PotentialExecutors => executorsData.PhaseToUnits[CurrentPhase];
 
         protected override void Awake()
         {
@@ -33,7 +31,7 @@ namespace LineWars.Model
             StartCoroutine(BuyCoroutine());
             IEnumerator BuyCoroutine()
             {
-                if(buySelector.TryGetPreset(this, out var preset))
+                if (buySelector.TryGetPreset(this, out var preset))
                     SpawnPreset(preset);
                 yield return null;
                 ExecuteTurn(PhaseType.Idle);
@@ -53,85 +51,79 @@ namespace LineWars.Model
                 ExecuteTurn(PhaseType.Idle);
             }
         }
-        
-        private void ExecuteAITurn(PhaseType phase)
-        {
-            var actions = new List<EnemyAction>();
-            foreach (var owned in OwnedObjects)
-            {
-                
-                if (!(owned is IExecutor executor)) continue;
-                if(executor.CurrentActionPoints <= 0) continue;
-                AddActionsForExecutor(actions, executor, phase);
-            }
 
-            var chosenAction = PickAction(actions);
-            currentExecutor = chosenAction.Executor;
-            chosenAction.ActionCompleted += GetActionOnActionCompleted(phase);
-            Debug.Log($"{chosenAction} CHOSEN");
-            chosenAction.Execute();
-        }
-        
-        private Action<EnemyAction> GetActionOnActionCompleted(PhaseType phase)
+        public void ExecuteAITurn(PhaseType phase)
         {
-            return (action) => OnActionCompleted(action, phase);
-        }
-
-        private void OnActionCompleted(EnemyAction previousAction, PhaseType phaseType)
-        {
-            previousAction.ActionCompleted -= GetActionOnActionCompleted(phaseType);
-            StartCoroutine(NewActionCoroutine());
-            IEnumerator NewActionCoroutine()
-            {
-                yield return new WaitForSeconds(actionCooldown);
-                if (currentExecutor.CurrentActionPoints > 0)
-                {
-                    yield return new WaitForSeconds(actionCooldown);
-                    var actions = new List<EnemyAction>();
-                    AddActionsForExecutor(actions, currentExecutor, phaseType);
-                    var newAction = PickAction(actions);
-                    newAction.ActionCompleted += GetActionOnActionCompleted(phaseType);
-                    newAction.Execute();
-
-                }
-                else
-                {
-                    currentExecutor = null;
-                    ExecuteTurn(PhaseType.Idle);
-                }
-            }
-        }
-
-        private void AddActionsForExecutor(List<EnemyAction> actions, IExecutor executor, PhaseType phase)
-        {
-            var unitTypes = executorsData.PhaseToUnits[phase];
-            if (executor is ComponentUnit unit && !unitTypes.Contains(unit.Type)) return;
+            var gameProjection = 
+                GameProjection.GetProjectionFromMono(SingleGame.Instance.AllPlayers.Values, MonoGraph.Instance, PhaseManager.Instance);
             
-            var possibleActionData = enemyPhaseActions.PhasesToActions[phase];
-            foreach (var actionData in possibleActionData)
+            var possibleCommands = CommandBlueprintCollector.CollectAllCommands(gameProjection);
+            var commandEvalList = new List<(ICommandBlueprint, int)>(); 
+
+            foreach (var blueprint in possibleCommands)
             {
-                Debug.Log(actionData);
-                actionData.AddAllPossibleActions(actions, this, executor);
+                var newGame = GetProjectionFromCommand(gameProjection, blueprint);
+                var eval = MinMax(newGame, depth - 1);
+                commandEvalList.Add((blueprint, eval));
             }
+
+            Debug.Log(commandEvalList.Count);
+            foreach(var command in commandEvalList)
+            {
+                Debug.Log(command.ToString());
+            }
+            StartCoroutine(TurnCoroutine());
+            IEnumerator TurnCoroutine()
+            {
+                var bestBlueprint = commandEvalList.Aggregate((i1, i2) => i1.Item2 > i2.Item2 ? i1 : i2);
+                var command = bestBlueprint.Item1.GenerateMonoCommand(gameProjection);
+                Debug.Log(command.ToString());
+                command.Execute();
+                yield return null;
+                ExecuteTurn(PhaseType.Idle);
+            }
+            
         }
 
-        private EnemyAction PickAction(List<EnemyAction> actions)
+        private int MinMax(GameProjection gameProjection, int depth)
         {
-            var sortedList = new List<EnemyAction>(actions);
-            sortedList.Sort();
-            var randomList = new RandomChanceList<EnemyAction>();
-            for (var i = 0; i < sortedList.Count; i++)
+            var thisPlayerPojection = gameProjection.OriginalToProjectionPlayers[this];
+            if (depth == 0 || gameProjection.CurrentPhase == PhaseType.Buy)
+                return gameEvaluator.Evaluate(gameProjection, thisPlayerPojection);
+
+            var possibleCommands = CommandBlueprintCollector.CollectAllCommands(gameProjection);
+            if (thisPlayerPojection == gameProjection.CurrentPlayer)
             {
-                var currentAction = sortedList[i];
-                Debug.Log($"action - {currentAction}, score - {currentAction.Score}, i - {i}, count - {sortedList.Count}, " +
-                          $"time - {((float) i + 1)/ sortedList.Count}, evaluate - {difficulty.Curve.Evaluate(((float) i + 1)/ sortedList.Count)}");
-                randomList.Add(currentAction, 
-                    difficulty.Curve.Evaluate(((float) i + 1)/ sortedList.Count));
+                var maxEval = int.MinValue;
+                foreach (var blueprint in possibleCommands)
+                {
+                    var newGame = GetProjectionFromCommand(gameProjection, blueprint);
+                    var eval = MinMax(newGame, depth - 1);
+                    maxEval = Mathf.Max(maxEval, eval);
+                }
+                return maxEval;
+            }
+            var minEval = int.MaxValue;
+            foreach (var blueprint in possibleCommands)
+            {
+                var newGame = GetProjectionFromCommand(gameProjection, blueprint);
+                var eval = MinMax(newGame, depth - 1);
+                minEval = Mathf.Min(minEval, eval);
             }
 
-            return randomList.PickRandomObject();
+            return minEval;
         }
 
+        private GameProjection GetProjectionFromCommand(GameProjection game, ICommandBlueprint blueprint)
+        {
+            var newGame = GameProjection.GetCopy(game);
+            var command = blueprint.GenerateCommand(newGame); 
+            command.Execute();
+            if (!newGame.IsUnitPhaseAvailable(newGame.CurrentPhase))
+                newGame.CycleTurn();
+
+            return newGame;
+        }
         #endregion
 
         #region Check Turns
@@ -143,11 +135,11 @@ namespace LineWars.Model
 
         private bool CanExecutePhase(PhaseType phase)
         {
-            var executors = executorsData.PhaseToUnits[phase];
+            var executors = PhaseExecutorsData.PhaseToUnits[phase];
             foreach (var owned in OwnedObjects)
             {
-                if (!(owned is ComponentUnit unit)) continue;
-                if(executors.Contains(unit.Type) && unit.CurrentActionPoints > 0)
+                if (!(owned is Unit unit)) continue;
+                if (executors.Contains(unit.Type) && unit.CurrentActionPoints > 0)
                     return true;
             }
 

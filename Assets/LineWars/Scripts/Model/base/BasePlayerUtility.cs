@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using UnityEngine;
 
 namespace LineWars.Model
@@ -6,7 +7,7 @@ namespace LineWars.Model
     public static class BasePlayerUtility
     {
         private static int globalUnitIndex;
-        public static bool CanSpawnUnit(Node node, ComponentUnit unit, UnitDirection unitDirection = UnitDirection.Any)
+        public static bool CanSpawnUnit(Node node, Unit unit, UnitDirection unitDirection = UnitDirection.Any)
         {
             return node != null && unit != null &&
                    (unit.Size == UnitSize.Large && node.LeftIsFree && node.RightIsFree 
@@ -17,7 +18,7 @@ namespace LineWars.Model
                    );
         }
 
-        public static ComponentUnit CreateUnitForPlayer(BasePlayer player, Node node, ComponentUnit unitPrefab,
+        public static Unit CreateUnitForPlayer(BasePlayer player, Node node, Unit unitPrefab,
             UnitDirection unitDirection = UnitDirection.Any)
         {
             var unit = Object.Instantiate(unitPrefab, player.transform);
@@ -50,6 +51,13 @@ namespace LineWars.Model
             unit.name = $"{unit.UnitName}{globalUnitIndex}";
             globalUnitIndex++;
             return unit;
+        }
+        
+        public static int GetCountUnitByType(this BasePlayer player, UnitType type)
+        {
+            return player.OwnedObjects
+                .OfType<Unit>()
+                .Count(x => x.Type == type);
         }
     }
 }

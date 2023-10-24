@@ -14,9 +14,9 @@ namespace LineWars.Model
             public bool TryGetPreset(EnemyAI enemyAI, [NotNullWhen(true)] out UnitBuyPreset buyPreset)
             {
                 buyPreset = null;
-                if (!enemyAI.Base.Node.AllIsFree) return false;
+                if (!enemyAI.Base.AllIsFree) return false;
 
-                var allPresets = enemyAI.MyNation.NationEconomicLogic.UnitBuyPresets;
+                var allPresets = enemyAI.Nation.NationEconomicLogic;
                 var currentMoney = enemyAI.CurrentMoney;
                 float income = enemyAI.Income;
                 var personality = enemyAI.personality;
@@ -47,7 +47,7 @@ namespace LineWars.Model
                 return buyPreset != null;
             }
 
-            private IEnumerable<ComponentUnit> GetUnitsByPreset(UnitBuyPreset preset, EnemyAI enemyAI)
+            private IEnumerable<Unit> GetUnitsByPreset(UnitBuyPreset preset, EnemyAI enemyAI)
             {
                 var leftUnit = enemyAI.GetUnitPrefab(preset.FirstUnitType);
                 if (leftUnit != null)
