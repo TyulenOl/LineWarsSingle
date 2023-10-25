@@ -1,38 +1,43 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using LineWars.Controllers;
+using UnityEngine;
 
 namespace LineWars.Model
 {
     public sealed class MeleeAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> :
-        AttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>,
-        IMeleeAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>
-    
+            AttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>,
+            IMeleeAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>
+
         #region Сonstraints
         where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer> 
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
         where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
         where TOwned : class, IOwned<TOwned, TPlayer>
-        where TPlayer: class, IBasePlayer<TOwned, TPlayer>
-        #endregion 
+        where TPlayer : class, IBasePlayer<TOwned, TPlayer>
+        #endregion
+
     {
         private readonly UnitBlockerSelector blockerSelector;
         private readonly bool onslaught;
+        private readonly IMoveAction<TNode, TEdge, TUnit, TOwned, TPlayer> moveAction;
 
         public MeleeAttackAction([NotNull] TUnit unit, MonoMeleeAttackAction data) : base(unit, data)
         {
             blockerSelector = data.InitialBlockerSelector;
+            moveAction = unit.GetUnitAction<IMoveAction<TNode, TEdge, TUnit, TOwned, TPlayer>>();
             onslaught = data.InitialOnslaught;
         }
 
-        public MeleeAttackAction([NotNull] TUnit unit, MeleeAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> data) 
+        public MeleeAttackAction([NotNull] TUnit unit, MeleeAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> data)
             : base(unit, data)
         {
             blockerSelector = data.blockerSelector;
             onslaught = data.onslaught;
+            moveAction = data.moveAction;
         }
 
-        public override CommandType GetMyCommandType() => CommandType.MeleeAttack;
+        public override CommandType CommandType => CommandType.MeleeAttack;
 
         public override bool CanAttackFrom([NotNull] TNode node, [NotNull] TUnit enemy,
             bool ignoreActionPointsCondition = false)
@@ -59,11 +64,13 @@ namespace LineWars.Model
             // иначе выбрать того, кто будет блокировать урон
             else
             {
-                var selectedUnit = blockerSelector.SelectBlocker<TNode, TEdge, TUnit, TOwned, TPlayer>(enemy, neighbour);
-                if (selectedUnit == enemy)
-                    AttackUnitButIgnoreBlock(enemy);
-                else
-                    UnitsController.ExecuteCommand(new BlockAttackCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(MyUnit, selectedUnit), false);
+                var selectedUnit =
+                    blockerSelector.SelectBlocker<TNode, TEdge, TUnit, TOwned, TPlayer>(enemy, neighbour);
+                AttackUnitButIgnoreBlock(selectedUnit);
+                if (selectedUnit != enemy)
+                {
+                    Debug.Log($"Юнит {selectedUnit} перехватил атаку");
+                }
             }
         }
 
@@ -73,13 +80,21 @@ namespace LineWars.Model
             var enemyNode = enemy.Node;
             MeleeAttack(enemy);
 
-            if (enemy.IsDied && enemyNode.AllIsFree && onslaught)
-                UnitsController.ExecuteCommand(new MoveCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(MyUnit, enemyNode));
+            if (enemy.IsDied
+                && enemyNode.AllIsFree
+                && onslaught
+                && moveAction.CanMoveTo(enemyNode)
+               )
+            {
+                moveAction.MoveTo(enemyNode);
+            }
         }
 
         private void MeleeAttack(TUnit target)
         {
-            target.CurrentHp -= Damage;
+            var enemyDamage = target.GetMaxDamage<TNode, TEdge, TUnit, TOwned, TPlayer>();
+            target.DealDamageThroughArmor(Damage);
+            MyUnit.DealDamageThroughArmor(enemyDamage);
             CompleteAndAutoModify();
         }
 

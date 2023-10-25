@@ -2,7 +2,8 @@
 
 namespace LineWars.Model
 {
-    public interface IAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> : 
+    public interface IAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> :
+        IActionWithDamage,
         IUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>,
         ITargetedAction
     
@@ -14,7 +15,6 @@ namespace LineWars.Model
         where TPlayer: class, IBasePlayer<TOwned, TPlayer>
         #endregion 
     {
-        int Damage { get; }
         bool IsPenetratingDamage { get; }
         
         bool CanAttack(IAlive enemy, bool ignoreActionPointsCondition = false);

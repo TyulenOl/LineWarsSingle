@@ -31,9 +31,14 @@ namespace LineWars.Model
         public int CurrentMoney { get; set; }
         public IReadOnlyCollection<OwnedProjection> OwnedObjects => ownedObjects;
 
-        public BasePlayerProjection(PlayerRules rules, 
-            int income, int currentMoney, PhaseExecutorsData executorsData, NationEconomicLogic economicLogic, BasePlayer original = null,
-            IReadOnlyCollection<OwnedProjection> ownedObjects = null, NodeProjection playerBase = null)
+        public BasePlayerProjection(
+            PlayerRules rules, 
+            int income, int currentMoney,
+            PhaseExecutorsData executorsData,
+            NationEconomicLogic economicLogic,
+            BasePlayer original = null,
+            IReadOnlyCollection<OwnedProjection> ownedObjects = null,
+            NodeProjection playerBase = null)
         {
             Original = original;
             Base = playerBase;

@@ -42,17 +42,13 @@ namespace LineWars.Model
 
         public override void Attack(TUnit enemy)
         {
-            DistanceAttack(enemy, Damage);
+            enemy.DealDamageThroughArmor(Damage);
             CompleteAndAutoModify();
         }
-
-        protected void DistanceAttack(IAlive enemy, int damage)
-        {
-            enemy.CurrentHp -= damage;
-        }
-
+        
         public override uint GetPossibleMaxRadius() => Distance;
-        public override CommandType GetMyCommandType() => CommandType.Fire;
+
+        public override CommandType CommandType => CommandType.Fire;
 
         public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor)
         {

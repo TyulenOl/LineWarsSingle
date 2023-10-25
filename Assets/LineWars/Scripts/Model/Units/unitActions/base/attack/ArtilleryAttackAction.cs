@@ -40,7 +40,7 @@
 
         public override void Attack(TEdge edge)
         {
-            DistanceAttack(edge, Damage);
+            edge.CurrentHp -= Damage;
             CompleteAndAutoModify();
         }
 
@@ -50,14 +50,14 @@
             if (enemy.TryGetNeighbour(out var neighbour))
             {
                 damage /= 2;
-                DistanceAttack(neighbour, damage);
+                neighbour.CurrentHp -= damage;
             }
 
-            DistanceAttack(enemy, damage);
+            enemy.CurrentHp -= damage;
             CompleteAndAutoModify();
         }
 
-        public override CommandType GetMyCommandType() => CommandType.Explosion;
+        public override CommandType CommandType => CommandType.Explosion;
 
         public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor)
         {

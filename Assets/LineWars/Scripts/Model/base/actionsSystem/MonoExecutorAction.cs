@@ -7,7 +7,7 @@ namespace LineWars.Model
     [RequireComponent(typeof(IExecutor))]
     public abstract class MonoExecutorAction : MonoBehaviour, IExecutorAction
     {
-        [field:SerializeField] public int InitializePriority { get; private set; }
+        [field: SerializeField] public int Priority { get; private set; }
         [SerializeField] protected IntModifier actionModifier;
         
         protected IExecutor Executor;
@@ -15,14 +15,16 @@ namespace LineWars.Model
         public event Action ActionCompleted;
         public IntModifier ActionModifier => actionModifier;
 
-        public void Initialize()
+        public virtual void Initialize()
         {
             Executor = GetComponent<IExecutor>();
             ExecutorAction = GetAction();
             ExecutorAction.ActionCompleted += () => ActionCompleted?.Invoke();
         }
         public void OnReplenish() => ExecutorAction.OnReplenish();
-        public CommandType GetMyCommandType() => ExecutorAction.GetMyCommandType();
+
+        public CommandType CommandType => ExecutorAction.CommandType;
+
         protected abstract ExecutorAction GetAction();
     }
 }

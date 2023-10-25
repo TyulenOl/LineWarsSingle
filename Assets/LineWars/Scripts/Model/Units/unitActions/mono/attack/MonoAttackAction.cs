@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using JetBrains.Annotations;
 using LineWars.Controllers;
 using UnityEngine;
 
@@ -29,8 +30,9 @@ namespace LineWars.Model
             SfxManager.Instance.Play(attackSfx);
         }
 
-        public bool IsMyTarget(ITarget target) => AttackAction.IsMyTarget(target);
-        public ICommand GenerateCommand(ITarget target)
+        public Type TargetType => typeof(IAlive);
+        public bool IsMyTarget(ITarget target) => target is IAlive;
+        public ICommandWithCommandType GenerateCommand(ITarget target)
         {
             return new AttackCommand<Node, Edge, Unit, Owned, BasePlayer>(this, (IAlive) target);
         }

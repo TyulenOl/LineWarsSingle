@@ -44,10 +44,13 @@ namespace LineWars.Model
 
             CompleteAndAutoModify();
         }
-        public override CommandType GetMyCommandType() => CommandType.Build;
+
+        public override CommandType CommandType => CommandType.Build;
+
+        public Type TargetType => typeof(TEdge);
         public bool IsMyTarget(ITarget target) => target is TEdge;
 
-        public ICommand GenerateCommand(ITarget target)
+        public ICommandWithCommandType GenerateCommand(ITarget target)
         {
             return new BuildCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this, (TEdge)target);
         }

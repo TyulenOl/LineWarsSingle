@@ -4,8 +4,7 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    [CreateAssetMenu(fileName = "New UnitBlockerSelector", menuName = "BlockerSelectors/Base UnitBlockerSelector",
-        order = 60)]
+    [CreateAssetMenu(fileName = "New UnitBlockerSelector", menuName = "BlockerSelectors/Base UnitBlockerSelector", order = 60)]
     public class UnitBlockerSelector : ScriptableObject
     {
         public virtual TUnit SelectBlocker<TNode, TEdge, TUnit, TOwned, TPlayer>(TUnit targetUnit, TUnit neighborUnit)
@@ -19,9 +18,8 @@ namespace LineWars.Model
         {
             return
                 (new[] {targetUnit, neighborUnit})
-                //.OrderByDescending(x => x.GetIsBlocked()) // Сперва берем того, кто блокирует
-                .OrderByDescending(x => x.MaxHp) // Потом того, у кого больше максимальное хп
-                .ThenByDescending(x => x.CurrentArmor) // Потом того, у кого больше армор
+                .OrderByDescending(x => x.CurrentArmor) // Потом того, у кого больше армор
+                .ThenByDescending(x => x.MaxHp) // Потом того, у кого больше максимальное хп
                 .ThenBy(x => x.CurrentHp) // Потом того, у кого меньше текущее хп
                 .First();
         }

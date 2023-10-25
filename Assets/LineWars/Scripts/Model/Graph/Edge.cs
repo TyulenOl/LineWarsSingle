@@ -48,9 +48,11 @@ namespace LineWars.Model
         public int Id => index;
         
 
-        public int MaxHp => lineMap.ContainsKey(LineType)
-            ? lineMap[LineType].MaxHp
-            : 0;
+        public int MaxHp
+        {
+            get => lineMap[LineType].MaxHp;
+            set => lineMap[LineType].MaxHp = value;
+        }
 
         public Node FirstNode => firstNode;
         public Node SecondNode => secondNode;

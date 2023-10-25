@@ -11,11 +11,29 @@ namespace LineWars.Model
         [SerializeField] private Sprite sprite;
         [SerializeField, Min(0)] private float width = 5;
 
-        public LineType LineType => lineType;
-        public int MaxHp => maxHp;
-        public Sprite Sprite => sprite;
+        public LineType LineType
+        {
+            get => lineType;
+            set => lineType = value;
+        }
 
-        public float Width => width;
+        public int MaxHp
+        {
+            get => maxHp;
+            set => maxHp = value;
+        }
+
+        public Sprite Sprite
+        {
+            get => sprite;
+            set => sprite = value;
+        }
+
+        public float Width
+        {
+            get => width;
+            set => width = value;
+        }
 
         public LineTypeCharacteristics(LineType type)
         {

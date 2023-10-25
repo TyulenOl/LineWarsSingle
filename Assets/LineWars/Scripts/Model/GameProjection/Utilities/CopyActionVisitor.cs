@@ -1,7 +1,7 @@
 namespace LineWars.Model
 {
     public class CopyActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> : IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer>
-        #region Ñonstraints
+        #region Ð¡onstraints
         where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
         where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
@@ -53,13 +53,38 @@ namespace LineWars.Model
         {
             Result = new MeleeAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action);
         }
+
+        public void Visit(RLBlockAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
+        {
+            Result = new RLBlockAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action);
+        }
+
+        public void Visit(SacrificeForPerunAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
+        {
+            Result = new SacrificeForPerunAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action);
+        }
+
+        public void Visit(RamAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
+        {
+            Result = new RamAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action);
+        }
+
+        public void Visit(BlowWithSwingAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
+        {
+            Result = new BlowWithSwingAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action);
+        }
+
+        public void Visit(ShotUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
+        {
+            Result = new ShotUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action);
+        }
     }
 
     public static class CopyActionVisitor
     {
         public static CopyActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> 
             Create<TNode, TEdge, TUnit, TOwned, TPlayer>(TUnit unit, IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer> graph)
-            #region Ñonstraints
+            #region Ð¡onstraints
             where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
             where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
             where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>

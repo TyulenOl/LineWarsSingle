@@ -9,7 +9,7 @@
         public NodeProjection FirstNode { get; private set; }
         public NodeProjection SecondNode { get; private set; }
         public int Id { get; private set; }
-
+        public int MaxHp { get; set; }
         public int CurrentHp { get; set; }
         public LineType LineType { get; set; }
 

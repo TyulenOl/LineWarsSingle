@@ -24,14 +24,8 @@ namespace LineWars.Model
             };
         }
 
-        protected override ExecutorAction GetAction()
-        {
-            return new ArtilleryAttackAction<Node, Edge, Unit, Owned, BasePlayer>(Unit, this, MonoGraph.Instance);
-        }
-
-        public override void Accept(IMonoUnitVisitor visitor)
-        {
-            visitor.Visit(this);
-        }
+        protected override ExecutorAction GetAction() 
+            => new ArtilleryAttackAction<Node, Edge, Unit, Owned, BasePlayer>(Unit, this, MonoGraph.Instance);
+        public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
     }
 }

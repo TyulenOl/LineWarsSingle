@@ -29,20 +29,20 @@ namespace LineWars.Model
 
             foreach (var node in Nodes)
                 result[node] = false;
-            foreach (var visibilityNode in _GetVisibilityNodes(ownedNodes))
+            foreach (var visibilityNode in GetVisibilityNodes(ownedNodes))
                 result[visibilityNode] = true;
 
             return result;
         }
-
-        private IEnumerable<TNode> _GetVisibilityNodes(IReadOnlyCollection<TNode> ownedNodes)
+        public IEnumerable<TNode> GetVisibilityNodes(IEnumerable<TNode> _startNodes)
         {
-            if (ownedNodes == null || ownedNodes.Count == 0) throw new ArgumentException();
-            if (ownedNodes.Any(x => !Nodes.Contains(x))) throw new InvalidOperationException();
+            var startNodes = _startNodes.ToArray();
+            if (startNodes.Length == 0) throw new ArgumentException();
+            if (startNodes.Any(x => !Nodes.Contains(x))) throw new InvalidOperationException();
             
             var closedNodes = new HashSet<TNode>();
             var priorityQueue = new PriorityQueue<TNode, int>(0);
-            foreach (var ownedNode in ownedNodes)
+            foreach (var ownedNode in startNodes)
                 priorityQueue.Enqueue(ownedNode, -ownedNode.Visibility);
 
             while (priorityQueue.Count != 0)

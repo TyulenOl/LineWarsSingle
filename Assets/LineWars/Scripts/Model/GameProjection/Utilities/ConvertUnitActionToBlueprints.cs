@@ -5,7 +5,7 @@ namespace LineWars.Model
 {
     public class ConvertUnitActionToBlueprints<TNode, TEdge, TUnit, TOwned, TPlayer> 
         : IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer>
-        #region Ñonstraints
+        #region Ð¡onstraints
         where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
         where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
@@ -95,6 +95,32 @@ namespace LineWars.Model
             ProcessAttackAction(action, 1);
         }
 
+        public void Visit(RLBlockAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void Visit(SacrificeForPerunAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void Visit(RamAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void Visit(BlowWithSwingAction<TNode, TEdge, TUnit, TOwned, TPlayer> ramAction)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void Visit(ShotUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer> ramAction)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        
         private void ProcessAttackAction(AttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> action, uint range)
         {
             foreach (var node in Graph.GetNodesInRange(action.MyUnit.Node, range))
@@ -124,7 +150,7 @@ namespace LineWars.Model
             Create<TNode, TEdge, TUnit, TOwned, TPlayer>
             (IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer> graph,
             List<ICommandBlueprint> list)
-            #region Ñonstraints
+            #region Ð¡onstraints
             where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
             where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
             where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>

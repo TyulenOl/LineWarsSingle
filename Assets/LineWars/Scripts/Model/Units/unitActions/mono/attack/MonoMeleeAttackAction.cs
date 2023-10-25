@@ -2,6 +2,7 @@
 
 namespace LineWars.Model
 {
+    [RequireComponent(typeof(MonoMoveAction))]
     public class MonoMeleeAttackAction : MonoAttackAction,
         IMeleeAttackAction<Node, Edge, Unit, Owned, BasePlayer>
     {

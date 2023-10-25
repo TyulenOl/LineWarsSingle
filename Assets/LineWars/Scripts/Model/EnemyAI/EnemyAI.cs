@@ -12,7 +12,7 @@ namespace LineWars.Model
         [SerializeField] private EnemyAIPersonality personality;
         [SerializeField] private GameEvaluator gameEvaluator;
 
-        private IReadOnlyExecutor currentExecutor;
+        private IExecutor currentExecutor;
         private EnemyAIBuySelector buySelector;
 
         protected override void Awake()

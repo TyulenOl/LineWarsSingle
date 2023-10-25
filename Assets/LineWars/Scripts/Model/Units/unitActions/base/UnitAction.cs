@@ -18,12 +18,16 @@ namespace LineWars.Model
     {
         public TUnit MyUnit { get; }
 
-        public UnitAction([NotNull] TUnit unit, [NotNull] MonoUnitAction data) : base(unit, data)
+        public UnitAction(
+            [NotNull] TUnit unit,
+            [NotNull] MonoUnitAction data) : base(unit, data)
         {
             MyUnit = unit;
         }
 
-        public UnitAction([NotNull] TUnit unit, [NotNull] UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer> data) 
+        public UnitAction(
+            [NotNull] TUnit unit,
+            [NotNull] UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer> data) 
             : base(unit, data)
         {
             MyUnit = unit;

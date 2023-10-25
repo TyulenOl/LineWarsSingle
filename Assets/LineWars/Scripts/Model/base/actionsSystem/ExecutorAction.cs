@@ -6,11 +6,11 @@ namespace LineWars.Model
 {
     public abstract class ExecutorAction: IExecutorAction
     {
-        
         private readonly IExecutor myExecutor;
+        private static CommandType commandType;
         public event Action ActionCompleted;
         public IntModifier ActionModifier { get; private set; }
-
+        
         protected ExecutorAction([NotNull] IExecutor unit, [NotNull] MonoExecutorAction data)
         {
             ActionModifier = data.ActionModifier;
@@ -29,7 +29,7 @@ namespace LineWars.Model
             if (myExecutor == null) throw new ArgumentNullException(nameof(unit));
         }
 
-        public abstract CommandType GetMyCommandType();
+        public abstract CommandType CommandType { get; }
 
         public virtual void OnReplenish() {}
         

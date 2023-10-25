@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Linq;
 using System.Collections.Generic;
@@ -16,6 +17,7 @@ namespace LineWars
 
         private IReadOnlyCollection<UnitType> potentialExecutors;
         private bool isTurnMade;
+        private HashSet<Node> additionalVisibleNodes;
 
         private StateMachine stateMachine;
         private PlayerPhase idlePhase;
@@ -27,6 +29,8 @@ namespace LineWars
         
         [field: SerializeField] public UnityEvent TurnMade {get; private set;}
         public IReadOnlyCollection<UnitType> PotentialExecutors => potentialExecutors;
+        public IReadOnlyDictionary<Node, bool> VisibilityMap;
+        public IEnumerable<Node> AdditionalVisibleNodes => additionalVisibleNodes;
         public bool IsTurnMade
         {
             get => isTurnMade;
@@ -198,6 +202,19 @@ namespace LineWars
         }
 
         #endregion
+
+        public void AddVisibleNode(Node node)
+        {
+            if (!MonoGraph.Instance.Nodes.Contains(node))
+                throw new ArgumentException();
+            if (node == null)
+                throw new ArgumentException();
+            if (additionalVisibleNodes.Contains(node))
+                return;
+            additionalVisibleNodes.Add(node);
+        }
+
+        public bool RemoveVisibleNode(Node node) => additionalVisibleNodes.Remove(node);
         
         private void UnitOnDied(Unit diedUnit)
         {
@@ -208,7 +225,7 @@ namespace LineWars
                 RecalculateVisibility();
             }
         }
-        private void OnExecuteCommand(IReadOnlyExecutor executor, IReadOnlyTarget target)
+        private void OnExecuteCommand(IExecutor executor, ITarget target)
         {
             RecalculateVisibility();
         }
@@ -216,13 +233,18 @@ namespace LineWars
         public void RecalculateVisibility(bool useLerp = true)
         {
             var visibilityMap = MonoGraph.Instance.GetVisibilityInfo(this);
+            foreach (var node in additionalVisibleNodes)
+                visibilityMap[node] = true;
+            
             foreach (var (node, visibility) in visibilityMap)
             {
                 if (useLerp)
-                    ((Node)node).RenderNodeV3.SetVisibilityGradually(visibility ? 1 : 0);
+                    node.RenderNodeV3.SetVisibilityGradually(visibility ? 1 : 0);
                 else
-                    ((Node)node).RenderNodeV3.SetVisibilityInstantly(visibility ? 1 : 0);
+                    node.RenderNodeV3.SetVisibilityInstantly(visibility ? 1 : 0);
             }
+
+            VisibilityMap = visibilityMap;
         }
     }
 }

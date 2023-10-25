@@ -37,11 +37,11 @@ namespace LineWars
             }
         }
         
-        public bool Action(IReadOnlyExecutor executor, IReadOnlyTarget target)
+        public bool Action(IExecutor executor, ITarget target)
         {
             foreach (var commandType in target.CommandPriorityData)
             {
-                if (executor.TryGetCommand(commandType, target, out var command)
+                if (executor.TryGetCommandForTarget(commandType, target, out var command)
                     && command.CanExecute())
                 {
                     ExecuteCommand(command);
@@ -50,20 +50,6 @@ namespace LineWars
             }
 
             return false;
-        }
-
-        public CommandType GetCommandTypeBy(IReadOnlyExecutor executor, IReadOnlyTarget target)
-        {
-            foreach (var commandType in target.CommandPriorityData)
-            {
-                if (executor.TryGetCommand(commandType, target, out var command)
-                    && command.CanExecute())
-                {
-                    return commandType;
-                }
-            }
-
-            return CommandType.None;
         }
     }
 }

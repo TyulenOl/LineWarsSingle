@@ -33,7 +33,11 @@ namespace LineWars.Model
         Fire,
         Move,
         Build,
-        Block
+        Block,
+        SacrificePerun,
+        Ram,
+        BlowWithSwing,
+        ShotUnit
     }
 }   
 

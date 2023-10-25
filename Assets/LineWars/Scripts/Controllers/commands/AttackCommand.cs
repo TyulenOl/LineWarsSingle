@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace LineWars.Model
 {
     public class AttackCommand<TNode, TEdge, TUnit, TOwned, TPlayer>:
-        ICommand
+        ICommandWithCommandType
     
         #region Сonstraints
         where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
@@ -54,5 +54,7 @@ namespace LineWars.Model
         {
             return $"{Attacker} атаковал {Defender}";
         }
+
+        public CommandType CommandType => attackAction.CommandType;
     }
 }

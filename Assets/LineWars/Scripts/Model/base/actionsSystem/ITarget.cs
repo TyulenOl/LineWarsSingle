@@ -1,7 +1,7 @@
 ﻿namespace LineWars.Model
 {
-    public interface ITarget: IReadOnlyTarget
+    public interface ITarget
     {
-        
+        public CommandPriorityData CommandPriorityData {get;}
     }
 }

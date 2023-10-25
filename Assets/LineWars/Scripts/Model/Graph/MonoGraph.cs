@@ -67,16 +67,19 @@ namespace LineWars.Model
         public Dictionary<Node, bool> GetVisibilityInfo(BasePlayer player) =>
             Instance.modelGraph.GetVisibilityInfo(player);
 
+        public IEnumerable<Node> GetVisibilityNodes(IEnumerable<Node> ownedNodes)
+            => modelGraph.GetVisibilityNodes(ownedNodes);
+
         public List<Node> FindShortestPath(
             [NotNull] Node start,
             [NotNull] Node end,
             Func<Node, Node, bool> condition = null)
-            => Instance.modelGraph.FindShortestPath(start, end, condition);
+            => modelGraph.FindShortestPath(start, end, condition);
 
         public IEnumerable<Node> GetNodesInRange(
             Node startNode,
             uint range,
             Func<Node, Node, bool> condition = null)
-            => Instance.modelGraph.GetNodesInRange(startNode, range, condition);
+            => modelGraph.GetNodesInRange(startNode, range, condition);
     }
 }

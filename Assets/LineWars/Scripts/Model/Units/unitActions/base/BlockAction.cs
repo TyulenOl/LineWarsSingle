@@ -18,17 +18,17 @@ namespace LineWars.Model
     {
         private bool isBlocked;
         private readonly IntModifier contrAttackDamageModifier;
-        private AttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> attackAction;
+        private IAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> attackAction;
 
         public event Action<bool, bool> CanBlockChanged;
 
-        private AttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> AttackAction
+        private IAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> AttackAction
         {
             get
             {
                 if (attackAction == null)
                 {
-                    if (MyUnit.TryGetUnitAction<AttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>>(out var action)) 
+                    if (MyUnit.TryGetUnitAction<IAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>>(out var action)) 
                         attackAction = action;
                     else
                         throw new Exception("Для контратаки необходимо иметь хотя бы атакующий компонент!");
@@ -100,7 +100,7 @@ namespace LineWars.Model
                 CanBlockChanged?.Invoke(before, value);
         }
 
-        public override CommandType GetMyCommandType() => CommandType.Block;
+        public override CommandType CommandType => CommandType.Block;
 
         public ICommand GenerateCommand()
         {

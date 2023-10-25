@@ -9,8 +9,10 @@ namespace LineWars.Model
 {
     [RequireComponent(typeof(Selectable2D))]
     [RequireComponent(typeof(RenderNodeV3))]
-    public class Node : Owned, INodeForGame<Node, Edge, Unit, Owned, BasePlayer>
+    public class Node : Owned, INodeForGame<Node, Edge, Unit, Owned, BasePlayer>, ITargetsEnumerable
     {
+        private static INodeForGame<Node, Edge, Unit, Owned, BasePlayer> iNodeImplementation;
+        
         [SerializeField] private int index;
         [SerializeField] private List<Edge> edges;
 
@@ -78,8 +80,11 @@ namespace LineWars.Model
         public CommandPriorityData CommandPriorityData => priorityData;
         public RenderNodeV3 RenderNodeV3 => renderNodeV3;
 
+
+
         private void Awake()
         {
+            iNodeImplementation = this;
             mainCamera = Camera.main;
             IsDirty = ReferenceToSpawn != null;
         }
@@ -109,6 +114,20 @@ namespace LineWars.Model
             if (selectable2D == null)
                 selectable2D = GetComponent<Selectable2D>();
         }
+
+        public IEnumerable<ITarget> Targets
+        {
+            get
+            {
+                yield return this;
+                foreach (var edge in edges)
+                    yield return edge;
+                foreach (var unit in Units)
+                    yield return unit;
+            }
+        }
+
+        public IEnumerable<Unit> Units => iNodeImplementation.Units;
 
         private GameObject OnPointerClicked(GameObject obj, PointerEventData eventData)
         {

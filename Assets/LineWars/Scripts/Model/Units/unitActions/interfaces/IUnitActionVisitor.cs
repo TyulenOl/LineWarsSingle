@@ -1,7 +1,7 @@
 namespace LineWars.Model
 {
     public interface IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer>
-        #region Ñonstraints
+        #region Constraints
         where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
         where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
@@ -16,6 +16,11 @@ namespace LineWars.Model
         public void Visit(DistanceAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> action);
         public void Visit(ArtilleryAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> action);
         public void Visit(MeleeAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> action);
+        public void Visit(RLBlockAction<TNode, TEdge, TUnit, TOwned, TPlayer> action);
+        public void Visit(SacrificeForPerunAction<TNode, TEdge, TUnit, TOwned, TPlayer> action);
+        public void Visit(RamAction<TNode, TEdge, TUnit, TOwned, TPlayer> action);
+        public void Visit(BlowWithSwingAction<TNode, TEdge, TUnit, TOwned, TPlayer> ramAction);
+        public void Visit(ShotUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer> ramAction);
     }
 }
 

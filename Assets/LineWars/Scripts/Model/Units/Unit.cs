@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using LineWars.Extensions.Attributes;
 using UnityEngine;
 using UnityEngine.Events;
@@ -25,7 +26,7 @@ namespace LineWars.Model
         [SerializeField] private CommandPriorityData priorityData;
 
         [Header("Actions Settings")] 
-        [SerializeField] [Min(0)] private int initialActionPoints;
+        [SerializeField] [Min(0)] private int maxActionPoints;
 
         [Header("DEBUG")] 
         [SerializeField, ReadOnlyInspector] private Node myNode;
@@ -47,14 +48,28 @@ namespace LineWars.Model
         public event Action<IExecutorAction> CurrentActionCompleted;
 
         private UnitMovementLogic movementLogic;
-        private Dictionary<CommandType, MonoUnitAction> runtimeActionsDictionary;
-        public IEnumerable<MonoUnitAction> Actions => runtimeActionsDictionary.Values;
-        private uint maxPossibleActionRadius;
+        
+        
+        private Dictionary<CommandType, MonoUnitAction> monoActionsDictionary;
+        private IEnumerable<MonoUnitAction> MonoActions => monoActionsDictionary.Values;
+        public uint MaxPossibleActionRadius { get; private set; }
+        public IReadOnlyCollection<Type> PossibleTargetsTypes { get; private set; }
+        public IReadOnlyDictionary<Type, ITargetedAction[]> TargetTypeActionsDictionary { get; private set; }
+        private ITargetActionGrouper grouper = new DefaultTargetActionGrouper();
 
         #region Properties
         public int Id => index;
         public string UnitName => unitName;
-        public int InitialActionPoints => initialActionPoints;
+        
+        public int MaxActionPoints
+        {
+            get => maxActionPoints;
+            set
+            {
+                maxActionPoints = Mathf.Max(value, 0);
+                CurrentActionPoints = Mathf.Min(currentActionPoints, maxActionPoints);
+            }
+        }
 
         public int CurrentActionPoints
         {
@@ -67,8 +82,15 @@ namespace LineWars.Model
             }
         }
 
-        public int MaxHp => maxHp;
-        public int MaxArmor => maxArmor;
+        public int MaxHp
+        {
+            get => maxHp;
+            set
+            {
+                maxHp = Mathf.Max(value, 0);
+                CurrentHp = Mathf.Min(currentHp, maxHp);
+            }
+        }
 
         public int CurrentHp
         {
@@ -86,7 +108,11 @@ namespace LineWars.Model
             }
         }
 
-        public bool IsDied => CurrentHp <= 0;
+        public int MaxArmor
+        {
+            get => maxArmor;
+            set => maxArmor = Mathf.Max(value, 0);
+        }
 
         public int CurrentArmor
         {
@@ -136,15 +162,15 @@ namespace LineWars.Model
 
         public UnitMovementLogic MovementLogic => movementLogic;
 
-        public int MaxActionPoints => initialActionPoints;
+        public bool IsDied => CurrentHp <= 0;
 
         #endregion
-
+        
         private void Awake()
         {
             currentHp = maxHp;
             currentArmor = maxArmor;
-            currentActionPoints = initialActionPoints;
+            currentActionPoints = maxActionPoints;
 
             movementLogic = GetComponent<UnitMovementLogic>();
 
@@ -153,21 +179,33 @@ namespace LineWars.Model
             void InitialiseAllActions()
             {
                 var serializeActions = GetComponents<MonoUnitAction>()
-                        .OrderByDescending(x => x.InitializePriority)
-                        .ToArray();
-                runtimeActionsDictionary = new Dictionary<CommandType, MonoUnitAction>(serializeActions.Length);
+                    .OrderByDescending(x => x.Priority)
+                    .ToArray();
+                
+                monoActionsDictionary = new Dictionary<CommandType, MonoUnitAction>(serializeActions.Length);
                 foreach (var serializeAction in serializeActions)
                 {
                     serializeAction.Initialize();
-                    runtimeActionsDictionary.Add(serializeAction.GetMyCommandType(), serializeAction);
+                    monoActionsDictionary.Add(serializeAction.CommandType, serializeAction);
                     serializeAction.ActionCompleted += () =>
                     {
                         AnyActionCompleted?.Invoke();
                         CurrentActionCompleted?.Invoke(serializeAction);
                     };
                 }
+
+                MaxPossibleActionRadius = MonoActions.Max(x => x.GetPossibleMaxRadius());
+
+                var targetActions = MonoActions
+                    .OfType<ITargetedAction>()
+                    .ToArray();
                 
-                maxPossibleActionRadius = Actions.Max(x => x.GetPossibleMaxRadius());
+                PossibleTargetsTypes = targetActions
+                    .Select(x => x.TargetType)
+                    .Distinct()
+                    .ToArray();
+
+                TargetTypeActionsDictionary = grouper.GroupByType(targetActions);
             }
         }
 
@@ -177,8 +215,9 @@ namespace LineWars.Model
             UnitDirection = direction;
         }
 
-        public T GetUnitAction<T>() where T : IUnitAction<Node, Edge, Unit, Owned, BasePlayer> 
-            => Actions.OfType<T>().FirstOrDefault();
+        public IEnumerable<IUnitAction<Node, Edge, Unit, Owned, BasePlayer>> Actions => MonoActions;
+        public T GetUnitAction<T>() where T : IUnitAction<Node, Edge, Unit, Owned, BasePlayer>
+            => MonoActions.OfType<T>().FirstOrDefault();
 
         public bool TryGetUnitAction<T>(out T action) where T : IUnitAction<Node, Edge, Unit, Owned, BasePlayer>
         {
@@ -186,9 +225,10 @@ namespace LineWars.Model
             return action != null;
         }
 
-        public bool TryGetCommand(CommandType priorityType, ITarget target, out ICommand command)
+        public bool TryGetCommandForTarget(CommandType priorityType, ITarget target,
+            out ICommandWithCommandType command)
         {
-            if (runtimeActionsDictionary.TryGetValue(priorityType, out var value)
+            if (monoActionsDictionary.TryGetValue(priorityType, out var value)
                 && value is ITargetedAction targetedAction
                 && targetedAction.IsMyTarget(target))
             {
@@ -199,12 +239,8 @@ namespace LineWars.Model
             command = null;
             return false;
         }
-
-        bool IReadOnlyExecutor.TryGetCommand(CommandType priorityType, IReadOnlyTarget target, out ICommand command)
-        {
-            return TryGetCommand(priorityType, (ITarget) target, out command);
-        }
         
+
         private void OnDied()
         {
             if (unitSize == UnitSize.Large)
@@ -227,32 +263,29 @@ namespace LineWars.Model
 
         protected override void OnReplenish()
         {
-            CurrentActionPoints = initialActionPoints;
+            CurrentActionPoints = maxActionPoints;
 
-            foreach (var unitAction in Actions)
+            foreach (var unitAction in MonoActions)
                 unitAction.OnReplenish();
         }
 
-        public IEnumerable<(IReadOnlyTarget, CommandType)> GetAllAvailableTargets()
-        {
-            return GetAllAvailableTargetsInRange(maxPossibleActionRadius + 1);
-        }
-
-        private IEnumerable<(IReadOnlyTarget, CommandType)> GetAllAvailableTargetsInRange(uint range)
-        {
-            foreach (var node in MonoGraph.Instance.GetNodesInRange(myNode, range))
-            {
-                yield return (node, UnitsController.Instance.GetCommandTypeBy(this, node));
-                if (node.LeftUnit != null)
-                    yield return (node.LeftUnit, UnitsController.Instance.GetCommandTypeBy(this, node.LeftUnit));
-                if (node.RightUnit != null)
-                    yield return (node.RightUnit, UnitsController.Instance.GetCommandTypeBy(this, node.RightUnit));
-
-                foreach (var edge in node.Edges)
-                {
-                    yield return (edge, UnitsController.Instance.GetCommandTypeBy(this, edge));
-                }
-            }
-        }
+        public T Accept<T>(IExecutorVisitor<T> visitor) => visitor.Visit(this);
+        
+        // private static class AllTargetTypes
+        // {
+        //     public static Type[] Types;
+        //
+        //     static AllTargetTypes()
+        //     {
+        //         var assemblies = AppDomain.CurrentDomain
+        //             .GetAssemblies()
+        //             .Where(assembly => assembly.ManifestModule.Name == "Assembly-CSharp.dll");
+        //         
+        //         Types = assemblies
+        //             .SelectMany(s => s.GetTypes())
+        //             .Where(p => p.IsAssignableFrom(typeof(ITarget)))
+        //             .ToArray();
+        //     }
+        // }
     }
 }

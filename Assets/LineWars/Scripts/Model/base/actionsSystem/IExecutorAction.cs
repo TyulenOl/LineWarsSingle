@@ -6,8 +6,6 @@ namespace LineWars.Model
     {
         public event Action ActionCompleted;
 
-        public CommandType GetMyCommandType();
-
-        public void OnReplenish();
+        public CommandType CommandType { get; }
     }
 }

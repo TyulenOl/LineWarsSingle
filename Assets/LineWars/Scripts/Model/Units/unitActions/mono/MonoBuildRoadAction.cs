@@ -1,4 +1,5 @@
-﻿using LineWars.Controllers;
+﻿using System;
+using LineWars.Controllers;
 using UnityEngine;
 
 namespace LineWars.Model
@@ -18,9 +19,9 @@ namespace LineWars.Model
             BuildAction.UpRoad(edge);
             SfxManager.Instance.Play(buildSfx);
         }
-
-        public bool IsMyTarget(ITarget target) => BuildAction.IsMyTarget(target);
-        public ICommand GenerateCommand(ITarget target)
+        public Type TargetType => typeof(Edge);
+        public bool IsMyTarget(ITarget target) => target is Edge;
+        public ICommandWithCommandType GenerateCommand(ITarget target)
         {
             return new BuildCommand<Node, Edge, Unit, Owned, BasePlayer>(this, (Edge) target);
         }

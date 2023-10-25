@@ -1,5 +1,4 @@
-﻿using AYellowpaper.SerializedCollections.KeysGenerators;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace LineWars.Model

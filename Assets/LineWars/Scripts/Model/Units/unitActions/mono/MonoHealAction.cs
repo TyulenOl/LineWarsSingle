@@ -1,4 +1,5 @@
-﻿using LineWars.Controllers;
+﻿using System;
+using LineWars.Controllers;
 using UnityEngine;
 
 namespace LineWars.Model
@@ -22,9 +23,10 @@ namespace LineWars.Model
             HealAction.Heal(target);
             SfxManager.Instance.Play(healSfx);
         }
-        
-        public bool IsMyTarget(ITarget target) => HealAction.IsMyTarget(target);
-        public ICommand GenerateCommand(ITarget target)
+
+        public Type TargetType => typeof(Unit);
+        public bool IsMyTarget(ITarget target) => target is Unit;
+        public ICommandWithCommandType GenerateCommand(ITarget target)
         {
             return new HealCommand<Node, Edge, Unit, Owned, BasePlayer>(this, (Unit) target);
         }

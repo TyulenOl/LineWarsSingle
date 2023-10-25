@@ -1,7 +1,7 @@
 namespace LineWars.Model
 {
     public class ConvertMonoActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> : IMonoUnitVisitor
-        #region Ñonstraints
+        #region Ð¡onstraints
         where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
         where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
@@ -53,13 +53,38 @@ namespace LineWars.Model
         {
             Result = new MeleeAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action);
         }
+
+        public void Visit(MonoRLBlockAction action)
+        {
+            Result = new RLBlockAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action);
+        }
+
+        public void Visit(MonoSacrificeForPerunAction action)
+        {
+            Result = new SacrificeForPerunAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action);
+        }
+
+        public void Visit(MonoRamAction action)
+        {
+            Result = new RamAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action);
+        }
+
+        public void Visit(MonoBlowWithSwingAction action)
+        {
+            Result = new BlowWithSwingAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action);
+        }
+
+        public void Visit(MonoShotUnitAction action)
+        {
+            Result = new ShotUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action);
+        }
     }
 
     public static class ConvertMonoActionVisitor
     {
         public static ConvertMonoActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer>
             Create<TNode, TEdge, TUnit, TOwned, TPlayer>(TUnit unit, IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer> graph)
-            #region Ñonstraints
+            #region Ð¡onstraints
             where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
             where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
             where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>

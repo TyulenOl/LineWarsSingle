@@ -20,13 +20,17 @@ namespace LineWars.Model
         public int HealingAmount { get; private set; }
         public bool HealLocked { get; private set; }
 
-        public HealAction([NotNull] TUnit unit, MonoHealAction data) : base(unit, data)
+        public HealAction(
+            [NotNull] TUnit unit, 
+            MonoHealAction data) : base(unit, data)
         {
             IsMassHeal = data.InitialIsMassHeal;
             HealingAmount = data.InitialHealingAmount;
         }
 
-        public HealAction([NotNull] TUnit unit, HealAction<TNode, TEdge, TUnit, TOwned, TPlayer> data) : base(unit, data)
+        public HealAction(
+            [NotNull] TUnit unit,
+            HealAction<TNode, TEdge, TUnit, TOwned, TPlayer> data) : base(unit, data)
         {
             IsMassHeal = data.IsMassHeal;
             HealingAmount = data.HealingAmount;
@@ -63,11 +67,12 @@ namespace LineWars.Model
             CompleteAndAutoModify();
         }
 
-        public override CommandType GetMyCommandType() => CommandType.Heal;
+        public override CommandType CommandType => CommandType.Heal;
 
+        public Type TargetType => typeof(TUnit);
         public bool IsMyTarget(ITarget target) => target is TUnit;
 
-        public ICommand GenerateCommand(ITarget target)
+        public ICommandWithCommandType GenerateCommand(ITarget target)
         {
             return new HealCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this, (TUnit) target);
         }
