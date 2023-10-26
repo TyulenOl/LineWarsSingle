@@ -31,18 +31,18 @@ namespace LineWars.Controllers
 
             private void OnSelectedObjectChanged(GameObject lastObject, GameObject newObject)
             {
-                if(newObject.TryGetComponent<IReadOnlyExecutor>(out IReadOnlyExecutor executor) &&
+                if(newObject.TryGetComponent<IExecutor>(out IExecutor executor) &&
                 executor == manager.executor)
                 {
                    CancelExecutor();
                    return;
                 }
-                if(!newObject.TryGetComponent<IReadOnlyTarget>(out IReadOnlyTarget target)) return;
+                if(!newObject.TryGetComponent<ITarget>(out ITarget target)) return;
 
                 SetTarget(target);
             }
 
-            private void SetTarget(IReadOnlyTarget target)
+            private void SetTarget(ITarget target)
             {
                 manager.Target = target;
                 var isCommandExecuted = UnitsController.Instance.Action(manager.executor, target);

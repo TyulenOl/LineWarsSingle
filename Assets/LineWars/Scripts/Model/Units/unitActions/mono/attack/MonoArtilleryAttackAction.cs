@@ -8,7 +8,7 @@ namespace LineWars.Model
         IArtilleryAttackAction<Node, Edge, Unit, Owned, BasePlayer>
     {
         private ArtilleryAttackAction<Node, Edge, Unit, Owned, BasePlayer> AttackAction
-            => (ArtilleryAttackAction<Node, Edge, Unit, Owned, BasePlayer>) ExecutorAction;
+            => (ArtilleryAttackAction<Node, Edge, Unit, Owned, BasePlayer>) Action;
         
         [SerializeField] private Explosion explosionPrefab;
 
@@ -24,14 +24,11 @@ namespace LineWars.Model
             };
         }
 
-        protected override ExecutorAction GetAction()
+        protected override AttackAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
         {
-            return new ArtilleryAttackAction<Node, Edge, Unit, Owned, BasePlayer>(Unit, this, MonoGraph.Instance);
+            return new ArtilleryAttackAction<Node, Edge, Unit, Owned, BasePlayer>(Unit, MonoGraph.Instance);
         }
 
-        public override void Accept(IMonoUnitVisitor visitor)
-        {
-            visitor.Visit(this);
-        }
+        public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
     }
 }

@@ -15,7 +15,7 @@ namespace LineWars.Model
         [SerializeField] private GameEvaluator gameEvaluator;
         [SerializeField] private int depth;
 
-        private IReadOnlyExecutor currentExecutor;
+        private IExecutor currentExecutor;
         private EnemyAIBuySelector buySelector;
 
         protected override void Awake()

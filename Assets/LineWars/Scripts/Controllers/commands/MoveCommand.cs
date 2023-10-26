@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace LineWars.Model
 {
     public class MoveCommand<TNode, TEdge, TUnit, TOwned, TPlayer>:
-        ICommand
+        ICommandWithCommandType
     
         #region Сonstraints
         where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
@@ -19,7 +19,9 @@ namespace LineWars.Model
         private readonly TNode start;
         private readonly TNode end;
         
-        public MoveCommand([NotNull] TUnit unit, [NotNull] TNode end)
+        public MoveCommand(
+            [NotNull] TUnit unit,
+            [NotNull] TNode end)
         {
             this.unit = unit ?? throw new ArgumentNullException(nameof(unit));
             this.end = end ?? throw new ArgumentNullException(nameof(end));
@@ -40,6 +42,8 @@ namespace LineWars.Model
             unit = this.moveAction.MyUnit;
             start = unit.Node;
         }
+
+        public CommandType CommandType => moveAction.CommandType;
 
         public void Execute()
         {

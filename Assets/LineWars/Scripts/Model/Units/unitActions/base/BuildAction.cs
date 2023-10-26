@@ -16,14 +16,10 @@ namespace LineWars.Model
         where TPlayer: class, IBasePlayer<TOwned, TPlayer>
         #endregion 
     {
-        public BuildAction([NotNull] TUnit unit, [NotNull] MonoBuildRoadAction data) : base(unit, data)
+        public BuildAction(TUnit executor) : base(executor)
         {
         }
-
-        public BuildAction([NotNull] TUnit unit, [NotNull] BuildAction<TNode, TEdge, TUnit, TOwned, TPlayer> data) : base(unit, data)
-        {
-        }
-
+        
         public bool CanUpRoad([NotNull] TEdge edge, bool ignoreActionPointsCondition = false)
             => CanUpRoad(edge, MyUnit.Node, ignoreActionPointsCondition);
 
@@ -44,10 +40,13 @@ namespace LineWars.Model
 
             CompleteAndAutoModify();
         }
-        public override CommandType GetMyCommandType() => CommandType.Build;
+
+        public override CommandType CommandType => CommandType.Build;
+
+        public Type TargetType => typeof(TEdge);
         public bool IsMyTarget(ITarget target) => target is TEdge;
 
-        public ICommand GenerateCommand(ITarget target)
+        public ICommandWithCommandType GenerateCommand(ITarget target)
         {
             return new BuildCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this, (TEdge)target);
         }

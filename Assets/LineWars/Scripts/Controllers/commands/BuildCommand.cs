@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 namespace LineWars.Model
 {
     public class BuildCommand<TNode, TEdge, TUnit, TOwned, TPlayer>:
-        ICommand
+        ICommandWithCommandType
     
         #region Сonstraints
         where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
@@ -53,5 +53,7 @@ namespace LineWars.Model
         {
             return $"Инженер {engineer} улучшил дорогу {edge}";
         }
+
+        public CommandType CommandType => buildAction.CommandType;
     }
 }

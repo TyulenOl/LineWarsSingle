@@ -1,33 +1,34 @@
-﻿using LineWars.Controllers;
+﻿using System;
+using LineWars.Controllers;
 using UnityEngine;
 
 namespace LineWars.Model
 {
-    public class MonoBuildRoadAction: MonoUnitAction,
+    public class MonoBuildRoadAction : MonoUnitAction<BuildAction<Node, Edge, Unit, Owned, BasePlayer>>,
         IBuildAction<Node, Edge, Unit, Owned, BasePlayer>
     {
         [SerializeField] private SFXData buildSfx;
-        private BuildAction<Node, Edge, Unit, Owned, BasePlayer> BuildAction
-            => (BuildAction<Node, Edge, Unit, Owned, BasePlayer>) ExecutorAction;
 
         public bool CanUpRoad(Edge edge, bool ignoreActionPointsCondition = false) =>
-            BuildAction.CanUpRoad(edge, ignoreActionPointsCondition);
+            Action.CanUpRoad(edge, ignoreActionPointsCondition);
 
         public void UpRoad(Edge edge)
         {
-            BuildAction.UpRoad(edge);
+            Action.UpRoad(edge);
             SfxManager.Instance.Play(buildSfx);
         }
 
-        public bool IsMyTarget(ITarget target) => BuildAction.IsMyTarget(target);
-        public ICommand GenerateCommand(ITarget target)
+        public Type TargetType => typeof(Edge);
+        public bool IsMyTarget(ITarget target) => target is Edge;
+
+        public ICommandWithCommandType GenerateCommand(ITarget target)
         {
             return new BuildCommand<Node, Edge, Unit, Owned, BasePlayer>(this, (Edge) target);
         }
 
-        protected override ExecutorAction GetAction()
+        protected override BuildAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
         {
-            return new BuildAction<Node, Edge, Unit, Owned, BasePlayer>(Unit, this);
+            return new BuildAction<Node, Edge, Unit, Owned, BasePlayer>(Unit);
         }
 
         public override void Accept(IMonoUnitVisitor visitor)

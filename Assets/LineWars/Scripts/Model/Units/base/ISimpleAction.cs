@@ -2,6 +2,6 @@
 {
     public interface ISimpleAction
     {
-        public ICommand GenerateCommand();
+        public ICommandWithCommandType GenerateCommand();
     }
 }

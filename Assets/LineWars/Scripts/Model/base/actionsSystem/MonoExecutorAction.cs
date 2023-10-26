@@ -5,24 +5,32 @@ using UnityEngine;
 namespace LineWars.Model
 {
     [RequireComponent(typeof(IExecutor))]
-    public abstract class MonoExecutorAction : MonoBehaviour, IExecutorAction
-    {
-        [field:SerializeField] public int InitializePriority { get; private set; }
-        [SerializeField] protected IntModifier actionModifier;
-        
-        protected IExecutor Executor;
-        protected ExecutorAction ExecutorAction;
-        public event Action ActionCompleted;
-        public IntModifier ActionModifier => actionModifier;
+    public abstract class MonoExecutorAction<TExecutor, TAction> :
+        MonoBehaviour, 
+        IMonoExecutorAction<TExecutor, TAction>
 
-        public void Initialize()
+        where TExecutor : class, IExecutor
+        where TAction: ExecutorAction<TExecutor>
+    {
+        [field: SerializeField] public int Priority { get; private set; }
+        [SerializeField] protected IntModifier actionModifier;
+
+        public TExecutor Executor { get; private set; }
+        public TAction Action { get; private set; }
+        public event Action ActionCompleted;
+
+        public virtual void Initialize()
         {
-            Executor = GetComponent<IExecutor>();
-            ExecutorAction = GetAction();
-            ExecutorAction.ActionCompleted += () => ActionCompleted?.Invoke();
+            Executor = GetComponent<TExecutor>();
+            Action = GetAction();
+            Action.ActionModifier = actionModifier;
+            Action.ActionCompleted += () => ActionCompleted?.Invoke();
         }
-        public void OnReplenish() => ExecutorAction.OnReplenish();
-        public CommandType GetMyCommandType() => ExecutorAction.GetMyCommandType();
-        protected abstract ExecutorAction GetAction();
+
+        public void OnReplenish() => Action.OnReplenish();
+
+        public CommandType CommandType => Action.CommandType;
+
+        protected abstract TAction GetAction();
     }
 }

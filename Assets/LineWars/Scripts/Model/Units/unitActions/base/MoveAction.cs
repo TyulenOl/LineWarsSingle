@@ -15,14 +15,6 @@ namespace LineWars.Model
         where TPlayer: class, IBasePlayer<TOwned, TPlayer>
         #endregion 
     {
-        public MoveAction([NotNull] TUnit unit, [NotNull] MonoMoveAction data) : base(unit, data)
-        {
-        }
-
-        public MoveAction([NotNull] TUnit unit, [NotNull] MoveAction<TNode, TEdge, TUnit, TOwned, TPlayer> data) : base(unit, data)
-        {
-        }
-
         public bool CanMoveTo([NotNull] TNode target, bool ignoreActionPointsCondition = false)
         {
             return MyUnit.Node != target
@@ -53,7 +45,7 @@ namespace LineWars.Model
         }
 
         public void MoveTo([NotNull] TNode target)
-        {
+        { 
             var startNode = MyUnit.Node;
 
             if (startNode.LeftUnit == MyUnit)
@@ -107,12 +99,13 @@ namespace LineWars.Model
                     target.ConnectTo(MyUnit.Owner);
             }
         }
-        
-        public override CommandType GetMyCommandType() => CommandType.Move;
 
+        public override CommandType CommandType => CommandType.Move;
+
+        public Type TargetType => typeof(TNode);
         public bool IsMyTarget(ITarget target) => target is TNode;
 
-        public ICommand GenerateCommand(ITarget target)
+        public ICommandWithCommandType GenerateCommand(ITarget target)
         {
             return new MoveCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this, (TNode) target);
         }
@@ -137,5 +130,9 @@ namespace LineWars.Model
         }
 
         #endregion
+
+        public MoveAction(TUnit executor) : base(executor)
+        {
+        }
     }
 }

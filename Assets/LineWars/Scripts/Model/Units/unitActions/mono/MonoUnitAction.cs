@@ -4,16 +4,14 @@ using UnityEngine;
 namespace LineWars.Model
 {
     [RequireComponent(typeof(Unit))]
-    public abstract class MonoUnitAction: MonoExecutorAction,
-        IUnitAction<Node, Edge, Unit, Owned, BasePlayer>
+    public abstract class MonoUnitAction<TAction> :
+        MonoExecutorAction<Unit, TAction>,
+        IMonoUnitAction<TAction>
+        where TAction : UnitAction<Node, Edge, Unit, Owned, BasePlayer>
     {
-        protected Unit Unit => (Unit)Executor;
-
-        private UnitAction<Node, Edge, Unit, Owned, BasePlayer> UnitAction
-            => (UnitAction<Node, Edge, Unit, Owned, BasePlayer>) ExecutorAction;
-
-        public Unit MyUnit => UnitAction.MyUnit;
-        public uint GetPossibleMaxRadius() => UnitAction.GetPossibleMaxRadius();
+        protected Unit Unit => Executor;
+        public Unit MyUnit => Action.MyUnit;
+        public uint GetPossibleMaxRadius() => Action.GetPossibleMaxRadius();
         public abstract void Accept(IMonoUnitVisitor visitor);
     }
 }

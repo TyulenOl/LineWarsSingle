@@ -17,53 +17,15 @@ namespace LineWars.Model
         #endregion 
     {
         private bool isBlocked;
-        private readonly IntModifier contrAttackDamageModifier;
-        private AttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> attackAction;
+        public IntModifier ContrAttackDamageModifier { get; set; }
+        private IAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> attackAction;
 
         public event Action<bool, bool> CanBlockChanged;
-
-        private AttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> AttackAction
-        {
-            get
-            {
-                if (attackAction == null)
-                {
-                    if (MyUnit.TryGetUnitAction<AttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>>(out var action)) 
-                        attackAction = action;
-                    else
-                        throw new Exception("Для контратаки необходимо иметь хотя бы атакующий компонент!");
-                }
-                return attackAction;
-            }
-        }
-
-        public bool Protection { get; private set; }
+        
+        public bool Protection { get;  set; }
         public bool IsBlocked => isBlocked || Protection;
         
-        public BlockAction([NotNull] TUnit unit, [NotNull] MonoBlockAction data) : base (unit, data)
-        {
-            Protection = data.InitialProtection;
-            contrAttackDamageModifier = data.InitialContrAttackDamageModifier;
-            unit.CurrentActionCompleted += (unitAction) =>
-            {
-                if (unitAction == this)
-                    return;
-                SetBlock(false);
-            };
-        }
-
-        public BlockAction([NotNull] TUnit unit, [NotNull] BlockAction<TNode, TEdge, TUnit, TOwned, TPlayer> data) : base(unit, data)
-        {
-            Protection = data.Protection;
-            contrAttackDamageModifier = data.contrAttackDamageModifier;
-            unit.CurrentActionCompleted += (unitAction) =>
-            {
-                if (unitAction == this)
-                    return;
-                SetBlock(false);
-            };
-        }
-
+        
         public bool CanBlock()
         {
             return ActionPointsCondition();
@@ -79,14 +41,14 @@ namespace LineWars.Model
         {
             if (enemy == null) throw new ArgumentNullException(nameof(enemy));
             return (IsBlocked)
-                && contrAttackDamageModifier.Modify(AttackAction.Damage) > 0
-                && AttackAction.CanAttack(enemy, true);
+                && ContrAttackDamageModifier.Modify(attackAction.Damage) > 0
+                && attackAction.CanAttack(enemy, true);
         }
 
         public void ContrAttack([NotNull] TUnit enemy)
         {
             if (enemy == null) throw new ArgumentNullException(nameof(enemy));
-            var contrAttackDamage = contrAttackDamageModifier.Modify(AttackAction.Damage);
+            var contrAttackDamage = ContrAttackDamageModifier.Modify(attackAction.Damage);
 
             enemy.CurrentHp -= contrAttackDamage;
             SetBlock(false);
@@ -100,9 +62,9 @@ namespace LineWars.Model
                 CanBlockChanged?.Invoke(before, value);
         }
 
-        public override CommandType GetMyCommandType() => CommandType.Block;
+        public override CommandType CommandType => CommandType.Block;
 
-        public ICommand GenerateCommand()
+        public ICommandWithCommandType GenerateCommand()
         {
             return new BlockCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this);
         }
@@ -110,6 +72,16 @@ namespace LineWars.Model
         public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor)
         {
             visitor.Visit(this);
+        }
+
+        public BlockAction(
+            TUnit executor,
+            IntModifier contrAttackDamageModifier,
+            bool protection) : base(executor)
+        {
+            ContrAttackDamageModifier = contrAttackDamageModifier;
+            Protection = protection;
+            attackAction = MyUnit.GetUnitAction<IAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>>();
         }
     }
 }

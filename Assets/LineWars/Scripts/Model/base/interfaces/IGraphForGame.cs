@@ -15,5 +15,6 @@ namespace LineWars.Model
         #endregion 
     {
         public Dictionary<TNode, bool> GetVisibilityInfo(TPlayer player);
+        public IEnumerable<TNode> GetVisibilityNodes(IEnumerable<TNode> ownedNodes);
     }
 }

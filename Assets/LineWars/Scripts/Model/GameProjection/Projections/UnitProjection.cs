@@ -12,9 +12,9 @@ namespace LineWars.Model
     {
         private Dictionary<CommandType, UnitAction<NodeProjection, EdgeProjection,
             UnitProjection, OwnedProjection,
-            BasePlayerProjection>> actionsDictionary 
-            = new Dictionary<CommandType, UnitAction<NodeProjection, EdgeProjection, UnitProjection, OwnedProjection, BasePlayerProjection>>();
-        private IEnumerable<MonoUnitAction> monoActions;
+            BasePlayerProjection>> actionsDictionary;
+
+        private IEnumerable<IMonoUnitAction<UnitAction<Node, Edge, Unit, Owned, BasePlayer>>> monoActions;
 
         private IEnumerable<UnitAction<NodeProjection, EdgeProjection,
             UnitProjection, OwnedProjection,
@@ -22,10 +22,10 @@ namespace LineWars.Model
 
         public Unit Original { get; private set; }
         public string UnitName { get; private set; }
-        public int MaxHp { get; private set; }
-        public int MaxArmor { get; private set; }
-        public int MaxActionPoints { get; private set; }
-        public int Visibility { get; private set; }
+        public int MaxHp { get; set; }
+        public int MaxArmor { get; set; }
+        public int MaxActionPoints { get; set; }
+        public int Visibility { get; set; }
         public UnitType Type { get; private set; }
         public UnitSize Size { get; private set; }
         public LineType MovementLineType { get; private set; }
@@ -40,30 +40,27 @@ namespace LineWars.Model
         public int CurrentHp { get; set; }
 
         public event Action AnyActionCompleted;
-        public event Action<IExecutorAction> CurrentActionCompleted;
 
         public IReadOnlyDictionary<CommandType, UnitAction<NodeProjection, EdgeProjection,
             UnitProjection, OwnedProjection,
             BasePlayerProjection>> ActionsDictionary => actionsDictionary;
+
         public bool HasOriginal => Original != null;
 
-        int IReadOnlyExecutor.CurrentActionPoints => CurrentActionPoints;
-
-        public UnitProjection(string unitName, 
-            int maxHp, 
+        public UnitProjection(string unitName,
+            int maxHp,
             int maxArmor,
-            int maxActionPoints,
-            int visibility, 
-            UnitType type, 
-            UnitSize size, 
+            int visibility,
+            UnitType type,
+            UnitSize size,
             LineType lineType,
             CommandPriorityData commandPriorityData,
-            int currentArmor, 
-            UnitDirection unitDirection, 
-            IEnumerable<MonoUnitAction> actions,
+            int currentArmor,
+            UnitDirection unitDirection,
+            IEnumerable<IMonoUnitAction<UnitAction<Node, Edge, Unit, Owned, BasePlayer>>> actions,
             int currentActionPoints,
-            int id,
             bool hasId,
+            int id,
             Unit original = null,
             NodeProjection node = null)
         {
@@ -81,16 +78,16 @@ namespace LineWars.Model
             CurrentActionPoints = currentActionPoints;
             Original = original;
             monoActions = actions;
-            MaxActionPoints = maxActionPoints;
 
-            Id = id;
+
             HasId = hasId;
+            Id = id;
         }
 
-        public UnitProjection(string unitName,
+        public UnitProjection(
+            string unitName,
             int maxHp,
             int maxArmor,
-            int maxActionPoints,
             int visibility,
             UnitType type,
             UnitSize size,
@@ -98,12 +95,10 @@ namespace LineWars.Model
             CommandPriorityData commandPriorityData,
             int currentArmor,
             UnitDirection unitDirection,
-            IEnumerable<UnitAction<NodeProjection, EdgeProjection,
-            UnitProjection, OwnedProjection,
-            BasePlayerProjection>> actions,
+            IEnumerable<UnitAction<NodeProjection, EdgeProjection, UnitProjection, OwnedProjection, BasePlayerProjection>> actions,
             int currentActionPoints,
-            int id,
             bool hasId,
+            int id,
             Unit original = null,
             NodeProjection node = null)
         {
@@ -121,31 +116,42 @@ namespace LineWars.Model
             CurrentActionPoints = currentActionPoints;
             Original = original;
             unitActions = actions;
-            MaxActionPoints = maxActionPoints;
 
-            Id = id;
             HasId = hasId;
+            Id = id;
         }
 
         public UnitProjection(IReadOnlyUnitProjection unit, NodeProjection node = null)
-            : this(unit.UnitName, unit.MaxHp, unit.MaxArmor, unit.MaxActionPoints, unit.Visibility, unit.Type, unit.Size,
-                  unit.MovementLineType, unit.CommandPriorityData, unit.CurrentArmor, unit.UnitDirection,
-                  unit.ActionsDictionary.Values, unit.CurrentActionPoints, unit.Id, unit.HasId, unit.Original, node)
+            : this(unit.UnitName, unit.MaxHp, unit.MaxArmor, unit.Visibility, unit.Type, unit.Size,
+                unit.MovementLineType, unit.CommandPriorityData, unit.CurrentArmor, unit.UnitDirection,
+                unit.ActionsDictionary.Values, unit.CurrentActionPoints, true, unit.Id, unit.Original, node)
         {
         }
 
-        public UnitProjection(Unit original, NodeProjection node = null) 
-            : this(original.UnitName, original.MaxHp, original.MaxArmor, original.MaxActionPoints, original.Visibility, original.Type, 
-                  original.Size, original.MovementLineType, original.CommandPriorityData, original.CurrentArmor, 
-                  original.UnitDirection, original.Actions, original.CurrentActionPoints, original.Id, true, original, node)
+        public UnitProjection(Unit original, NodeProjection node = null) //: this(
+            // unitName: original.UnitName,
+            // maxHp: original.MaxHp,
+            // maxArmor: original.MaxArmor,
+            // visibility: original.Visibility,
+            // type: original.Type,
+            // size: original.Size,
+            // lineType: original.MovementLineType,
+            // commandPriorityData: original.CommandPriorityData,
+            // currentArmor: original.CurrentArmor,
+            // unitDirection: original.UnitDirection,
+            // actions: original.Actions,
+            // currentActionPoints: original.CurrentActionPoints,
+            // hasId: true,
+            // id: original.Id,
+            // original: original,
+            // node: node)
         {
-
         }
 
         public void SetId(int id)
         {
-            Id = id;
             HasId = true;
+            Id = id;
         }
 
         public void InitializeActions(GraphProjection graphProjection)
@@ -155,7 +161,8 @@ namespace LineWars.Model
                 InitializeMonoActions(graphProjection);
                 return;
             }
-            if(unitActions != null)
+
+            if (unitActions != null)
             {
                 InitializeUnitActions(graphProjection);
                 return;
@@ -168,8 +175,8 @@ namespace LineWars.Model
             {
                 var visitor = ConvertMonoActionVisitor.Create(this, graphProjection);
                 action.Accept(visitor);
-                actionsDictionary[action.GetMyCommandType()] = 
-                    visitor.Result;   
+                actionsDictionary[action.CommandType] =
+                    visitor.Result;
             }
         }
 
@@ -179,10 +186,13 @@ namespace LineWars.Model
             {
                 var visitor = CopyActionVisitor.Create(this, graphProjection);
                 action.Accept(visitor);
-                actionsDictionary[action.GetMyCommandType()] =
+                actionsDictionary[action.CommandType] =
                     visitor.Result;
             }
         }
+
+        public IEnumerable<IUnitAction<NodeProjection, EdgeProjection, UnitProjection, OwnedProjection,
+            BasePlayerProjection>> Actions => actionsDictionary.Values;
 
         public T GetUnitAction<T>()
             where T : IUnitAction<NodeProjection, EdgeProjection, UnitProjection, OwnedProjection, BasePlayerProjection>
@@ -197,7 +207,8 @@ namespace LineWars.Model
             return action != null;
         }
 
-        public bool TryGetCommand(CommandType priorityType, ITarget target, out ICommand command)
+        public bool TryGetCommandForTarget(CommandType priorityType, ITarget target,
+            out ICommandWithCommandType command)
         {
             if (actionsDictionary.TryGetValue(priorityType, out var value)
                 && value is ITargetedAction targetedAction
@@ -211,24 +222,16 @@ namespace LineWars.Model
             return false;
         }
 
-        public bool TryGetCommand(CommandType priorityType, IReadOnlyTarget target, out ICommand command)
-        {
-            return TryGetCommand(priorityType, (ITarget)target, out command);
-        }
-
-        public IEnumerable<(IReadOnlyTarget, CommandType)> GetAllAvailableTargets()
-        {
-            throw new NotImplementedException();
-        }
-
         public override void Replenish()
         {
             base.Replenish();
             CurrentActionPoints = MaxActionPoints;
         }
+
+        public T Accept<T>(IExecutorVisitor<T> visitor) => visitor.Visit(this);
     }
 
-    public interface IReadOnlyUnitProjection : INumbered
+    public interface IReadOnlyUnitProjection
     {
         public Unit Original { get; }
         public string UnitName { get; }
@@ -239,7 +242,7 @@ namespace LineWars.Model
         public UnitType Type { get; }
         public UnitSize Size { get; }
         public LineType MovementLineType { get; }
-        public bool HasId { get; }
+        public int Id { get; }
         public CommandPriorityData CommandPriorityData { get; }
         public bool CanDoAnyAction => CurrentActionPoints > 0;
 
@@ -248,13 +251,12 @@ namespace LineWars.Model
         public NodeProjection Node { get; }
         public int CurrentActionPoints { get; }
         public int CurrentHp { get; }
-
         public event Action AnyActionCompleted;
-        public event Action<IExecutorAction> CurrentActionCompleted;
 
         public IReadOnlyDictionary<CommandType, UnitAction<NodeProjection, EdgeProjection,
             UnitProjection, OwnedProjection,
             BasePlayerProjection>> ActionsDictionary { get; }
+
         public bool HasOriginal => Original != null;
     }
 }

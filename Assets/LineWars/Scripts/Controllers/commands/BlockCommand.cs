@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 namespace LineWars.Model
 {
     public class BlockCommand<TNode, TEdge, TUnit, TOwned, TPlayer> :
-        ICommand
+        ICommandWithCommandType
     
         #region Сonstraints
         where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
@@ -45,5 +45,7 @@ namespace LineWars.Model
         {
             return $"Юнит {unit} встал в защиту";
         }
+
+        public CommandType CommandType => blockAction.CommandType;
     }
 }

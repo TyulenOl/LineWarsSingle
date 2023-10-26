@@ -11,16 +11,8 @@ namespace LineWars.Model
     {
         [SerializeField, NamedArray("name")] private List<UnitBuyPreset> unitBuyPresets;
 
-        public int Count => ((IReadOnlyCollection<UnitBuyPreset>)unitBuyPresets).Count;
-
-        public IEnumerator<UnitBuyPreset> GetEnumerator()
-        {
-            return ((IEnumerable<UnitBuyPreset>)unitBuyPresets).GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return ((IEnumerable)unitBuyPresets).GetEnumerator();
-        }
+        public int Count => unitBuyPresets.Count;
+        public IEnumerator<UnitBuyPreset> GetEnumerator() => unitBuyPresets.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => unitBuyPresets.GetEnumerator();
     }
 }

@@ -1,5 +1,4 @@
-﻿using AYellowpaper.SerializedCollections.KeysGenerators;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace LineWars.Model
@@ -43,6 +42,8 @@ namespace LineWars.Model
                     Owner = value.Owner;
             }
         }
+
+        public IBuilding Building { get; set; }
 
         public Action<UnitProjection> UnitAdded;
         public NodeProjection(CommandPriorityData commandPriorityData,
@@ -94,6 +95,8 @@ namespace LineWars.Model
 
             edges.Add(edge);
         }
+        
+        public T Accept<T>(INodeVisitor<T> visitor) => visitor.Visit(this);
     }
 
     public interface IReadOnlyNodeProjection : INumbered

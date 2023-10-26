@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 namespace LineWars.Model
 {
     public class HealCommand<TNode, TEdge, TUnit, TOwned, TPlayer>:
-        ICommand
+        ICommandWithCommandType
     
         #region Сonstraints
         where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
@@ -52,5 +52,7 @@ namespace LineWars.Model
         {
             return $"Доктор {doctor} похилил {unit}";
         }
+
+        public CommandType CommandType => healAction.CommandType;
     }
 }
