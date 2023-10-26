@@ -9,10 +9,8 @@ using UnityEngine.UI;
 public class EnemyTurnPanel : MonoBehaviour
 {
     private float alphaDecreaseModifier;
-    [SerializeField] private float rotationSpeed;
-    
-    [SerializeField] private Image clockImage;
-    [SerializeField] private TMP_Text text;
+
+    [SerializeField] private Image lizardsImage;
 
     private const float MIN_ALPHA = 130f;
     private const float ALPHA_DECREASE_MODIFIER = -3f;
@@ -41,14 +39,13 @@ public class EnemyTurnPanel : MonoBehaviour
     {
         if (IsCoroutinActive)
         {
-            ChangeAlpha(); 
-            clockImage.gameObject.transform.Rotate(new Vector3(0,0,rotationSpeed));
+            ChangeAlpha();
         }
     }
 
     private void ChangeAlpha()
     {
-        var currentAlpha = text.color.a * 255;
+        var currentAlpha = lizardsImage.color.a * 255;
         if (currentAlpha >= 255)
         {
             alphaDecreaseModifier = -Math.Abs(alphaDecreaseModifier);
@@ -59,13 +56,12 @@ public class EnemyTurnPanel : MonoBehaviour
         }
 
         var resultAlpha = currentAlpha + alphaDecreaseModifier;
-        text.color = new Color(text.color.r, text.color.g, text.color.b, resultAlpha/255f);
+        lizardsImage.color = new Color(lizardsImage.color.r, lizardsImage.color.g, lizardsImage.color.b, resultAlpha/255f);
     }
     
     private void RestoreDefaults()
     {
-        text.color = new Color(text.color.r, text.color.g, text.color.b, 1);
-        clockImage.gameObject.transform.localRotation = new Quaternion(0,0,0,0);
+        lizardsImage.color = new Color(lizardsImage.color.r, lizardsImage.color.g, lizardsImage.color.b, 1);
         gameObject.SetActive(true);
     }
 }

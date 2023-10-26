@@ -26,6 +26,10 @@ namespace LineWars.Model
         [SerializeField] private RenderNodeV3 renderNodeV3;
         [SerializeField] private CommandPriorityData priorityData;
         
+        [field: Header("Sprite Info")]
+        [SerializeField] private SpriteRenderer spriteRenderer;
+        [SerializeField] private Sprite spriteOfDefaultNode;
+        
         [field: Header("Initial Info")]
         [field: SerializeField] public Spawn ReferenceToSpawn { get; set; }
         [field: SerializeField] public UnitType LeftUnitType { get; private set; }
@@ -206,13 +210,11 @@ namespace LineWars.Model
             else if (IsBase)
             {
                 gameObject.name = $"Spawn {ReferenceToSpawn.GroupName}";
-                var spriteRenderer = GetComponent<SpriteRenderer>();
                 spriteRenderer.sprite = ReferenceToSpawn.GroupSprite;
             }
             else
             {
                 gameObject.name = $"Node{Id} Group with {ReferenceToSpawn.GroupName}";
-                var spriteRenderer = GetComponent<SpriteRenderer>();
                 spriteRenderer.sprite = ReferenceToSpawn.GroupSprite;
                 
             }
@@ -221,8 +223,7 @@ namespace LineWars.Model
         private void DrawToDefault()
         {
             gameObject.name = $"Node{Id}";
-            var spriteRenderer = GetComponent<SpriteRenderer>();
-            spriteRenderer.sprite = Resources.Load<Sprite>("Sprites/Circle");
+            spriteRenderer.sprite = spriteOfDefaultNode;
         }
 
         #endregion
