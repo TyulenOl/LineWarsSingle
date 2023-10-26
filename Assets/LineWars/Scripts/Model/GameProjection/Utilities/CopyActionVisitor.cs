@@ -93,7 +93,7 @@ namespace LineWars.Model
             //Result = new ShotUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action);
         }
 
-        public void Visit(RLBuilderAction<TNode, TEdge, TUnit, TOwned, TPlayer> ramAction)
+        public void Visit(RLBuildAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
             throw new NotImplementedException();
         }

@@ -19,6 +19,6 @@
         public void TakeUnit(TUnit unit);
 
         public bool CanShotUnitTo(TNode node);
-        public void ShotUnit(TNode node);
+        public void ShotUnitTo(TNode node);
     }
 }

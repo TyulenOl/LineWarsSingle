@@ -7,17 +7,14 @@ namespace LineWars.Model
     public class MonoBuildRoadAction : MonoUnitAction<BuildAction<Node, Edge, Unit, Owned, BasePlayer>>,
         IBuildAction<Node, Edge, Unit, Owned, BasePlayer>
     {
-        private BuildAction<Node, Edge, Unit, Owned, BasePlayer> BuildAction
-            => (BuildAction<Node, Edge, Unit, Owned, BasePlayer>) Action;
-
         [SerializeField] private SFXData buildSfx;
 
         public bool CanUpRoad(Edge edge, bool ignoreActionPointsCondition = false) =>
-            BuildAction.CanUpRoad(edge, ignoreActionPointsCondition);
+            Action.CanUpRoad(edge, ignoreActionPointsCondition);
 
         public void UpRoad(Edge edge)
         {
-            BuildAction.UpRoad(edge);
+            Action.UpRoad(edge);
             SfxManager.Instance.Play(buildSfx);
         }
 

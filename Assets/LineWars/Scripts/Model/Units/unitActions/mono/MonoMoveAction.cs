@@ -9,12 +9,10 @@ namespace LineWars.Model
     {
         [SerializeField] private SFXData moveSfx;
         public event Action MoveAnimationEnded;
-
-        private MoveAction<Node, Edge, Unit, Owned, BasePlayer> MoveAction =>
-            (MoveAction<Node, Edge, Unit, Owned, BasePlayer>) Action;
+        
 
         public bool CanMoveTo(Node target, bool ignoreActionPointsCondition = false) =>
-            MoveAction.CanMoveTo(target, ignoreActionPointsCondition);
+            Action.CanMoveTo(target, ignoreActionPointsCondition);
 
         public override void Initialize()
         {
@@ -24,7 +22,7 @@ namespace LineWars.Model
 
         public void MoveTo(Node target)
         {
-            MoveAction.MoveTo(target);
+            Action.MoveTo(target);
             Unit.MovementLogic.MoveTo(target.transform);
             SfxManager.Instance.Play(moveSfx);
         }

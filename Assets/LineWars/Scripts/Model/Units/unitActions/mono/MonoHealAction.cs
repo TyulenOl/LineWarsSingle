@@ -7,22 +7,19 @@ namespace LineWars.Model
     public class MonoHealAction : MonoUnitAction<HealAction<Node, Edge, Unit, Owned, BasePlayer>>,
         IHealAction<Node, Edge, Unit, Owned, BasePlayer>
     {
-        private HealAction<Node, Edge, Unit, Owned, BasePlayer> HealAction
-            => (HealAction<Node, Edge, Unit, Owned, BasePlayer>) Action;
-
         [SerializeField] private SFXData healSfx;
         [field: SerializeField] public bool InitialIsMassHeal { get; private set; }
         [field: SerializeField, Min(0)] public int InitialHealingAmount { get; private set; }
 
-        public bool IsMassHeal => HealAction.IsMassHeal;
-        public int HealingAmount => HealAction.HealingAmount;
+        public bool IsMassHeal => Action.IsMassHeal;
+        public int HealingAmount => Action.HealingAmount;
 
         public bool CanHeal(Unit target, bool ignoreActionPointsCondition = false) =>
-            HealAction.CanHeal(target, ignoreActionPointsCondition);
+            Action.CanHeal(target, ignoreActionPointsCondition);
 
         public void Heal(Unit target)
         {
-            HealAction.Heal(target);
+            Action.Heal(target);
             SfxManager.Instance.Play(healSfx);
         }
 

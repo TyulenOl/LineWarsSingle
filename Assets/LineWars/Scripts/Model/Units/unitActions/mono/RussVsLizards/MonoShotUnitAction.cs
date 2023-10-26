@@ -2,7 +2,7 @@
 
 namespace LineWars.Model
 {
-    public class MonoShotUnitAction:
+    public class MonoShotUnitAction :
         MonoUnitAction<ShotUnitAction<Node, Edge, Unit, Owned, BasePlayer>>,
         IShotUnitActon<Node, Edge, Unit, Owned, BasePlayer>
     {
@@ -10,11 +10,11 @@ namespace LineWars.Model
         {
             return new ShotUnitAction<Node, Edge, Unit, Owned, BasePlayer>(Unit);
         }
-        
+
         public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
 
         public Unit TakenUnit => Action.TakenUnit;
-        
+
         public bool CanTakeUnit(Unit unit)
         {
             return Action.CanTakeUnit(unit);
@@ -30,9 +30,9 @@ namespace LineWars.Model
             return Action.CanShotUnitTo(node);
         }
 
-        public void ShotUnit(Node node)
+        public void ShotUnitTo(Node node)
         {
-            Action.ShotUnit(node);
+            Action.ShotUnitTo(node);
         }
 
         public Type TargetType => Action.TargetType;
@@ -41,8 +41,12 @@ namespace LineWars.Model
 
         public ICommandWithCommandType GenerateCommand(ITarget target)
         {
-            //TODO
-            throw new NotImplementedException();
+            if (TakenUnit == null)
+            {
+                return new TakeUnitCommand<Node, Edge, Unit, Owned, BasePlayer>(this, (Unit) target);
+            }
+
+            return new ShotUnitCommand<Node, Edge, Unit, Owned, BasePlayer>(this, (Node) target);
         }
     }
 }

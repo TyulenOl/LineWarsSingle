@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace LineWars.Model
 {
-    public class RLBuilderAction<TNode, TEdge, TUnit, TOwned, TPlayer> :
+    public class RLBuildAction<TNode, TEdge, TUnit, TOwned, TPlayer> :
             UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>,
             IRLBuildAction<TNode, TEdge, TUnit, TOwned, TPlayer>
         #region Сonstraints
@@ -14,29 +15,30 @@ namespace LineWars.Model
         where TPlayer : class, IBasePlayer<TOwned, TPlayer>
         #endregion
     {
-        private IBuildingFactory Factory { get; set; }
-
+        public IBuildingFactory Factory { get; private set; }
         public IEnumerable<BuildingType> PossibleBuildings { get; }
         public bool CanBuild(TNode node, BuildingType buildingType)
         {
-            throw new NotImplementedException();
+            return ActionPointsCondition()
+                   && node.Building == null
+                   && PossibleBuildings.Contains(buildingType);
         }
 
         public void Build(TNode node, BuildingType buildingType)
         {
-            throw new NotImplementedException();
+            node.Building = Factory.Create(buildingType);
         }
-        
-        
-        public Type TargetType { get; } = typeof(TNode);
-        public bool IsMyTarget(ITarget target) => target is TNode;
         
         public override CommandType CommandType => CommandType.Build;
         public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor) => visitor.Visit(this);
 
-        public RLBuilderAction(TUnit executor, IBuildingFactory factory) : base(executor)
+        public RLBuildAction(
+            TUnit executor,
+            IEnumerable<BuildingType> possibleTypes,
+            IBuildingFactory factory) : base(executor)
         {
             Factory = factory;
+            PossibleBuildings = possibleTypes.ToHashSet();
         }
     }
 }

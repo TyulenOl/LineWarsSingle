@@ -44,7 +44,7 @@ namespace LineWars.Model
             return TakenUnit != null;
         }
 
-        public void ShotUnit(TNode node)
+        public void ShotUnitTo(TNode node)
         {
             if (node.AllIsFree)
             {
@@ -75,9 +75,9 @@ namespace LineWars.Model
         {
             if (TakenUnit == null)
             {
-                return default;
+                return new TakeUnitCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this, (TUnit) target);
             } 
-            return default;
+            return new ShotUnitCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this, (TNode) target);
         }
 
         public ShotUnitAction(TUnit executor) : base(executor)

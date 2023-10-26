@@ -110,17 +110,17 @@ namespace LineWars.Model
             throw new System.NotImplementedException();
         }
 
-        public void Visit(BlowWithSwingAction<TNode, TEdge, TUnit, TOwned, TPlayer> ramAction)
+        public void Visit(BlowWithSwingAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
             throw new System.NotImplementedException();
         }
 
-        public void Visit(ShotUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer> ramAction)
+        public void Visit(ShotUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
             throw new System.NotImplementedException();
         }
 
-        public void Visit(RLBuilderAction<TNode, TEdge, TUnit, TOwned, TPlayer> ramAction)
+        public void Visit(RLBuildAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
             throw new System.NotImplementedException();
         }

@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace LineWars.Model
 {
     public class MonoRLBuildAction :
-        MonoUnitAction<RLBuilderAction<Node, Edge, Unit, Owned, BasePlayer>>,
+        MonoUnitAction<RLBuildAction<Node, Edge, Unit, Owned, BasePlayer>>,
         IRLBuildAction<Node, Edge, Unit, Owned, BasePlayer>
     {
+        [SerializeField] public List<BuildingType> initialPossibleBuildingTypes;
         public IEnumerable<BuildingType> PossibleBuildings => Action.PossibleBuildings;
         
         public bool CanBuild(Node node, BuildingType buildingType)
@@ -19,9 +21,12 @@ namespace LineWars.Model
             Action.Build(node, buildingType);
         }
 
-        protected override RLBuilderAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
+        protected override RLBuildAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
         {
-            return new RLBuilderAction<Node, Edge, Unit, Owned, BasePlayer>(Unit, new MonoBuildingFactory());
+            return new RLBuildAction<Node, Edge, Unit, Owned, BasePlayer>(
+                Unit,
+                initialPossibleBuildingTypes,
+                new MonoBuildingFactory());
         }
         public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
     }

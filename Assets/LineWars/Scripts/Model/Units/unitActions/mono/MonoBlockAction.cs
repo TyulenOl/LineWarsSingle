@@ -9,23 +9,20 @@ namespace LineWars.Model
         MonoUnitAction<BlockAction<Node, Edge, Unit, Owned, BasePlayer>>,
         IBlockAction<Node, Edge, Unit, Owned, BasePlayer>
     {
-        private BlockAction<Node, Edge, Unit, Owned, BasePlayer> BlockAction
-            => (BlockAction<Node, Edge, Unit, Owned, BasePlayer>) Action;
-
         [SerializeField] private bool initialProtection = false;
         [SerializeField] private IntModifier initialContrAttackDamageModifier;
         public IntModifier InitialContrAttackDamageModifier => initialContrAttackDamageModifier;
         public bool InitialProtection => initialProtection;
 
-        public bool Protection => BlockAction.Protection;
-        public bool IsBlocked => BlockAction.IsBlocked;
+        public bool Protection => Action.Protection;
+        public bool IsBlocked => Action.IsBlocked;
         public event Action<bool, bool> CanBlockChanged;
 
-        public bool CanBlock() => BlockAction.CanBlock();
-        public void EnableBlock() => BlockAction.EnableBlock();
+        public bool CanBlock() => Action.CanBlock();
+        public void EnableBlock() => Action.EnableBlock();
 
-        public bool CanContrAttack(Unit enemy) => BlockAction.CanContrAttack(enemy);
-        public void ContrAttack(Unit enemy) => BlockAction.CanContrAttack(enemy);
+        public bool CanContrAttack(Unit enemy) => Action.CanContrAttack(enemy);
+        public void ContrAttack(Unit enemy) => Action.CanContrAttack(enemy);
 
         protected override BlockAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
         {

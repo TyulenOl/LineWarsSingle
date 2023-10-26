@@ -3,59 +3,59 @@ using JetBrains.Annotations;
 
 namespace LineWars.Model
 {
-    public class ShotUnitCommand<TNode, TEdge, TUnit, TOwned, TPlayer> :
+    public class RLBuildCommand<TNode, TEdge, TUnit, TOwned, TPlayer> :
             ICommandWithCommandType
 
         #region Сonstraints
-
         where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
         where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
         where TOwned : class, IOwned<TOwned, TPlayer>
         where TPlayer : class, IBasePlayer<TOwned, TPlayer>
-
-    #endregion
+        #endregion
 
     {
-        private readonly IShotUnitActon<TNode, TEdge, TUnit, TOwned, TPlayer> action;
+        private readonly IRLBuildAction<TNode, TEdge, TUnit, TOwned, TPlayer> action;
         private readonly TUnit unit;
         private readonly TNode targetNode;
-        private readonly TUnit takenUnit;
+        private readonly BuildingType buildingType;
 
-        public ShotUnitCommand(
+        public RLBuildCommand(
             [NotNull] TUnit unit,
-            [NotNull] TNode targetNode) :
-            this(unit.TryGetUnitAction<IShotUnitActon<TNode, TEdge, TUnit, TOwned, TPlayer>>(out var action)
+            [NotNull] TNode targetNode,
+            BuildingType type) :
+            this(unit.TryGetUnitAction<IRLBuildAction<TNode, TEdge, TUnit, TOwned, TPlayer>>(out var action)
                     ? action
                     : throw new ArgumentException(
-                        $"{nameof(TUnit)} does not contain {nameof(IShotUnitActon<TNode, TEdge, TUnit, TOwned, TPlayer>)}"),
-                targetNode)
+                        $"{nameof(TUnit)} does not contain {nameof(IRLBuildAction<TNode, TEdge, TUnit, TOwned, TPlayer>)}"),
+                targetNode, type)
         {
         }
 
-        public ShotUnitCommand(
-            [NotNull] IShotUnitActon<TNode, TEdge, TUnit, TOwned, TPlayer> action,
-            [NotNull] TNode targetNode)
+        public RLBuildCommand(
+            [NotNull] IRLBuildAction<TNode, TEdge, TUnit, TOwned, TPlayer> action,
+            [NotNull] TNode targetNode,
+            BuildingType type)
         {
             this.action = action;
             unit = action.MyUnit;
             this.targetNode = targetNode;
-            this.takenUnit = action.TakenUnit;
+            buildingType = type;
         }
 
         public void Execute()
         {
-            action.ShotUnitTo(targetNode);
+            action.Build(targetNode, buildingType);
         }
 
         public bool CanExecute()
         {
-            return action.CanShotUnitTo(targetNode);
+            return action.CanBuild(targetNode, buildingType);
         }
 
         public string GetLog()
         {
-            return $"Юнит {unit} бросил юнита {takenUnit} в ноду {targetNode}";
+            return $"Юнит {unit} постоил строение типа {buildingType} в ноде {targetNode}";
         }
 
         public CommandType CommandType => action.CommandType;
