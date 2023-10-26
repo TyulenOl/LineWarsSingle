@@ -70,8 +70,10 @@ namespace LineWars.Model
             return new AttackCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this, (IAlive) target);
         }
 
-        protected AttackAction(TUnit executor) : base(executor)
+        protected AttackAction(TUnit executor, int damage, bool isPenetratingDamage) : base(executor)
         {
+            Damage = damage;
+            IsPenetratingDamage = isPenetratingDamage;
         }
     }
 }

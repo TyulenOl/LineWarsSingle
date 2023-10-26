@@ -38,8 +38,9 @@
             CompleteAndAutoModify();
         }
 
-        public BlowWithSwingAction(TUnit executor) : base(executor)
+        public BlowWithSwingAction(TUnit executor, int damage) : base(executor)
         {
+            Damage = damage;
         }
     }
 }

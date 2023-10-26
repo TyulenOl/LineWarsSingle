@@ -18,8 +18,9 @@ namespace LineWars.Model
         #endregion
 
     {
-        private readonly UnitBlockerSelector blockerSelector;
-        private readonly bool onslaught;
+        private UnitBlockerSelector BlockerSelector { get; }
+        private bool Onslaught { get; }
+        
         private readonly IMoveAction<TNode, TEdge, TUnit, TOwned, TPlayer> moveAction;
         
         public override CommandType CommandType => CommandType.MeleeAttack;
@@ -50,7 +51,7 @@ namespace LineWars.Model
             else
             {
                 var selectedUnit =
-                    blockerSelector.SelectBlocker<TNode, TEdge, TUnit, TOwned, TPlayer>(enemy, neighbour);
+                    BlockerSelector.SelectBlocker<TNode, TEdge, TUnit, TOwned, TPlayer>(enemy, neighbour);
                 AttackUnitButIgnoreBlock(selectedUnit);
                 if (selectedUnit != enemy)
                 {
@@ -67,7 +68,7 @@ namespace LineWars.Model
 
             if (enemy.IsDied
                 && enemyNode.AllIsFree
-                && onslaught
+                && Onslaught
                 && moveAction.CanMoveTo(enemyNode)
                )
             {
@@ -88,8 +89,15 @@ namespace LineWars.Model
             visitor.Visit(this);
         }
 
-        public MeleeAttackAction(TUnit executor) : base(executor)
+        public MeleeAttackAction(
+            TUnit executor, 
+            int damage,
+            bool isPenetrating,
+            bool onslaught, 
+            UnitBlockerSelector blockerSelector) : base(executor, damage, isPenetrating)
         {
+            Onslaught = onslaught;
+            BlockerSelector = blockerSelector;
             moveAction = executor.GetUnitAction<IMoveAction<TNode, TEdge, TUnit, TOwned, TPlayer>>();
         }
     }

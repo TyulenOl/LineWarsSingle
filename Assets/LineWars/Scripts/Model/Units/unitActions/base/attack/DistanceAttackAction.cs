@@ -16,7 +16,7 @@ namespace LineWars.Model
         #endregion 
     {
         protected readonly IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer> Graph;
-        public uint Distance { get; private set; }
+        public uint Distance { get; }
 
         public override bool CanAttackFrom(TNode node, TUnit enemy, bool ignoreActionPointsCondition = false)
         {
@@ -42,8 +42,14 @@ namespace LineWars.Model
             visitor.Visit(this);
         }
 
-        public DistanceAttackAction(TUnit executor, IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer> graph) : base(executor)
+        public DistanceAttackAction(
+            TUnit executor,
+            int damage,
+            bool isPenetratingDamage,
+            uint distance,
+            IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer> graph) : base(executor, damage, isPenetratingDamage)
         {
+            Distance = distance;
             Graph = graph;
         }
     }

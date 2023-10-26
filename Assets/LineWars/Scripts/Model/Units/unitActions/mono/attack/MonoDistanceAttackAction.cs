@@ -17,7 +17,12 @@ namespace LineWars.Model
         
         protected override AttackAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
         {
-            return new DistanceAttackAction<Node, Edge, Unit, Owned, BasePlayer>(Unit, MonoGraph.Instance);
+            return new DistanceAttackAction<Node, Edge, Unit, Owned, BasePlayer>(
+                Unit,
+                InitialDamage,
+                InitialIsPenetratingDamage,
+                (uint)InitialDistance,
+                MonoGraph.Instance);
         }
 
         public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);

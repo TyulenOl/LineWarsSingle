@@ -18,7 +18,7 @@ namespace LineWars.Model
         
         protected override BlowWithSwingAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
         {
-            return new BlowWithSwingAction<Node, Edge, Unit, Owned, BasePlayer>(Unit);
+            return new BlowWithSwingAction<Node, Edge, Unit, Owned, BasePlayer>(Unit, InitialDamage);
         }
 
         public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);

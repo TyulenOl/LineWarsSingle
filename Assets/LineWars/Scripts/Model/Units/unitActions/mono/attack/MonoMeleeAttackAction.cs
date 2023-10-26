@@ -15,7 +15,12 @@ namespace LineWars.Model
 
         protected override AttackAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
         {
-            return new MeleeAttackAction<Node, Edge, Unit, Owned, BasePlayer>(Unit);
+            return new MeleeAttackAction<Node, Edge, Unit, Owned, BasePlayer>(
+                Unit, 
+                InitialDamage,
+                InitialIsPenetratingDamage,
+                InitialOnslaught,
+                InitialBlockerSelector);
         }
 
         public override void Accept(IMonoUnitVisitor visitor)

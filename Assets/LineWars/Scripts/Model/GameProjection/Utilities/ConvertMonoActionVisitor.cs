@@ -23,70 +23,67 @@ namespace LineWars.Model
 
         public void Visit(MonoBuildRoadAction action)
         {
-            Result = new BuildAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit);
+            throw new NotImplementedException();
         }
 
         public void Visit(MonoBlockAction action)
         {
             throw new NotImplementedException();
-            //Result = new BlockAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit);
         }
 
         public void Visit(MonoMoveAction action)
         {
-            Result = new MoveAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit);
+            throw new NotImplementedException();
         }
 
         public void Visit(MonoHealAction action)
         {
             throw new NotImplementedException();
-            //Result = new HealAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit);
         }
 
         public void Visit(MonoDistanceAttackAction action)
         {
-            Result = new DistanceAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, Graph);
+            throw new NotImplementedException();
         }
 
         public void Visit(MonoArtilleryAttackAction action)
         {
-            Result = new ArtilleryAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, Graph);
+            throw new NotImplementedException();
         }
 
         public void Visit(MonoMeleeAttackAction action)
         {
-            Result = new MeleeAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit);
+            throw new NotImplementedException();
         }
 
         public void Visit(MonoRLBlockAction action)
         {
-            Result = new RLBlockAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit);
+            throw new NotImplementedException();
         }
 
         public void Visit(MonoSacrificeForPerunAction action)
         {
-            Result = new SacrificeForPerunAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit);
+            throw new NotImplementedException();
         }
 
         public void Visit(MonoRamAction action)
         {
-            Result = new RamAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit);
+            throw new NotImplementedException();
         }
 
         public void Visit(MonoBlowWithSwingAction action)
         {
-            Result = new BlowWithSwingAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit);
+            throw new NotImplementedException();
         }
 
         public void Visit(MonoShotUnitAction action)
         {
-            Result = new ShotUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit);
+            throw new NotImplementedException();
         }
 
         public void Visit(MonoRLBuildAction action)
         {
             throw new NotImplementedException();
-            //Result = new RLBuilderAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit);
         }
     }
 
