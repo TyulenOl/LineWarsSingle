@@ -9,7 +9,7 @@ namespace LineWars.Model
     {
         private ArtilleryAttackAction<Node, Edge, Unit, Owned, BasePlayer> AttackAction
             => (ArtilleryAttackAction<Node, Edge, Unit, Owned, BasePlayer>) Action;
-        
+
         [SerializeField] private Explosion explosionPrefab;
 
         public override void Attack(IAlive enemy)
@@ -18,15 +18,16 @@ namespace LineWars.Model
             var explosion = Instantiate(explosionPrefab);
             explosion.transform.position = mono.transform.position;
             SfxManager.Instance.Play(attackSfx);
-            explosion.ExplosionEnded += () =>
-            {
-                AttackAction.Attack(enemy);
-            };
+            explosion.ExplosionEnded += () => { AttackAction.Attack(enemy); };
         }
 
         protected override AttackAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
         {
-            return new ArtilleryAttackAction<Node, Edge, Unit, Owned, BasePlayer>(Unit, MonoGraph.Instance);
+            return new ArtilleryAttackAction<Node, Edge, Unit, Owned, BasePlayer>(Unit,
+                InitialDamage,
+                InitialIsPenetratingDamage,
+                (uint) InitialDistance,
+                MonoGraph.Instance);
         }
 
         public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);

@@ -69,7 +69,7 @@ namespace LineWars.Model
         
         protected override RamAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
         {
-            var action = new RamAction<Node, Edge, Unit, Owned, BasePlayer>(Unit);
+            var action = new RamAction<Node, Edge, Unit, Owned, BasePlayer>(Unit, InitialDamage);
             return action;
         }
 

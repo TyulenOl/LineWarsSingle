@@ -96,8 +96,9 @@ namespace LineWars.Model
             return new RamCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(MyUnit, (TNode) target);
         }
 
-        public RamAction(TUnit executor) : base(executor)
+        public RamAction(TUnit executor, int damage) : base(executor)
         {
+            Damage = damage;
             moveAction = MyUnit.GetUnitAction<IMoveAction<TNode, TEdge, TUnit, TOwned, TPlayer>>();
         }
     }
