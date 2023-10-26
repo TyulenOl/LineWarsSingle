@@ -32,8 +32,8 @@ namespace LineWars
 
             if (missionsMapUIPrefab == null)
                 Debug.LogError($"{nameof(missionsMapUIPrefab)} is null on {name}");
-            else if (missionsMapUIPrefab.UIsCount != missions.Count)
-                Debug.LogError("The number of missions does not match the number of UI");
+            //else if (missionsMapUIPrefab.UIsCount != missions.Count)
+                //Debug.LogError("The number of missions does not match the number of UI");
         }
 
         public string Name => companyName;

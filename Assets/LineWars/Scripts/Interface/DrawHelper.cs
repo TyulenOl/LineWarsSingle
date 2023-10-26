@@ -12,14 +12,14 @@ public static class DrawHelper
         switch (characteristicType)
         {
             case CharacteristicType.MeleeAttack:
-                return Resources.Load<Sprite>("UI/Icons/attack");
+                return Resources.Load<Sprite>("UI/Sorokin/Icons/Attack");
             case CharacteristicType.Armor:
-                return Resources.Load<Sprite>("UI/Icons/armor");
+                return Resources.Load<Sprite>("UI/Sorokin/Icons/Block");
             case CharacteristicType.Hp:
-                return Resources.Load<Sprite>("UI/Icons/Icon_Heart");
+                return Resources.Load<Sprite>("UI/Sorokin/Icons/Heal");
             case CharacteristicType.ActionPoints:
-                return Resources.Load<Sprite>("UI/Icons/ActionPoints");
-            default: return Resources.Load<Sprite>("UI/Icons/Icon_Heart");
+                return Resources.Load<Sprite>("UI/Sorokin/Icons/Move");
+            default: return Resources.Load<Sprite>("UI/Sorokin/Icons/Heal");
         }
     }
     
@@ -28,13 +28,13 @@ public static class DrawHelper
         switch (commandType)
         {
             case CommandType.MeleeAttack:
-                return Resources.Load<Sprite>("UI/Icons/Icon_Skull");
+                return Resources.Load<Sprite>("UI/Sorokin/Icons/AttackOrder");
             case CommandType.Heal:
-                return Resources.Load<Sprite>("UI/Icons/HP");
+                return Resources.Load<Sprite>("UI/Sorokin/Icons/Heal");
             case CommandType.Fire:
                 return Resources.Load<Sprite>("UI/Icons/Icon_Focus");
             case CommandType.Move:
-                return Resources.Load<Sprite>("UI/Icons/Icon_Flag");
+                return Resources.Load<Sprite>("UI/Sorokin/Icons/MoveOrder");
             case CommandType.Build:
                 return Resources.Load<Sprite>("UI/Icons/Upgrade");
             default: return Resources.Load<Sprite>("UI/Icons/Icon_Focus");

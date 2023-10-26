@@ -1,5 +1,6 @@
 using System.Collections.Generic;
-using UnityEngine.Assertions.Must;
+using System.Linq;
+using UnityEngine;
 
 namespace LineWars.Model
 {
@@ -31,6 +32,7 @@ namespace LineWars.Model
                 if(action.CanUpRoad(edge))
                 {
                     var command = new BuildCommandBlueprint(action.MyUnit.Id, edge.Id);
+                    BlueprintList.Add(command);
                 }
             }
         }
@@ -47,8 +49,9 @@ namespace LineWars.Model
 
         public void Visit(MoveAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
-            foreach(var node in Graph.GetNodesInRange(action.MyUnit.Node, 1))
+            foreach (var node in Graph.GetNodesInRange(action.MyUnit.Node, 2))
             {
+                
                 if(action.CanMoveTo(node))
                 {
                     var command = new MoveCommandBlueprint(action.MyUnit.Id, action.MyUnit.Node.Id);
@@ -60,7 +63,7 @@ namespace LineWars.Model
 
         public void Visit(HealAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
-            foreach (var node in Graph.GetNodesInRange(action.MyUnit.Node, 1))
+            foreach (var node in Graph.GetNodesInRange(action.MyUnit.Node, 2))
             {
                 if (!node.LeftIsFree)
                     ProcessUnit(node.LeftUnit);

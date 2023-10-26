@@ -23,7 +23,8 @@ namespace LineWars
         [Header("Debug")] 
         [SerializeField] private bool isAI;
 
-        public readonly IndexList<BasePlayer> AllPlayers = new IndexList<BasePlayer> (); //сру и не стесняюсь!
+        public readonly IndexList<BasePlayer> AllPlayers = new IndexList<BasePlayer> ();
+        public readonly IndexList<Unit> AllUnits = new IndexList<Unit>();//сру и не стесняюсь!
         private Player player;
         
 
@@ -108,7 +109,7 @@ namespace LineWars
                     ? playerInitializer.Initialize<EnemyAI>(spawnPoint)
                     : playerInitializer.Initialize<TestActor>(spawnPoint); 
 
-                AllPlayers.Add(enemy);
+                //AllPlayers.Add(enemy);
             }
         }
         

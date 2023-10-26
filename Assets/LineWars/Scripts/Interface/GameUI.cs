@@ -142,7 +142,8 @@ namespace LineWars.Interface
         
         private void OnPhaseChanged(PhaseType previousPhase, PhaseType currentPhase)
         {
-            currentPhaseText.text = DrawHelper.GetPhaseName(currentPhase);
+            if(currentPhaseText != null)
+                currentPhaseText.text = DrawHelper.GetPhaseName(currentPhase);
         }
         void PlayerOnCurrenMoneyChanged(int before, int after)
         {
@@ -151,7 +152,7 @@ namespace LineWars.Interface
         
         private void LocalPlayerOnIncomeChanged(int before, int after)
         {
-            currentIncomeText.text = after.ToString();
+            currentIncomeText.text = $"( <color=#E22B12>+{after.ToString()}</color> )";
         }
         
         public void ToMainMenu()
