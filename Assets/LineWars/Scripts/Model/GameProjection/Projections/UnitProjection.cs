@@ -14,7 +14,7 @@ namespace LineWars.Model
             UnitProjection, OwnedProjection,
             BasePlayerProjection>> actionsDictionary;
 
-        private IEnumerable<MonoUnitAction> monoActions;
+        private IEnumerable<IMonoUnitAction<UnitAction<Node, Edge, Unit, Owned, BasePlayer>>> monoActions;
 
         private IEnumerable<UnitAction<NodeProjection, EdgeProjection,
             UnitProjection, OwnedProjection,
@@ -40,7 +40,6 @@ namespace LineWars.Model
         public int CurrentHp { get; set; }
 
         public event Action AnyActionCompleted;
-        public event Action<IExecutorAction> CurrentActionCompleted;
 
         public IReadOnlyDictionary<CommandType, UnitAction<NodeProjection, EdgeProjection,
             UnitProjection, OwnedProjection,
@@ -58,7 +57,7 @@ namespace LineWars.Model
             CommandPriorityData commandPriorityData,
             int currentArmor,
             UnitDirection unitDirection,
-            IEnumerable<MonoUnitAction> actions,
+            IEnumerable<IMonoUnitAction<UnitAction<Node, Edge, Unit, Owned, BasePlayer>>> actions,
             int currentActionPoints,
             bool hasId,
             int id,
@@ -252,9 +251,7 @@ namespace LineWars.Model
         public NodeProjection Node { get; }
         public int CurrentActionPoints { get; }
         public int CurrentHp { get; }
-
         public event Action AnyActionCompleted;
-        public event Action<IExecutorAction> CurrentActionCompleted;
 
         public IReadOnlyDictionary<CommandType, UnitAction<NodeProjection, EdgeProjection,
             UnitProjection, OwnedProjection,

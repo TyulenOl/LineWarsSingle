@@ -16,16 +16,6 @@ namespace LineWars.Model
         where TPlayer : class, IBasePlayer<TOwned, TPlayer>
         #endregion
     {
-        public ShotUnitAction(TUnit unit, MonoShotUnitAction data)
-            : base(unit, data)
-        {
-        }
-
-        public ShotUnitAction(TUnit unit, ShotUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer> data)
-            : base(unit, data)
-        {
-        }
-
         public override CommandType CommandType => CommandType.ShotUnit;
 
         public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor) =>
@@ -72,6 +62,26 @@ namespace LineWars.Model
             }
             TakenUnit = null;
             CompleteAndAutoModify();
+        }
+
+        public Type TargetType { get; } =  typeof(TUnit);
+        public Type[] MyTargets { get; } = {typeof(TUnit), typeof(TNode)};
+        public bool IsMyTarget(ITarget target)
+        {
+            return TakenUnit == null && target is TUnit || TakenUnit != null && target is TNode;
+        }
+
+        public ICommandWithCommandType GenerateCommand(ITarget target)
+        {
+            if (TakenUnit == null)
+            {
+                return default;
+            } 
+            return default;
+        }
+
+        public ShotUnitAction(TUnit executor) : base(executor)
+        {
         }
     }
 }

@@ -76,7 +76,9 @@ namespace LineWars.Model
             get => rightUnit;
             set => rightUnit = value;
         }
-        
+
+        public IBuilding Building { get; set; }
+
         public CommandPriorityData CommandPriorityData => priorityData;
         public RenderNodeV3 RenderNodeV3 => renderNodeV3;
 
@@ -212,8 +214,9 @@ namespace LineWars.Model
             IsDirty = true;
             Redraw();
         }
-        
-        
+
+        public T Accept<T>(INodeVisitor<T> visitor) => visitor.Visit(this);
+
         #region Visualisation
         public void Redraw()
         {

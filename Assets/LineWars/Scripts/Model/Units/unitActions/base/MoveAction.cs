@@ -15,18 +15,6 @@ namespace LineWars.Model
         where TPlayer: class, IBasePlayer<TOwned, TPlayer>
         #endregion 
     {
-        public MoveAction(
-            [NotNull] TUnit unit,
-            [NotNull] MonoMoveAction data) : base(unit, data)
-        {
-        }
-
-        public MoveAction(
-            [NotNull] TUnit unit,
-            [NotNull] MoveAction<TNode, TEdge, TUnit, TOwned, TPlayer> data) : base(unit, data)
-        {
-        }
-
         public bool CanMoveTo([NotNull] TNode target, bool ignoreActionPointsCondition = false)
         {
             return MyUnit.Node != target
@@ -142,5 +130,9 @@ namespace LineWars.Model
         }
 
         #endregion
+
+        public MoveAction(TUnit executor) : base(executor)
+        {
+        }
     }
 }

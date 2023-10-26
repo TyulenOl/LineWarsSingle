@@ -1,7 +1,8 @@
 ﻿namespace LineWars.Model
 {
     public interface IShotUnitActon<TNode, TEdge, TUnit, TOwned, TPlayer>: 
-        IUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>
+        IUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>,
+        IMultiStageTargetAction
 
         #region Сonstraints
         where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>

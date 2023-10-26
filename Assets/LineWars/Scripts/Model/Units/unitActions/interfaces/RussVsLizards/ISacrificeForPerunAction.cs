@@ -1,7 +1,8 @@
 ﻿namespace LineWars.Model
 {
     public interface ISacrificeForPerunAction<TNode, TEdge, TUnit, TOwned, TPlayer> :
-        IUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>
+        IUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>,
+        ITargetedAction
 
         #region Сonstraints
         where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>

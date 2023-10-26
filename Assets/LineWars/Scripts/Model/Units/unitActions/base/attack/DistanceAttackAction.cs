@@ -18,19 +18,6 @@ namespace LineWars.Model
         protected readonly IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer> Graph;
         public uint Distance { get; private set; }
 
-        public DistanceAttackAction(TUnit unit,
-            MonoDistanceAttackAction data,
-            [NotNull] IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer> graph) : base(unit, data)
-        {
-            Graph = graph ?? throw new ArgumentNullException(nameof(graph));
-        }
-
-        public DistanceAttackAction(TUnit unit, DistanceAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> data,
-            [NotNull] IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer> graph) : base(unit, data)
-        {
-            Graph = graph ?? throw new ArgumentNullException(nameof(graph));
-        }
-
         public override bool CanAttackFrom(TNode node, TUnit enemy, bool ignoreActionPointsCondition = false)
         {
             return !AttackLocked
@@ -53,6 +40,11 @@ namespace LineWars.Model
         public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor)
         {
             visitor.Visit(this);
+        }
+
+        public DistanceAttackAction(TUnit executor, IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer> graph) : base(executor)
+        {
+            Graph = graph;
         }
     }
 }

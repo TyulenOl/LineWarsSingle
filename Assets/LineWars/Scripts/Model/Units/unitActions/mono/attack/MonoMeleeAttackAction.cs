@@ -13,9 +13,9 @@ namespace LineWars.Model
         /// </summary>
         [field: SerializeField] public bool InitialOnslaught { get; private set; }
 
-        protected override ExecutorAction GetAction()
+        protected override AttackAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
         {
-            return new MeleeAttackAction<Node, Edge, Unit, Owned, BasePlayer>(GetComponent<Unit>(), this);
+            return new MeleeAttackAction<Node, Edge, Unit, Owned, BasePlayer>(Unit);
         }
 
         public override void Accept(IMonoUnitVisitor visitor)

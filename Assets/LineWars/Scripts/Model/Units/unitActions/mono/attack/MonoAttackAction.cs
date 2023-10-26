@@ -6,11 +6,11 @@ using UnityEngine;
 namespace LineWars.Model
 {
     [DisallowMultipleComponent]
-    public abstract class MonoAttackAction : MonoUnitAction,
+    public abstract class MonoAttackAction : MonoUnitAction<AttackAction<Node, Edge, Unit, Owned, BasePlayer>>,
         IAttackAction<Node, Edge, Unit, Owned, BasePlayer>
     {
         private AttackAction<Node, Edge, Unit, Owned, BasePlayer> AttackAction
-            => (AttackAction<Node, Edge, Unit, Owned, BasePlayer>) ExecutorAction;
+            => (AttackAction<Node, Edge, Unit, Owned, BasePlayer>) Action;
 
         [SerializeField] protected SFXData attackSfx;
         [field: SerializeField] public int InitialDamage { get; private set; }

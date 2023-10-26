@@ -45,17 +45,16 @@ namespace LineWars.Model
         [field: SerializeField] public UnityEvent<int, int> ActionPointsChanged { get; private set; }
 
         public event Action AnyActionCompleted;
-        public event Action<IExecutorAction> CurrentActionCompleted;
 
         private UnitMovementLogic movementLogic;
         
         
-        private Dictionary<CommandType, MonoUnitAction> monoActionsDictionary;
-        private IEnumerable<MonoUnitAction> MonoActions => monoActionsDictionary.Values;
+        private Dictionary<CommandType, IMonoUnitAction<UnitAction<Node, Edge, Unit, Owned, BasePlayer>>> monoActionsDictionary;
+        private IEnumerable<IMonoUnitAction<UnitAction<Node, Edge, Unit, Owned, BasePlayer>>> MonoActions => monoActionsDictionary.Values;
         public uint MaxPossibleActionRadius { get; private set; }
         public IReadOnlyCollection<Type> PossibleTargetsTypes { get; private set; }
         public IReadOnlyDictionary<Type, ITargetedAction[]> TargetTypeActionsDictionary { get; private set; }
-        private ITargetActionGrouper grouper = new DefaultTargetActionGrouper();
+        private readonly ITargetActionGrouper grouper = new DefaultTargetActionGrouper();
 
         #region Properties
         public int Id => index;
@@ -178,11 +177,11 @@ namespace LineWars.Model
 
             void InitialiseAllActions()
             {
-                var serializeActions = GetComponents<MonoUnitAction>()
+                var serializeActions = GetComponents<IMonoUnitAction<UnitAction<Node, Edge, Unit, Owned, BasePlayer>>>()
                     .OrderByDescending(x => x.Priority)
                     .ToArray();
                 
-                monoActionsDictionary = new Dictionary<CommandType, MonoUnitAction>(serializeActions.Length);
+                monoActionsDictionary = new Dictionary<CommandType, IMonoUnitAction<UnitAction<Node, Edge, Unit, Owned, BasePlayer>>>(serializeActions.Length);
                 foreach (var serializeAction in serializeActions)
                 {
                     serializeAction.Initialize();
@@ -190,7 +189,6 @@ namespace LineWars.Model
                     serializeAction.ActionCompleted += () =>
                     {
                         AnyActionCompleted?.Invoke();
-                        CurrentActionCompleted?.Invoke(serializeAction);
                     };
                 }
 
@@ -270,22 +268,5 @@ namespace LineWars.Model
         }
 
         public T Accept<T>(IExecutorVisitor<T> visitor) => visitor.Visit(this);
-        
-        // private static class AllTargetTypes
-        // {
-        //     public static Type[] Types;
-        //
-        //     static AllTargetTypes()
-        //     {
-        //         var assemblies = AppDomain.CurrentDomain
-        //             .GetAssemblies()
-        //             .Where(assembly => assembly.ManifestModule.Name == "Assembly-CSharp.dll");
-        //         
-        //         Types = assemblies
-        //             .SelectMany(s => s.GetTypes())
-        //             .Where(p => p.IsAssignableFrom(typeof(ITarget)))
-        //             .ToArray();
-        //     }
-        // }
     }
 }

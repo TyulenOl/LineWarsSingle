@@ -1,15 +1,16 @@
-﻿namespace LineWars.Model
+﻿using System;
+
+namespace LineWars.Model
 {
-    public class MonoShotUnitAction: MonoUnitAction,
+    public class MonoShotUnitAction:
+        MonoUnitAction<ShotUnitAction<Node, Edge, Unit, Owned, BasePlayer>>,
         IShotUnitActon<Node, Edge, Unit, Owned, BasePlayer>
     {
-        private ShotUnitAction<Node, Edge, Unit, Owned, BasePlayer> Action
-            => (ShotUnitAction<Node, Edge, Unit, Owned, BasePlayer>) ExecutorAction;
-        protected override ExecutorAction GetAction()
+        protected override ShotUnitAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
         {
-            return new ShotUnitAction<Node, Edge, Unit, Owned, BasePlayer>(Unit, this);
+            return new ShotUnitAction<Node, Edge, Unit, Owned, BasePlayer>(Unit);
         }
-
+        
         public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
 
         public Unit TakenUnit => Action.TakenUnit;
@@ -32,6 +33,16 @@
         public void ShotUnit(Node node)
         {
             Action.ShotUnit(node);
+        }
+
+        public Type TargetType => Action.TargetType;
+        public Type[] MyTargets => Action.MyTargets;
+        public bool IsMyTarget(ITarget target) => Action.IsMyTarget(target);
+
+        public ICommandWithCommandType GenerateCommand(ITarget target)
+        {
+            //TODO
+            throw new NotImplementedException();
         }
     }
 }

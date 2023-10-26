@@ -21,6 +21,7 @@ namespace LineWars.Model
         public void Visit(RamAction<TNode, TEdge, TUnit, TOwned, TPlayer> action);
         public void Visit(BlowWithSwingAction<TNode, TEdge, TUnit, TOwned, TPlayer> ramAction);
         public void Visit(ShotUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer> ramAction);
+        public void Visit(RLBuilderAction<TNode, TEdge, TUnit, TOwned, TPlayer> ramAction);
     }
 }
 

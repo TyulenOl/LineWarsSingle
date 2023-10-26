@@ -39,6 +39,8 @@ namespace LineWars.Model
             }
         }
 
+        public IBuilding Building { get; set; }
+
         public Action<UnitProjection> UnitAdded;
         public NodeProjection(CommandPriorityData commandPriorityData,
             bool isBase, int index, int visibility,
@@ -89,6 +91,8 @@ namespace LineWars.Model
 
             edges.Add(edge);
         }
+        
+        public T Accept<T>(INodeVisitor<T> visitor) => visitor.Visit(this);
     }
 
     public interface IReadOnlyNodeProjection

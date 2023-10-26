@@ -12,22 +12,12 @@
         where TPlayer : class, IBasePlayer<TOwned, TPlayer>
         #endregion
     {
-        public BlowWithSwingAction(TUnit unit, MonoBlowWithSwingAction data) : base(unit, data)
-        {
-            Damage = data.InitialDamage;
-        }
-
-        public BlowWithSwingAction(TUnit unit, BlowWithSwingAction<TNode, TEdge, TUnit, TOwned, TPlayer> data) : base(unit, data)
-        {
-            Damage = data.Damage;
-        }
-
         public override CommandType CommandType => CommandType.BlowWithSwing;
 
         public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor) =>
             visitor.Visit(this);
 
-        public ICommand GenerateCommand() => new BlowWithSwingCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this);
+        public ICommandWithCommandType GenerateCommand() => new BlowWithSwingCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this);
 
         public int Damage { get; }
         public bool CanBlowWithSwing() => ActionPointsCondition();
@@ -46,6 +36,10 @@
                 }
             }
             CompleteAndAutoModify();
+        }
+
+        public BlowWithSwingAction(TUnit executor) : base(executor)
+        {
         }
     }
 }

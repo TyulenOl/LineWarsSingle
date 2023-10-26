@@ -1,9 +1,5 @@
-﻿using System;
-using PathCreation;
-using PathCreation.Examples;
+﻿using PathCreation;
 using UnityEngine;
-
-// ReSharper disable Unity.InefficientPropertyAccess
 
 namespace LineWars.Interface
 {

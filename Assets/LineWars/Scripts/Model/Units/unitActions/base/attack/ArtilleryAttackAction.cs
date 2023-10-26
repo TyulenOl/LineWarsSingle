@@ -12,19 +12,6 @@
         where TPlayer: class, IBasePlayer<TOwned, TPlayer>
         #endregion 
     {
-        public ArtilleryAttackAction(TUnit unit,
-            MonoArtilleryAttackAction data, 
-            IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer> graph) : base(unit, data, graph)
-        {
-     
-        }
-        public ArtilleryAttackAction(TUnit unit,
-            ArtilleryAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> data,
-            IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer> graph) : base(unit, data, graph)
-        {
-
-        }
-
         public override bool CanAttackFrom(TNode node, TEdge edge, bool ignoreActionPointsCondition = false)
         {
             var pathLen1 = Graph.FindShortestPath(node, edge.FirstNode).Count - 1;
@@ -62,6 +49,10 @@
         public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor)
         {
             visitor.Visit(this);
+        }
+
+        public ArtilleryAttackAction(TUnit executor, IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer> graph) : base(executor, graph)
+        {
         }
     }
 }

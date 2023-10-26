@@ -1,3 +1,5 @@
+using System;
+
 namespace LineWars.Model
 {
     public class ConvertMonoActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> : IMonoUnitVisitor
@@ -21,69 +23,76 @@ namespace LineWars.Model
 
         public void Visit(MonoBuildRoadAction action)
         {
-            Result = new BuildAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action);
+            Result = new BuildAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit);
         }
 
         public void Visit(MonoBlockAction action)
         {
-            Result = new BlockAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action);
+            throw new NotImplementedException();
+            //Result = new BlockAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit);
         }
 
         public void Visit(MonoMoveAction action)
         {
-            Result = new MoveAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action);
+            Result = new MoveAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit);
         }
 
         public void Visit(MonoHealAction action)
         {
-            Result = new HealAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action);
+            throw new NotImplementedException();
+            //Result = new HealAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit);
         }
 
         public void Visit(MonoDistanceAttackAction action)
         {
-            Result = new DistanceAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action, Graph);
+            Result = new DistanceAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, Graph);
         }
 
         public void Visit(MonoArtilleryAttackAction action)
         {
-            Result = new ArtilleryAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action, Graph);
+            Result = new ArtilleryAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, Graph);
         }
 
         public void Visit(MonoMeleeAttackAction action)
         {
-            Result = new MeleeAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action);
+            Result = new MeleeAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit);
         }
 
         public void Visit(MonoRLBlockAction action)
         {
-            Result = new RLBlockAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action);
+            Result = new RLBlockAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit);
         }
 
         public void Visit(MonoSacrificeForPerunAction action)
         {
-            Result = new SacrificeForPerunAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action);
+            Result = new SacrificeForPerunAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit);
         }
 
         public void Visit(MonoRamAction action)
         {
-            Result = new RamAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action);
+            Result = new RamAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit);
         }
 
         public void Visit(MonoBlowWithSwingAction action)
         {
-            Result = new BlowWithSwingAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action);
+            Result = new BlowWithSwingAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit);
         }
 
         public void Visit(MonoShotUnitAction action)
         {
-            Result = new ShotUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action);
+            Result = new ShotUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit);
+        }
+
+        public void Visit(MonoRLBuildAction action)
+        {
+            throw new NotImplementedException();
+            //Result = new RLBuilderAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit);
         }
     }
 
     public static class ConvertMonoActionVisitor
     {
-        public static ConvertMonoActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer>
-            Create<TNode, TEdge, TUnit, TOwned, TPlayer>(TUnit unit, IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer> graph)
+        public static ConvertMonoActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> Create<TNode, TEdge, TUnit, TOwned, TPlayer>(TUnit unit, IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer> graph)
             #region Сonstraints
             where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
             where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>

@@ -9,14 +9,17 @@ namespace LineWars.Model
         IDistanceAttackAction<Node, Edge, Unit, Owned, BasePlayer>
     {
         private DistanceAttackAction<Node, Edge, Unit, Owned, BasePlayer> DistanceAttack
-            => (DistanceAttackAction<Node, Edge, Unit, Owned, BasePlayer>) ExecutorAction;
+            => (DistanceAttackAction<Node, Edge, Unit, Owned, BasePlayer>) Action;
         
         [field: SerializeField, Min(0)] public int InitialDistance { get; private set; }
         public uint Distance => DistanceAttack.Distance;
         
         
-        protected override ExecutorAction GetAction() 
-            => new DistanceAttackAction<Node, Edge, Unit, Owned, BasePlayer>(Unit, this, MonoGraph.Instance);
+        protected override AttackAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
+        {
+            return new DistanceAttackAction<Node, Edge, Unit, Owned, BasePlayer>(Unit, MonoGraph.Instance);
+        }
+
         public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
     }
 }

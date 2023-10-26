@@ -120,7 +120,12 @@ namespace LineWars.Model
             throw new System.NotImplementedException();
         }
 
-        
+        public void Visit(RLBuilderAction<TNode, TEdge, TUnit, TOwned, TPlayer> ramAction)
+        {
+            throw new System.NotImplementedException();
+        }
+
+
         private void ProcessAttackAction(AttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> action, uint range)
         {
             foreach (var node in Graph.GetNodesInRange(action.MyUnit.Node, range))

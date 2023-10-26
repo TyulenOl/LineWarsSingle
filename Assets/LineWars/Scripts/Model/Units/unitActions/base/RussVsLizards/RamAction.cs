@@ -19,20 +19,6 @@ namespace LineWars.Model
     {
         private readonly IMoveAction<TNode, TEdge, TUnit, TOwned, TPlayer> moveAction;
 
-        public RamAction(TUnit unit, MonoRamAction data)
-            : base(unit, data)
-        {
-            Damage = data.InitialDamage;
-            moveAction = unit.GetUnitAction<IMoveAction<TNode, TEdge, TUnit, TOwned, TPlayer>>();
-            if (moveAction == null) throw new ArgumentException();
-        }
-
-        public RamAction(TUnit unit, RamAction<TNode, TEdge, TUnit, TOwned, TPlayer> data)
-            : base(unit, data)
-        {
-            Damage = data.Damage;
-        }
-
         public override CommandType CommandType => CommandType.Ram;
 
         public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor) =>
@@ -108,6 +94,11 @@ namespace LineWars.Model
         public ICommandWithCommandType GenerateCommand(ITarget target)
         {
             return new RamCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(MyUnit, (TNode) target);
+        }
+
+        public RamAction(TUnit executor) : base(executor)
+        {
+            moveAction = MyUnit.GetUnitAction<IMoveAction<TNode, TEdge, TUnit, TOwned, TPlayer>>();
         }
     }
 }

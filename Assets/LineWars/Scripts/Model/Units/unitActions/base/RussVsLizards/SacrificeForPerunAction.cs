@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace LineWars.Model
 {
@@ -15,19 +16,10 @@ namespace LineWars.Model
         #endregion
 
     {
-        public SacrificeForPerunAction(
-            TUnit unit, 
-            MonoSacrificeForPerunAction data) : base(unit, data)
+        public SacrificeForPerunAction(TUnit executor) : base(executor)
         {
         }
-
-        public SacrificeForPerunAction(
-            TUnit unit,
-            SacrificeForPerunAction<TNode, TEdge, TUnit, TOwned, TPlayer> data) :
-            base(unit, data)
-        {
-        }
-
+        
         public override CommandType CommandType => CommandType.SacrificePerun;
 
         public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor) =>
@@ -53,6 +45,14 @@ namespace LineWars.Model
             
             MyUnit.CurrentHp = 0;
             CompleteAndAutoModify();
+        }
+
+        public Type TargetType => typeof(TNode);
+        public bool IsMyTarget(ITarget target) => target is TNode;
+
+        public ICommandWithCommandType GenerateCommand(ITarget target)
+        {
+            return new SacrificeForPerunCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this, (TNode) target);
         }
     }
 }

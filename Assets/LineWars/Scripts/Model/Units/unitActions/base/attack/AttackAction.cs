@@ -20,19 +20,7 @@ namespace LineWars.Model
         public bool AttackLocked { get; protected set; }
         public int Damage { get; protected set; }
         public bool IsPenetratingDamage { get; protected set; }
-
-        protected AttackAction([NotNull] TUnit unit, MonoAttackAction data) : base(unit, data)
-        {
-            Damage = data.InitialDamage;
-            IsPenetratingDamage = data.InitialIsPenetratingDamage;
-        }
-
-        protected AttackAction([NotNull] TUnit unit, AttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> data) : base(unit, data)
-        {
-            Damage = data.Damage;
-            IsPenetratingDamage = data.IsPenetratingDamage;
-        }
-
+        
         public bool CanAttack(IAlive enemy, bool ignoreActionPointsCondition = false) =>
             CanAttackFrom(MyUnit.Node, enemy, ignoreActionPointsCondition);
 
@@ -80,6 +68,10 @@ namespace LineWars.Model
         public ICommandWithCommandType GenerateCommand(ITarget target)
         {
             return new AttackCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this, (IAlive) target);
+        }
+
+        protected AttackAction(TUnit executor) : base(executor)
+        {
         }
     }
 }

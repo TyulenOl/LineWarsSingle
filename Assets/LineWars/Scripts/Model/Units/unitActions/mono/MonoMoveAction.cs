@@ -4,14 +4,14 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    public class MonoMoveAction : MonoUnitAction,
+    public class MonoMoveAction : MonoUnitAction<MoveAction<Node, Edge, Unit, Owned, BasePlayer>>,
         IMoveAction<Node, Edge, Unit, Owned, BasePlayer>
     {
         [SerializeField] private SFXData moveSfx;
         public event Action MoveAnimationEnded;
 
         private MoveAction<Node, Edge, Unit, Owned, BasePlayer> MoveAction =>
-            (MoveAction<Node, Edge, Unit, Owned, BasePlayer>) ExecutorAction;
+            (MoveAction<Node, Edge, Unit, Owned, BasePlayer>) Action;
 
         public bool CanMoveTo(Node target, bool ignoreActionPointsCondition = false) =>
             MoveAction.CanMoveTo(target, ignoreActionPointsCondition);
@@ -39,12 +39,6 @@ namespace LineWars.Model
             return new MoveCommand<Node, Edge, Unit, Owned, BasePlayer>(this, (Node) target);
         }
 
-        protected override ExecutorAction GetAction()
-        {
-            var action = new MoveAction<Node, Edge, Unit, Owned, BasePlayer>(Unit, this);
-            return action;
-        }
-
         public override void Accept(IMonoUnitVisitor visitor)
         {
             visitor.Visit(this);
@@ -53,6 +47,12 @@ namespace LineWars.Model
         private void OnDestroy()
         {
             Unit.MovementLogic.MovementIsOver -= MovementLogicOnMovementIsOver;
+        }
+
+        protected override MoveAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
+        {
+            var action = new MoveAction<Node, Edge, Unit, Owned, BasePlayer>(Unit);
+            return action;
         }
     }
 }

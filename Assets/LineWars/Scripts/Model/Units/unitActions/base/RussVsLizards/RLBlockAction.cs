@@ -16,17 +16,7 @@ namespace LineWars.Model
 
     {
         private bool isBlocked;
-
-        public RLBlockAction(TUnit unit, MonoRLBlockAction data)
-            : base(unit, data)
-        {
-        }
-
-        public RLBlockAction(TUnit unit, RLBlockAction<TNode, TEdge, TUnit, TOwned, TPlayer> data) 
-            : base(unit, data)
-        {
-        }
-
+        
         public bool IsBlocked
         {
             get => isBlocked;
@@ -56,6 +46,10 @@ namespace LineWars.Model
         public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor) =>
             visitor.Visit(this);
 
-        public ICommand GenerateCommand() => new RLBlockCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this);
+        public ICommandWithCommandType GenerateCommand() => new RLBlockCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this);
+
+        public RLBlockAction(TUnit executor) : base(executor)
+        {
+        }
     }
 }

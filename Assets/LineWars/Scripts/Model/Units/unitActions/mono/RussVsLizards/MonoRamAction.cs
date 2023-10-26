@@ -4,12 +4,11 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    public class MonoRamAction : MonoUnitAction,
+    public class MonoRamAction :
+        MonoUnitAction<RamAction<Node, Edge, Unit, Owned, BasePlayer>>,
         IRamAction<Node, Edge, Unit, Owned, BasePlayer>
     {
-        private RamAction<Node, Edge, Unit, Owned, BasePlayer> Action
-            => (RamAction<Node, Edge, Unit, Owned, BasePlayer>) ExecutorAction;
-
+       
         private MonoMoveAction moveAction;
         [field: SerializeField] public int InitialDamage { get; private set; }
 
@@ -18,15 +17,7 @@ namespace LineWars.Model
             base.Initialize();
             moveAction = Unit.GetUnitAction<MonoMoveAction>();
         }
-
-        protected override ExecutorAction GetAction()
-        {
-            var action = new RamAction<Node, Edge, Unit, Owned, BasePlayer>(Unit, this);
-            return action;
-        }
-
-        public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
-
+        
         public int Damage => Action.Damage;
 
         public bool CanRam(Node node)
@@ -36,6 +27,7 @@ namespace LineWars.Model
 
         public void Ram(Node node)
         {
+            //TODO: анимации и звуки
             StartCoroutine(RamCoroutine(node));
         }
 
@@ -74,5 +66,13 @@ namespace LineWars.Model
         {
             return new RamCommand<Node, Edge, Unit, Owned, BasePlayer>(Unit, (Node) target);
         }
+        
+        protected override RamAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
+        {
+            var action = new RamAction<Node, Edge, Unit, Owned, BasePlayer>(Unit);
+            return action;
+        }
+
+        public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
     }
 }

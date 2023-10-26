@@ -21,22 +21,7 @@ namespace LineWars.Model
         private readonly UnitBlockerSelector blockerSelector;
         private readonly bool onslaught;
         private readonly IMoveAction<TNode, TEdge, TUnit, TOwned, TPlayer> moveAction;
-
-        public MeleeAttackAction([NotNull] TUnit unit, MonoMeleeAttackAction data) : base(unit, data)
-        {
-            blockerSelector = data.InitialBlockerSelector;
-            moveAction = unit.GetUnitAction<IMoveAction<TNode, TEdge, TUnit, TOwned, TPlayer>>();
-            onslaught = data.InitialOnslaught;
-        }
-
-        public MeleeAttackAction([NotNull] TUnit unit, MeleeAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> data)
-            : base(unit, data)
-        {
-            blockerSelector = data.blockerSelector;
-            onslaught = data.onslaught;
-            moveAction = data.moveAction;
-        }
-
+        
         public override CommandType CommandType => CommandType.MeleeAttack;
 
         public override bool CanAttackFrom([NotNull] TNode node, [NotNull] TUnit enemy,
@@ -101,6 +86,11 @@ namespace LineWars.Model
         public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor)
         {
             visitor.Visit(this);
+        }
+
+        public MeleeAttackAction(TUnit executor) : base(executor)
+        {
+            moveAction = executor.GetUnitAction<IMoveAction<TNode, TEdge, TUnit, TOwned, TPlayer>>();
         }
     }
 }

@@ -5,6 +5,8 @@ namespace LineWars.Model
 {
     public static class UnitExtension
     {
+        
+        public static int GetMaxDamage(this Unit unit) => GetMaxDamage<Node, Edge, Unit, Owned, BasePlayer>(unit);
         public static int GetMaxDamage<TNode, TEdge, TUnit, TOwned, TPlayer>(this TUnit unit)
             #region Сonstraints
             where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
@@ -22,6 +24,7 @@ namespace LineWars.Model
                 : 0;
         }
 
+        public static IEnumerable<(CommandType, int)> GetDamages(this Unit unit) => GetDamages<Node, Edge, Unit, Owned, BasePlayer>(unit);
         public static IEnumerable<(CommandType, int)> GetDamages<TNode, TEdge, TUnit, TOwned, TPlayer>(this TUnit unit)
             #region Сonstraints
             where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
@@ -43,8 +46,13 @@ namespace LineWars.Model
             }
         }
 
-
-        public static int GetMaxDamage(this Unit unit) => GetMaxDamage<Node, Edge, Unit, Owned, BasePlayer>(unit);
-        public static IEnumerable<(CommandType, int)> GetDamages(this Unit unit) => GetDamages<Node, Edge, Unit, Owned, BasePlayer>(unit);
+        public static IEnumerable<ICommandWithCommandType> GetCommandsForNode(this Unit unit, Node node)
+        {
+            return node.Targets
+                .Where(target => unit.TargetTypeActionsDictionary.ContainsKey(target.GetType()))
+                .Select(target => unit.TargetTypeActionsDictionary[target.GetType()]
+                    .Select(action => action.GenerateCommand(target)))
+                .SelectMany(x => x);
+        }
     }
 }
