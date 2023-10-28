@@ -17,6 +17,12 @@ namespace LineWars.Model
     {
         public bool CanMoveTo([NotNull] TNode target, bool ignoreActionPointsCondition = false)
         {
+            var r1 = MyUnit.Node != target;
+            var r2 = OwnerCondition();
+            var r3 = SizeCondition();
+            var r4 = LineCondition();
+            var r5 = (ignoreActionPointsCondition || ActionPointsCondition());
+
             return MyUnit.Node != target
                    && OwnerCondition()
                    && SizeCondition()
@@ -67,7 +73,7 @@ namespace LineWars.Model
                     return;
                 }
 
-                if (target.Owner != MyUnit.Owner)
+                if (target.Owner != MyUnit.Owner) //?????????
                 {
                     OnCapturingEnemyNode();
                     if (target.IsBase)

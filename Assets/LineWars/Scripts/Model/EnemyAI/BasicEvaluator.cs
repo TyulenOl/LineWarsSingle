@@ -35,16 +35,16 @@ namespace LineWars.Model
             }
 
             var unitScore = 0;
-            foreach(var units in projection.UnitsIndexList.Values)
+            foreach(var unit in projection.UnitsIndexList.Values)
             {
-                if (units.Owner != player)
+                if (unit.Owner != player)
                 {
-                    unitScore--;
+                    unitScore -= unit.CurrentHp * 2;
                     continue;
                 }
-                unitScore++;
+                unitScore += unit.CurrentHp;
             }
-            Debug.Log($"{nodeScore} {unitScore} {moneyScore}");
+            //Debug.Log($"moneyS : {moneyScore} hpS : {unitScore} nodeS : {nodeScore}");
             return nodeScore * nodesMultiplier + unitScore * unitsMultiplier + moneyScore * moneyMultiplier;
         }
     }

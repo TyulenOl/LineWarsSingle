@@ -59,7 +59,11 @@ namespace LineWars.Model
 
         private static void CollectUsualState(PhaseType type, List<ICommandBlueprint> commands, GameProjection gameProjection)
         {
-            foreach (var unit in gameProjection.UnitsIndexList.Values)
+            var units = gameProjection.CurrentPlayer.OwnedObjects
+                .Where(owned => owned is UnitProjection)
+                .Select(owned => (UnitProjection)owned)
+                .ToList();
+            foreach (var unit in units)
             {
                 if (unit.Owner != gameProjection.CurrentPlayer) continue;
                 if (!gameProjection.CurrentPlayer.PhaseExecutorsData[type].Contains(unit.Type)) continue;

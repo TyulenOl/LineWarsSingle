@@ -12,7 +12,7 @@ namespace LineWars.Model
     {
         private Dictionary<CommandType, UnitAction<NodeProjection, EdgeProjection,
             UnitProjection, OwnedProjection,
-            BasePlayerProjection>> actionsDictionary;
+            BasePlayerProjection>> actionsDictionary = new();
 
         private IEnumerable<IMonoUnitAction<UnitAction<Node, Edge, Unit, Owned, BasePlayer>>> monoActions;
 
@@ -48,6 +48,7 @@ namespace LineWars.Model
         public bool HasOriginal => Original != null;
 
         public UnitProjection(string unitName,
+            int currentHp,
             int maxHp,
             int maxArmor,
             int visibility,
@@ -65,6 +66,7 @@ namespace LineWars.Model
             NodeProjection node = null)
         {
             UnitName = unitName;
+            CurrentHp = currentHp;
             MaxHp = maxHp;
             MaxArmor = maxArmor;
             Visibility = visibility;
@@ -86,6 +88,7 @@ namespace LineWars.Model
 
         public UnitProjection(
             string unitName,
+            int currentHp,
             int maxHp,
             int maxArmor,
             int visibility,
@@ -103,6 +106,7 @@ namespace LineWars.Model
             NodeProjection node = null)
         {
             UnitName = unitName;
+            CurrentHp = currentHp;
             MaxHp = maxHp;
             MaxArmor = maxArmor;
             Visibility = visibility;
@@ -122,7 +126,7 @@ namespace LineWars.Model
         }
 
         public UnitProjection(IReadOnlyUnitProjection unit, NodeProjection node = null)
-            : this(unit.UnitName, unit.MaxHp, unit.MaxArmor, unit.Visibility, unit.Type, unit.Size,
+            : this(unit.UnitName, unit.CurrentHp, unit.MaxHp, unit.MaxArmor, unit.Visibility, unit.Type, unit.Size,
                 unit.MovementLineType, unit.CommandPriorityData, unit.CurrentArmor, unit.UnitDirection,
                 unit.ActionsDictionary.Values, unit.CurrentActionPoints, true, unit.Id, unit.Original, node)
         {
@@ -130,6 +134,7 @@ namespace LineWars.Model
 
         public UnitProjection(Unit original, NodeProjection node = null) : this(
              unitName: original.UnitName,
+             currentHp : original.CurrentHp,
              maxHp: original.MaxHp,
              maxArmor: original.MaxArmor,
              visibility: original.Visibility,

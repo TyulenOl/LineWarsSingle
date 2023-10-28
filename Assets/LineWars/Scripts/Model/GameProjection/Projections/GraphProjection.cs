@@ -33,7 +33,6 @@ namespace LineWars.Model
         private void AddNode(NodeProjection node)
         {
             NodesIndexList.Add(node.Id, node);
-            node.OwnerChanged += OnNodeOwnerChanged;
             if (node.LeftUnit != null)
                 UnitsIndexList.Add(node.LeftUnit.Id, node.LeftUnit);
             if (node.RightUnit != null)

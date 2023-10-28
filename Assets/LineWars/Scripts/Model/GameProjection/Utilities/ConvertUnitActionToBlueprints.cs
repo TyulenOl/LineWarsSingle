@@ -54,7 +54,8 @@ namespace LineWars.Model
                 
                 if(action.CanMoveTo(node))
                 {
-                    var command = new MoveCommandBlueprint(action.MyUnit.Id, action.MyUnit.Node.Id);
+
+                    var command = new MoveCommandBlueprint(action.MyUnit.Id, node.Id);
 
                     BlueprintList.Add(command);
                 }
@@ -95,7 +96,7 @@ namespace LineWars.Model
 
         public void Visit(MeleeAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
-            ProcessAttackAction(action, 1);
+            ProcessAttackAction(action, 2);
         }
 
         public void Visit(RLBlockAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)

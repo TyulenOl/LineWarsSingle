@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 
 
@@ -59,7 +60,7 @@ namespace LineWars.Model
                 GameProjection.GetProjectionFromMono(SingleGame.Instance.AllPlayers.Values, MonoGraph.Instance, PhaseManager.Instance);
             
             var possibleCommands = CommandBlueprintCollector.CollectAllCommands(gameProjection);
-            var commandEvalList = new List<(int, List<ICommandBlueprint>)>(); 
+            var commandEvalList = new List<(int, List<ICommandBlueprint>)>();
             foreach(var command in possibleCommands)
             {
                 var commandChain = new List<ICommandBlueprint>();
@@ -74,8 +75,7 @@ namespace LineWars.Model
                 foreach (var blueprint in bestBlueprint.Item2)
                 {
                     var command = blueprint.GenerateMonoCommand(gameProjection);
-                    Debug.Log(command.ToString());
-                    command.Execute();
+                    UnitsController.ExecuteCommand(command);
                     yield return new WaitForSeconds(commandPause);
                 }
                 yield return null;
@@ -95,6 +95,7 @@ namespace LineWars.Model
             currentExecutorId = blueprint.ExecutorId;
             var newGame = GameProjection.GetCopy(gameProjection);
             var thisCommand = blueprint.GenerateCommand(newGame);
+            Debug.Log(thisCommand);
             thisCommand.Execute();
             //если сохраняются команды, то записать команду
             if(isSavingCommands)
@@ -119,13 +120,15 @@ namespace LineWars.Model
             //проверить закончилась ли глубина, если да, то оценить проекцию и return
             var thisPlayerProjection = newGame.OriginalToProjectionPlayers[this];
             if (depth == 0 || newGame.CurrentPhase == PhaseType.Buy)
-            {  
-                return (gameEvaluator.Evaluate(gameProjection, thisPlayerProjection), firstCommandChain);
+            {
+                return (gameEvaluator.Evaluate(newGame, thisPlayerProjection), firstCommandChain);
             }
+
             //пройтись по доступным командам и запустить на них минмакс
             //если текущий игрок == this, найти наивысшую, если != - найти наименьшую
+            
             var possibleCommands = CommandBlueprintCollector.CollectAllCommands(newGame)
-                .Where(newBlueprint => currentExecutorId != -1 && newBlueprint.ExecutorId != currentExecutorId)
+                .Where(newBlueprint => currentExecutorId == -1 || newBlueprint.ExecutorId != currentExecutorId)
                 .Select(newBlueprint => MinMax(newGame, newBlueprint, depth, currentExecutorId, firstCommandChain, isSavingCommands));
 
             if (thisPlayerProjection != newGame.CurrentPlayer)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 using System.Linq;
 
 namespace LineWars.Model
@@ -27,9 +28,7 @@ namespace LineWars.Model
             set
             {
                 leftUnit = value;
-                UnitAdded?.Invoke(value);
-                if(value != null)
-                    Owner = value.Owner;
+                UnitAdded?.Invoke(value);       
             } 
         }
         public UnitProjection RightUnit
@@ -39,8 +38,6 @@ namespace LineWars.Model
             {
                 rightUnit = value;
                 UnitAdded?.Invoke(value);
-                if (value != null)
-                    Owner = value.Owner;
             }
         }
 

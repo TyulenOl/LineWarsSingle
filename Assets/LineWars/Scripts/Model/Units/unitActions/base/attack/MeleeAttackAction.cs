@@ -90,12 +90,13 @@ namespace LineWars.Model
         }
 
         public MeleeAttackAction(
-            TUnit executor, 
+            TUnit executor,
             int damage,
             bool isPenetrating,
-            bool onslaught, 
-            UnitBlockerSelector blockerSelector) : base(executor, damage, isPenetrating)
+            bool onslaught,
+            [NotNull] UnitBlockerSelector blockerSelector) : base(executor, damage, isPenetrating)
         {
+            if(blockerSelector == null) throw new ArgumentException();
             Onslaught = onslaught;
             BlockerSelector = blockerSelector;
             moveAction = executor.GetUnitAction<IMoveAction<TNode, TEdge, TUnit, TOwned, TPlayer>>();
