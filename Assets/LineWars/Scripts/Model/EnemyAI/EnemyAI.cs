@@ -1,3 +1,4 @@
+using LineWars.Extensions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,8 +15,8 @@ namespace LineWars.Model
         [SerializeField] private EnemyAIPersonality personality;
         [SerializeField] private GameEvaluator gameEvaluator;
         [SerializeField] private int depth;
+        [SerializeField] private float commandPause;
 
-        private IExecutor currentExecutor;
         private EnemyAIBuySelector buySelector;
 
         protected override void Awake()
@@ -58,71 +59,95 @@ namespace LineWars.Model
                 GameProjection.GetProjectionFromMono(SingleGame.Instance.AllPlayers.Values, MonoGraph.Instance, PhaseManager.Instance);
             
             var possibleCommands = CommandBlueprintCollector.CollectAllCommands(gameProjection);
-            var commandEvalList = new List<(ICommandBlueprint, int)>(); 
-
-            foreach (var blueprint in possibleCommands)
+            var commandEvalList = new List<(int, List<ICommandBlueprint>)>(); 
+            foreach(var command in possibleCommands)
             {
-                var newGame = GetProjectionFromCommand(gameProjection, blueprint);
-                var eval = MinMax(newGame, depth - 1);
-                commandEvalList.Add((blueprint, eval));
+                var commandChain = new List<ICommandBlueprint>();
+                commandEvalList.Add(MinMax(gameProjection, command, depth, -1, commandChain, true));
             }
 
-            Debug.Log(commandEvalList.Count);
-            foreach(var command in commandEvalList)
-            {
-                Debug.Log(command.ToString());
-            }
             StartCoroutine(TurnCoroutine());
+
             IEnumerator TurnCoroutine()
             {
-                var bestBlueprint = commandEvalList.Aggregate((i1, i2) => i1.Item2 > i2.Item2 ? i1 : i2);
-                var command = bestBlueprint.Item1.GenerateMonoCommand(gameProjection);
-                Debug.Log(command.ToString());
-                command.Execute();
+                var bestBlueprint = commandEvalList.Aggregate((i1, i2) => i1.Item1 > i2.Item1 ? i1 : i2);
+                foreach (var blueprint in bestBlueprint.Item2)
+                {
+                    var command = blueprint.GenerateMonoCommand(gameProjection);
+                    Debug.Log(command.ToString());
+                    command.Execute();
+                    yield return new WaitForSeconds(commandPause);
+                }
                 yield return null;
                 ExecuteTurn(PhaseType.Idle);
-            }
-            
+            }         
         }
 
-        private int MinMax(GameProjection gameProjection, int depth)
+        private (int, List<ICommandBlueprint>) MinMax(GameProjection gameProjection, ICommandBlueprint blueprint, int depth, 
+            int currentExecutorId, List<ICommandBlueprint> firstCommandChain, bool isSavingCommands)
         {
-            var thisPlayerPojection = gameProjection.OriginalToProjectionPlayers[this];
-            if (depth == 0 || gameProjection.CurrentPhase == PhaseType.Buy)
-                return gameEvaluator.Evaluate(gameProjection, thisPlayerPojection);
-
-            var possibleCommands = CommandBlueprintCollector.CollectAllCommands(gameProjection);
-            if (thisPlayerPojection == gameProjection.CurrentPlayer)
+            //проверить ид экзекутора
+            if(currentExecutorId != -1 && blueprint.ExecutorId != currentExecutorId)
             {
-                var maxEval = int.MinValue;
-                foreach (var blueprint in possibleCommands)
-                {
-                    var newGame = GetProjectionFromCommand(gameProjection, blueprint);
-                    var eval = MinMax(newGame, depth - 1);
-                    maxEval = Mathf.Max(maxEval, eval);
-                }
-                return maxEval;
+                throw new ArgumentException();
             }
-            var minEval = int.MaxValue;
-            foreach (var blueprint in possibleCommands)
+            // cгенерировать новую проекцию из комманды и обновиить ид экзекутора
+            currentExecutorId = blueprint.ExecutorId;
+            var newGame = GameProjection.GetCopy(gameProjection);
+            var thisCommand = blueprint.GenerateCommand(newGame);
+            thisCommand.Execute();
+            //если сохран€ютс€ команды, то записать команду
+            if(isSavingCommands)
             {
-                var newGame = GetProjectionFromCommand(gameProjection, blueprint);
-                var eval = MinMax(newGame, depth - 1);
-                minEval = Mathf.Min(minEval, eval);
+                var newCommandChain = new List<ICommandBlueprint>(firstCommandChain);
+                newCommandChain.Add(blueprint);
+                firstCommandChain = newCommandChain;
             }
+            //проверить закончилс€ ли ход, если да, обнулить экзекутора, выключить сохранение комманд
+            // а также проверить фазу, если фаза окончена, то найти новую фазу и игрока
+            // если нет, то найти нового игрока
+            if (IsTurnOver(newGame, currentExecutorId))
+            {
+                depth--;
+                currentExecutorId = -1;
+                isSavingCommands = false;
+                if (!newGame.IsUnitPhaseAvailable())
+                    newGame.CycleTurn();
+                else
+                    newGame.CyclePlayers();
+            }
+            //проверить закончилась ли глубина, если да, то оценить проекцию и return
+            var thisPlayerProjection = newGame.OriginalToProjectionPlayers[this];
+            if (depth == 0 || newGame.CurrentPhase == PhaseType.Buy)
+            {  
+                return (gameEvaluator.Evaluate(gameProjection, thisPlayerProjection), firstCommandChain);
+            }
+            //пройтись по доступным командам и запустить на них минмакс
+            //если текущий игрок == this, найти наивысшую, если != - найти наименьшую
+            var possibleCommands = CommandBlueprintCollector.CollectAllCommands(newGame)
+                .Where(newBlueprint => currentExecutorId != -1 && newBlueprint.ExecutorId != currentExecutorId)
+                .Select(newBlueprint => MinMax(newGame, newBlueprint, depth, currentExecutorId, firstCommandChain, isSavingCommands));
 
-            return minEval;
+            if (thisPlayerProjection != newGame.CurrentPlayer)
+            {
+                var minChain = possibleCommands.MinItem((i1, i2) => i1.Item1.CompareTo(i2.Item1));
+                return minChain;
+            }
+            else
+            {
+                var maxChain = possibleCommands.MaxItem((i1, i2) => i1.Item1.CompareTo(i2.Item1));
+                return maxChain;
+            }
         }
 
-        private GameProjection GetProjectionFromCommand(GameProjection game, ICommandBlueprint blueprint)
+        private bool IsTurnOver(GameProjection game, int currentExecutorId)
         {
-            var newGame = GameProjection.GetCopy(game);
-            var command = blueprint.GenerateCommand(newGame); 
-            command.Execute();
-            if (!newGame.IsUnitPhaseAvailable(newGame.CurrentPhase))
-                newGame.CycleTurn();
-
-            return newGame;
+            if(game.CurrentPhase != PhaseType.Buy && currentExecutorId != -1)
+            {
+                var currentExecutor = game.UnitsIndexList[currentExecutorId];
+                return currentExecutor.CurrentActionPoints <= 0;
+            }
+            return true;
         }
         #endregion
 

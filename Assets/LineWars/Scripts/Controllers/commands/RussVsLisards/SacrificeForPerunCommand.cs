@@ -40,7 +40,7 @@ namespace LineWars.Model
 
         public string GetLog()
         {
-            return $"Юнит {unit} пожертвовал собой ради того, чтобы нанести урон всем в юнитам в ноде {node}";
+            return $"Юнит {unit} пожертвовал собой ради того, чтобы нанести урон всем в юнитам в ноде {node}. Настоящий герой!";
         }
         
         public CommandType CommandType => action.CommandType;

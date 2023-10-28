@@ -7,18 +7,18 @@ namespace LineWars.Model
 {
     public class BuildCommandBlueprint : ICommandBlueprint
     {
-        public int EngineerId { get; private set; }
+        public int ExecutorId { get; private set; }
         public int EdgeId { get; private set; }
 
         public BuildCommandBlueprint(int engineerId, int edgeId)
         {
-            EngineerId = engineerId;
+            ExecutorId = engineerId;
             EdgeId = edgeId;
         }
 
         public ICommand GenerateCommand(GameProjection projection)
         {
-            var engineer = projection.UnitsIndexList[EngineerId];
+            var engineer = projection.UnitsIndexList[ExecutorId];
             var edge = projection.EdgesIndexList[EdgeId];   
 
             return new BuildCommand
@@ -29,7 +29,7 @@ namespace LineWars.Model
 
         public ICommand GenerateMonoCommand(GameProjection projection)
         {
-            var engineer = projection.UnitsIndexList[EngineerId].Original;
+            var engineer = projection.UnitsIndexList[ExecutorId].Original;
             var edge = projection.EdgesIndexList[EdgeId].Original;
 
             return new BuildCommand

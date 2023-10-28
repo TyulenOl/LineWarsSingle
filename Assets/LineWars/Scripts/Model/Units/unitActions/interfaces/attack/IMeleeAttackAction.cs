@@ -11,6 +11,7 @@
         where TPlayer: class, IBasePlayer<TOwned, TPlayer>
         #endregion 
     {
-        
+        public bool Onslaught { get; }
+        public UnitBlockerSelector BlockerSelector { get; }
     }
 }

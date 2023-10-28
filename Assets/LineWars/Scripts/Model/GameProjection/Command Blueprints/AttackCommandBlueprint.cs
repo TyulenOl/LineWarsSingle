@@ -10,19 +10,19 @@ namespace LineWars.Model
             Unit
         }
         public Target TargetType { get; private set; }
-        public int UnitId { get; private set; }
+        public int ExecutorId { get; private set; }
         public int TargetId { get; private set; }
 
         public AttackCommandBlueprint(int unitId, int targetId, Target targetType)
         {
-            UnitId = unitId;
+            ExecutorId = unitId;
             TargetId = targetId;
             TargetType = targetType;
         }
 
         public ICommand GenerateCommand(GameProjection projection)
         {
-            var unit = projection.UnitsIndexList[UnitId];
+            var unit = projection.UnitsIndexList[ExecutorId];
             switch(TargetType)
             {
                 case Target.Edge:
@@ -42,7 +42,7 @@ namespace LineWars.Model
 
         public ICommand GenerateMonoCommand(GameProjection projection)
         {
-            var unit = projection.UnitsIndexList[UnitId].Original;
+            var unit = projection.UnitsIndexList[ExecutorId].Original;
             switch (TargetType)
             {
                 case Target.Edge:
