@@ -2,6 +2,7 @@ namespace LineWars.Model
 {
     public class SpawnPresetCommandBlueprint : ICommandBlueprint
     {
+        public int ExecutorId { get => -1; }
         public int PlayerId { get; private set; }
         public UnitBuyPreset UnitBuyPreset { get; private set; }
 

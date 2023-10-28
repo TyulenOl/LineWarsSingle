@@ -50,7 +50,7 @@ namespace LineWars.Model
         
         
         private Dictionary<CommandType, IMonoUnitAction<UnitAction<Node, Edge, Unit, Owned, BasePlayer>>> monoActionsDictionary;
-        private IEnumerable<IMonoUnitAction<UnitAction<Node, Edge, Unit, Owned, BasePlayer>>> MonoActions => monoActionsDictionary.Values;
+        public IEnumerable<IMonoUnitAction<UnitAction<Node, Edge, Unit, Owned, BasePlayer>>> MonoActions => monoActionsDictionary.Values;
         public uint MaxPossibleActionRadius { get; private set; }
         public IReadOnlyCollection<Type> PossibleTargetsTypes { get; private set; }
         public IReadOnlyDictionary<Type, ITargetedAction[]> TargetTypeActionsDictionary { get; private set; }

@@ -100,7 +100,11 @@ namespace LineWars.Model
 
         public void Visit(RLBlockAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
-            throw new System.NotImplementedException();
+            if(action.CanBlock())
+            {
+                var unitId = action.MyUnit.Id;
+
+            }
         }
 
         public void Visit(SacrificeForPerunAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)

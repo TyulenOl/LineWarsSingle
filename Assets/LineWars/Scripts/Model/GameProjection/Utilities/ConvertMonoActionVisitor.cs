@@ -2,20 +2,13 @@ using System;
 
 namespace LineWars.Model
 {
-    public class ConvertMonoActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> : IMonoUnitVisitor
-        #region Сonstraints
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TOwned : class, IOwned<TOwned, TPlayer>
-        where TPlayer : class, IBasePlayer<TOwned, TPlayer>
-        #endregion
+    public class ConvertMonoActionVisitor : IMonoUnitVisitor
     {
-        public TUnit Unit { get; private set; }
-        public IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer> Graph { get; private set; }
-        public UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer> Result { get; private set; }
+        public UnitProjection Unit { get; private set; }
+        public IGraphForGame<NodeProjection, EdgeProjection, UnitProjection, OwnedProjection, BasePlayerProjection> Graph { get; private set; }
+        public UnitAction<NodeProjection, EdgeProjection, UnitProjection, OwnedProjection, BasePlayerProjection> Result { get; private set; }
 
-        public ConvertMonoActionVisitor(TUnit unit, IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer> graph)
+        public ConvertMonoActionVisitor(UnitProjection unit, IGraphForGame<NodeProjection, EdgeProjection, UnitProjection, OwnedProjection, BasePlayerProjection> graph)
         {
             Unit = unit;
             Graph = graph;
@@ -23,82 +16,75 @@ namespace LineWars.Model
 
         public void Visit(MonoBuildRoadAction action)
         {
-            throw new NotImplementedException();
+            Result = new BuildAction<NodeProjection, EdgeProjection, UnitProjection, OwnedProjection, BasePlayerProjection>(Unit);
         }
 
         public void Visit(MonoBlockAction action)
         {
-            throw new NotImplementedException();
+            Result = new BlockAction<NodeProjection, EdgeProjection, UnitProjection, OwnedProjection, BasePlayerProjection>(Unit, action.InitialContrAttackDamageModifier, action.Protection);
         }
 
         public void Visit(MonoMoveAction action)
         {
-            throw new NotImplementedException();
+            Result = new MoveAction<NodeProjection, EdgeProjection, UnitProjection, OwnedProjection, BasePlayerProjection>(Unit);
         }
 
         public void Visit(MonoHealAction action)
         {
-            throw new NotImplementedException();
+            Result = new HealAction<NodeProjection, EdgeProjection, UnitProjection, OwnedProjection, BasePlayerProjection>(Unit, action.IsMassHeal, action.HealingAmount);
         }
 
         public void Visit(MonoDistanceAttackAction action)
         {
-            throw new NotImplementedException();
+            Result = new DistanceAttackAction<NodeProjection, EdgeProjection, UnitProjection, OwnedProjection, BasePlayerProjection>(Unit, action.Damage, action.IsPenetratingDamage, action.Distance, Graph);
         }
 
         public void Visit(MonoArtilleryAttackAction action)
         {
-            throw new NotImplementedException();
+            Result = new ArtilleryAttackAction<NodeProjection, EdgeProjection, UnitProjection, OwnedProjection, BasePlayerProjection>(Unit, action.Damage, action.IsPenetratingDamage, action.Distance, Graph);
         }
 
         public void Visit(MonoMeleeAttackAction action)
         {
-            throw new NotImplementedException();
+            Result = new MeleeAttackAction<NodeProjection, EdgeProjection, UnitProjection, OwnedProjection, BasePlayerProjection>(Unit, action.Damage, action.IsPenetratingDamage, action.Onslaught, action.BlockerSelector);
         }
 
         public void Visit(MonoRLBlockAction action)
         {
-            throw new NotImplementedException();
+            Result = new RLBlockAction<NodeProjection, EdgeProjection, UnitProjection, OwnedProjection, BasePlayerProjection>(Unit);
         }
 
         public void Visit(MonoSacrificeForPerunAction action)
         {
-            throw new NotImplementedException();
+            Result = new SacrificeForPerunAction<NodeProjection, EdgeProjection, UnitProjection, OwnedProjection, BasePlayerProjection>(Unit);
         }
 
         public void Visit(MonoRamAction action)
         {
-            throw new NotImplementedException();
+            Result = new RamAction<NodeProjection, EdgeProjection, UnitProjection, OwnedProjection, BasePlayerProjection>(Unit, action.Damage);
         }
 
         public void Visit(MonoBlowWithSwingAction action)
         {
-            throw new NotImplementedException();
+            Result = new BlowWithSwingAction<NodeProjection, EdgeProjection, UnitProjection, OwnedProjection, BasePlayerProjection>(Unit, action.Damage);
         }
 
         public void Visit(MonoShotUnitAction action)
         {
-            throw new NotImplementedException();
+            Result = new ShotUnitAction<NodeProjection, EdgeProjection, UnitProjection, OwnedProjection, BasePlayerProjection>(Unit);
         }
 
         public void Visit(MonoRLBuildAction action)
         {
-            throw new NotImplementedException();
+            Result = new RLBuildAction<NodeProjection, EdgeProjection, UnitProjection, OwnedProjection, BasePlayerProjection>(Unit, action.PossibleBuildings, action.Factory);
+        }
+
+        public static ConvertMonoActionVisitor Create(UnitProjection unit, IGraphForGame<NodeProjection, EdgeProjection, UnitProjection, OwnedProjection, BasePlayerProjection> graph)
+
+        {
+            return new ConvertMonoActionVisitor(unit, graph);
         }
     }
 
-    public static class ConvertMonoActionVisitor
-    {
-        public static ConvertMonoActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> Create<TNode, TEdge, TUnit, TOwned, TPlayer>(TUnit unit, IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer> graph)
-            #region Сonstraints
-            where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-            where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-            where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
-            where TOwned : class, IOwned<TOwned, TPlayer>
-            where TPlayer : class, IBasePlayer<TOwned, TPlayer>
-            #endregion
-        {
-            return new ConvertMonoActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> (unit, graph);
-        }
-    }
+    
 }

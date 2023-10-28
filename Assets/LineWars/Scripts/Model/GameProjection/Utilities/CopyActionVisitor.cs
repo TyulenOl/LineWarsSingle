@@ -23,79 +23,69 @@ namespace LineWars.Model
 
         public void Visit(BuildAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
-            throw new NotImplementedException();
-            //Result = new BuildAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action);
+            Result = new BuildAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit); 
         }
 
         public void Visit(BlockAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
-            throw new NotImplementedException();
-            //Result = new BlockAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action);
+            Result = new BlockAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action.ContrAttackDamageModifier, action.Protection);
         }
 
         public void Visit(MoveAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
-            throw new NotImplementedException();
-            //Result = new MoveAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action);
+            Result = new MoveAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit);
         }
 
         public void Visit(HealAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
-            throw new NotImplementedException();
-            //Result = new HealAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action);
+            Result = new HealAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action.IsMassHeal, action.HealingAmount);
+
         }
 
         public void Visit(DistanceAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
-            throw new NotImplementedException();
-            //Result = new DistanceAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action, Graph);
+            Result = new DistanceAttackAction
+                <TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action.Damage, action.IsPenetratingDamage, action.Distance, Graph);
         }
 
         public void Visit(ArtilleryAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
-            throw new NotImplementedException();
-            //Result = new ArtilleryAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action, Graph);
+            Result = new ArtilleryAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action.Damage, action.IsPenetratingDamage, action.Distance, Graph);
         }
 
         public void Visit(MeleeAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
-            throw new NotImplementedException();
-            //Result = new MeleeAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action);
+            Result = new MeleeAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action.Damage, action.IsPenetratingDamage, action.Onslaught, action.BlockerSelector);
         }
 
         public void Visit(RLBlockAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
-            throw new NotImplementedException();
-            //Result = new RLBlockAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action);
+            Result = new RLBlockAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit);
         }
 
         public void Visit(SacrificeForPerunAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
-            throw new NotImplementedException();
-            //Result = new SacrificeForPerunAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action);
+            Result = new SacrificeForPerunAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit);
         }
 
         public void Visit(RamAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
-            throw new NotImplementedException();
-           //Result = new RamAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action);
+            Result = new RamAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action.Damage);
         }
 
         public void Visit(BlowWithSwingAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
-            throw new NotImplementedException();
-            //Result = new BlowWithSwingAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action);
+            Result = new BlowWithSwingAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action.Damage);
         }
 
         public void Visit(ShotUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
-            throw new NotImplementedException();
-            //Result = new ShotUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action);
+            Result = new ShotUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit);
         }
 
         public void Visit(RLBuildAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
-            throw new NotImplementedException();
+            Result = new RLBuildAction<TNode, TEdge, TUnit, TOwned, TPlayer>(Unit, action.PossibleBuildings, action.Factory);
         }
     }
 
