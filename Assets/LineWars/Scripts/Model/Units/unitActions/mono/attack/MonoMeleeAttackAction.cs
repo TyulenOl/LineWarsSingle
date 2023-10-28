@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 namespace LineWars.Model
 {
@@ -12,6 +13,9 @@ namespace LineWars.Model
         /// указывет на то, нужно ли захватывать точку после атаки
         /// </summary>
         [field: SerializeField] public bool InitialOnslaught { get; private set; }
+
+        public bool Onslaught => ((MeleeAttackAction<Node, Edge, Unit, Owned, BasePlayer>) Action).Onslaught;
+        public UnitBlockerSelector BlockerSelector => ((MeleeAttackAction<Node, Edge, Unit, Owned, BasePlayer>)Action).BlockerSelector;
 
         protected override AttackAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
         {

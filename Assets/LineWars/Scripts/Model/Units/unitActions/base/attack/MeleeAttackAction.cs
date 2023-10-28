@@ -18,8 +18,8 @@ namespace LineWars.Model
         #endregion
 
     {
-        private UnitBlockerSelector BlockerSelector { get; }
-        private bool Onslaught { get; }
+        public UnitBlockerSelector BlockerSelector { get; }
+        public bool Onslaught { get; }
         
         private readonly IMoveAction<TNode, TEdge, TUnit, TOwned, TPlayer> moveAction;
         

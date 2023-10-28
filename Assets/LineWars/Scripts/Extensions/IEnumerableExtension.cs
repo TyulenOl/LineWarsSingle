@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -26,6 +27,16 @@ namespace LineWars.Extensions
             return enumerable
                 .Select(x => x.GetComponent<TComponent>())
                 .Where(x => x != null);
+        }
+
+        public static T MaxItem<T>(this IEnumerable<T> enumerable, Comparison<T> comparison)
+        {
+            return enumerable.Aggregate((i1, i2) => comparison(i1, i2) > 0 ? i1 : i2);
+        }
+
+        public static T MinItem<T>(this IEnumerable<T> enumerable, Comparison<T> comparison)
+        {
+            return enumerable.Aggregate((i1, i2) => comparison(i1, i2) < 0 ? i1 : i2);
         }
     }
 }

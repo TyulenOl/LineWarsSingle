@@ -14,6 +14,10 @@ namespace LineWars.Model
 
     {
         public IEnumerable<BuildingType> PossibleBuildings { get; }
+        public IBuildingFactory Factory
+        {
+            get;
+        }
 
         public bool CanBuild(TNode node, BuildingType buildingType);
         public void Build(TNode node, BuildingType buildingType);
