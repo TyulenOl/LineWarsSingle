@@ -12,9 +12,6 @@ namespace LineWars.Interface
     public class GameUI : MonoBehaviour
     {
         public static GameUI Instance;
-        [SerializeField] private TMP_Text currentMoneyText;
-        [SerializeField] private TMP_Text currentPhaseText;
-        [SerializeField] private TMP_Text currentIncomeText;
         [SerializeField] private TMP_Text scoreText;
         [SerializeField] private EnemyTurnPanel enemyTurnPanel;
         [SerializeField] private List<Button> buttonsToBlockIfEnemyTurn;
@@ -39,13 +36,6 @@ namespace LineWars.Interface
 
         private void Start()
         {
-            Player.LocalPlayer.CurrentMoneyChanged += PlayerOnCurrenMoneyChanged;
-            PlayerOnCurrenMoneyChanged(0, Player.LocalPlayer.CurrentMoney);
-            
-            Player.LocalPlayer.IncomeChanged += LocalPlayerOnIncomeChanged;
-            LocalPlayerOnIncomeChanged(0, Player.LocalPlayer.Income);
-            
-            PhaseManager.Instance.PhaseChanged.AddListener(OnPhaseChanged);
             CommandsManager.Instance.ExecutorChanged.AddListener(OnExecutorChanged);
             
             SubscribeEventForGameReferee();
@@ -139,22 +129,7 @@ namespace LineWars.Interface
                 drawer.ReDraw(valueTuple.Item2);
             }
         }
-        
-        private void OnPhaseChanged(PhaseType previousPhase, PhaseType currentPhase)
-        {
-            if(currentPhaseText != null)
-                currentPhaseText.text = DrawHelper.GetPhaseName(currentPhase);
-        }
-        void PlayerOnCurrenMoneyChanged(int before, int after)
-        {
-            currentMoneyText.text = after.ToString();
-        }
-        
-        private void LocalPlayerOnIncomeChanged(int before, int after)
-        {
-            currentIncomeText.text = $"( <color=#E22B12>+{after.ToString()}</color> )";
-        }
-        
+
         public void ToMainMenu()
         {
             SceneTransition.LoadScene(SceneName.MainMenu);

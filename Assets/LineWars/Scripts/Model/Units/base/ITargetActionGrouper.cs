@@ -5,6 +5,6 @@ namespace LineWars.Model
 {
     public interface ITargetActionGrouper
     {
-        public Dictionary<Type, ITargetedAction[]> GroupByType(IEnumerable<ITargetedAction> targetedActions);
+        public TargetTypeActionsDictionary GroupByType(IEnumerable<ITargetedAction> targetedActions);
     }
 }

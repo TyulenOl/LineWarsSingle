@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace LineWars.Model
 {
@@ -44,6 +45,9 @@ namespace LineWars.Model
         }
 
         public IBuilding Building { get; set; }
+        public IEnumerable<UnitProjection> Units => new[] {LeftUnit, RightUnit}
+            .Where(x => x != null)
+            .Distinct();
 
         public Action<UnitProjection> UnitAdded;
         public NodeProjection(CommandPriorityData commandPriorityData,

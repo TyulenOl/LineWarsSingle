@@ -17,7 +17,7 @@ namespace LineWars
 
         private IReadOnlyCollection<UnitType> potentialExecutors;
         private bool isTurnMade;
-        private HashSet<Node> additionalVisibleNodes;
+        private HashSet<Node> additionalVisibleNodes = new ();
 
         private StateMachine stateMachine;
         private PlayerPhase idlePhase;

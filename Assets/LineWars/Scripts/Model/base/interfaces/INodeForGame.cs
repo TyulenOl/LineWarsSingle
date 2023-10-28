@@ -25,9 +25,7 @@ namespace LineWars.Model
         public TUnit RightUnit { get; set; }
         public IBuilding Building { get; set; }
 
-        public IEnumerable<TUnit> Units => new[] {LeftUnit, RightUnit}
-            .Where(x => x != null)
-            .Distinct();
+        public IEnumerable<TUnit> Units { get; }
 
         public bool LeftIsFree => LeftUnit == null;
         public bool RightIsFree => RightUnit == null;
