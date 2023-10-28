@@ -53,7 +53,7 @@ namespace LineWars.Model
         public IEnumerable<IMonoUnitAction<UnitAction<Node, Edge, Unit, Owned, BasePlayer>>> MonoActions => monoActionsDictionary.Values;
         public uint MaxPossibleActionRadius { get; private set; }
         public IReadOnlyCollection<Type> PossibleTargetsTypes { get; private set; }
-        public IReadOnlyDictionary<Type, ITargetedAction[]> TargetTypeActionsDictionary { get; private set; }
+        public TargetTypeActionsDictionary TargetTypeActionsDictionary { get; private set; }
         private readonly ITargetActionGrouper grouper = new DefaultTargetActionGrouper();
 
         #region Properties
@@ -177,10 +177,15 @@ namespace LineWars.Model
             index = SingleGame.Instance.AllUnits.Add(this);
             void InitialiseAllActions()
             {
-                var serializeActions = GetComponents<IMonoUnitAction<UnitAction<Node, Edge, Unit, Owned, BasePlayer>>>()
+                // var serializeActions = gameObject.GetComponents<IMonoUnitAction<UnitAction<Node, Edge, Unit, Owned, BasePlayer>>>()
+                //     .OrderByDescending(x => x.Priority)
+                //     .ToArray();
+
+                var serializeActions = gameObject.GetComponents<Component>()
+                    .OfType<IMonoUnitAction<UnitAction<Node, Edge, Unit, Owned, BasePlayer>>>()
                     .OrderByDescending(x => x.Priority)
                     .ToArray();
-                
+
                 monoActionsDictionary = new Dictionary<CommandType, IMonoUnitAction<UnitAction<Node, Edge, Unit, Owned, BasePlayer>>>(serializeActions.Length);
                 foreach (var serializeAction in serializeActions)
                 {

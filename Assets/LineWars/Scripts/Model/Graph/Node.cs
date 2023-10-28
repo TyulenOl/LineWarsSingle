@@ -11,8 +11,6 @@ namespace LineWars.Model
     [RequireComponent(typeof(RenderNodeV3))]
     public class Node : Owned, INodeForGame<Node, Edge, Unit, Owned, BasePlayer>, ITargetsEnumerable
     {
-        private static INodeForGame<Node, Edge, Unit, Owned, BasePlayer> iNodeImplementation;
-        
         [SerializeField] private int index;
         [SerializeField] private List<Edge> edges;
 
@@ -91,7 +89,6 @@ namespace LineWars.Model
 
         private void Awake()
         {
-            iNodeImplementation = this;
             mainCamera = Camera.main;
             IsDirty = ReferenceToSpawn != null;
         }
@@ -134,7 +131,9 @@ namespace LineWars.Model
             }
         }
 
-        public IEnumerable<Unit> Units => iNodeImplementation.Units;
+        public IEnumerable<Unit> Units => new[] {LeftUnit, RightUnit}
+            .Where(x => x != null)
+            .Distinct();
 
         private GameObject OnPointerClicked(GameObject obj, PointerEventData eventData)
         {
