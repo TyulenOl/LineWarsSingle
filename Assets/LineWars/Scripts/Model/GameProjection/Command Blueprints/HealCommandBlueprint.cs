@@ -7,12 +7,12 @@ namespace LineWars.Model
 {
     public class HealCommandBlueprint : ICommandBlueprint
     {
-        public int DoctorId { get; private set; }
+        public int ExecutorId { get; private set; }
         public int UnitId { get; private set; }
 
         public HealCommandBlueprint(int doctorId, int unitId)
         {
-            DoctorId = doctorId;
+            ExecutorId = doctorId;
             UnitId = unitId;
         }
     

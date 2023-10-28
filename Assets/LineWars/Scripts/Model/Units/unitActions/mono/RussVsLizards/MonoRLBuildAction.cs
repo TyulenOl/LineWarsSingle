@@ -9,7 +9,9 @@ namespace LineWars.Model
     {
         [SerializeField] public List<BuildingType> initialPossibleBuildingTypes;
         public IEnumerable<BuildingType> PossibleBuildings => Action.PossibleBuildings;
-        
+
+        public IBuildingFactory Factory => Action.Factory;
+
         public bool CanBuild(Node node, BuildingType buildingType)
         {
             return Action.CanBuild(node, buildingType);

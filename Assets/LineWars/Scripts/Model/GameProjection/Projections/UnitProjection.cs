@@ -128,23 +128,23 @@ namespace LineWars.Model
         {
         }
 
-        public UnitProjection(Unit original, NodeProjection node = null) //: this(
-            // unitName: original.UnitName,
-            // maxHp: original.MaxHp,
-            // maxArmor: original.MaxArmor,
-            // visibility: original.Visibility,
-            // type: original.Type,
-            // size: original.Size,
-            // lineType: original.MovementLineType,
-            // commandPriorityData: original.CommandPriorityData,
-            // currentArmor: original.CurrentArmor,
-            // unitDirection: original.UnitDirection,
-            // actions: original.Actions,
-            // currentActionPoints: original.CurrentActionPoints,
-            // hasId: true,
-            // id: original.Id,
-            // original: original,
-            // node: node)
+        public UnitProjection(Unit original, NodeProjection node = null) : this(
+             unitName: original.UnitName,
+             maxHp: original.MaxHp,
+             maxArmor: original.MaxArmor,
+             visibility: original.Visibility,
+             type: original.Type,
+             size: original.Size,
+             lineType: original.MovementLineType,
+             commandPriorityData: original.CommandPriorityData,
+             currentArmor: original.CurrentArmor,
+             unitDirection: original.UnitDirection,
+             actions: original.MonoActions,
+             currentActionPoints: original.CurrentActionPoints,
+             hasId: true,
+             id: original.Id,
+             original: original,
+             node: node)
         {
         }
 

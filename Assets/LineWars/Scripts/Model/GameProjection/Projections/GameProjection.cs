@@ -59,10 +59,11 @@ namespace LineWars.Model
         public void CycleTurn()
         {
             CurrentPhase = FindNextViablePhaseType(CurrentPhase);
-            CurrentPlayerPosition = FindNewPlayer(CurrentPhase);
+            CyclePlayers(CurrentPhase);
         }
 
-        private int FindNewPlayer(PhaseType phase)
+        public void CyclePlayers() => CyclePlayers(CurrentPhase);
+        public void CyclePlayers(PhaseType phase)
         {
             var failCounter = 0;
 
@@ -81,7 +82,7 @@ namespace LineWars.Model
                     throw new ArgumentException($"Failed to find new player {phase}");
             }
 
-            return tempPlayerPosition;
+            CurrentPlayerPosition = tempPlayerPosition;
         }
 
         private PhaseType FindNextViablePhaseType(PhaseType currentPhase)
@@ -110,6 +111,7 @@ namespace LineWars.Model
             return tempPhase;
         }
 
+        public bool IsUnitPhaseAvailable() => IsUnitPhaseAvailable(CurrentPhase);
         public bool IsUnitPhaseAvailable(PhaseType phase) 
         {
             foreach(var player in PlayersIndexList.Values)
