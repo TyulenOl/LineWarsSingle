@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using JetBrains.Annotations;
 using LineWars.Controllers;
 using UnityEngine;
@@ -13,13 +14,24 @@ namespace LineWars.Model
             => (AttackAction<Node, Edge, Unit, Owned, BasePlayer>) Action;
 
         [SerializeField] protected SFXData attackSfx;
+
+        [SerializeField] protected SFXList sfxList;
+
+        private IDJ DJ;
+        
         [field: SerializeField] public int InitialDamage { get; private set; }
         [field: SerializeField] public bool InitialIsPenetratingDamage { get; private set; }
 
 
         public int Damage => AttackAction.Damage;
         public bool IsPenetratingDamage => AttackAction.IsPenetratingDamage;
-        
+
+
+        public override void Initialize()
+        {
+            base.Initialize();
+            DJ = new RandomDJ(1);
+        }
 
         public virtual bool CanAttack(IAlive enemy, bool ignoreActionPointsCondition = false) =>
             AttackAction.CanAttack(enemy, ignoreActionPointsCondition);
@@ -28,6 +40,7 @@ namespace LineWars.Model
         {
             AttackAction.Attack(enemy);
             SfxManager.Instance.Play(attackSfx);
+            SfxManager.Instance.PlayWithDelay(DJ.GetSound(sfxList),1);
         }
 
         public Type TargetType => typeof(IAlive);
@@ -36,5 +49,6 @@ namespace LineWars.Model
         {
             return new AttackCommand<Node, Edge, Unit, Owned, BasePlayer>(this, (IAlive) target);
         }
+        
     }
 }

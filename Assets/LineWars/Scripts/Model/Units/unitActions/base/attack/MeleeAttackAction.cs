@@ -80,7 +80,8 @@ namespace LineWars.Model
         {
             var enemyDamage = target.GetMaxDamage<TNode, TEdge, TUnit, TOwned, TPlayer>();
             target.DealDamageThroughArmor(Damage);
-            MyUnit.DealDamageThroughArmor(enemyDamage);
+            if(!target.IsDied)
+                MyUnit.DealDamageThroughArmor(enemyDamage/2);
             CompleteAndAutoModify();
         }
 
@@ -97,6 +98,8 @@ namespace LineWars.Model
             UnitBlockerSelector blockerSelector) : base(executor, damage, isPenetrating)
         {
             Onslaught = onslaught;
+            if (blockerSelector == null)
+                throw new ArgumentException($"blocker selector is null");
             BlockerSelector = blockerSelector;
             moveAction = executor.GetUnitAction<IMoveAction<TNode, TEdge, TUnit, TOwned, TPlayer>>();
         }
