@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace LineWars.Model
@@ -9,7 +7,8 @@ namespace LineWars.Model
     {
         [SerializeField] private int moneyMultiplier;
         [SerializeField] private int nodesMultiplier;
-        [SerializeField] private int unitsMultiplier;
+        [SerializeField] private int HpMultiplier;
+        [SerializeField] private int enemyHpMultiplier;
         public override int Evaluate(GameProjection projection, BasePlayerProjection player)
         {
             var moneyScore = 0;
@@ -39,13 +38,15 @@ namespace LineWars.Model
             {
                 if (unit.Owner != player)
                 {
-                    unitScore -= unit.CurrentHp * 2;
+                    unitScore -= unit.CurrentHp * enemyHpMultiplier;
+                    unitScore -= unit.CurrentArmor * enemyHpMultiplier;
                     continue;
                 }
-                unitScore += unit.CurrentHp;
+                unitScore += unit.CurrentHp * HpMultiplier;
+                unitScore += unit.CurrentArmor * HpMultiplier;
             }
-            //Debug.Log($"moneyS : {moneyScore} hpS : {unitScore} nodeS : {nodeScore}");
-            return nodeScore * nodesMultiplier + unitScore * unitsMultiplier + moneyScore * moneyMultiplier;
+            //Debug.Log($"moneyS : {moneyScore * moneyMultiplier} hpS : {unitScore} nodeS : {nodeScore * nodesMultiplier}");
+            return nodeScore * nodesMultiplier + unitScore + moneyScore * moneyMultiplier;
         }
     }
 }

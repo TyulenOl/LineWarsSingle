@@ -3,7 +3,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UnityEngine;
 
 
@@ -95,7 +94,6 @@ namespace LineWars.Model
             currentExecutorId = blueprint.ExecutorId;
             var newGame = GameProjection.GetCopy(gameProjection);
             var thisCommand = blueprint.GenerateCommand(newGame);
-            Debug.Log(thisCommand);
             thisCommand.Execute();
             //если сохраняются команды, то записать команду
             if(isSavingCommands)
@@ -126,7 +124,7 @@ namespace LineWars.Model
 
             //пройтись по доступным командам и запустить на них минмакс
             //если текущий игрок == this, найти наивысшую, если != - найти наименьшую
-            
+
             var possibleCommands = CommandBlueprintCollector.CollectAllCommands(newGame)
                 .Where(newBlueprint => currentExecutorId == -1 || newBlueprint.ExecutorId != currentExecutorId)
                 .Select(newBlueprint => MinMax(newGame, newBlueprint, depth, currentExecutorId, firstCommandChain, isSavingCommands));
@@ -147,6 +145,8 @@ namespace LineWars.Model
         {
             if(game.CurrentPhase != PhaseType.Buy && currentExecutorId != -1)
             {
+                if (!game.UnitsIndexList.ContainsKey(currentExecutorId)) 
+                    return true;
                 var currentExecutor = game.UnitsIndexList[currentExecutorId];
                 return currentExecutor.CurrentActionPoints <= 0;
             }

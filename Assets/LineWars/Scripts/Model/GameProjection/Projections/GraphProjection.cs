@@ -1,6 +1,6 @@
 ﻿using DataStructures;
+using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace LineWars.Model
 {
@@ -34,10 +34,21 @@ namespace LineWars.Model
         {
             NodesIndexList.Add(node.Id, node);
             if (node.LeftUnit != null)
-                UnitsIndexList.Add(node.LeftUnit.Id, node.LeftUnit);
+                AddUnit(node.LeftUnit);
             if (node.RightUnit != null)
-                UnitsIndexList.Add(node.RightUnit.Id, node.RightUnit);
+                AddUnit(node.RightUnit);
             node.UnitAdded += OnUnitAdded;
+        }
+
+        private void AddUnit(UnitProjection unit)
+        {
+            UnitsIndexList.Add(unit.Id, unit);
+            unit.Died += OnUnitDied;
+        }
+
+        private void OnUnitDied(UnitProjection unit)
+        {
+            UnitsIndexList.Remove(unit.Id);
         }
 
         private void OnUnitAdded(UnitProjection unit)
@@ -79,17 +90,19 @@ namespace LineWars.Model
 
                 if(oldNode.LeftUnit != null)
                 {
-                    var newLeftUnit = new UnitProjection(oldNode.LeftUnit, newNode);
-                    var leftOwner = oldPlayersToNew[oldNode.LeftUnit.Owner];
-                    newLeftUnit.ConnectTo(leftOwner);
-                    newNode.LeftUnit = newLeftUnit;
+                    ConnectUnit(oldNode.LeftUnit, newNode, UnitDirection.Left, oldPlayersToNew);
+                    //var newLeftUnit = new UnitProjection(oldNode.LeftUnit, newNode);
+                    //var leftOwner = oldPlayersToNew[oldNode.LeftUnit.Owner];
+                    //newLeftUnit.ConnectTo(leftOwner);
+                    //newNode.LeftUnit = newLeftUnit;
                 }
                 if(oldNode.RightUnit != null)
                 {
-                    var newRightUnit = new UnitProjection(oldNode.RightUnit, newNode);
-                    var rightOwner = oldPlayersToNew[oldNode.RightUnit.Owner];
-                    newRightUnit.ConnectTo(rightOwner);
-                    newNode.RightUnit = newRightUnit;
+                    ConnectUnit(oldNode.RightUnit, newNode, UnitDirection.Right, oldPlayersToNew);
+                    //var newRightUnit = new UnitProjection(oldNode.RightUnit, newNode);
+                    //var rightOwner = oldPlayersToNew[oldNode.RightUnit.Owner];
+                    //newRightUnit.ConnectTo(rightOwner);
+                    //newNode.RightUnit = newRightUnit;
                 }
 
                 oldNodesToNew[oldNode] = newNode;
@@ -107,6 +120,26 @@ namespace LineWars.Model
             }
 
             return new GraphProjection(oldNodesToNew.Values, oldEdgesToNew.Values);
+        }
+
+        private static void ConnectUnit(UnitProjection oldUnit, NodeProjection newNode, UnitDirection unitDirection,
+            in IReadOnlyDictionary<BasePlayerProjection, BasePlayerProjection> oldPlayersToNew)
+        {
+            var newUnit = new UnitProjection(oldUnit, newNode);
+            var owner = oldPlayersToNew[oldUnit.Owner];
+            newUnit.ConnectTo(owner);
+            newUnit.Died += owner.RemoveOwned;
+            switch(unitDirection)
+            {
+                case UnitDirection.Right:
+                    newNode.RightUnit = newUnit;
+                    break;
+                case UnitDirection.Left:
+                    newNode.LeftUnit = newUnit;
+                    break;
+                default:
+                    throw new ArgumentException();
+            }
         }
 
         public static GraphProjection GetProjectionFromMono(MonoGraph monoGraph,
@@ -162,16 +195,9 @@ namespace LineWars.Model
                 var ownerProjection = players[unit.Owner];
 
                 unitProjection.ConnectTo(ownerProjection);
+                unitProjection.Died += ownerProjection.RemoveOwned;
                 return unitProjection;
             }
-        }
-
-        private void OnNodeOwnerChanged(OwnedProjection node, BasePlayerProjection oldOwner, BasePlayerProjection newOwner)
-        {
-            if(oldOwner != null)
-                oldOwner.RemoveOwned(node);
-            if(newOwner != null)
-                newOwner.AddOwned(node);
         }
     }
 

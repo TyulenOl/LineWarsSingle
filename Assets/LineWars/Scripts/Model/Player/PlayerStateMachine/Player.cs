@@ -223,6 +223,10 @@ namespace LineWars
             {
                 yield return null;
                 RecalculateVisibility();
+                if(CurrentPhase != PhaseType.Idle)
+                {
+                    ExecuteTurn(PhaseType.Idle);
+                }
             }
         }
         private void OnExecuteCommand(IExecutor executor, ITarget target)

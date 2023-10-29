@@ -106,7 +106,10 @@ namespace LineWars.Model
 
                 failCounter++;
                 if (failCounter > cycleTurnFailCounter)
+                {
+                    IsUnitPhaseAvailable(tempPhase);
                     throw new ArgumentException($"GameProjection failed to cycle turn! {currentPhase}");
+                }
             }
 
             return tempPhase;

@@ -27,8 +27,16 @@ namespace LineWars.Model
             get => leftUnit;
             set
             {
+                if(leftUnit != null)
+                {
+                    leftUnit.Died -= (unit) => OnUnitDied(UnitDirection.Left, value);
+                }
                 leftUnit = value;
-                UnitAdded?.Invoke(value);       
+                UnitAdded?.Invoke(value);
+                if (leftUnit != null)
+                {
+                    leftUnit.Died += (unit) => OnUnitDied(UnitDirection.Left, value);
+                }
             } 
         }
         public UnitProjection RightUnit
@@ -36,8 +44,16 @@ namespace LineWars.Model
             get => rightUnit;
             set
             {
+                if (rightUnit != null)
+                {
+                    rightUnit.Died -= (unit) => OnUnitDied(UnitDirection.Right, value);
+                }
                 rightUnit = value;
                 UnitAdded?.Invoke(value);
+                if (rightUnit != null)
+                {
+                    rightUnit.Died += (unit) => OnUnitDied(UnitDirection.Right, value);
+                }
             }
         }
 
@@ -98,6 +114,26 @@ namespace LineWars.Model
         }
         
         public T Accept<T>(INodeVisitor<T> visitor) => visitor.Visit(this);
+
+        public EdgeProjection GetLineOfNeighbour(NodeProjection otherNode) => 
+            ((INode<NodeProjection, EdgeProjection>)this).GetLine(otherNode); 
+
+        private void OnUnitDied(UnitDirection placement, UnitProjection unit)
+        {
+            switch(placement)
+            {
+                case UnitDirection.Left:
+                    leftUnit = null;
+                    break;
+                case UnitDirection.Right:
+                    rightUnit = null;
+                    break;
+                default:
+                    throw new ArgumentException();
+                   
+            }
+        }
+ 
     }
 
     public interface IReadOnlyNodeProjection : INumbered

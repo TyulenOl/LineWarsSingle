@@ -55,7 +55,7 @@ namespace LineWars.Model
                 AttackUnitButIgnoreBlock(selectedUnit);
                 if (selectedUnit != enemy)
                 {
-                    Debug.Log($"Юнит {selectedUnit} перехватил атаку");
+                    //Debug.Log($"Юнит {selectedUnit} перехватил атаку");
                 }
             }
         }
