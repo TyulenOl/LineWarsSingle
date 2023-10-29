@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using LineWars.Controllers;
 using LineWars.Extensions.Attributes;
 using UnityEngine;
 using UnityEngine.Events;
@@ -15,16 +16,23 @@ namespace LineWars.Model
         [SerializeField, ReadOnlyInspector] private int index;
 
         [SerializeField] private string unitName;
-
+        [SerializeField][TextArea] private string unitDescription;
+        
         [SerializeField, Min(0)] private int maxHp;
         [SerializeField, Min(0)] private int maxArmor;
         [SerializeField, Min(0)] private int visibility;
-
+        [field: SerializeField] public Sprite Sprite { get; private set; }
+        
         [SerializeField] private UnitType unitType;
         [SerializeField] private UnitSize unitSize;
         [SerializeField] private LineType movementLineType;
         [SerializeField] private CommandPriorityData priorityData;
 
+        [Header("Sounds")] 
+        [SerializeField] [Min(0)] private SFXList HpHealedSounds;
+        [SerializeField] [Min(0)] private SFXList HpDamagedSounds;
+        private IDJ dj;
+        
         [Header("Actions Settings")] 
         [SerializeField] [Min(0)] private int maxActionPoints;
 
@@ -98,7 +106,10 @@ namespace LineWars.Model
             {
                 var before = currentHp;
                 currentHp = Mathf.Min(Mathf.Max(0, value), maxHp);
+                if(before == currentHp) return;
                 HpChanged.Invoke(before, currentHp);
+                SfxManager.Instance.Play(before < currentHp ? dj.GetSound(HpHealedSounds) : dj.GetSound(HpDamagedSounds));
+
                 if (currentHp == 0)
                 {
                     OnDied();
@@ -124,6 +135,8 @@ namespace LineWars.Model
             }
         }
 
+        public string UnitDescription => unitDescription;
+        
         public UnitType Type => unitType;
 
         public UnitDirection UnitDirection
@@ -167,6 +180,8 @@ namespace LineWars.Model
         
         private void Awake()
         {
+            dj = new RandomDJ(1);
+            
             currentHp = maxHp;
             currentArmor = maxArmor;
             currentActionPoints = maxActionPoints;

@@ -8,6 +8,10 @@ namespace LineWars.Model
         IMoveAction<Node, Edge, Unit, Owned, BasePlayer>
     {
         [SerializeField] private SFXData moveSfx;
+        [SerializeField] private SFXList reactionsSfx;
+
+        private IDJ dj;
+        
         public event Action MoveAnimationEnded;
         
 
@@ -18,13 +22,15 @@ namespace LineWars.Model
         {
             base.Initialize();
             Unit.MovementLogic.MovementIsOver += MovementLogicOnMovementIsOver;
-        }
+            dj = new RandomDJ(0.5f);
+        }   
 
         public void MoveTo(Node target)
         {
             Action.MoveTo(target);
             Unit.MovementLogic.MoveTo(target.transform);
             SfxManager.Instance.Play(moveSfx);
+            SfxManager.Instance.Play(dj.GetSound(reactionsSfx));
         }
 
         private void MovementLogicOnMovementIsOver(Transform obj) => MoveAnimationEnded?.Invoke();

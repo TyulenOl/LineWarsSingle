@@ -10,10 +10,10 @@ namespace LineWars.Interface
     {
         [SerializeField] private TMP_Text cost;
         [SerializeField] private Image image;
+        [SerializeField] private Image moneyImage;
+        [SerializeField] private Image backgroundImage;
         [SerializeField] private Button button;
         [SerializeField] private Image ifChosenPanel;
-        [SerializeField] private Image ifUnAvailablePanel;
-        [SerializeField] private Image ifAvailablePanel;
 
         private bool isAvailable;
         
@@ -54,15 +54,20 @@ namespace LineWars.Interface
         
         public void SetChosen(bool isChosen)
         {
-            if(isAvailable)
+            if (isAvailable)
+            {
                 ifChosenPanel.gameObject.SetActive(isChosen);
-            else
-                ifUnAvailablePanel.gameObject.SetActive(isChosen);
+            }
         }
-        
+
         private void SetAvailable(bool isAvailable)
         {
-            ifAvailablePanel.gameObject.SetActive(!isAvailable);
+            button.interactable = isAvailable;
+            var color = isAvailable ? Color.white : new Color(226/255f, 43/255f, 18/255f,255/255f);
+            cost.color = color;
+            moneyImage.color = color;
+            backgroundImage.color =  !isAvailable ? Color.gray : new Color(226/255f, 43/255f, 18/255f,255/255f);
+            image.color = isAvailable ? Color.white : Color.gray;
             this.isAvailable = isAvailable;
         }
     }

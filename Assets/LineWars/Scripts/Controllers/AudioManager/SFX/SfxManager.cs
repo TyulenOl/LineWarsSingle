@@ -29,7 +29,19 @@ namespace LineWars.Controllers
 
         public void Play(SFXData data)
         {
-            source.PlayOneShot(data.Clip);
+            if(data != null)
+                source.PlayOneShot(data.Clip);
+        }
+
+        public void PlayWithDelay(SFXData data, int delayInSeconds)
+        {
+            StartCoroutine(WaitForSound(delayInSeconds, data));
+        }
+        
+        private IEnumerator WaitForSound(int seconds, SFXData data)
+        {
+            yield return new WaitForSeconds(seconds);
+            Play(data);
         }
 
         public void StopAllSounds()

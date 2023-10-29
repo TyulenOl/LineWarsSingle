@@ -10,7 +10,6 @@ namespace LineWars.Model
     public class NationEconomicLogic : ScriptableObject, IReadOnlyCollection<UnitBuyPreset>
     {
         [SerializeField, NamedArray("name")] private List<UnitBuyPreset> unitBuyPresets;
-
         public int Count => unitBuyPresets.Count;
         public IEnumerator<UnitBuyPreset> GetEnumerator() => unitBuyPresets.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => unitBuyPresets.GetEnumerator();

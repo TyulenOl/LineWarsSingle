@@ -26,6 +26,7 @@ namespace LineWars.Model
                 InitialOnslaught,
                 InitialBlockerSelector);
         }
+        
 
         public override void Accept(IMonoUnitVisitor visitor)
         {
