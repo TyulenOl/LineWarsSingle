@@ -20,7 +20,7 @@ namespace LineWars.Model
                 Debug.Log($"Units count: {unitsCount}");
 
                 var nodesCount = projection.NodesIndexList.Where(pair => pair.Value.Owner == playerProjection).Count();
-                Debug.Log($"Nodes count: {unitsCount}");
+                Debug.Log($"Nodes count: {nodesCount}");
                 Debug.Log($"Money: {playerProjection.CurrentMoney}");
             }
             Debug.Log("----END----");

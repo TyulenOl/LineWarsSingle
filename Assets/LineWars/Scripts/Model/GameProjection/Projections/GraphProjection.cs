@@ -35,7 +35,7 @@ namespace LineWars.Model
             NodesIndexList.Add(node.Id, node);
             if (node.LeftUnit != null)
                 AddUnit(node.LeftUnit);
-            if (node.RightUnit != null)
+            if (node.RightUnit != null && node.RightUnit != node.LeftUnit)
                 AddUnit(node.RightUnit);
             node.UnitAdded += OnUnitAdded;
         }
@@ -91,18 +91,14 @@ namespace LineWars.Model
                 if(oldNode.LeftUnit != null)
                 {
                     ConnectUnit(oldNode.LeftUnit, newNode, UnitDirection.Left, oldPlayersToNew);
-                    //var newLeftUnit = new UnitProjection(oldNode.LeftUnit, newNode);
-                    //var leftOwner = oldPlayersToNew[oldNode.LeftUnit.Owner];
-                    //newLeftUnit.ConnectTo(leftOwner);
-                    //newNode.LeftUnit = newLeftUnit;
+                    if(oldNode.RightUnit == oldNode.LeftUnit)
+                    {
+                        newNode.RightUnit = newNode.LeftUnit;
+                    }
                 }
-                if(oldNode.RightUnit != null)
+                if(oldNode.RightUnit != null && oldNode.RightUnit != oldNode.LeftUnit)
                 {
                     ConnectUnit(oldNode.RightUnit, newNode, UnitDirection.Right, oldPlayersToNew);
-                    //var newRightUnit = new UnitProjection(oldNode.RightUnit, newNode);
-                    //var rightOwner = oldPlayersToNew[oldNode.RightUnit.Owner];
-                    //newRightUnit.ConnectTo(rightOwner);
-                    //newNode.RightUnit = newRightUnit;
                 }
 
                 oldNodesToNew[oldNode] = newNode;
@@ -128,9 +124,10 @@ namespace LineWars.Model
             var newUnit = new UnitProjection(oldUnit, newNode);
             var owner = oldPlayersToNew[oldUnit.Owner];
             newUnit.ConnectTo(owner);
-            newUnit.Died += owner.RemoveOwned;
+            //newUnit.Died += owner.RemoveOwned;
             switch(unitDirection)
             {
+                case UnitDirection.Any:
                 case UnitDirection.Right:
                     newNode.RightUnit = newUnit;
                     break;
@@ -148,32 +145,36 @@ namespace LineWars.Model
             var nodeList = new Dictionary<Node, NodeProjection>();
             var edgeList = new Dictionary<Edge, EdgeProjection>();
 
-            foreach (var node in monoGraph.Nodes)
+            foreach (var oldNode in monoGraph.Nodes)
             {
-                var nodeProjection = new NodeProjection(node);
-                if (node.Owner != null)
+                var nodeProjection = new NodeProjection(oldNode);
+                if (oldNode.Owner != null)
                 {
-                    var nodeOwnerProjection = players[node.Owner];
+                    var nodeOwnerProjection = players[oldNode.Owner];
                     nodeProjection.ConnectTo(nodeOwnerProjection);
-                    if(node.IsBase)
+                    if(oldNode.IsBase)
                     {
                         nodeOwnerProjection.Base = nodeProjection;
                     }
                 }
-                if (!node.LeftIsFree)
+                if (!oldNode.LeftIsFree)
                 {
-                    var leftUnitProjection = InitializeUnitFromMono(node.LeftUnit);
+                    var leftUnitProjection = InitializeUnitFromMono(oldNode.LeftUnit);
                     leftUnitProjection.Node = nodeProjection;
                     nodeProjection.LeftUnit = leftUnitProjection;
+                    if(oldNode.RightUnit == oldNode.LeftUnit)
+                    {
+                        nodeProjection.RightUnit = leftUnitProjection;
+                    }
                 }
-                if (!node.RightIsFree)
+                if (!oldNode.RightIsFree && oldNode.RightUnit != oldNode.LeftUnit)
                 {
-                    var rightUnitProjection = InitializeUnitFromMono(node.RightUnit);
+                    var rightUnitProjection = InitializeUnitFromMono(oldNode.RightUnit);
                     rightUnitProjection.Node = nodeProjection;
                     nodeProjection.RightUnit = rightUnitProjection;
                 }
 
-                nodeList[node] = nodeProjection;
+                nodeList[oldNode] = nodeProjection;
             }
 
             foreach (var edge in monoGraph.Edges)
@@ -195,7 +196,7 @@ namespace LineWars.Model
                 var ownerProjection = players[unit.Owner];
 
                 unitProjection.ConnectTo(ownerProjection);
-                unitProjection.Died += ownerProjection.RemoveOwned;
+                //unitProjection.Died += ownerProjection.RemoveOwned;
                 return unitProjection;
             }
         }

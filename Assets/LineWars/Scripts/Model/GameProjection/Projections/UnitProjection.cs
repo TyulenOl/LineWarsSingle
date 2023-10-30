@@ -48,6 +48,8 @@ namespace LineWars.Model
                 if(value == 0)
                 {
                     Died?.Invoke(this);
+                    RemoveFromNode();
+                    RemoveFromOwner();
                 }
             }
         }
@@ -217,6 +219,20 @@ namespace LineWars.Model
                 actionsDictionary[action.CommandType] =
                     visitor.Result;
             }
+        }
+
+        private void RemoveFromNode()
+        {
+            if(Node == null) return;
+            if(Node.LeftUnit == this)
+                Node.LeftUnit = null;
+            if(Node.RightUnit == this)
+                Node.RightUnit = null;
+        }
+
+        private void RemoveFromOwner()
+        {
+            Owner.RemoveOwned(this);
         }
 
         public IEnumerable<IUnitAction<NodeProjection, EdgeProjection, UnitProjection, OwnedProjection,

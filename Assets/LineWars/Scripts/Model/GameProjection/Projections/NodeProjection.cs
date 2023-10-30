@@ -26,17 +26,9 @@ namespace LineWars.Model
         {
             get => leftUnit;
             set
-            {
-                if(leftUnit != null)
-                {
-                    leftUnit.Died -= (unit) => OnUnitDied(UnitDirection.Left, value);
-                }
+            { 
                 leftUnit = value;
-                UnitAdded?.Invoke(value);
-                if (leftUnit != null)
-                {
-                    leftUnit.Died += (unit) => OnUnitDied(UnitDirection.Left, value);
-                }
+                UnitAdded?.Invoke(value);          
             } 
         }
         public UnitProjection RightUnit
@@ -44,16 +36,8 @@ namespace LineWars.Model
             get => rightUnit;
             set
             {
-                if (rightUnit != null)
-                {
-                    rightUnit.Died -= (unit) => OnUnitDied(UnitDirection.Right, value);
-                }
                 rightUnit = value;
                 UnitAdded?.Invoke(value);
-                if (rightUnit != null)
-                {
-                    rightUnit.Died += (unit) => OnUnitDied(UnitDirection.Right, value);
-                }
             }
         }
 
