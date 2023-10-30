@@ -15,6 +15,7 @@ namespace LineWars.Model
         public bool InitialProtection => initialProtection;
 
         public bool Protection => Action.Protection;
+        public IntModifier ContrAttackDamageModifier => Action.ContrAttackDamageModifier;
         public bool IsBlocked => Action.IsBlocked;
         public event Action<bool, bool> CanBlockChanged;
 
@@ -38,9 +39,7 @@ namespace LineWars.Model
             return new BlockCommand<Node, Edge, Unit, Owned, BasePlayer>(this);
         }
 
-        public override void Accept(IMonoUnitVisitor visitor)
-        {
-            visitor.Visit(this);
-        }
+        public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit, Owned, BasePlayer> visitor) => visitor.Visit(this);
     }
 }

@@ -14,5 +14,7 @@
     {
         public TUnit MyUnit => Executor;
         public uint GetPossibleMaxRadius();
+
+        public TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit, TOwned, TPlayer> visitor);
     }
 }

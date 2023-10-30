@@ -84,12 +84,7 @@ namespace LineWars.Model
                 MyUnit.DealDamageThroughArmor(enemyDamage/2);
             CompleteAndAutoModify();
         }
-
-        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor)
-        {
-            visitor.Visit(this);
-        }
-
+        
         public MeleeAttackAction(
             TUnit executor, 
             int damage,
@@ -103,5 +98,8 @@ namespace LineWars.Model
             BlockerSelector = blockerSelector;
             moveAction = executor.GetUnitAction<IMoveAction<TNode, TEdge, TUnit, TOwned, TPlayer>>();
         }
+        
+        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit, TOwned, TPlayer> visitor) => visitor.Visit(this);
     }
 }

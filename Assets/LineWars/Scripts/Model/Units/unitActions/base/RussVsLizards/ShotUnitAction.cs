@@ -5,28 +5,31 @@ using JetBrains.Annotations;
 namespace LineWars.Model
 {
     public class ShotUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer> :
-        UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>,
-        IShotUnitActon<TNode, TEdge, TUnit, TOwned, TPlayer>
+            UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>,
+            IShotUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>
 
         #region Сonstraints
+
         where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
         where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
         where TOwned : class, IOwned<TOwned, TPlayer>
         where TPlayer : class, IBasePlayer<TOwned, TPlayer>
-        #endregion
+
+    #endregion
+
     {
         public override CommandType CommandType => CommandType.ShotUnit;
-
-        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor) =>
-            visitor.Visit(this);
-
-        
         public TUnit TakenUnit { get; private set; }
+
+        public ShotUnitAction(TUnit executor) : base(executor)
+        {
+        }
+
         public bool CanTakeUnit([NotNull] TUnit unit)
         {
             if (unit == null) throw new ArgumentNullException(nameof(unit));
-            
+
             var line = MyUnit.Node.GetLine(unit.Node);
             return ActionPointsCondition()
                    && line != null;
@@ -60,12 +63,14 @@ namespace LineWars.Model
                     enemy.DealDamageThroughArmor(myDamage);
                 TakenUnit.DealDamageThroughArmor(enemyDamage);
             }
+
             TakenUnit = null;
             CompleteAndAutoModify();
         }
 
-        public Type TargetType { get; } =  typeof(TUnit);
+        public Type TargetType { get; } = typeof(TUnit);
         public Type[] MyTargets { get; } = {typeof(TUnit), typeof(TNode)};
+
         public bool IsMyTarget(ITarget target)
         {
             return TakenUnit == null && target is TUnit || TakenUnit != null && target is TNode;
@@ -76,12 +81,13 @@ namespace LineWars.Model
             if (TakenUnit == null)
             {
                 return new TakeUnitCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this, (TUnit) target);
-            } 
+            }
+
             return new ShotUnitCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this, (TNode) target);
         }
 
-        public ShotUnitAction(TUnit executor) : base(executor)
-        {
-        }
+
+        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit, TOwned, TPlayer> visitor) => visitor.Visit(this);
     }
 }

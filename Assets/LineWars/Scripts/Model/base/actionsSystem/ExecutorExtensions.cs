@@ -7,7 +7,7 @@ namespace LineWars.Model
     {
         public static IEnumerable<(ITarget, CommandType)> GetAllAvailableTargets(this IExecutor executor)
         {
-            return executor.Accept(new GetAllAvailableCommandsVisitor())
+            return executor.Accept(new AllAvailableCommandForExecutorVisitor())
                 .Select(x => (x.Item1, x.Item2.First().CommandType));
         }
     }

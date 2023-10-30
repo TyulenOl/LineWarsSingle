@@ -32,6 +32,9 @@ namespace LineWars.Model
         }
 
         public event Action<bool, bool> CanBlockChanged;
+        public RLBlockAction(TUnit executor) : base(executor)
+        {
+        }
 
         public bool CanBlock() => ActionPointsCondition();
 
@@ -42,14 +45,9 @@ namespace LineWars.Model
         }
 
         public override CommandType CommandType => CommandType.Block;
-
-        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor) =>
-            visitor.Visit(this);
-
         public ICommandWithCommandType GenerateCommand() => new RLBlockCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this);
-
-        public RLBlockAction(TUnit executor) : base(executor)
-        {
-        }
+        
+        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit, TOwned, TPlayer> visitor) => visitor.Visit(this);
     }
 }

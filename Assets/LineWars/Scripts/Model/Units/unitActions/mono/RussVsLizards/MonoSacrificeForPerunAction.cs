@@ -21,14 +21,15 @@ namespace LineWars.Model
         {
             return new SacrificeForPerunAction<Node, Edge, Unit, Owned, BasePlayer>(Unit);
         }
-
-        public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
-
+        
         public Type TargetType => typeof(Node);
         public bool IsMyTarget(ITarget target) => target is Node;
         public ICommandWithCommandType GenerateCommand(ITarget target)
         {
             return new SacrificeForPerunCommand<Node, Edge, Unit, Owned, BasePlayer>(this, (Node) target);
         }
+        
+        public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit, Owned, BasePlayer> visitor) => visitor.Visit(this);
     }
 }
