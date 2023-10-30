@@ -34,7 +34,6 @@ namespace LineWars.Model
         [field: SerializeField] public Spawn ReferenceToSpawn { get; set; }
         [field: SerializeField] public UnitType LeftUnitType { get; private set; }
         [field: SerializeField] public UnitType RightUnitType { get; private set; }
-        
 
         private Camera mainCamera;
         
@@ -42,7 +41,7 @@ namespace LineWars.Model
         /// Флаг, который указывает, что нода уже кому-то принадлежала
         /// </summary>
         public bool IsDirty { get; private set; }
-
+        
         public bool IsBase => ReferenceToSpawn != null && ReferenceToSpawn.Node == this;
 
         public Vector2 Position => transform.position;

@@ -147,7 +147,12 @@ namespace LineWars.Model
 
             foreach (var oldNode in monoGraph.Nodes)
             {
-                var nodeProjection = new NodeProjection(oldNode);
+                var score = 1;
+                if(oldNode.TryGetComponent<NodeScore>(out NodeScore nodeScore))
+                {
+                    score = nodeScore.Score;
+                }
+                var nodeProjection = new NodeProjection(oldNode, score);
                 if (oldNode.Owner != null)
                 {
                     var nodeOwnerProjection = players[oldNode.Owner];
@@ -196,7 +201,6 @@ namespace LineWars.Model
                 var ownerProjection = players[unit.Owner];
 
                 unitProjection.ConnectTo(ownerProjection);
-                //unitProjection.Died += ownerProjection.RemoveOwned;
                 return unitProjection;
             }
         }

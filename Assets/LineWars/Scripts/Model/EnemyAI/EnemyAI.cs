@@ -69,13 +69,12 @@ namespace LineWars.Model
             }
 
             var commandEvalList = await Task.WhenAll(tasksList.ToArray());
-            /*var commandEvalList = new List<(int, List<ICommandBlueprint>)>();
-            foreach(var command in possibleCommands)
-            {
-                var commandChain = new List<ICommandBlueprint>();
-                commandEvalList.Add(MinMax(gameProjection, command, depth, -1, commandChain, true));
-            }*/
 
+            foreach(var c in commandEvalList )
+            {
+                Debug.Log(c.Item2[0]);
+                Debug.Log(c.Item1);
+            }
             StartCoroutine(TurnCoroutine());
 
             IEnumerator TurnCoroutine()

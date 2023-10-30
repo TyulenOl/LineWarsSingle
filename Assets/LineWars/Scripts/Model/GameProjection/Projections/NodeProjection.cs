@@ -13,6 +13,8 @@ namespace LineWars.Model
         private List<EdgeProjection> edges;
         private UnitProjection leftUnit;
         private UnitProjection rightUnit;
+
+        public int Score { get; private set; }
         public Node Original { get; private set; } 
         public CommandPriorityData CommandPriorityData { get; private set; }
         public IEnumerable<EdgeProjection> Edges => edges;
@@ -48,7 +50,7 @@ namespace LineWars.Model
 
         public Action<UnitProjection> UnitAdded;
         public NodeProjection(CommandPriorityData commandPriorityData,
-            bool isBase, int index, int visibility,
+            bool isBase, int index, int score, int visibility,
             int valueOfHidden, Node original = null,
             IEnumerable<EdgeProjection> edgeProjections = null, UnitProjection leftUnit = null,
             UnitProjection rightUnit = null)
@@ -56,6 +58,7 @@ namespace LineWars.Model
             CommandPriorityData = commandPriorityData;
             IsBase = isBase;
             Id = index;
+            Score = score;
             Visibility = visibility;
             ValueOfHidden = valueOfHidden;
             this.leftUnit = leftUnit;
@@ -68,14 +71,14 @@ namespace LineWars.Model
         public NodeProjection(IReadOnlyNodeProjection node, IEnumerable<EdgeProjection> edges = null,
             UnitProjection leftUnit = null, UnitProjection rightUnit = null) 
             : this(node.CommandPriorityData, node.IsBase,
-            node.Id, node.Visibility, node.ValueOfHidden, 
+            node.Id, node.Score, node.Visibility, node.ValueOfHidden,
             node.Original, edges, leftUnit, rightUnit)
         {
         }
 
-        public NodeProjection(Node original, IEnumerable<EdgeProjection> edgeProjections = null, UnitProjection leftUnit = null,
+        public NodeProjection(Node original, int score, IEnumerable<EdgeProjection> edgeProjections = null, UnitProjection leftUnit = null,
             UnitProjection rightUnit = null) 
-            : this(original.CommandPriorityData, original.IsBase, original.Id, 
+            : this(original.CommandPriorityData, original.IsBase, original.Id, score,
                   original.Visibility, original.ValueOfHidden, original, edgeProjections, leftUnit, rightUnit)
         {
         }
@@ -123,6 +126,7 @@ namespace LineWars.Model
     public interface IReadOnlyNodeProjection : INumbered
     {
         public Node Original { get; }
+        public int Score { get; }
         public BasePlayerProjection Owner { get; }
         public CommandPriorityData CommandPriorityData { get; }
         public IEnumerable<EdgeProjection> Edges { get; }

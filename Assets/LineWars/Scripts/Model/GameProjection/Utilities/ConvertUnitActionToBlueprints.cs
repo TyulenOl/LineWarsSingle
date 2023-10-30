@@ -110,27 +110,27 @@ namespace LineWars.Model
 
         public void Visit(SacrificeForPerunAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public void Visit(RamAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public void Visit(BlowWithSwingAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
-            throw new System.NotImplementedException();
+          
         }
 
         public void Visit(ShotUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
-            throw new System.NotImplementedException();
+           
         }
 
         public void Visit(RLBuildAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
-            throw new System.NotImplementedException();
+            
         }
 
 
