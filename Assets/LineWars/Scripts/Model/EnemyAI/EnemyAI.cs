@@ -135,7 +135,7 @@ namespace LineWars.Model
             }
 
             var possibleCommands = CommandBlueprintCollector.CollectAllCommands(newGame)
-            .Where(newBlueprint => currentExecutorId == -1 || newBlueprint.ExecutorId != currentExecutorId)
+            .Where(newBlueprint => currentExecutorId == -1 || newBlueprint.ExecutorId == currentExecutorId)
             .Select(newBlueprint => MinMax(newGame, newBlueprint, depth, currentExecutorId, firstCommandChain, isSavingCommands));
 
             if (thisPlayerProjection != newGame.CurrentPlayer)
