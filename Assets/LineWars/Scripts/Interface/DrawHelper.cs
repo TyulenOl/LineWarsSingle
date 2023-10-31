@@ -34,7 +34,7 @@ public static class DrawHelper
             case CommandType.Heal:
                 return Resources.Load<Sprite>("UI/Sorokin/Icons/Heal");
             case CommandType.Fire:
-                return Resources.Load<Sprite>("UI/Icons/Icon_Focus");
+                return Resources.Load<Sprite>("UI/Sorokin/Icons/ShootOrder");
             case CommandType.Move:
                 return Resources.Load<Sprite>("UI/Sorokin/Icons/MoveOrder");
             case CommandType.Build:
