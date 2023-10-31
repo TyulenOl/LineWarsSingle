@@ -36,20 +36,5 @@ namespace LineWars
                 command.Execute();
             }
         }
-        
-        public bool Action(IExecutor executor, ITarget target)
-        {
-            foreach (var commandType in target.CommandPriorityData)
-            {
-                if (executor.TryGetCommandForTarget(commandType, target, out var command)
-                    && command.CanExecute())
-                {
-                    ExecuteCommand(command);
-                    return true;
-                }
-            }
-
-            return false;
-        }
     }
 }
