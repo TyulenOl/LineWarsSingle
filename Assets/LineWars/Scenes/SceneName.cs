@@ -3,5 +3,6 @@
     MainMenu,
     Map_1,
     Map_2,
-    WinOrLoseScene
+    WinOrLoseScene,
+    Oboz
 }

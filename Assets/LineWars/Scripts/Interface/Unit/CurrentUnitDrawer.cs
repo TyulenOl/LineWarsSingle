@@ -11,7 +11,12 @@ namespace LineWars.Interface
     {
         private void OnEnable()
         {
-            CommandsManager.Instance.ExecutorChanged.AddListener(ExecutorChanged);
+            if(CommandsManager.Instance != null)
+                CommandsManager.Instance.ExecutorChanged.AddListener(ExecutorChanged);
+            else
+            {
+                Debug.LogWarning("CommandsManagerIsNull");
+            }
         }
 
         private void OnDisable()
