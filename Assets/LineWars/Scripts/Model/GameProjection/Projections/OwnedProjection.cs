@@ -14,7 +14,12 @@ namespace LineWars.Model
                 var oldOwner = owner;
                 owner = value;
                 if (oldOwner != owner)
+                {
                     OwnerChanged?.Invoke(this, oldOwner, value);
+                    if(oldOwner != null)
+                        oldOwner.RemoveOwned(this);
+                }    
+                    
             }
         }
 

@@ -59,7 +59,8 @@ namespace LineWars.Model
         public void CycleTurn()
         {
             CurrentPhase = FindNextViablePhaseType(CurrentPhase);
-            CyclePlayers(CurrentPhase);
+            if (PhaseHelper.TypeToMode[CurrentPhase] != PhaseMode.Simultaneous)
+                CyclePlayers(CurrentPhase);
         }
 
         public void CyclePlayers() => CyclePlayers(CurrentPhase);
@@ -104,7 +105,7 @@ namespace LineWars.Model
                     break;
 
                 failCounter++;
-                if (failCounter > cycleTurnFailCounter)
+                if (failCounter > cycleTurnFailCounter)         
                     throw new ArgumentException($"GameProjection failed to cycle turn! {currentPhase}");
             }
 
@@ -147,7 +148,9 @@ namespace LineWars.Model
                 newPlayerList.Add(newPlayerProjection);
                 oldPlayersToNew[oldPlayer] = newPlayerProjection;
 
+                if (newPlayerProjection.OwnedObjects.Count != 0) throw new ArgumentException("YOU FUCKING IDIOT");
             }
+
 
             var newGraphProjection = GraphProjection.GetCopy(oldProjection.Graph, oldPlayersToNew);
 

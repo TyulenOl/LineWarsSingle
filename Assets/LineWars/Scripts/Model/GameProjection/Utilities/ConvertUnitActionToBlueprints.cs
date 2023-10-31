@@ -52,9 +52,10 @@ namespace LineWars.Model
             foreach (var node in Graph.GetNodesInRange(action.MyUnit.Node, 1))
             {
                 
-                if(action.CanMoveTo(node))
+                if(action.CanMoveTo(node) && (!node.IsBase || action.MyUnit.Owner == node.Owner))
                 {
-                    var command = new MoveCommandBlueprint(action.MyUnit.Id, action.MyUnit.Node.Id);
+
+                    var command = new MoveCommandBlueprint(action.MyUnit.Id, node.Id);
 
                     BlueprintList.Add(command);
                 }
@@ -95,7 +96,7 @@ namespace LineWars.Model
 
         public void Visit(MeleeAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
-            ProcessAttackAction(action, 1);
+            ProcessAttackAction(action, 2);
         }
 
         public void Visit(RLBlockAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
@@ -103,33 +104,44 @@ namespace LineWars.Model
             if(action.CanBlock())
             {
                 var unitId = action.MyUnit.Id;
-
+                var command = new RlBlockCommandBlueprint(unitId);
+                BlueprintList.Add(command);
             }
         }
 
         public void Visit(SacrificeForPerunAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public void Visit(RamAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
-            throw new System.NotImplementedException();
+            foreach (var node in Graph.GetNodesInRange(action.MyUnit.Node, 2)) //TODO: 2 -> 1
+            {
+                if(action.CanRam(node))
+                {
+                    var unitId = action.MyUnit.Id;
+                    var nodeId = node.Id;
+                    var command = new RamCommandBlueprint(unitId, nodeId);
+
+                    BlueprintList.Add(command);
+                }
+            }
         }
 
         public void Visit(BlowWithSwingAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
-            throw new System.NotImplementedException();
+          
         }
 
         public void Visit(ShotUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
-            throw new System.NotImplementedException();
+           
         }
 
         public void Visit(RLBuildAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
-            throw new System.NotImplementedException();
+            
         }
 
 

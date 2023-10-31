@@ -7,7 +7,7 @@ namespace LineWars.Model
 {
     public static class CommandBlueprintCollector
     {
-        public static List<ICommandBlueprint> CollectAllCommands(GameProjection gameProjection)
+        public static List<ICommandBlueprint> CollectAllCommands(IReadOnlyGameProjection gameProjection)
         {
             var commands = new List<ICommandBlueprint>();
             switch (gameProjection.CurrentPhase)
@@ -31,7 +31,7 @@ namespace LineWars.Model
             return commands;
         }
 
-        private static void CollectBuyState(List<ICommandBlueprint> commands, GameProjection gameProjection)
+        private static void CollectBuyState(List<ICommandBlueprint> commands, IReadOnlyGameProjection gameProjection)
         {
             var currentPlayer = gameProjection.CurrentPlayer;
             foreach(var preset in currentPlayer.EconomicLogic)
@@ -42,24 +42,28 @@ namespace LineWars.Model
 
         }
 
-        private static void CollectArtilleryState(List<ICommandBlueprint> commands, GameProjection gameProjection)
+        private static void CollectArtilleryState(List<ICommandBlueprint> commands, IReadOnlyGameProjection gameProjection)
         {
             CollectUsualState(PhaseType.Artillery, commands, gameProjection);
         }
 
-        private static void CollectFightState(List<ICommandBlueprint> commands, GameProjection gameProjection)
+        private static void CollectFightState(List<ICommandBlueprint> commands, IReadOnlyGameProjection gameProjection)
         {
             CollectUsualState(PhaseType.Fight, commands, gameProjection);
         }
 
-        private static void CollectScoutState(List<ICommandBlueprint> commands, GameProjection gameProjection)
+        private static void CollectScoutState(List<ICommandBlueprint> commands, IReadOnlyGameProjection gameProjection)
         {
             CollectUsualState(PhaseType.Scout, commands, gameProjection);
         }
 
-        private static void CollectUsualState(PhaseType type, List<ICommandBlueprint> commands, GameProjection gameProjection)
+        private static void CollectUsualState(PhaseType type, List<ICommandBlueprint> commands, IReadOnlyGameProjection gameProjection)
         {
-            foreach (var unit in gameProjection.UnitsIndexList.Values)
+            var units = gameProjection.CurrentPlayer.OwnedObjects
+                .Where(owned => owned is UnitProjection)
+                .Select(owned => (UnitProjection)owned)
+                .ToList();
+            foreach (var unit in units)
             {
                 if (unit.Owner != gameProjection.CurrentPlayer) continue;
                 if (!gameProjection.CurrentPlayer.PhaseExecutorsData[type].Contains(unit.Type)) continue;
@@ -67,8 +71,8 @@ namespace LineWars.Model
             }
         }
 
-        private static void ProcessUnit(List<ICommandBlueprint> commands, UnitProjection projection, 
-            GameProjection gameProjection)
+        private static void ProcessUnit(List<ICommandBlueprint> commands, IReadOnlyUnitProjection projection,
+            IReadOnlyGameProjection gameProjection)
         {
             foreach(var action in projection.ActionsDictionary.Values)
             {

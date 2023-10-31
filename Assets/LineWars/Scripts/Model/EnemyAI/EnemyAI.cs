@@ -3,8 +3,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using UnityEditor;
 using UnityEngine;
-
 
 namespace LineWars.Model
 {
@@ -16,6 +17,7 @@ namespace LineWars.Model
         [SerializeField] private GameEvaluator gameEvaluator;
         [SerializeField] private int depth;
         [SerializeField] private float commandPause;
+        [SerializeField] private float firstCommandPause;
 
         private EnemyAIBuySelector buySelector;
 
@@ -53,29 +55,31 @@ namespace LineWars.Model
             }
         }
 
-        public void ExecuteAITurn(PhaseType phase)
+        public async void ExecuteAITurn(PhaseType phase)
         {
             var gameProjection = 
                 GameProjection.GetProjectionFromMono(SingleGame.Instance.AllPlayers.Values, MonoGraph.Instance, PhaseManager.Instance);
-            
+
             var possibleCommands = CommandBlueprintCollector.CollectAllCommands(gameProjection);
-            var commandEvalList = new List<(int, List<ICommandBlueprint>)>(); 
-            foreach(var command in possibleCommands)
+            var tasksList = new List<Task<(int, List<ICommandBlueprint>)>>();
+            foreach ( var command in possibleCommands )
             {
                 var commandChain = new List<ICommandBlueprint>();
-                commandEvalList.Add(MinMax(gameProjection, command, depth, -1, commandChain, true));
+                tasksList.Add(ExploreOutcomes(gameProjection, command, depth, -1, commandChain, true));
             }
+
+            var commandEvalList = await Task.WhenAll(tasksList.ToArray());
 
             StartCoroutine(TurnCoroutine());
 
             IEnumerator TurnCoroutine()
             {
-                var bestBlueprint = commandEvalList.Aggregate((i1, i2) => i1.Item1 > i2.Item1 ? i1 : i2);
+                yield return new WaitForSeconds(firstCommandPause);
+                var bestBlueprint = commandEvalList.MaxItem((i1, i2) => i1.Item1.CompareTo(i2.Item1));
                 foreach (var blueprint in bestBlueprint.Item2)
                 {
                     var command = blueprint.GenerateMonoCommand(gameProjection);
-                    Debug.Log(command.ToString());
-                    command.Execute();
+                    UnitsController.ExecuteCommand(command);
                     yield return new WaitForSeconds(commandPause);
                 }
                 yield return null;
@@ -83,29 +87,38 @@ namespace LineWars.Model
             }         
         }
 
+
+        private Task<(int, List<ICommandBlueprint>)> ExploreOutcomes(GameProjection gameProjection, ICommandBlueprint blueprint, int depth,
+            int currentExecutorId, List<ICommandBlueprint> firstCommandChain, bool isSavingCommands)
+        {
+            var task = new Task<(int, List<ICommandBlueprint>)>(
+                () => MinMax(gameProjection, blueprint, depth, currentExecutorId, firstCommandChain, isSavingCommands));
+            task.Start();
+            return task;
+        }
+
         private (int, List<ICommandBlueprint>) MinMax(GameProjection gameProjection, ICommandBlueprint blueprint, int depth, 
             int currentExecutorId, List<ICommandBlueprint> firstCommandChain, bool isSavingCommands)
         {
-            //проверить ид экзекутора
             if(currentExecutorId != -1 && blueprint.ExecutorId != currentExecutorId)
-            {
                 throw new ArgumentException();
-            }
-            // cгенерировать новую проекцию из комманды и обновиить ид экзекутора
+
             currentExecutorId = blueprint.ExecutorId;
             var newGame = GameProjection.GetCopy(gameProjection);
             var thisCommand = blueprint.GenerateCommand(newGame);
             thisCommand.Execute();
-            //если сохран€ютс€ команды, то записать команду
+
             if(isSavingCommands)
             {
                 var newCommandChain = new List<ICommandBlueprint>(firstCommandChain);
                 newCommandChain.Add(blueprint);
                 firstCommandChain = newCommandChain;
             }
-            //проверить закончилс€ ли ход, если да, обнулить экзекутора, выключить сохранение комманд
-            // а также проверить фазу, если фаза окончена, то найти новую фазу и игрока
-            // если нет, то найти нового игрока
+
+            var thisPlayerProjection = newGame.OriginalToProjectionPlayers[this];
+            if (newGame.UnitsIndexList.Count == 0)
+                return (gameEvaluator.Evaluate(newGame, thisPlayerProjection), firstCommandChain); 
+            
             if (IsTurnOver(newGame, currentExecutorId))
             {
                 depth--;
@@ -116,17 +129,14 @@ namespace LineWars.Model
                 else
                     newGame.CyclePlayers();
             }
-            //проверить закончилась ли глубина, если да, то оценить проекцию и return
-            var thisPlayerProjection = newGame.OriginalToProjectionPlayers[this];
             if (depth == 0 || newGame.CurrentPhase == PhaseType.Buy)
-            {  
-                return (gameEvaluator.Evaluate(gameProjection, thisPlayerProjection), firstCommandChain);
+            {
+                return (gameEvaluator.Evaluate(newGame, thisPlayerProjection), firstCommandChain);
             }
-            //пройтись по доступным командам и запустить на них минмакс
-            //если текущий игрок == this, найти наивысшую, если != - найти наименьшую
+
             var possibleCommands = CommandBlueprintCollector.CollectAllCommands(newGame)
-                .Where(newBlueprint => currentExecutorId != -1 && newBlueprint.ExecutorId != currentExecutorId)
-                .Select(newBlueprint => MinMax(newGame, newBlueprint, depth, currentExecutorId, firstCommandChain, isSavingCommands));
+            .Where(newBlueprint => currentExecutorId == -1 || newBlueprint.ExecutorId != currentExecutorId)
+            .Select(newBlueprint => MinMax(newGame, newBlueprint, depth, currentExecutorId, firstCommandChain, isSavingCommands));
 
             if (thisPlayerProjection != newGame.CurrentPlayer)
             {
@@ -144,6 +154,8 @@ namespace LineWars.Model
         {
             if(game.CurrentPhase != PhaseType.Buy && currentExecutorId != -1)
             {
+                if (!game.UnitsIndexList.ContainsKey(currentExecutorId)) 
+                    return true;
                 var currentExecutor = game.UnitsIndexList[currentExecutorId];
                 return currentExecutor.CurrentActionPoints <= 0;
             }
