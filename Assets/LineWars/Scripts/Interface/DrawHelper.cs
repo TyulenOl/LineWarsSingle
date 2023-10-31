@@ -6,7 +6,6 @@ using UnityEngine;
 
 public static class DrawHelper
 {
-
     public static Sprite GetSpriteByCharacteristicType(CharacteristicType characteristicType)
     {
         switch (characteristicType)
@@ -30,15 +29,16 @@ public static class DrawHelper
             case CommandType.MeleeAttack:
                 return Resources.Load<Sprite>("UI/Sorokin/Icons/AttackOrder");
             case CommandType.Ram:
-                return Resources.Load<Sprite>("UI/Sorokin/Icons/AttackOrder");
+                return Resources.Load<Sprite>("UI/Sorokin/Icons/RamOrder");
             case CommandType.Heal:
                 return Resources.Load<Sprite>("UI/Sorokin/Icons/Heal");
             case CommandType.Fire:
-                return Resources.Load<Sprite>("UI/Sorokin/Icons/ShootOrder");
+                return Resources.Load<Sprite>("UI/Sorokin/Icons/DistanseAttackOrder");
             case CommandType.Move:
                 return Resources.Load<Sprite>("UI/Sorokin/Icons/MoveOrder");
             case CommandType.Build:
                 return Resources.Load<Sprite>("UI/Icons/Upgrade");
+                
             default: return Resources.Load<Sprite>("UI/Icons/Icon_Focus");
         }
     }

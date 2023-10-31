@@ -1,3 +1,4 @@
+using LineWars.Extensions.Attributes;
 using UnityEngine;
 using UnityEngine.Events;
 using LineWars.Model;
@@ -17,6 +18,7 @@ namespace LineWars.Controllers
         private CommandsManagerTargetState targetState;
         private CommandsManagerIdleState idleState;
 
+        [SerializeField, ReadOnlyInspector] private CommandsManagerStateType state; 
 
         public UnityEvent<ITarget, ITarget> TargetChanged;
         public UnityEvent<IExecutor, IExecutor> ExecutorChanged;

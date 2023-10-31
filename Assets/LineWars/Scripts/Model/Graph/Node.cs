@@ -132,10 +132,9 @@ namespace LineWars.Model
             var absolutePosition = mainCamera.ScreenToWorldPoint(eventData.position);
             var relativePosition = absolutePosition - transform.position;
 
-            if (relativePosition.x > 0)
+            if (relativePosition.x > 0 && rightUnit != null)
             {
-                if (rightUnit != null)
-                    Selector.SelectedObjects = new []{rightUnit.gameObject, gameObject};
+                Selector.SelectedObjects = new []{rightUnit.gameObject, gameObject};
             }
             else if (leftUnit != null)
             {

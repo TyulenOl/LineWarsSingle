@@ -18,6 +18,7 @@ namespace LineWars.Controllers
 
             public override void OnEnter()
             {
+                manager.state = CommandsManagerStateType.Executor;
                 Selector.SelectedObjectChanged += OnSelectedObjectChanged;
             }
 

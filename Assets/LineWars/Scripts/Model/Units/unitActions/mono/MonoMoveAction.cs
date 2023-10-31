@@ -31,6 +31,7 @@ namespace LineWars.Model
             Unit.MovementLogic.MoveTo(target.transform);
             SfxManager.Instance.Play(moveSfx);
             SfxManager.Instance.Play(dj.GetSound(reactionsSfx));
+            Player.LocalPlayer.RecalculateVisibility();
         }
 
         private void MovementLogicOnMovementIsOver(Transform obj) => MoveAnimationEnded?.Invoke();

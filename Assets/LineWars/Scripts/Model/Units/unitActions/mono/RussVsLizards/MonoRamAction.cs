@@ -57,6 +57,7 @@ namespace LineWars.Model
                     }
                 }
             }
+            Player.LocalPlayer.RecalculateVisibility();
         }
 
         public Type TargetType => typeof(Node);
