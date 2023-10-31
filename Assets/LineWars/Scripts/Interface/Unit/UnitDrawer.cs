@@ -98,6 +98,7 @@ namespace LineWars.Interface
         
         private void OnUnitHpChange(int before, int after)
         {
+            if(before == after) return;
             var diff = after - before;
             var color = diff > 0 ? healColor : damageColor; 
             

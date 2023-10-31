@@ -113,6 +113,8 @@ namespace LineWars.Model
 
             bool NodeConditional()
             {
+                if (Nation.GetUnit(preset.FirstUnitType).Size != UnitSize.Large && (preset.FirstUnitType == UnitType.None || preset.SecondUnitType == UnitType.None))
+                    return Base.AnyIsFree;
                 return Base.AllIsFree;
             }
 

@@ -69,7 +69,7 @@ namespace LineWars.Model
             if (enemy.IsDied
                 && enemyNode.AllIsFree
                 && Onslaught
-                && moveAction.CanMoveTo(enemyNode)
+                && moveAction.CanMoveTo(enemyNode, true)
                )
             {
                 moveAction.MoveTo(enemyNode);
