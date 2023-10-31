@@ -13,13 +13,7 @@ namespace LineWars
         ///<returns> Возвращаемое значение: Объект, выбранный Selector </returns>
         ///</summary>
         public event Func<GameObject, PointerEventData, GameObject> PointerClicked;
-
-        // private void OnValidate()
-        // {
-        //     if (GetComponent<Collider2D>() == null)
-        //         Debug.LogWarning($"У {gameObject.name} нет коллайдера!");
-        // }
-
+        
         public void OnPointerClick(PointerEventData eventData)
         {
             if(PointerClicked != null)
@@ -31,7 +25,5 @@ namespace LineWars
                 Selector.SelectedObject = gameObject;
             }
         }
-
-
     }
 }
