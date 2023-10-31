@@ -17,7 +17,7 @@ namespace LineWars.Model
     #endregion
 
     {
-        private readonly IShotUnitActon<TNode, TEdge, TUnit, TOwned, TPlayer> action;
+        private readonly IShotUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer> action;
         private readonly TUnit unit;
         private readonly TNode targetNode;
         private readonly TUnit takenUnit;
@@ -25,16 +25,16 @@ namespace LineWars.Model
         public ShotUnitCommand(
             [NotNull] TUnit unit,
             [NotNull] TNode targetNode) :
-            this(unit.TryGetUnitAction<IShotUnitActon<TNode, TEdge, TUnit, TOwned, TPlayer>>(out var action)
+            this(unit.TryGetUnitAction<IShotUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>>(out var action)
                     ? action
                     : throw new ArgumentException(
-                        $"{nameof(TUnit)} does not contain {nameof(IShotUnitActon<TNode, TEdge, TUnit, TOwned, TPlayer>)}"),
+                        $"{nameof(TUnit)} does not contain {nameof(IShotUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>)}"),
                 targetNode)
         {
         }
 
         public ShotUnitCommand(
-            [NotNull] IShotUnitActon<TNode, TEdge, TUnit, TOwned, TPlayer> action,
+            [NotNull] IShotUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer> action,
             [NotNull] TNode targetNode)
         {
             this.action = action;

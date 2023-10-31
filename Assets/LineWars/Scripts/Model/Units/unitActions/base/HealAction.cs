@@ -20,6 +20,12 @@ namespace LineWars.Model
         public int HealingAmount { get; private set; }
         public bool HealLocked { get; private set; }
         
+        public HealAction(TUnit executor, bool isMassHeal, int healingAmount) : base(executor)
+        {
+            IsMassHeal = isMassHeal;
+            HealingAmount = healingAmount;
+        }
+        
         public bool CanHeal([NotNull] TUnit target, bool ignoreActionPointsCondition = false)
         {
             return !HealLocked
@@ -61,15 +67,7 @@ namespace LineWars.Model
             return new HealCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this, (TUnit) target);
         }
 
-        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor)
-        {
-            visitor.Visit(this);
-        }
-
-        public HealAction(TUnit executor, bool isMassHeal, int healingAmount) : base(executor)
-        {
-            IsMassHeal = isMassHeal;
-            HealingAmount = healingAmount;
-        }
+        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit, TOwned, TPlayer> visitor) => visitor.Visit(this);
     }
 }

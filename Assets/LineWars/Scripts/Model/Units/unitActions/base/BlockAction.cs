@@ -18,13 +18,22 @@ namespace LineWars.Model
     {
         private bool isBlocked;
         public IntModifier ContrAttackDamageModifier { get; set; }
-        private IAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> attackAction;
+        private readonly IAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> attackAction;
 
         public event Action<bool, bool> CanBlockChanged;
         
         public bool Protection { get;  set; }
         public bool IsBlocked => isBlocked || Protection;
         
+        public BlockAction(
+            TUnit executor,
+            IntModifier contrAttackDamageModifier,
+            bool protection) : base(executor)
+        {
+            ContrAttackDamageModifier = contrAttackDamageModifier;
+            Protection = protection;
+            attackAction = MyUnit.GetUnitAction<IAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>>();
+        }
         
         public bool CanBlock()
         {
@@ -69,19 +78,7 @@ namespace LineWars.Model
             return new BlockCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this);
         }
 
-        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor)
-        {
-            visitor.Visit(this);
-        }
-
-        public BlockAction(
-            TUnit executor,
-            IntModifier contrAttackDamageModifier,
-            bool protection) : base(executor)
-        {
-            ContrAttackDamageModifier = contrAttackDamageModifier;
-            Protection = protection;
-            attackAction = MyUnit.GetUnitAction<IAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>>();
-        }
+        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit, TOwned, TPlayer> visitor) => visitor.Visit(this);
     }
 }

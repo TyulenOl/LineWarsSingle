@@ -20,8 +20,6 @@ namespace LineWars.Model
             //TODO: анимации и звуки
             Action.EnableBlock();
         }
-
-        public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
         public ICommandWithCommandType GenerateCommand() => new RLBlockCommand<Node, Edge, Unit, Owned, BasePlayer>(this);
         
         protected override RLBlockAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
@@ -30,5 +28,8 @@ namespace LineWars.Model
             action.CanBlockChanged += (before, after) => CanBlockChanged?.Invoke(before, after);
             return action;
         }
+        
+        public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit, Owned, BasePlayer> visitor) => visitor.Visit(this);
     }
 }

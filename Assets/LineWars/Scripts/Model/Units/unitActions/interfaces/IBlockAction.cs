@@ -17,6 +17,7 @@ namespace LineWars.Model
     {
         bool IsBlocked { get; }
         bool Protection { get; }
+        IntModifier ContrAttackDamageModifier { get; }
         event Action<bool, bool> CanBlockChanged;
         bool CanBlock();
         void EnableBlock();

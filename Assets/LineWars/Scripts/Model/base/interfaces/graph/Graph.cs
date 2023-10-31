@@ -61,7 +61,16 @@ namespace LineWars.Model
             result.Reverse();
             return result;
         }
-
+        
+        /// <summary>
+        /// Действует как волновой алгоритм
+        /// </summary>
+        /// <param name="startNode"></param>
+        /// <param name="range">Если 0, то возвращает только ноду, если 1, то возвращает ноду и ее соседей</param>
+        /// <param name="condition">Условие перехода из ноды в ноду, если истина, то переход возможен, если ложно, то нет.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException">Стартовая нода не содержится в графе</exception>
+        /// <exception cref="InvalidOperationException">Выход за пределы графа</exception>
         public IEnumerable<TNode> GetNodesInRange(
             [NotNull]TNode startNode,
             uint range,
@@ -84,7 +93,7 @@ namespace LineWars.Model
                     if (!Nodes.Contains(neighborhood)) throw new InvalidOperationException();
                     if (condition != null && !condition(node, neighborhood)) continue;
                     var distanceForNextNode = distanceMemory[node] + 1;
-                    if (distanceForNextNode >= range) continue;
+                    if (distanceForNextNode > range) continue;
 
                     distanceMemory[neighborhood] = distanceForNextNode;
                     queue.Enqueue(neighborhood);

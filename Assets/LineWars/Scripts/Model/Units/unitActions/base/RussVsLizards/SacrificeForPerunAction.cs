@@ -21,13 +21,11 @@ namespace LineWars.Model
         }
         
         public override CommandType CommandType => CommandType.SacrificePerun;
-
-        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor) =>
-            visitor.Visit(this);
         
         public bool CanSacrifice(TNode node)
         {
-            return ActionPointsCondition();
+            return ActionPointsCondition()
+                   && node.Owner != Executor.Owner;
         }
 
         public void Sacrifice(TNode node)
@@ -54,5 +52,8 @@ namespace LineWars.Model
         {
             return new SacrificeForPerunCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this, (TNode) target);
         }
+        
+        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit, TOwned, TPlayer> visitor) => visitor.Visit(this);
     }
 }

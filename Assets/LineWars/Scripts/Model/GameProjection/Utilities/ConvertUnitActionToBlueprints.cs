@@ -49,7 +49,7 @@ namespace LineWars.Model
 
         public void Visit(MoveAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
-            foreach (var node in Graph.GetNodesInRange(action.MyUnit.Node, 2))
+            foreach (var node in Graph.GetNodesInRange(action.MyUnit.Node, 1))
             {
                 
                 if(action.CanMoveTo(node))
@@ -63,7 +63,7 @@ namespace LineWars.Model
 
         public void Visit(HealAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
-            foreach (var node in Graph.GetNodesInRange(action.MyUnit.Node, 2))
+            foreach (var node in Graph.GetNodesInRange(action.MyUnit.Node, 1))
             {
                 if (!node.LeftIsFree)
                     ProcessUnit(node.LeftUnit);
@@ -85,12 +85,12 @@ namespace LineWars.Model
 
         public void Visit(DistanceAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
-            ProcessAttackAction(action, (uint)action.MyUnit.MaxActionPoints + 1);
+            ProcessAttackAction(action, (uint)action.MyUnit.MaxActionPoints);
         }
 
         public void Visit(ArtilleryAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
-            ProcessAttackAction(action, (uint)action.MyUnit.MaxActionPoints + 1);
+            ProcessAttackAction(action, (uint)action.MyUnit.MaxActionPoints);
         }
 
         public void Visit(MeleeAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)

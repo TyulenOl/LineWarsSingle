@@ -19,12 +19,13 @@ namespace LineWars.Model
     {
         public TUnit MyUnit => Executor;
         
-        public virtual uint GetPossibleMaxRadius() => (uint) MyUnit.CurrentActionPoints;
-
-        public abstract void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor);
-
         protected UnitAction(TUnit executor) : base(executor)
         {
         }
+        
+        public virtual uint GetPossibleMaxRadius() => (uint) MyUnit.CurrentActionPoints;
+
+        public abstract void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor);
+        public abstract TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit, TOwned, TPlayer> visitor);
     }
 }

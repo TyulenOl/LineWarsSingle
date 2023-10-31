@@ -20,8 +20,9 @@ namespace LineWars.Model
         {
             return new BlowWithSwingAction<Node, Edge, Unit, Owned, BasePlayer>(Unit, InitialDamage);
         }
-
+        
         public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit, Owned, BasePlayer> visitor) => visitor.Visit(this);
 
         public ICommandWithCommandType GenerateCommand() => new BlowWithSwingCommand<Node, Edge, Unit, Owned, BasePlayer>(this);
     }
