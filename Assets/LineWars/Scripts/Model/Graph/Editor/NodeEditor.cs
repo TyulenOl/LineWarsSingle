@@ -9,13 +9,14 @@ public class NodeEditor : Editor
 {
     private Node Node => (Node) target;
 
-    public void OnSceneGUI()
+
+    private void OnSceneGUI()
     {
         if (EditorSceneManager.IsPreviewSceneObject(Node.gameObject) || Application.isPlaying)
         {
             return;
         }
-        
+    
         try
         {
             Node.Redraw();
@@ -24,7 +25,7 @@ public class NodeEditor : Editor
                 edge.Redraw();
                 EditorUtility.SetDirty(edge);
             }
-
+    
             EditorUtility.SetDirty(Node);
         }
         catch (Exception)

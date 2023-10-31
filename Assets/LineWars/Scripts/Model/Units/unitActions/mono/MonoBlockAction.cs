@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    [RequireComponent(typeof(MonoAttackAction))]
     public class MonoBlockAction :
         MonoUnitAction<BlockAction<Node, Edge, Unit, Owned, BasePlayer>>,
         IBlockAction<Node, Edge, Unit, Owned, BasePlayer>

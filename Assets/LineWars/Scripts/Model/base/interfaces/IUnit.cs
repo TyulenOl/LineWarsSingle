@@ -25,7 +25,6 @@ namespace LineWars.Model
         public int MaxArmor { get; set; }
         public int CurrentArmor { get; set; }
         public int Visibility { get; set; }
-
         public UnitType Type { get; }
         public UnitSize Size { get; }
         public LineType MovementLineType { get; }

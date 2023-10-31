@@ -4,13 +4,13 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    public class MonoArtilleryAttackAction : MonoDistanceAttackAction,
+    public class MonoArtilleryAttackAction :
+        MonoAttackAction<ArtilleryAttackAction<Node, Edge, Unit, Owned, BasePlayer>>,
         IArtilleryAttackAction<Node, Edge, Unit, Owned, BasePlayer>
     {
-        private ArtilleryAttackAction<Node, Edge, Unit, Owned, BasePlayer> AttackAction
-            => (ArtilleryAttackAction<Node, Edge, Unit, Owned, BasePlayer>) Action;
-
-        [SerializeField] private Explosion explosionPrefab;
+        [field: SerializeField, Min(0)] public int InitialDistance { get; private set; }
+        [SerializeField] private SimpleEffect explosionPrefab;
+        public uint Distance => Action.Distance;
 
         public override void Attack(IAlive enemy)
         {
@@ -18,10 +18,10 @@ namespace LineWars.Model
             var explosion = Instantiate(explosionPrefab);
             explosion.transform.position = mono.transform.position;
             SfxManager.Instance.Play(attackSfx);
-            explosion.ExplosionEnded += () => { AttackAction.Attack(enemy); };
+            explosion.Ended += () => { Action.Attack(enemy); };
         }
 
-        protected override AttackAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
+        protected override ArtilleryAttackAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
         {
             return new ArtilleryAttackAction<Node, Edge, Unit, Owned, BasePlayer>(Unit,
                 InitialDamage,
@@ -31,5 +31,6 @@ namespace LineWars.Model
         }
 
         public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit, Owned, BasePlayer> visitor) => visitor.Visit(this);
     }
 }

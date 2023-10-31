@@ -28,7 +28,6 @@ namespace LineWars.Model
         
         [field: Header("Sprite Info")]
         [SerializeField] private SpriteRenderer spriteRenderer;
-        [SerializeField] private Sprite spriteOfDefaultNode;
         
         [field: Header("Initial Info")]
         [field: SerializeField] public Spawn ReferenceToSpawn { get; set; }
@@ -111,13 +110,6 @@ namespace LineWars.Model
             selectable2D.PointerClicked -= OnPointerClicked;
         }
 
-        protected void OnValidate()
-        {
-            if (renderNodeV3 == null)
-                renderNodeV3 = GetComponent<RenderNodeV3>();
-            if (selectable2D == null)
-                selectable2D = GetComponent<Selectable2D>();
-        }
 
         public IEnumerable<ITarget> Targets
         {
@@ -244,9 +236,16 @@ namespace LineWars.Model
         private void DrawToDefault()
         {
             gameObject.name = $"Node{Id}";
-            spriteRenderer.sprite = spriteOfDefaultNode;
+            spriteRenderer.sprite = null;
         }
 
+        private void OnValidate()
+        {
+            if (renderNodeV3 == null)
+                renderNodeV3 = GetComponent<RenderNodeV3>();
+            if (selectable2D == null)
+                selectable2D = GetComponent<Selectable2D>();
+        }
         #endregion
     }
 }

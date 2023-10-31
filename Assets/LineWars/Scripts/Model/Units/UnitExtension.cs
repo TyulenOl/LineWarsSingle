@@ -46,13 +46,13 @@ namespace LineWars.Model
             }
         }
 
-        public static IEnumerable<ICommandWithCommandType> GetCommandsForNode(this Unit unit, Node node)
-        {
-            return node.Targets
-                .Where(target => unit.TargetTypeActionsDictionary.ContainsKey(target.GetType()))
-                .Select(target => unit.TargetTypeActionsDictionary[target.GetType()]
-                    .Select(action => action.GenerateCommand(target)))
-                .SelectMany(x => x);
-        }
+        // public static IEnumerable<ICommandWithCommandType> GetCommandsForNode(this Unit unit, Node node)
+        // {
+        //     return node.Targets
+        //         .Where(target => unit.TargetTypeActionsDictionary.ContainsKey(target.GetType()))
+        //         .Select(target => unit.TargetTypeActionsDictionary[target.GetType()]
+        //             .Select(action => action.GenerateCommand(target)))
+        //         .SelectMany(x => x);
+        // }
     }
 }
