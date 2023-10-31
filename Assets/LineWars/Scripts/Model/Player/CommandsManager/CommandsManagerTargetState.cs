@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using LineWars.Model;
 
@@ -9,7 +12,7 @@ namespace LineWars.Controllers
         {
             private CommandsManager manager;
             private bool isCancelable;
-        
+
             public CommandsManagerTargetState(CommandsManager manager)
             {
                 this.manager = manager;
@@ -24,36 +27,67 @@ namespace LineWars.Controllers
             public override void OnExit()
             {
                 Selector.SelectedObjectChanged -= OnSelectedObjectChanged;
+                
             }
 
             private void OnSelectedObjectChanged(GameObject lastObject, GameObject newObject)
             {
-                if(newObject.TryGetComponent(out IExecutor executor) && executor == manager.executor)
+                if (newObject == null)
+                    return;
+                if (Selector.SelectedObjects
+                    .Any(x => x.TryGetComponent(out IExecutor executor)
+                              && executor == manager.executor))
                 {
-                   CancelExecutor();
-                   return;
+                    CancelExecutor();
+                    return;
                 }
-                if(!newObject.TryGetComponent(out ITarget target)) return;
 
-                SetTarget(target);
-            }
+                var targets = Selector.SelectedObjects
+                    .Select(x => x.GetComponent<ITarget>())
+                    .Where(x => x != null)
+                    .ToArray();
 
-            private void SetTarget(ITarget target)
-            {
-                manager.Target = target;
-                var isCommandExecuted = UnitsController.Instance.Action(manager.executor, target);
-                if(isCommandExecuted)
+                var targetsAndCommands = targets
+                    .Select(x => (x,GetAvailableCommandForPair(manager.executor, x)))
+                    .Where(x => x.Item2 != null)
+                    .ToArray();
+                
+                if (targetsAndCommands.Length == 0)
                 {
+                    
+                }
+                else if (targetsAndCommands.Length == 1)
+                {
+                    manager.Target = targetsAndCommands[0].Item1;
+                    UnitsController.ExecuteCommand(targetsAndCommands[0].Item2);
                     manager.CommandExecuted.Invoke(manager.executor, manager.target);
                     isCancelable = false;
+                    manager.target = null;
                 }
-                    
-                manager.Target = null;
+                else
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
+
+            private ICommand GetAvailableCommandForPair(IExecutor executor, ITarget target)
+            {
+                foreach (var commandType in target.CommandPriorityData)
+                {
+                    if (executor.TryGetCommandForTarget(commandType, target, out var command)
+                        && command.CanExecute())
+                    {
+                        return command;
+                    }
+                }
+
+                return null;
             }
 
             private void CancelExecutor()
             {
-                if(!isCancelable) return;
+                if (!isCancelable) return;
                 manager.Executor = null;
                 Debug.Log("EXECUTOR CANCELED");
 
@@ -62,4 +96,3 @@ namespace LineWars.Controllers
         }
     }
 }
-

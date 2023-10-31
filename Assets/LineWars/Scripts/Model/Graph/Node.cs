@@ -141,8 +141,10 @@ namespace LineWars.Model
             {
                 Selector.SelectedObjects = new []{leftUnit.gameObject, gameObject};
             }
-
-            Selector.SelectedObject = gameObject;
+            else
+            {
+                Selector.SelectedObject = gameObject;
+            }
         }
 
         public void Initialize(int index)
