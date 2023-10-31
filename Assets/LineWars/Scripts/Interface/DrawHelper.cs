@@ -29,6 +29,8 @@ public static class DrawHelper
         {
             case CommandType.MeleeAttack:
                 return Resources.Load<Sprite>("UI/Sorokin/Icons/AttackOrder");
+            case CommandType.Ram:
+                return Resources.Load<Sprite>("UI/Sorokin/Icons/AttackOrder");
             case CommandType.Heal:
                 return Resources.Load<Sprite>("UI/Sorokin/Icons/Heal");
             case CommandType.Fire:

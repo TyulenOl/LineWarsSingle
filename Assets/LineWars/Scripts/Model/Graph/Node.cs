@@ -48,8 +48,8 @@ namespace LineWars.Model
         
         public IEnumerable<Edge> Edges => edges;
 
-        public bool LeftIsFree => LeftUnit == null;
-        public bool RightIsFree => RightUnit == null;
+        public bool LeftIsFree => LeftUnit is null;
+        public bool RightIsFree => RightUnit is null;
         public bool AnyIsFree => LeftIsFree || RightIsFree;
         public bool AllIsFree => LeftIsFree && RightIsFree;
 
