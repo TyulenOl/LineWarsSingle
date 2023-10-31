@@ -30,7 +30,8 @@ namespace LineWars.Controllers
             {
                 var previousTarget = target;
                 target = value;
-                TargetChanged.Invoke(previousTarget, target);
+                if (previousTarget != target)
+                    TargetChanged.Invoke(previousTarget, target);
             }
         }
         public IExecutor Executor 
@@ -40,7 +41,8 @@ namespace LineWars.Controllers
             {
                 var previousExecutor = executor;
                 executor = value;
-                ExecutorChanged.Invoke(previousExecutor, executor);
+                if (previousExecutor != executor)
+                    ExecutorChanged.Invoke(previousExecutor, executor);
             }
         }
 
