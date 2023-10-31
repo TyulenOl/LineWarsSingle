@@ -131,6 +131,7 @@ namespace LineWars.Model
             {
                 var before = currentArmor;
                 currentArmor = Mathf.Max(0, value);
+                if(before == currentArmor) return;
                 ArmorChanged.Invoke(before, currentArmor);
             }
         }
@@ -182,7 +183,7 @@ namespace LineWars.Model
             dj = new RandomDJ(1);
             
             currentHp = maxHp;
-            currentArmor = maxArmor;
+            currentArmor = 0;
             currentActionPoints = maxActionPoints;
 
             movementLogic = GetComponent<UnitMovementLogic>();
@@ -191,10 +192,6 @@ namespace LineWars.Model
             index = SingleGame.Instance.AllUnits.Add(this);
             void InitialiseAllActions()
             {
-                // var serializeActions = gameObject.GetComponents<IMonoUnitAction<UnitAction<Node, Edge, Unit, Owned, BasePlayer>>>()
-                //     .OrderByDescending(x => x.Priority)
-                //     .ToArray();
-
                 var serializeActions = gameObject.GetComponents<Component>()
                     .OfType<IMonoUnitAction<UnitAction<Node, Edge, Unit, Owned, BasePlayer>>>()
                     .OrderByDescending(x => x.Priority)
