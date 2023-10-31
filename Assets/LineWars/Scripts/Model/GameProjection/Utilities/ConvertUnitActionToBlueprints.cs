@@ -104,7 +104,8 @@ namespace LineWars.Model
             if(action.CanBlock())
             {
                 var unitId = action.MyUnit.Id;
-
+                var command = new RlBlockCommandBlueprint(unitId);
+                BlueprintList.Add(command);
             }
         }
 

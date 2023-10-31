@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 
-
 namespace LineWars.Model
 {
     public partial class EnemyAI : BasePlayer
@@ -18,6 +17,7 @@ namespace LineWars.Model
         [SerializeField] private GameEvaluator gameEvaluator;
         [SerializeField] private int depth;
         [SerializeField] private float commandPause;
+        [SerializeField] private float firstCommandPause;
 
         private EnemyAIBuySelector buySelector;
 
@@ -70,15 +70,11 @@ namespace LineWars.Model
 
             var commandEvalList = await Task.WhenAll(tasksList.ToArray());
 
-            foreach(var c in commandEvalList )
-            {
-                Debug.Log(c.Item2[0]);
-                Debug.Log(c.Item1);
-            }
             StartCoroutine(TurnCoroutine());
 
             IEnumerator TurnCoroutine()
             {
+                yield return new WaitForSeconds(firstCommandPause);
                 var bestBlueprint = commandEvalList.MaxItem((i1, i2) => i1.Item1.CompareTo(i2.Item1));
                 foreach (var blueprint in bestBlueprint.Item2)
                 {
