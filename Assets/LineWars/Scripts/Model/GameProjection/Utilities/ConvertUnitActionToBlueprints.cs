@@ -116,7 +116,7 @@ namespace LineWars.Model
 
         public void Visit(RamAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
-            foreach (var node in Graph.GetNodesInRange(action.MyUnit.Node, 2)) //TODO: 2 -> 1
+            foreach (var node in Graph.GetNodesInRange(action.MyUnit.Node, 1))
             {
                 if(action.CanRam(node))
                 {
