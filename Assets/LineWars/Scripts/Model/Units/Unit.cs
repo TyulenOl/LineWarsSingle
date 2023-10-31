@@ -136,7 +136,6 @@ namespace LineWars.Model
         }
 
         public string UnitDescription => unitDescription;
-        
         public UnitType Type => unitType;
 
         public UnitDirection UnitDirection

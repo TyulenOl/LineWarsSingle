@@ -1,13 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using AYellowpaper.SerializedCollections;
 using UnityEngine;
 
 namespace LineWars.Model
 {
     [CreateAssetMenu(fileName = "new Nation", menuName = "Data/Create Nation", order = 50)]
-    [Serializable]
     public class Nation: ScriptableObject
     {
         [SerializeField] private NationEconomicLogic nationEconomicLogic;

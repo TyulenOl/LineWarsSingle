@@ -13,7 +13,6 @@ namespace LineWars.Model
     /// </summary>
     public abstract class BasePlayer : MonoBehaviour, IActor, IBasePlayer<Owned, BasePlayer>
     {
-        
         [field: SerializeField, ReadOnlyInspector] public int Id { get;  private set; }
         [SerializeField, ReadOnlyInspector] private int money;
         /// <summary>
@@ -31,10 +30,13 @@ namespace LineWars.Model
         
 
         private HashSet<Owned> myOwned;
-        private bool isFirstReplenish = true;
+        private readonly List<Node> nodes = new ();
+        private readonly List<Unit> units = new ();
         
-        private IEnumerable<Node> MyNodes => myOwned.OfType<Node>();
-        protected IEnumerable<Unit> MyUnits => myOwned.OfType<Unit>();
+        private bool isFirstReplenish = true;
+
+        public IEnumerable<Node> MyNodes => nodes;
+        public IEnumerable<Unit> MyUnits => units;
         
         public event Action<PhaseType, PhaseType> TurnChanged;
         public event Action<Owned> OwnedAdded;
@@ -159,6 +161,7 @@ namespace LineWars.Model
 
         protected virtual void BeforeAddOwned(Node node)
         {
+            nodes.Add(node);
             var nodeIncome = GetMyIncomeFromNode(node);
             if (!node.IsDirty) CurrentMoney += GetMyCapturingMoneyFromNode(node);
             Income += nodeIncome;
@@ -176,7 +179,7 @@ namespace LineWars.Model
 
         protected virtual void BeforeAddOwned(Unit unit)
         {
-            
+            units.Add(unit);
         }
 
         public void RemoveOwned([NotNull] Owned owned)
@@ -201,6 +204,7 @@ namespace LineWars.Model
 
         protected virtual void BeforeRemoveOwned(Node node)
         {
+            nodes.Remove(node);
             Income -= Mathf.RoundToInt(Rules.IncomeModifier.Modify(node.BaseIncome));
 
             if (node == Base)
@@ -211,6 +215,7 @@ namespace LineWars.Model
 
         protected virtual void BeforeRemoveOwned(Unit unit)
         {
+            units.Remove(unit);
         }
 
         public void Defeat()
@@ -353,5 +358,7 @@ namespace LineWars.Model
         }
 
         #endregion
+
+        public T Accept<T>(IBasePlayerVisitor<T> visitor) => visitor.Visit(this);
     }
 }

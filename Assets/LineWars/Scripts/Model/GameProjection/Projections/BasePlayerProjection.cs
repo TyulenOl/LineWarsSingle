@@ -99,6 +99,8 @@ namespace LineWars.Model
         {
             var leftUnit = preset.FirstUnitType; // СПРОСИТЬ У ПАШИ
         }
+        
+        public T Accept<T>(IBasePlayerVisitor<T> visitor) => visitor.Visit(this);
     }
 
     public interface IReadOnlyBasePlayerProjection : INumbered
