@@ -116,7 +116,17 @@ namespace LineWars.Model
 
         public void Visit(RamAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
         {
-            
+            foreach (var node in Graph.GetNodesInRange(action.MyUnit.Node, 2)) //TODO: 2 -> 1
+            {
+                if(action.CanRam(node))
+                {
+                    var unitId = action.MyUnit.Id;
+                    var nodeId = node.Id;
+                    var command = new RamCommandBlueprint(unitId, nodeId);
+
+                    BlueprintList.Add(command);
+                }
+            }
         }
 
         public void Visit(BlowWithSwingAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)

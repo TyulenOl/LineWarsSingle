@@ -63,7 +63,7 @@ namespace LineWars.Model
                 resultScore += unit.CurrentHp * hpMultiplier;
                 resultScore += unit.MaxArmor * hpMultiplier;
 
-                foreach(var node in projection.Graph.GetNodesInRange(unit.Node, 2))
+                foreach(var node in projection.Graph.GetNodesInRange(unit.Node, 2)) //TODO: 2 -> 1
                 {
                     if (node.Owner == player)
                         resultScore += visibleOwnedNodeMultiplier * node.Score;

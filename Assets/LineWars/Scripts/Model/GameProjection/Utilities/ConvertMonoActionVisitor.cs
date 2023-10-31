@@ -94,11 +94,13 @@ namespace LineWars.Model
 
         public void Visit(MonoRLBuildAction action)
         {
-            Result = new RLBuildAction<NodeProjection, EdgeProjection, UnitProjection, OwnedProjection, BasePlayerProjection>(Unit, action.PossibleBuildings, action.Factory);
+            Result = new RLBuildAction<NodeProjection, EdgeProjection, UnitProjection, OwnedProjection, BasePlayerProjection>
+                (Unit, action.PossibleBuildings, action.Factory);
             Result.ActionModifier = action.Action.ActionModifier;
         }
 
-        public static ConvertMonoActionVisitor Create(UnitProjection unit, IGraphForGame<NodeProjection, EdgeProjection, UnitProjection, OwnedProjection, BasePlayerProjection> graph)
+        public static ConvertMonoActionVisitor Create(UnitProjection unit, 
+            IGraphForGame<NodeProjection, EdgeProjection, UnitProjection, OwnedProjection, BasePlayerProjection> graph)
 
         {
             return new ConvertMonoActionVisitor(unit, graph);
