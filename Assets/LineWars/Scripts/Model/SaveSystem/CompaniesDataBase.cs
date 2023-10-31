@@ -50,7 +50,7 @@ namespace LineWars
         private void Start()
         {
             Initialize();
-            Game.IsNormalStart = true;
+            GameVariables.IsNormalStart = true;
         }
 
         private void Initialize()

@@ -1,36 +1,56 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace LineWars
 {
-    public class Selector : MonoBehaviour // Отвечает за Input
+    public static class Selector
     {
-        private static Selector instance;
-        private GameObject selectedObject;
-        public static event Action<GameObject, GameObject> SelectedObjectsChanged;
-
+        public static event Action<GameObject, GameObject> SelectedObjectChanged;
+        public static event Action<IEnumerable<GameObject>, IEnumerable<GameObject>> ManySelectedObjectsChanged;
+        private static GameObject selectedObject;
         public static GameObject SelectedObject
         {
-            get => instance.selectedObject;
+            get => selectedObject;
             set
             {
-                SelectedObjectsChanged?.Invoke(instance.selectedObject, value);
-                instance.selectedObject = value;
+                var beforeSelectedObject = selectedObject;
+                var beforeSelectedObjects = selectedObjects;
+                
+                selectedObject = value;
+                selectedObjects = value != null ? new[] {selectedObject} : Array.Empty<GameObject>();
+
+                ManySelectedObjectsChanged?.Invoke(beforeSelectedObjects, selectedObjects);
+                SelectedObjectChanged?.Invoke(beforeSelectedObject, selectedObject);
             }
         }
 
-        private void Awake()
+        private static GameObject[] selectedObjects = Array.Empty<GameObject>();
+
+        public static IReadOnlyCollection<GameObject> SelectedObjects
         {
-            if (instance != null && instance != this)
+            get => selectedObjects;
+            set
             {
-                Destroy(gameObject);
-            }
-            else
-            {
-                instance = this;
+                var before = selectedObjects;
+                //если в коллекции есть хоть что-то
+                if (value != null && value.Count > 0)
+                {
+                    selectedObjects = value.ToArray();
+                    SelectedObjectChanged?.Invoke(selectedObject, selectedObjects[0]);
+                    selectedObject = selectedObjects[0];
+                }
+                // если коллекция пуста
+                else
+                {
+                    selectedObjects = Array.Empty<GameObject>();
+                    SelectedObjectChanged?.Invoke(selectedObject, null);
+                    selectedObject = null;
+                }
+
+                ManySelectedObjectsChanged?.Invoke(before, selectedObjects);
             }
         }
-        
     }
 }

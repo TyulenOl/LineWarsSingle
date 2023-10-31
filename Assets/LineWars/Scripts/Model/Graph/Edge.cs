@@ -4,12 +4,14 @@ using System.Linq;
 using LineWars.Extensions.Attributes;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
 namespace LineWars.Model
 {
     public class Edge : MonoBehaviour,
         IEdgeForGame<Node, Edge, Unit, Owned, BasePlayer>,
-        ISerializationCallbackReceiver
+        ISerializationCallbackReceiver,
+        IPointerClickHandler
     {
         [Header("Graph Settings")]
         [SerializeField] private int index;
@@ -161,6 +163,11 @@ namespace LineWars.Model
                         lineMap[value] = new LineTypeCharacteristics(value);
                 }
             }
+        }
+
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            Selector.SelectedObject = gameObject;
         }
     }
 }
