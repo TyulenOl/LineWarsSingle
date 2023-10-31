@@ -50,15 +50,15 @@ namespace LineWars.Model
         {
             var enemies = node.Units
                 .ToArray();
-            var enemyOwner = node.Owner;
+            var damage = Damage / enemies.Length;
             var possibleNodeForRetreat = node
                 .GetNeighbors()
-                .Where(x => x.Owner == enemyOwner)
+                .Where(x => x.Owner != MyUnit.Owner)
                 .ToArray();
 
             foreach (var enemy in enemies)
             {
-                if (enemy.CurrentHp + enemy.CurrentArmor <= Damage)
+                if (enemy.CurrentHp + enemy.CurrentArmor <= damage)
                 {
                     enemy.CurrentHp = 0;
                     yield return new DiedUnit() {Unit = enemy};
@@ -82,9 +82,9 @@ namespace LineWars.Model
                     continue;
                 }
 
-                moveAction.MoveTo(nodeForRetreat);
+                enemy.DealDamageThroughArmor(damage);
+                enemyMoveAction.MoveTo(nodeForRetreat);
                 yield return new MovedUnit() {Unit = enemy};
-                enemy.DealDamageThroughArmor(Damage);
             }
 
             moveAction.MoveTo(node);
