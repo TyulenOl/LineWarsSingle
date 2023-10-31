@@ -8,7 +8,7 @@ namespace LineWars.Controllers
     public class SFXData : ScriptableObject
     {
         [SerializeField] private AudioClip clip;
-
+        public float LengthInSeconds => clip.length;
         public AudioClip Clip => clip;
     }
 }

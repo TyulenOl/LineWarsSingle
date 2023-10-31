@@ -11,7 +11,10 @@ namespace LineWars.Model
         Cavalry,
         Artillery,
         Doctor,
-        Tank
+        Tank,
+        Mechnik,
+        Luchnik,
+        BogatyrForZBT,
     }
     
 }

@@ -9,6 +9,7 @@ namespace LineWars.Controllers
     public class SfxManager : MonoBehaviour
     {
         public static SfxManager Instance { get; private set; }
+        
     
         private AudioSource source;
 

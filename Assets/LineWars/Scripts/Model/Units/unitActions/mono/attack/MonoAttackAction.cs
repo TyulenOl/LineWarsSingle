@@ -38,9 +38,15 @@ namespace LineWars.Model
 
         public virtual void Attack(IAlive enemy)
         {
+            StartCoroutine(AttackCoroutine(enemy));
+        }
+
+        private IEnumerator AttackCoroutine(IAlive enemy)
+        {
             AttackAction.Attack(enemy);
             SfxManager.Instance.Play(attackSfx);
-            SfxManager.Instance.PlayWithDelay(DJ.GetSound(sfxList),1);
+            yield return new WaitForSeconds(attackSfx.LengthInSeconds/2);
+            SfxManager.Instance.Play(DJ.GetSound(sfxList));
         }
 
         public Type TargetType => typeof(IAlive);
