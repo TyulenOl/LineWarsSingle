@@ -117,7 +117,7 @@ namespace LineWars
         private void WinGame()
         {
             Debug.Log("<color=yellow>Вы Победили</color>");
-            if (!Game.IsNormalStart) return;
+            if (!GameVariables.IsNormalStart) return;
             WinLoseUI.isWin = true;
             SceneTransition.LoadScene(SceneName.WinOrLoseScene);
             CompaniesDataBase.ChooseMission.isCompleted = true;
@@ -127,7 +127,7 @@ namespace LineWars
         private void LoseGame()
         {
             Debug.Log("<color=red>Потрачено</color>");
-            if (!Game.IsNormalStart) return;
+            if (!GameVariables.IsNormalStart) return;
             WinLoseUI.isWin = false;
             SceneTransition.LoadScene(SceneName.WinOrLoseScene);
         }

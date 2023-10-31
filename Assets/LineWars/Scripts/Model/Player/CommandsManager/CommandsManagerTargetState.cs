@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using LineWars.Model;
 
@@ -20,24 +17,23 @@ namespace LineWars.Controllers
 
             public override void OnEnter()
             {
-                Selector.SelectedObjectsChanged += OnSelectedObjectChanged;
+                Selector.SelectedObjectChanged += OnSelectedObjectChanged;
                 isCancelable = true;
             }
 
             public override void OnExit()
             {
-                Selector.SelectedObjectsChanged -= OnSelectedObjectChanged;
+                Selector.SelectedObjectChanged -= OnSelectedObjectChanged;
             }
 
             private void OnSelectedObjectChanged(GameObject lastObject, GameObject newObject)
             {
-                if(newObject.TryGetComponent<IExecutor>(out IExecutor executor) &&
-                executor == manager.executor)
+                if(newObject.TryGetComponent(out IExecutor executor) && executor == manager.executor)
                 {
                    CancelExecutor();
                    return;
                 }
-                if(!newObject.TryGetComponent<ITarget>(out ITarget target)) return;
+                if(!newObject.TryGetComponent(out ITarget target)) return;
 
                 SetTarget(target);
             }

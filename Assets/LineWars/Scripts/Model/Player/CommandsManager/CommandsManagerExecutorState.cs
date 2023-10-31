@@ -10,7 +10,7 @@ namespace LineWars.Controllers
         public class CommandsManagerExecutorState : State
         {
             private CommandsManager manager;
-            
+
             public CommandsManagerExecutorState(CommandsManager manager)
             {
                 this.manager = manager;
@@ -18,34 +18,31 @@ namespace LineWars.Controllers
 
             public override void OnEnter()
             {
-                Selector.SelectedObjectsChanged += OnSelectedObjectChanged;
+                Selector.SelectedObjectChanged += OnSelectedObjectChanged;
             }
 
             public override void OnExit()
             {
-                Selector.SelectedObjectsChanged -= OnSelectedObjectChanged;
+                Selector.SelectedObjectChanged -= OnSelectedObjectChanged;
             }
 
             private void OnSelectedObjectChanged(GameObject previousObject, GameObject newObject)
             {
-                if(!(newObject.TryGetComponent<Owned>(out Owned owned))) return;
-                if(!Player.LocalPlayer.IsMyOwn(owned)) return;
-                if(!(newObject.TryGetComponent<IExecutor>(out IExecutor executor))) return;
-        
-                if(!Player.LocalPlayer.OwnedObjects.Contains(owned))
-                    return;
-                if(executor is Unit unit 
-                && !Player.LocalPlayer.PotentialExecutors.Contains(unit.Type)) 
-                    return;
-                if(executor.CurrentActionPoints <= 0)
-                    return;
+                if (!newObject.TryGetComponent(out IExecutor executor)) return;
                 
+                if (!newObject.TryGetComponent(out Owned owned)
+                    || !Player.LocalPlayer.IsMyOwn(owned)) return;
+                
+                if (executor is Unit unit
+                    && !Player.LocalPlayer.PotentialExecutors.Contains(unit.Type))
+                    return;
+                if (!executor.CanDoAnyAction)
+                    return;
+
                 manager.Executor = executor;
 
                 manager.stateMachine.SetState(manager.targetState);
             }
-
-            
         }
     }
 }
