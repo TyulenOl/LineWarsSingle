@@ -37,7 +37,7 @@ namespace LineWars.Model
                         OwnedProjection, BasePlayerProjection>(unit, targetUnit);
             }
 
-            throw new ArgumentException("Faild to generate Command!");
+            throw new ArgumentException("Failed to generate Command!");
         }
 
         public ICommand GenerateMonoCommand(GameProjection projection)
@@ -57,7 +57,7 @@ namespace LineWars.Model
                         Owned, BasePlayer>(unit, targetUnit);
             }
 
-            throw new ArgumentException("Faild to generate Command!");
+            throw new ArgumentException("Failed to generate Command!");
         }
     }
 }

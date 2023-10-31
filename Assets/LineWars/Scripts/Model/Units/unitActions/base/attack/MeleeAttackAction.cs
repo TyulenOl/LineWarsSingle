@@ -55,7 +55,7 @@ namespace LineWars.Model
                 AttackUnitButIgnoreBlock(selectedUnit);
                 if (selectedUnit != enemy)
                 {
-                    Debug.Log($"Юнит {selectedUnit} перехватил атаку");
+                    //Debug.Log($"Юнит {selectedUnit} перехватил атаку");
                 }
             }
         }
@@ -86,12 +86,13 @@ namespace LineWars.Model
         }
         
         public MeleeAttackAction(
-            TUnit executor, 
+            TUnit executor,
             int damage,
             bool isPenetrating,
-            bool onslaught, 
-            UnitBlockerSelector blockerSelector) : base(executor, damage, isPenetrating)
+            bool onslaught,
+            [NotNull] UnitBlockerSelector blockerSelector) : base(executor, damage, isPenetrating)
         {
+            if(blockerSelector == null) throw new ArgumentException();
             Onslaught = onslaught;
             if (blockerSelector == null)
                 throw new ArgumentException($"blocker selector is null");

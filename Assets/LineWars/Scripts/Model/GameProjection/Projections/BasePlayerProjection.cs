@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -19,6 +20,12 @@ namespace LineWars.Model
 
             set
             {
+                if (value == null)
+                {
+                    baseProjection = null;
+                    return;
+                }
+
                 if (value.Owner != this) throw new ArgumentException();
 
                 baseProjection = value;
@@ -32,6 +39,7 @@ namespace LineWars.Model
         public IReadOnlyCollection<OwnedProjection> OwnedObjects => ownedObjects;
 
         public BasePlayerProjection(
+            int id,
             PlayerRules rules, 
             int income, int currentMoney,
             PhaseExecutorsData executorsData,
@@ -40,6 +48,7 @@ namespace LineWars.Model
             IReadOnlyCollection<OwnedProjection> ownedObjects = null,
             NodeProjection playerBase = null)
         {
+            Id = id;
             Original = original;
             Base = playerBase;
             Rules = rules;
@@ -54,14 +63,14 @@ namespace LineWars.Model
         }
 
        public BasePlayerProjection(BasePlayer original, IReadOnlyCollection<OwnedProjection> ownedObjects = null, NodeProjection playerBase = null)
-            : this(original.Rules, original.Income, original.CurrentMoney, original.PhaseExecutorsData, original.EconomicLogic, original, ownedObjects, playerBase)
+            : this(original.Id, original.Rules, original.Income, original.CurrentMoney, original.PhaseExecutorsData, original.EconomicLogic, original, ownedObjects, playerBase)
         {
         }
 
-        public BasePlayerProjection(IReadOnlyBasePlayerProjection playerProjection)
-             : this(playerProjection.Rules, playerProjection.Income, playerProjection.CurrentMoney,
+        public BasePlayerProjection(IReadOnlyBasePlayerProjection playerProjection, IReadOnlyCollection<OwnedProjection> ownedObjects = null, NodeProjection playerBase = null)
+             : this(playerProjection.Id, playerProjection.Rules, playerProjection.Income, playerProjection.CurrentMoney,
                    playerProjection.PhaseExecutorsData, playerProjection.EconomicLogic, playerProjection.Original,
-                   playerProjection.OwnedObjects, playerProjection.Base)
+                   ownedObjects, playerBase)
         { }
 
         public void SimulateReplenish()
@@ -79,7 +88,34 @@ namespace LineWars.Model
             if (owned.Owner != null && owned.Owner != this)
                 owned.Owner.RemoveOwned(owned);
 
+            CheckOwnedValidity(owned);
             ownedObjects.Add(owned);
+            
+        }
+
+        private void CheckOwnedValidity(OwnedProjection newProj)
+        {
+            if(newProj is UnitProjection newUnit)
+            {
+                foreach(var oldUnit in OwnedObjects
+                    .Where(owned => owned is UnitProjection)
+                    .Select(owned => (UnitProjection)owned))
+                {
+                    if (newUnit.Id == oldUnit.Id)
+                        throw new InvalidOperationException();
+                }
+            }
+
+            if(newProj is NodeProjection newNode)
+            {
+                foreach(var oldNode in OwnedObjects
+                    .Where (owned => owned is NodeProjection)
+                    .Select (owned => (NodeProjection)owned))
+                {
+                    if(newNode.Id == oldNode.Id)
+                        throw new InvalidOperationException();
+                }
+            }
         }
 
         public bool CanSpawnPreset(UnitBuyPreset preset)
