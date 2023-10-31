@@ -42,12 +42,7 @@ namespace LineWars.Model
         {
             return new MoveCommand<Node, Edge, Unit, Owned, BasePlayer>(this, (Node) target);
         }
-
-        public override void Accept(IMonoUnitVisitor visitor)
-        {
-            visitor.Visit(this);
-        }
-
+        
         private void OnDestroy()
         {
             Unit.MovementLogic.MovementIsOver -= MovementLogicOnMovementIsOver;
@@ -58,5 +53,8 @@ namespace LineWars.Model
             var action = new MoveAction<Node, Edge, Unit, Owned, BasePlayer>(Unit);
             return action;
         }
+        
+        public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit, Owned, BasePlayer> visitor) => visitor.Visit(this);
     }
 }

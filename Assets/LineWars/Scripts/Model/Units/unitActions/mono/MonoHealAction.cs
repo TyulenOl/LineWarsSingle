@@ -30,12 +30,7 @@ namespace LineWars.Model
         {
             return new HealCommand<Node, Edge, Unit, Owned, BasePlayer>(this, (Unit) target);
         }
-
-        public override void Accept(IMonoUnitVisitor visitor)
-        {
-            visitor.Visit(this);
-        }
-
+        
         protected override HealAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
         {
             var action = new HealAction<Node, Edge, Unit, Owned, BasePlayer>(
@@ -44,5 +39,8 @@ namespace LineWars.Model
                 InitialHealingAmount);
             return action;
         }
+        
+        public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit, Owned, BasePlayer> visitor) => visitor.Visit(this);
     }
 }

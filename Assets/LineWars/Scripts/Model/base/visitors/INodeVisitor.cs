@@ -1,6 +1,6 @@
 ﻿namespace LineWars.Model
 {
-    public interface INodeVisitor<T>
+    public interface INodeVisitor<out T>
     {
         public T Visit(Node node);
         public T Visit(NodeProjection projection);

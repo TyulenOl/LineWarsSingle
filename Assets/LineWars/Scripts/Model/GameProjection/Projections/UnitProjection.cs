@@ -41,9 +41,7 @@ namespace LineWars.Model
 
         public event Action AnyActionCompleted;
 
-        public IReadOnlyDictionary<CommandType, UnitAction<NodeProjection, EdgeProjection,
-            UnitProjection, OwnedProjection,
-            BasePlayerProjection>> ActionsDictionary => actionsDictionary;
+        public IReadOnlyDictionary<CommandType, UnitAction<NodeProjection, EdgeProjection, UnitProjection, OwnedProjection, BasePlayerProjection>> ActionsDictionary => actionsDictionary;
 
         public bool HasOriginal => Original != null;
 

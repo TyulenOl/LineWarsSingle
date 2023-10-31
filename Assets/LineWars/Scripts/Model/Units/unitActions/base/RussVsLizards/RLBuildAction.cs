@@ -30,7 +30,6 @@ namespace LineWars.Model
         }
         
         public override CommandType CommandType => CommandType.Build;
-        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor) => visitor.Visit(this);
 
         public RLBuildAction(
             TUnit executor,
@@ -40,5 +39,8 @@ namespace LineWars.Model
             Factory = factory;
             PossibleBuildings = possibleTypes.ToHashSet();
         }
+        
+        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit, TOwned, TPlayer> visitor) => visitor.Visit(this);
     }
 }

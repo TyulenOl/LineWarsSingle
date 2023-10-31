@@ -21,11 +21,13 @@ namespace LineWars.Model
 
         public override CommandType CommandType => CommandType.Ram;
 
-        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor) =>
-            visitor.Visit(this);
-
         public int Damage { get; }
 
+        public RamAction(TUnit executor, int damage) : base(executor)
+        {
+            Damage = damage;
+            moveAction = MyUnit.GetUnitAction<IMoveAction<TNode, TEdge, TUnit, TOwned, TPlayer>>();
+        }
         public bool CanRam(TNode node)
         {
             var line = MyUnit.Node.GetLine(node);
@@ -95,11 +97,7 @@ namespace LineWars.Model
         {
             return new RamCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(MyUnit, (TNode) target);
         }
-
-        public RamAction(TUnit executor, int damage) : base(executor)
-        {
-            Damage = damage;
-            moveAction = MyUnit.GetUnitAction<IMoveAction<TNode, TEdge, TUnit, TOwned, TPlayer>>();
-        }
+        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit, TOwned, TPlayer> visitor) => visitor.Visit(this);
     }
 }
