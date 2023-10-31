@@ -1,24 +1,25 @@
+using LineWars.Extensions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using DataStructures;
-using LineWars.Controllers;
+using System.Threading.Tasks;
+using UnityEditor;
 using UnityEngine;
 
 namespace LineWars.Model
 {
     public partial class EnemyAI : BasePlayer
     {
-        [SerializeField] private PhaseExecutorsData executorsData;
-        [SerializeField] private EnemyPhaseActions enemyPhaseActions;
         [SerializeField] private EnemyDifficulty difficulty;
         [SerializeField] private float actionCooldown;
         [SerializeField] private EnemyAIPersonality personality;
+        [SerializeField] private GameEvaluator gameEvaluator;
+        [SerializeField] private int depth;
+        [SerializeField] private float commandPause;
+        [SerializeField] private float firstCommandPause;
 
-        private IExecutor currentExecutor;
         private EnemyAIBuySelector buySelector;
-        public IReadOnlyCollection<UnitType> PotentialExecutors => executorsData.PhaseToUnits[CurrentPhase];
 
         protected override void Awake()
         {
@@ -33,7 +34,7 @@ namespace LineWars.Model
             StartCoroutine(BuyCoroutine());
             IEnumerator BuyCoroutine()
             {
-                if(buySelector.TryGetPreset(this, out var preset))
+                if (buySelector.TryGetPreset(this, out var preset))
                     SpawnPreset(preset);
                 yield return null;
                 ExecuteTurn(PhaseType.Idle);
@@ -53,85 +54,113 @@ namespace LineWars.Model
                 ExecuteTurn(PhaseType.Idle);
             }
         }
-        
-        private void ExecuteAITurn(PhaseType phase)
+
+        public async void ExecuteAITurn(PhaseType phase)
         {
-            var actions = new List<EnemyAction>();
-            foreach (var owned in OwnedObjects)
+            var gameProjection = 
+                GameProjection.GetProjectionFromMono(SingleGame.Instance.AllPlayers.Values, MonoGraph.Instance, PhaseManager.Instance);
+
+            var possibleCommands = CommandBlueprintCollector.CollectAllCommands(gameProjection);
+            var tasksList = new List<Task<(int, List<ICommandBlueprint>)>>();
+            foreach ( var command in possibleCommands )
             {
-                
-                if (!(owned is IExecutor executor)) continue;
-                if(executor.CurrentActionPoints <= 0) continue;
-                AddActionsForExecutor(actions, executor, phase);
+                var commandChain = new List<ICommandBlueprint>();
+                tasksList.Add(ExploreOutcomes(gameProjection, command, depth, -1, commandChain, true));
             }
 
-            var chosenAction = PickAction(actions);
-            currentExecutor = chosenAction.Executor;
-            chosenAction.ActionCompleted += GetActionOnActionCompleted(phase);
-            Debug.Log($"{chosenAction} CHOSEN");
-            chosenAction.Execute();
-        }
-        
-        private Action<EnemyAction> GetActionOnActionCompleted(PhaseType phase)
-        {
-            return (action) => OnActionCompleted(action, phase);
-        }
+            var commandEvalList = await Task.WhenAll(tasksList.ToArray());
 
-        private void OnActionCompleted(EnemyAction previousAction, PhaseType phaseType)
-        {
-            previousAction.ActionCompleted -= GetActionOnActionCompleted(phaseType);
-            StartCoroutine(NewActionCoroutine());
-            IEnumerator NewActionCoroutine()
+            StartCoroutine(TurnCoroutine());
+
+            IEnumerator TurnCoroutine()
             {
-                yield return new WaitForSeconds(actionCooldown);
-                if (currentExecutor.CurrentActionPoints > 0)
+                yield return new WaitForSeconds(firstCommandPause);
+                var bestBlueprint = commandEvalList.MaxItem((i1, i2) => i1.Item1.CompareTo(i2.Item1));
+                foreach (var blueprint in bestBlueprint.Item2)
                 {
-                    yield return new WaitForSeconds(actionCooldown);
-                    var actions = new List<EnemyAction>();
-                    AddActionsForExecutor(actions, currentExecutor, phaseType);
-                    var newAction = PickAction(actions);
-                    newAction.ActionCompleted += GetActionOnActionCompleted(phaseType);
-                    newAction.Execute();
-
+                    var command = blueprint.GenerateMonoCommand(gameProjection);
+                    UnitsController.ExecuteCommand(command);
+                    yield return new WaitForSeconds(commandPause);
                 }
-                else
-                {
-                    currentExecutor = null;
-                    ExecuteTurn(PhaseType.Idle);
-                }
-            }
+                yield return null;
+                ExecuteTurn(PhaseType.Idle);
+            }         
         }
 
-        private void AddActionsForExecutor(List<EnemyAction> actions, IExecutor executor, PhaseType phase)
+
+        private Task<(int, List<ICommandBlueprint>)> ExploreOutcomes(GameProjection gameProjection, ICommandBlueprint blueprint, int depth,
+            int currentExecutorId, List<ICommandBlueprint> firstCommandChain, bool isSavingCommands)
         {
-            var unitTypes = executorsData.PhaseToUnits[phase];
-            if (executor is ComponentUnit unit && !unitTypes.Contains(unit.Type)) return;
+            var task = new Task<(int, List<ICommandBlueprint>)>(
+                () => MinMax(gameProjection, blueprint, depth, currentExecutorId, firstCommandChain, isSavingCommands));
+            task.Start();
+            return task;
+        }
+
+        private (int, List<ICommandBlueprint>) MinMax(GameProjection gameProjection, ICommandBlueprint blueprint, int depth, 
+            int currentExecutorId, List<ICommandBlueprint> firstCommandChain, bool isSavingCommands)
+        {
+            if(currentExecutorId != -1 && blueprint.ExecutorId != currentExecutorId)
+                throw new ArgumentException();
+
+            currentExecutorId = blueprint.ExecutorId;
+            var newGame = GameProjection.GetCopy(gameProjection);
+            var thisCommand = blueprint.GenerateCommand(newGame);
+            thisCommand.Execute();
+
+            if(isSavingCommands)
+            {
+                var newCommandChain = new List<ICommandBlueprint>(firstCommandChain);
+                newCommandChain.Add(blueprint);
+                firstCommandChain = newCommandChain;
+            }
+
+            var thisPlayerProjection = newGame.OriginalToProjectionPlayers[this];
+            if (newGame.UnitsIndexList.Count == 0)
+                return (gameEvaluator.Evaluate(newGame, thisPlayerProjection), firstCommandChain); 
             
-            var possibleActionData = enemyPhaseActions.PhasesToActions[phase];
-            foreach (var actionData in possibleActionData)
+            if (IsTurnOver(newGame, currentExecutorId))
             {
-                Debug.Log(actionData);
-                actionData.AddAllPossibleActions(actions, this, executor);
+                depth--;
+                currentExecutorId = -1;
+                isSavingCommands = false;
+                if (!newGame.IsUnitPhaseAvailable())
+                    newGame.CycleTurn();
+                else
+                    newGame.CyclePlayers();
+            }
+            if (depth == 0 || newGame.CurrentPhase == PhaseType.Buy)
+            {
+                return (gameEvaluator.Evaluate(newGame, thisPlayerProjection), firstCommandChain);
+            }
+
+            var possibleCommands = CommandBlueprintCollector.CollectAllCommands(newGame)
+            .Where(newBlueprint => currentExecutorId == -1 || newBlueprint.ExecutorId != currentExecutorId)
+            .Select(newBlueprint => MinMax(newGame, newBlueprint, depth, currentExecutorId, firstCommandChain, isSavingCommands));
+
+            if (thisPlayerProjection != newGame.CurrentPlayer)
+            {
+                var minChain = possibleCommands.MinItem((i1, i2) => i1.Item1.CompareTo(i2.Item1));
+                return minChain;
+            }
+            else
+            {
+                var maxChain = possibleCommands.MaxItem((i1, i2) => i1.Item1.CompareTo(i2.Item1));
+                return maxChain;
             }
         }
 
-        private EnemyAction PickAction(List<EnemyAction> actions)
+        private bool IsTurnOver(GameProjection game, int currentExecutorId)
         {
-            var sortedList = new List<EnemyAction>(actions);
-            sortedList.Sort();
-            var randomList = new RandomChanceList<EnemyAction>();
-            for (var i = 0; i < sortedList.Count; i++)
+            if(game.CurrentPhase != PhaseType.Buy && currentExecutorId != -1)
             {
-                var currentAction = sortedList[i];
-                Debug.Log($"action - {currentAction}, score - {currentAction.Score}, i - {i}, count - {sortedList.Count}, " +
-                          $"time - {((float) i + 1)/ sortedList.Count}, evaluate - {difficulty.Curve.Evaluate(((float) i + 1)/ sortedList.Count)}");
-                randomList.Add(currentAction, 
-                    difficulty.Curve.Evaluate(((float) i + 1)/ sortedList.Count));
+                if (!game.UnitsIndexList.ContainsKey(currentExecutorId)) 
+                    return true;
+                var currentExecutor = game.UnitsIndexList[currentExecutorId];
+                return currentExecutor.CurrentActionPoints <= 0;
             }
-
-            return randomList.PickRandomObject();
+            return true;
         }
-
         #endregion
 
         #region Check Turns
@@ -143,11 +172,11 @@ namespace LineWars.Model
 
         private bool CanExecutePhase(PhaseType phase)
         {
-            var executors = executorsData.PhaseToUnits[phase];
+            var executors = PhaseExecutorsData.PhaseToUnits[phase];
             foreach (var owned in OwnedObjects)
             {
-                if (!(owned is ComponentUnit unit)) continue;
-                if(executors.Contains(unit.Type) && unit.CurrentActionPoints > 0)
+                if (!(owned is Unit unit)) continue;
+                if (executors.Contains(unit.Type) && unit.CurrentActionPoints > 0)
                     return true;
             }
 

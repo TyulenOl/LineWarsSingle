@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,11 +5,23 @@ using UnityEngine;
 namespace LineWars.Model
 {
     [CreateAssetMenu(fileName = "New Commands Priority Data", menuName = "Create Commands Priority Data")]
-    public class CommandPriorityData : ScriptableObject
+    public class CommandPriorityData : ScriptableObject, IReadOnlyList<CommandType>
     {
         [SerializeField] private List<CommandType> commandsPriority;
 
-        public IReadOnlyList<CommandType> Priority => commandsPriority;
+        public CommandType this[int index] => commandsPriority[index];
+
+        public int Count => commandsPriority.Count;
+
+        public IEnumerator<CommandType> GetEnumerator()
+        {
+            return commandsPriority.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return commandsPriority.GetEnumerator();
+        }
     }
     
     public enum CommandType
@@ -22,7 +33,11 @@ namespace LineWars.Model
         Fire,
         Move,
         Build,
-        Block
+        Block,
+        SacrificePerun,
+        Ram,
+        BlowWithSwing,
+        ShotUnit
     }
 }   
 

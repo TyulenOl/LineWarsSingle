@@ -49,6 +49,9 @@ namespace LineWars
                 companyElement.Initialize(companyState, OnCompanyButtonClick); 
                 companyElements.Add(companyElement);
             }
+            
+            Instantiate(companyElementUIPrefab, contentTransform);
+            Instantiate(companyElementUIPrefab, contentTransform);
         }
 
         private void OnCompanyButtonClick(CompanyState companyState)

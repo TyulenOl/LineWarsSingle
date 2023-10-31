@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using AYellowpaper.SerializedCollections;
 using LineWars.Extensions.Attributes;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace LineWars.Model
 {
-    [RequireComponent(typeof(Selectable2D))]
-    public class Edge : MonoBehaviour, ITarget, INumbered, ISerializationCallbackReceiver
+    public class Edge : MonoBehaviour,
+        IEdgeForGame<Node, Edge, Unit, Owned, BasePlayer>,
+        ISerializationCallbackReceiver
     {
-        public ModelEdge Model { get; private set; }
-
         [Header("Graph Settings")]
         [SerializeField] private int index;
 
@@ -22,26 +20,75 @@ namespace LineWars.Model
         [Header("Line Settings")] 
         [SerializeField] private LineType lineType;
 
-        [SerializeField] private SerializedDictionary<LineType, LineTypeCharacteristics> lineMap;
+        [SerializeField, NamedArray("lineType")]
+        private List<LineTypeCharacteristics> lineTypeCharacteristics;
 
         [Header("Commands Settings")] 
         [SerializeField] private CommandPriorityData priorityData;
+
+        [Header("DEBUG")] 
+        [SerializeField] [ReadOnlyInspector] private int hp;
+
+        [field: Header("Events")]
+        [field: SerializeField]
+        public UnityEvent<int, int> HpChanged { get; private set; }
+
+        [field: SerializeField] public UnityEvent<LineType, LineType> LineTypeChanged { get; private set; }
+
+        private Dictionary<LineType, LineTypeCharacteristics> lineMap;
         
         [Header("References")]
-        [SerializeField] private BoxCollider2D edgeCollider;
         [SerializeField] private SpriteRenderer edgeSpriteRenderer;
-        
-        [field: Header("Events")]
-        [field: SerializeField] public UnityEvent<int, int> HpChanged { get; private set; }
-        [field: SerializeField] public UnityEvent<LineType, LineType> LineTypeChanged { get; private set; }
-        
+        [SerializeField] private BoxCollider2D edgeCollider;
+
+        public IReadOnlyDictionary<LineType, LineTypeCharacteristics> LineMap => lineMap;
         public SpriteRenderer SpriteRenderer => edgeSpriteRenderer;
         public BoxCollider2D BoxCollider2D => edgeCollider;
 
-        public int Index => Model.Index;
+        public int Id => index;
+        
+
+        public int MaxHp
+        {
+            get => lineMap[LineType].MaxHp;
+            set => lineMap[LineType].MaxHp = value;
+        }
+
         public Node FirstNode => firstNode;
         public Node SecondNode => secondNode;
 
+        public int CurrentHp
+        {
+            get => hp;
+            set
+            {
+                var before = hp;
+
+                if (value < 0)
+                {
+                    LineType = LineTypeHelper.Down(LineType);
+                    hp = MaxHp;
+                }
+                else
+                    hp = Math.Min(value, MaxHp);
+
+                HpChanged.Invoke(before, hp);
+            }
+        }
+        
+        public LineType LineType
+        {
+            get => lineType;
+            set
+            {
+                var before = lineType;
+                lineType = value;
+                LineTypeChanged.Invoke(before, lineType);
+                CurrentHp = MaxHp;
+                RedrawLine();
+            }
+        }
+        
         public CommandPriorityData CommandPriorityData => priorityData;
 
         private float CurrentWidth => lineMap.TryGetValue(lineType, out var ch) 
@@ -53,37 +100,29 @@ namespace LineWars.Model
             : Resources.Load<Sprite>("Sprites/Road");
 
 
-        private void Awake()
+        protected void OnValidate()
         {
-            Model = GenerateModel();
-            if (Model == null)
-                Debug.LogError("Model in Edge is null!");
+            hp = MaxHp;
         }
-
+        
         public void Initialize(int index, Node firstNode, Node secondNode)
         {
             this.index = index;
             this.firstNode = firstNode;
             this.secondNode = secondNode;
         }
-
-        public Node GetOther(Node node)
+        
+        public void LevelUp()
         {
-            if (FirstNode.Equals(node))
-                return SecondNode;
-            else
-                return FirstNode;
+            LineType = LineTypeHelper.Up(LineType);
         }
-
-        public void LevelUp() => Model.LevelUp();
 
         public void Redraw()
         {
-            name = $"Edge{Index} from {(FirstNode ? FirstNode.name : "Null")} to {(SecondNode ? SecondNode.name : "None")}";
+            name = $"Edge{Id} from {(FirstNode ? FirstNode.name : "Null")} to {(SecondNode ? SecondNode.name : "None")}";
             RedrawLine();
             AlineCollider();
         }
-
         private void RedrawLine()
         {
             var v1 = firstNode?firstNode.Position: Vector2.zero;
@@ -98,51 +137,30 @@ namespace LineWars.Model
             edgeSpriteRenderer.size = new Vector2(distance, CurrentWidth);
             edgeSpriteRenderer.sprite = CurrentSprite;
         }
-
-
         private void AlineCollider()
         {
             edgeCollider.size = edgeSpriteRenderer.size;
         }
-
-        public void OnBeforeSerialize() {}
-
+        public void OnBeforeSerialize()
+        {
+        }
         public void OnAfterDeserialize()
         {
-            Model = GenerateModel();
-        }
+            lineMap = new Dictionary<LineType, LineTypeCharacteristics>();
 
-        public ModelEdge GenerateModel()
-        {
-            try
+            for (int i = 0; i != lineTypeCharacteristics.Count; i++)
+                lineMap.TryAdd(lineTypeCharacteristics[i].LineType, lineTypeCharacteristics[i]);
+
+            UpdateTypes();
+            
+            void UpdateTypes()
             {
-                var model = new ModelEdge(index,transform.position, lineType, firstNode.Model, secondNode.Model, priorityData, lineMap);
-                model.HpChanged += (before, after) => HpChanged.Invoke(before, after);
-                model.LineTypeChanged += (before, after) => LineTypeChanged.Invoke(before, after);
-                return model;
+                foreach (var value in Enum.GetValues(typeof(LineType)).OfType<LineType>())
+                {
+                    if (!lineMap.ContainsKey(value))
+                        lineMap[value] = new LineTypeCharacteristics(value);
+                }
             }
-            catch (Exception _)
-            {
-                return null;
-            }
-        }
-    }
-    
-    [Serializable]
-    public class LineTypeCharacteristics
-    {
-        [SerializeField, Min(0)] private int maxHp;
-        [SerializeField] private Sprite sprite;
-        [SerializeField, Min(0)] private float width = 5;
-        
-        public int MaxHp => maxHp;
-        public Sprite Sprite => sprite;
-
-        public float Width => width;
-
-        public LineTypeCharacteristics(LineType type)
-        {
-            maxHp = 0;
         }
     }
 }

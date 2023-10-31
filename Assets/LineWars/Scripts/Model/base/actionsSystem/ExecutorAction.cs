@@ -4,32 +4,36 @@ using LineWars.Controllers;
 
 namespace LineWars.Model
 {
-    public abstract class ExecutorAction
+    public abstract class ExecutorAction<T>: IExecutorAction<T>
+        where T: class, IExecutor 
     {
-        private readonly IntModifier actionModifier;
-        private readonly IExecutor myExecutor;
+        public T Executor { get; }
+        public IntModifier ActionModifier { get; set; }
         public event Action ActionCompleted;
+        public abstract CommandType CommandType { get; }
 
-        protected ExecutorAction([NotNull] IExecutor unit, [NotNull] BaseExecutorAction data)
+        protected ExecutorAction(T executor)
         {
-            actionModifier = data.ActionModifier;
-            myExecutor = unit;
-            
-            if (data == null) throw new ArgumentNullException(nameof(data));
-            if (myExecutor == null) throw new ArgumentNullException(nameof(unit));
+            Executor = executor;
         }
 
-        public abstract CommandType GetMyCommandType();
-
         public virtual void OnReplenish() {}
+        
         protected void Complete() => ActionCompleted?.Invoke();
-        public int ModifyActionPoints(int actionPoints) => actionModifier.Modify(actionPoints);
-        public int ModifyActionPoints() => ModifyActionPoints(myExecutor.CurrentActionPoints);
         
-        public bool ActionPointsCondition(int actionPoints) => ActionPointsCondition(actionModifier, actionPoints);
-        public bool ActionPointsCondition() => ActionPointsCondition(actionModifier, myExecutor.CurrentActionPoints);
+        protected void CompleteAndAutoModify()
+        {
+            Executor.CurrentActionPoints = ModifyActionPoints();
+            Complete();
+        }
+
+        protected int ModifyActionPoints(int actionPoints) => ActionModifier.Modify(actionPoints);
+        protected int ModifyActionPoints() => ModifyActionPoints(Executor.CurrentActionPoints);
         
-        public static bool ActionPointsCondition(IntModifier modifier, int actionPoints) =>
+        protected bool ActionPointsCondition(int actionPoints) => ActionPointsCondition(ActionModifier, actionPoints);
+        protected bool ActionPointsCondition() => ActionPointsCondition(ActionModifier, Executor.CurrentActionPoints);
+        
+        protected static bool ActionPointsCondition(IntModifier modifier, int actionPoints) =>
             actionPoints > 0 && modifier != null && modifier.Modify(actionPoints) >= 0;
     }
 }

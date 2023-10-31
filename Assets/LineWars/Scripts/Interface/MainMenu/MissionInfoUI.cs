@@ -43,9 +43,9 @@ namespace LineWars
             
             if (missionImage == null)
                 Debug.LogError($"{nameof(missionImage)} is null on {name}");
-            
-            if (missionStatus == null)
-                Debug.LogError($"{nameof(missionStatus)} is null on {name}");
+
+            //if (missionStatus == null)
+                //Debug.LogError($"{nameof(missionStatus)} is null on {name}");
             
             if (startButton == null)
                 Debug.LogError($"{nameof(startButton)} is null on {name}");
@@ -58,7 +58,7 @@ namespace LineWars
             missionDescription.text = data.MissionDescription;
             missionImage.sprite = data.MissionImage;
 
-            missionStatus.text = state.isCompleted ? @"<color=green>Завершена</color>" : "Не пройдена";
+            //missionStatus.text = state.isCompleted ? @"<color=green>Завершена</color>" : "Не пройдена";
 
             sceneToLoad = data.SceneToLoad;
         }

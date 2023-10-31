@@ -9,11 +9,10 @@ using UnityEngine.UI;
 public class EnemyTurnPanel : MonoBehaviour
 {
     private float alphaDecreaseModifier;
-    [SerializeField] private float rotationSpeed;
-    
-    [SerializeField] private Image clockImage;
-    [SerializeField] private TMP_Text text;
 
+    [SerializeField] private Image lizardsImage;
+    [SerializeField] private Image rusImage;
+    
     private const float MIN_ALPHA = 130f;
     private const float ALPHA_DECREASE_MODIFIER = -3f;
     
@@ -28,7 +27,7 @@ public class EnemyTurnPanel : MonoBehaviour
             if(value)
                 RestoreDefaults();
             else
-                gameObject.SetActive(false);
+                Hide();
         }
     }
 
@@ -41,14 +40,19 @@ public class EnemyTurnPanel : MonoBehaviour
     {
         if (IsCoroutinActive)
         {
-            ChangeAlpha(); 
-            clockImage.gameObject.transform.Rotate(new Vector3(0,0,rotationSpeed));
+            ChangeAlpha();
         }
     }
 
+    private void Hide()
+    {
+        lizardsImage.gameObject.SetActive(false);
+        StartCoroutine(HideCoroutine());
+    }
+    
     private void ChangeAlpha()
     {
-        var currentAlpha = text.color.a * 255;
+        var currentAlpha = lizardsImage.color.a * 255;
         if (currentAlpha >= 255)
         {
             alphaDecreaseModifier = -Math.Abs(alphaDecreaseModifier);
@@ -59,13 +63,27 @@ public class EnemyTurnPanel : MonoBehaviour
         }
 
         var resultAlpha = currentAlpha + alphaDecreaseModifier;
-        text.color = new Color(text.color.r, text.color.g, text.color.b, resultAlpha/255f);
+        lizardsImage.color = new Color(lizardsImage.color.r, lizardsImage.color.g, lizardsImage.color.b, resultAlpha/255f);
     }
     
+    IEnumerator HideCoroutine()
+    {
+        rusImage.gameObject.SetActive(true);
+        rusImage.color = new Color(rusImage.color.r, rusImage.color.g, rusImage.color.b, 1);
+        var resultAlpha = 255f;
+        while (rusImage.gameObject.activeInHierarchy && rusImage.color.a > 0.1)
+        {
+            resultAlpha -= 2f;
+            yield return new WaitForSeconds(0.01f);
+            rusImage.color = new Color(rusImage.color.r, rusImage.color.g, rusImage.color.b, resultAlpha/255f);
+        }
+        rusImage.gameObject.SetActive(false);
+    }
+
     private void RestoreDefaults()
     {
-        text.color = new Color(text.color.r, text.color.g, text.color.b, 1);
-        clockImage.gameObject.transform.localRotation = new Quaternion(0,0,0,0);
-        gameObject.SetActive(true);
+        lizardsImage.color = new Color(lizardsImage.color.r, lizardsImage.color.g, lizardsImage.color.b, 1);
+        lizardsImage.gameObject.SetActive(true);
+        rusImage.gameObject.SetActive(false);
     }
 }

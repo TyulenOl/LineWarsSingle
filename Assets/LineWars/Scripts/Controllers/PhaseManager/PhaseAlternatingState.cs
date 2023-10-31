@@ -10,7 +10,7 @@ namespace LineWars
     {
         public class PhaseAlternatingState : Phase
         {
-            private IActor currentActor => manager.Actors[manager.currentActorId];
+            //private IActor CurrentActor => manager.Actors[manager.currentActorId];
 
             public override bool AreActorsDone
             {
@@ -54,7 +54,7 @@ namespace LineWars
                 if(AreActorsDone) return;
                 
                 PickNewActor();
-                currentActor.ExecuteTurn(Type);
+                manager.CurrentActor.ExecuteTurn(Type);
             }
             
             private bool PickNewActor()
@@ -84,14 +84,14 @@ namespace LineWars
                     return;
                 }
 
-                if (actor != currentActor)
+                if (actor != manager.CurrentActor)
                 {
-                    Debug.LogError($"{currentActor} is making a turn; {actor} is ended the turn instead!");
+                    Debug.LogError($"{manager.CurrentActor} is making a turn; {actor} is ended the turn instead!");
                     return;
                 }
 
                 if (PickNewActor())
-                    currentActor.ExecuteTurn(Type);
+                    manager.CurrentActor.ExecuteTurn(Type);
             }
         }
     }

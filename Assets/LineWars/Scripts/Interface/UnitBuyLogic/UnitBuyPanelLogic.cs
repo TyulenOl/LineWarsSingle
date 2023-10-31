@@ -19,13 +19,13 @@ namespace LineWars.Interface
 
         public void Awake()
         {
-            nation = Player.LocalPlayer.MyNation;
+            nation = Player.LocalPlayer.Nation;
             GeneratePresets();
         }
 
         private void GeneratePresets()
         {
-            var presets = nation.NationEconomicLogic.UnitBuyPresets;
+            var presets = nation.NationEconomicLogic;
             foreach (var preset in presets)
             {
                 var presetDrawer = Instantiate(presetDrawerPrefab.gameObject, presetsLayoutGroup.transform)

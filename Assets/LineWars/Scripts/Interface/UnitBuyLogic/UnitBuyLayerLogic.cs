@@ -11,7 +11,6 @@ public class UnitBuyLayerLogic : MonoBehaviour
 {
     [SerializeField] private RectTransform buyUnitsLayer;
     [SerializeField] private Button buyButton;
-    [SerializeField] private DescriptionPanelLogic descriptionPanelLogic;
 
 
     private UnitBuyPresetDrawer chosenUnitPresetDrawer;
@@ -25,7 +24,6 @@ public class UnitBuyLayerLogic : MonoBehaviour
             chosenUnitPresetDrawer = value;
             chosenUnitPresetDrawer?.SetChosen(true);
             buyButton.interactable = value != null && value.IsAvailable;
-            descriptionPanelLogic.ReDrawDescription(ChosenUnitPresetDrawer?.UnitBuyPreset);
         }
     }
 
@@ -51,7 +49,7 @@ public class UnitBuyLayerLogic : MonoBehaviour
         var player = Player.LocalPlayer;
         if (PhaseManager.Instance.CurrentPhase != PhaseType.Buy) return;
         UnitsController.ExecuteCommand(
-            new SpawnPresetCommand(
+            new SpawnPresetCommand<Node, Edge, Unit, Owned, BasePlayer>(
                 player,
                 CurrentPreset
             ), false);

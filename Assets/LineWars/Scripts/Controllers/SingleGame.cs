@@ -1,4 +1,5 @@
 ﻿using System;
+using DataStructures;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
@@ -22,14 +23,14 @@ namespace LineWars
         [Header("Debug")] 
         [SerializeField] private bool isAI;
 
-        private List<BasePlayer> allPlayers = new ();
+        public readonly IndexList<BasePlayer> AllPlayers = new IndexList<BasePlayer> ();
+        public readonly IndexList<Unit> AllUnits = new IndexList<Unit>();//сру и не стесняюсь!
         private Player player;
         
 
         private Stack<SpawnInfo> spawnInfosStack;
         private SpawnInfo playerSpawnInfo;
-
-        public IReadOnlyList<BasePlayer> AllPlayers => allPlayers;
+        
         public SceneName MyScene => (SceneName) SceneManager.GetActiveScene().buildIndex;
         private bool HasSpawnPoint() => spawnInfosStack.Count > 0;
         private SpawnInfo GetSpawnPoint() => spawnInfosStack.Pop();
@@ -67,24 +68,27 @@ namespace LineWars
         {
             if (GameReferee.Instance == null)
                 Debug.LogError($"Нет {nameof(GameReferee)} на данной сцене");
-            GameReferee.Instance.Initialize(Player.LocalPlayer, allPlayers.Where(x => x != Player.LocalPlayer));
+            GameReferee.Instance.Initialize(Player.LocalPlayer, AllPlayers
+                .Select(x => x.Value)
+                .Where(x => x != Player.LocalPlayer));
             GameReferee.Instance.Wined += WinGame;
             GameReferee.Instance.Losed += LoseGame;
         }
+        
 
         private void InitializeSpawns()
         {
-            if (Graph.Spawns.Count == 0)
+            if (MonoGraph.Instance.Spawns.Count == 0)
             {
                 Debug.LogError("Игрок не создался, потому что нет точек для его спавна");
                 return;
             }
 
             playerSpawnInfo = playerSpawn
-                ? Graph.Spawns.First(info => info.SpawnNode == playerSpawn)
-                : Graph.Spawns.First();
+                ? MonoGraph.Instance.Spawns.First(info => info.SpawnNode == playerSpawn)
+                : MonoGraph.Instance.Spawns.First();
             
-            spawnInfosStack = Graph.Spawns
+            spawnInfosStack = MonoGraph.Instance.Spawns
                 .Where(x => x != playerSpawnInfo)
                 .ToStack(true);
         }
@@ -92,7 +96,6 @@ namespace LineWars
         private void InitializePlayer()
         { 
             player = playerInitializer.Initialize<Player>(playerSpawnInfo);
-            allPlayers.Add(player);
             player.RecalculateVisibility(false);
         }
         
@@ -106,7 +109,7 @@ namespace LineWars
                     ? playerInitializer.Initialize<EnemyAI>(spawnPoint)
                     : playerInitializer.Initialize<TestActor>(spawnPoint); 
 
-                allPlayers.Add(enemy);
+                //AllPlayers.Add(enemy);
             }
         }
         

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using LineWars.Extensions.Attributes;
-using LineWars.Interface;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -10,11 +9,8 @@ namespace LineWars.Model
 {
     [RequireComponent(typeof(Selectable2D))]
     [RequireComponent(typeof(RenderNodeV3))]
-    public class Node : Owned, ITarget, INumbered
+    public class Node : Owned, INodeForGame<Node, Edge, Unit, Owned, BasePlayer>, ITargetsEnumerable
     {
-        public ModelNode Model { get; private set; }
-
-
         [SerializeField] private int index;
         [SerializeField] private List<Edge> edges;
 
@@ -23,19 +19,21 @@ namespace LineWars.Model
         [SerializeField] [Min(0)] private int valueOfHidden;
         [SerializeField] private int baseIncome;
 
-        [SerializeField, ReadOnlyInspector] private ComponentUnit leftUnit;
-        [SerializeField, ReadOnlyInspector] private ComponentUnit rightUnit;
-
-        [SerializeField] private Outline2D outline;
+        [SerializeField, ReadOnlyInspector] private Unit leftUnit;
+        [SerializeField, ReadOnlyInspector] private Unit rightUnit;
+        
         [SerializeField] private Selectable2D selectable2D;
         [SerializeField] private RenderNodeV3 renderNodeV3;
         [SerializeField] private CommandPriorityData priorityData;
+        
+        [field: Header("Sprite Info")]
+        [SerializeField] private SpriteRenderer spriteRenderer;
+        [SerializeField] private Sprite spriteOfDefaultNode;
         
         [field: Header("Initial Info")]
         [field: SerializeField] public Spawn ReferenceToSpawn { get; set; }
         [field: SerializeField] public UnitType LeftUnitType { get; private set; }
         [field: SerializeField] public UnitType RightUnitType { get; private set; }
-        
 
         private Camera mainCamera;
         
@@ -43,20 +41,19 @@ namespace LineWars.Model
         /// Флаг, который указывает, что нода уже кому-то принадлежала
         /// </summary>
         public bool IsDirty { get; private set; }
+        
+        public bool IsBase => ReferenceToSpawn != null && ReferenceToSpawn.Node == this;
 
-        public bool IsBase => ReferenceToSpawn.Node == this;
         public Vector2 Position => transform.position;
-        public IReadOnlyCollection<Edge> Edges => edges;
+        
+        public IEnumerable<Edge> Edges => edges;
+
         public bool LeftIsFree => LeftUnit == null;
         public bool RightIsFree => RightUnit == null;
         public bool AnyIsFree => LeftIsFree || RightIsFree;
         public bool AllIsFree => LeftIsFree && RightIsFree;
 
-        public int Index
-        {
-            get => index;
-            set => index = value;
-        }
+        public int Id => index;
 
         public int Visibility =>
             Math.Max(visibility,
@@ -70,27 +67,31 @@ namespace LineWars.Model
 
         public int BaseIncome => baseIncome;
 
-        public ComponentUnit LeftUnit
+        public Unit LeftUnit
         {
             get => leftUnit;
-            set { leftUnit = value; }
+            set => leftUnit = value;
         }
 
-        public ComponentUnit RightUnit
+        public Unit RightUnit
         {
             get => rightUnit;
-            set { rightUnit = value; }
+            set => rightUnit = value;
         }
+
+        public IBuilding Building { get; set; }
+
         public CommandPriorityData CommandPriorityData => priorityData;
         public RenderNodeV3 RenderNodeV3 => renderNodeV3;
+
+
 
         private void Awake()
         {
             mainCamera = Camera.main;
             IsDirty = ReferenceToSpawn != null;
         }
-
-
+        
         private void Start()
         {
             var nodeInfoDrawer = GetComponent<NodeInfoDrawer>();
@@ -111,13 +112,27 @@ namespace LineWars.Model
 
         protected void OnValidate()
         {
-            if (outline == null)
-                outline = GetComponent<Outline2D>();
             if (renderNodeV3 == null)
                 renderNodeV3 = GetComponent<RenderNodeV3>();
             if (selectable2D == null)
                 selectable2D = GetComponent<Selectable2D>();
         }
+
+        public IEnumerable<ITarget> Targets
+        {
+            get
+            {
+                yield return this;
+                foreach (var edge in edges)
+                    yield return edge;
+                foreach (var unit in Units)
+                    yield return unit;
+            }
+        }
+
+        public IEnumerable<Unit> Units => new[] {LeftUnit, RightUnit}
+            .Where(x => x != null)
+            .Distinct();
 
         private GameObject OnPointerClicked(GameObject obj, PointerEventData eventData)
         {
@@ -137,8 +152,9 @@ namespace LineWars.Model
             return gameObject;
         }
 
-        public void Initialize()
+        public void Initialize(int index)
         {
+            this.index = index;
             edges = new List<Edge>();
         }
 
@@ -177,7 +193,7 @@ namespace LineWars.Model
 
         public bool ContainsEdge(Edge edge) => edges.Contains(edge);
 
-        public void SetActiveOutline(bool value) => outline.SetActiveOutline(value);
+        public void SetActiveOutline(bool value) {}
 
         public IEnumerable<Node> GetNeighbors()
         {
@@ -189,6 +205,7 @@ namespace LineWars.Model
                     yield return edge.FirstNode;
             }
         }
+        
 
         protected override void OnSetOwner(BasePlayer oldPlayer, BasePlayer newPlayer)
         {
@@ -196,12 +213,13 @@ namespace LineWars.Model
             {
                 GetComponent<NodeInfoDrawer>().Capture();
             }
-            ReferenceToSpawn = newPlayer != null ? basePlayer.Base : null;
+            ReferenceToSpawn = newPlayer != null ? basePlayer.Base.GetComponent<Spawn>() : null;
             IsDirty = true;
             Redraw();
         }
-        
-        
+
+        public T Accept<T>(INodeVisitor<T> visitor) => visitor.Visit(this);
+
         #region Visualisation
         public void Redraw()
         {
@@ -212,14 +230,11 @@ namespace LineWars.Model
             else if (IsBase)
             {
                 gameObject.name = $"Spawn {ReferenceToSpawn.GroupName}";
-                var spriteRenderer = GetComponent<SpriteRenderer>();
                 spriteRenderer.sprite = ReferenceToSpawn.GroupSprite;
-                GetComponent<Outline2D>().SetActiveOutline(true);
             }
             else
             {
-                gameObject.name = $"Node{Index} Group with {ReferenceToSpawn.GroupName}";
-                var spriteRenderer = GetComponent<SpriteRenderer>();
+                gameObject.name = $"Node{Id} Group with {ReferenceToSpawn.GroupName}";
                 spriteRenderer.sprite = ReferenceToSpawn.GroupSprite;
                 
             }
@@ -227,10 +242,8 @@ namespace LineWars.Model
         
         private void DrawToDefault()
         {
-            gameObject.name = $"Node{Index}";
-            var spriteRenderer = GetComponent<SpriteRenderer>();
-            spriteRenderer.sprite = Resources.Load<Sprite>("Sprites/Circle");;
-            GetComponent<Outline2D>().SetActiveOutline(false);
+            gameObject.name = $"Node{Id}";
+            spriteRenderer.sprite = spriteOfDefaultNode;
         }
 
         #endregion

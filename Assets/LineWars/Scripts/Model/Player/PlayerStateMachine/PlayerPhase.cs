@@ -23,7 +23,7 @@ namespace LineWars
             public override void OnEnter()
             {
                 Debug.Log($"Player entered {phaseType}");
-                player.potentialExecutors = player.phaseExecutorsData.PhaseToUnits[phaseType];
+                player.potentialExecutors = player.PhaseExecutorsData.PhaseToUnits[phaseType];
                 player.IsTurnMade = false;
             }
 

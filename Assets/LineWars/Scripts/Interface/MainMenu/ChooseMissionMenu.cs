@@ -8,6 +8,7 @@ namespace LineWars
         public static ChooseMissionMenu Instance { get; private set; }
         
         [SerializeField] private MissionInfoUI missionInfoUI;
+        [SerializeField] private CompanyElementUI companyElementUI;
         [SerializeField] private Transform missions;
 
         private MissionsMapUI initializedMap;
@@ -50,8 +51,12 @@ namespace LineWars
             {
                 var missionUi = initializedMap.MissionUIs[i];
                 var missionState = companyState.missionStates[i]; 
-                missionUi.Initialize(missionState, i+1, OnMissionUiClick);
+                missionUi.Initialize(missionState, OnMissionUiClick);
             }
+            
+            companyElementUI.gameObject.SetActive(true);
+            missionInfoUI.gameObject.SetActive(false);
+            companyElementUI.Initialize(companyState, null);
         }
 
         private void OnMissionUiClick(MissionState state)
@@ -59,6 +64,7 @@ namespace LineWars
             missionInfoUI.gameObject.SetActive(true);
             missionInfoUI.Initialize(state);
             CompaniesDataBase.ChooseMission = state;
+            companyElementUI.gameObject.SetActive(false);
         }
 
         public override void OnOpen()

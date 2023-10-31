@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Linq;
 using System.Collections.Generic;
@@ -12,10 +13,11 @@ namespace LineWars
     public partial class Player : BasePlayer
     {
         public static Player LocalPlayer { get; private set; }
-        [SerializeField] private PhaseExecutorsData phaseExecutorsData;
+        [SerializeField] private float pauseAfterTurn;
 
         private IReadOnlyCollection<UnitType> potentialExecutors;
         private bool isTurnMade;
+        private HashSet<Node> additionalVisibleNodes = new ();
 
         private StateMachine stateMachine;
         private PlayerPhase idlePhase;
@@ -27,6 +29,8 @@ namespace LineWars
         
         [field: SerializeField] public UnityEvent TurnMade {get; private set;}
         public IReadOnlyCollection<UnitType> PotentialExecutors => potentialExecutors;
+        public IReadOnlyDictionary<Node, bool> VisibilityMap;
+        public IEnumerable<Node> AdditionalVisibleNodes => additionalVisibleNodes;
         public bool IsTurnMade
         {
             get => isTurnMade;
@@ -80,14 +84,14 @@ namespace LineWars
 
         private void OnOwnedAdded(Owned owned)
         {
-            if(!(owned is ComponentUnit unit)) return;
+            if(!(owned is Unit unit)) return;
             unit.ActionPointsChanged.AddListener(ProcessActionPointsChange);
             unit.Died.AddListener(UnitOnDied);
         }
 
         private void OnOwnerRemoved(Owned owned)
         {
-            if(!(owned is ComponentUnit unit)) return;
+            if(!(owned is Unit unit)) return;
             unit.ActionPointsChanged.RemoveListener(ProcessActionPointsChange);
             if (!unit.IsDied)
                 unit.Died.RemoveListener(UnitOnDied);
@@ -96,7 +100,16 @@ namespace LineWars
         private void ProcessActionPointsChange(int previousValue, int currentValue)
         {
             if (currentValue <= 0 && CurrentPhase != PhaseType.Idle)
+            {
                 IsTurnMade = true;
+                StartCoroutine(PauseCoroutine());
+            }
+
+            IEnumerator PauseCoroutine()
+            {
+                yield return new WaitForSeconds(pauseAfterTurn);
+                ExecuteTurn(PhaseType.Idle);
+            }
         }
         
         public void FinishTurn()
@@ -105,9 +118,9 @@ namespace LineWars
             ExecuteTurn(PhaseType.Idle);
         }
 
-        public IEnumerable<ComponentUnit> GetAllUnitsByPhase(PhaseType phaseType)
+        public IEnumerable<Unit> GetAllUnitsByPhase(PhaseType phaseType)
         {
-            if (phaseExecutorsData.PhaseToUnits.TryGetValue(phaseType, out var value))
+            if (PhaseExecutorsData.PhaseToUnits.TryGetValue(phaseType, out var value))
             {
                 foreach (var myUnit in MyUnits)
                 {
@@ -176,11 +189,11 @@ namespace LineWars
 
         private bool CanExecutePhase(PhaseType phaseType)
         {
-            var phaseExecutors = phaseExecutorsData.PhaseToUnits[phaseType];
+            var phaseExecutors = PhaseExecutorsData.PhaseToUnits[phaseType];
 
             foreach (var owned in OwnedObjects)
             {
-                if(!(owned is ComponentUnit unit)) continue;
+                if(!(owned is Unit unit)) continue;
                 if(phaseExecutors.Contains(unit.Type) && unit.CurrentActionPoints > 0)
                     return true;
             }
@@ -189,14 +202,31 @@ namespace LineWars
         }
 
         #endregion
+
+        public void AddVisibleNode(Node node)
+        {
+            if (!MonoGraph.Instance.Nodes.Contains(node))
+                throw new ArgumentException();
+            if (node == null)
+                throw new ArgumentException();
+            if (additionalVisibleNodes.Contains(node))
+                return;
+            additionalVisibleNodes.Add(node);
+        }
+
+        public bool RemoveVisibleNode(Node node) => additionalVisibleNodes.Remove(node);
         
-        private void UnitOnDied(ComponentUnit diedUnit)
+        private void UnitOnDied(Unit diedUnit)
         {
             StartCoroutine(UnitOnDiedCoroutine());
             IEnumerator UnitOnDiedCoroutine()
             {
                 yield return null;
                 RecalculateVisibility();
+                if(CurrentPhase != PhaseType.Idle)
+                {
+                    ExecuteTurn(PhaseType.Idle);
+                }
             }
         }
         private void OnExecuteCommand(IExecutor executor, ITarget target)
@@ -206,7 +236,10 @@ namespace LineWars
 
         public void RecalculateVisibility(bool useLerp = true)
         {
-            var visibilityMap = Graph.GetVisibilityInfo(this);
+            var visibilityMap = MonoGraph.Instance.GetVisibilityInfo(this);
+            foreach (var node in additionalVisibleNodes)
+                visibilityMap[node] = true;
+            
             foreach (var (node, visibility) in visibilityMap)
             {
                 if (useLerp)
@@ -214,6 +247,8 @@ namespace LineWars
                 else
                     node.RenderNodeV3.SetVisibilityInstantly(visibility ? 1 : 0);
             }
+
+            VisibilityMap = visibilityMap;
         }
     }
 }

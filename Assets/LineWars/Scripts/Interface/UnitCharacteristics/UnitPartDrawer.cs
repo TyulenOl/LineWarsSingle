@@ -1,9 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using LineWars.Model;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using LineWars;
 
 public class UnitPartDrawer : MonoBehaviour
 {
@@ -22,9 +21,9 @@ public class UnitPartDrawer : MonoBehaviour
     private CharacteristicDrawer HPDrawer;
     private CharacteristicDrawer ActionPointsDrawer;
     
-    private ComponentUnit currentUnit;
+    private Unit currentUnit;
 
-    public ComponentUnit CurrentUnit
+    public Unit CurrentUnit
     {
         get => currentUnit;
         set
@@ -34,7 +33,7 @@ public class UnitPartDrawer : MonoBehaviour
         }
     }
 
-    private void Init(ComponentUnit unitToInit)
+    private void Init(Unit unitToInit)
     {
         var hpSprite = DrawHelper.GetSpriteByCharacteristicType(CharacteristicType.Hp);
         var armorSprite = DrawHelper.GetSpriteByCharacteristicType(CharacteristicType.Armor);
@@ -43,7 +42,7 @@ public class UnitPartDrawer : MonoBehaviour
         
         MeleeAttackDrawer = Instantiate(CharacteristicDrawerPrefab.gameObject, CharacteristicsLayoutGroup.transform)
             .GetComponent<CharacteristicDrawer>();
-        MeleeAttackDrawer.Init(attackSprite, unitToInit.GetDamage().ToString());
+        MeleeAttackDrawer.Init(attackSprite, unitToInit.GetMaxDamage().ToString());
         
         ArmorDrawer = Instantiate(CharacteristicDrawerPrefab.gameObject, CharacteristicsLayoutGroup.transform)
             .GetComponent<CharacteristicDrawer>();
@@ -88,7 +87,7 @@ public class UnitPartDrawer : MonoBehaviour
     {
         if( MeleeAttackDrawer != null)
         {
-            MeleeAttackDrawer.ReDraw(currentUnit.GetDamage().ToString());
+            MeleeAttackDrawer.ReDraw(currentUnit.GetMaxDamage().ToString());
         }
         //TODO Добавить проверку на то, что юнит стреляющий. Если он стреляющий - выводить дальнюю атаку
         // if( FarAttackDrawer != null)

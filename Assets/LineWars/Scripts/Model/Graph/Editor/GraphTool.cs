@@ -14,7 +14,7 @@ public class GraphTool : EditorTool
 {
     private Edge edgePrefab;
     private Node nodePrefab;
-    private Graph graph;
+    private MonoGraph graph;
 
 
     private SelectionListener<Node> nodeListener;
@@ -72,8 +72,8 @@ public class GraphTool : EditorTool
     private void AssignGraph()
     {
         var graphObj = GameObject.Find("Graph") ?? new GameObject("Graph");
-        graph = graphObj.GetComponent<Graph>() ??
-                graphObj.AddComponent<Graph>();
+        graph = graphObj.GetComponent<MonoGraph>() ??
+                graphObj.AddComponent<MonoGraph>();
 
         if (graph.NodesParent == null)
         {
@@ -189,8 +189,7 @@ public class GraphTool : EditorTool
 
         var node = (Node) PrefabUtility.InstantiatePrefab(nodePrefab, graph.NodesParent.transform);
         node.transform.position = GetMousePosition2D();
-        node.Initialize();
-        node.Index = GetNextIndex(node);
+        node.Initialize(GetNextIndex(node));
         Selection.activeObject = node.gameObject;
 
         Undo.RegisterCreatedObjectUndo(node.gameObject, "CreateNode");
@@ -267,11 +266,11 @@ public class GraphTool : EditorTool
     {
         var objects = FindObjectsOfType<T>()
             .Where(x => x != obj)
-            .OrderBy(x => x.Index);
+            .OrderBy(x => x.Id);
         var nextIndex = 0;
         foreach (var o in objects)
         {
-            if (o.Index == nextIndex)
+            if (o.Id == nextIndex)
                 nextIndex++;
             else
                 return nextIndex;

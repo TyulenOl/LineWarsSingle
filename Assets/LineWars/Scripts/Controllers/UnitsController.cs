@@ -39,9 +39,9 @@ namespace LineWars
         
         public bool Action(IExecutor executor, ITarget target)
         {
-            foreach (var commandType in target.CommandPriorityData.Priority)
+            foreach (var commandType in target.CommandPriorityData)
             {
-                if (executor.TryGetCommand(commandType, target, out var command)
+                if (executor.TryGetCommandForTarget(commandType, target, out var command)
                     && command.CanExecute())
                 {
                     ExecuteCommand(command);
@@ -50,20 +50,6 @@ namespace LineWars
             }
 
             return false;
-        }
-
-        public CommandType GetCommandTypeBy(IExecutor executor, ITarget target)
-        {
-            foreach (var commandType in target.CommandPriorityData.Priority)
-            {
-                if (executor.TryGetCommand(commandType, target, out var command)
-                    && command.CanExecute())
-                {
-                    return commandType;
-                }
-            }
-
-            return CommandType.None;
         }
     }
 }
