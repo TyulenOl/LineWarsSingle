@@ -1,9 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using LineWars.Extensions.Attributes;
 using UnityEngine;
-using LineWars.Controllers;
 
 namespace LineWars.Model
 {

@@ -44,6 +44,16 @@ namespace LineWars.Model
             CompleteAndAutoModify();
         }
 
+        public override void OnReplenish()
+        {
+            base.OnReplenish();
+            if (isBlocked)
+            {
+                isBlocked = false;
+                MyUnit.CurrentArmor = 0;
+            }
+        }
+
         public override CommandType CommandType => CommandType.Block;
         public ICommandWithCommandType GenerateCommand() => new RLBlockCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this);
         

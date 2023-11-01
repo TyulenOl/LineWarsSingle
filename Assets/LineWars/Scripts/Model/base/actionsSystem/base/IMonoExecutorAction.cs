@@ -10,6 +10,5 @@
          public TAction Action { get;}
 
          public void Initialize();
-         public void OnReplenish();
     }
 }

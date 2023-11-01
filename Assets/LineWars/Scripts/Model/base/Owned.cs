@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using LineWars.Extensions.Attributes;
-using LineWars.Model;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace LineWars.Model
 {

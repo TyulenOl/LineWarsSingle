@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using static UnityEditor.Experimental.GraphView.GraphView;
 
 namespace LineWars.Model
 {
@@ -27,7 +26,7 @@ namespace LineWars.Model
             {
                 if (slashEffectPrefab == null)
                 {
-                    Debug.LogWarning($"Slash effect is nul on {name}");
+                    Debug.LogWarning($"Slash effect is null on {name}");
                 }
                 else
                 {

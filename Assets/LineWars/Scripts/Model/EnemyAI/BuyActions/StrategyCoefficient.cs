@@ -27,16 +27,6 @@ namespace LineWars.Model
                              .OfType<StrategyPhase>())
                 {
                     strategyInfosMap.TryAdd(phase, new UnitTypeCoefficientDictionary());
-                    AssignUnitTypeCoefficientDictionary();
-                    
-                    void AssignUnitTypeCoefficientDictionary()
-                    {
-                        foreach (var unitType in Enum.GetValues(typeof(UnitType))
-                                     .OfType<UnitType>()
-                                     .Where(x => x != UnitType.None))
-
-                            strategyInfosMap[phase].pairs.TryAdd(unitType, 0);
-                    }
                 }
             }
 
@@ -56,7 +46,16 @@ namespace LineWars.Model
         public float GetValue(UnitType unitType)
         {
             var currentPhase = GetCurrentPhase(new GameStateHelper());
-            return strategyInfosMap[currentPhase].pairs[unitType];
+            if (strategyInfosMap.TryGetValue(currentPhase, out var unitTypeCoefficientDictionary)
+                && unitTypeCoefficientDictionary.pairs.TryGetValue(unitType, out var value))
+            {
+                return value;
+            }
+            else
+            {
+                Debug.LogWarning($"Коэфициент стратегии {name} не содержит значения на {currentPhase}->{unitType}");
+                return 0;
+            }
         }
 
         protected virtual StrategyPhase GetCurrentPhase([NotNull] GameStateHelper stateHelper)

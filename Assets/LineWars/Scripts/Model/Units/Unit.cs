@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using LineWars.Controllers;
-using LineWars.Extensions.Attributes;
 using UnityEngine;
 using UnityEngine.Events;
 
