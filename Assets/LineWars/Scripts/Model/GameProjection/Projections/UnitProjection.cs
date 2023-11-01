@@ -267,6 +267,10 @@ namespace LineWars.Model
         public override void Replenish()
         {
             base.Replenish();
+            foreach (var action in actionsDictionary.Values)
+            {
+                action.OnReplenish();
+            }
             CurrentActionPoints = MaxActionPoints;
         }
 
