@@ -21,7 +21,7 @@ namespace LineWars.Model
             Action.EnableBlock();
         }
         public ICommandWithCommandType GenerateCommand() => new RLBlockCommand<Node, Edge, Unit, Owned, BasePlayer>(this);
-        
+
         protected override RLBlockAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
         {
             var action = new RLBlockAction<Node, Edge, Unit, Owned, BasePlayer>(Unit);

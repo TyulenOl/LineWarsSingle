@@ -4,5 +4,6 @@
     Map_1,
     Map_2,
     WinOrLoseScene,
-    Oboz
+    Oboz,
+    Oboz1
 }

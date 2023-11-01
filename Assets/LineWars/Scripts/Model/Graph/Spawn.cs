@@ -15,7 +15,6 @@ namespace LineWars.Model
         [field: Header("DEBUG")]
         [field: SerializeField] public string GroupName { get; set; } = DEFAULT_NAME;
         [field: SerializeField] public Sprite GroupSprite { get; set; }
-        [field: SerializeField] public Sprite DefaultSprite { get; set; }
         [field: SerializeField, HideInInspector] public Node Node { get; private set; }
 
         private void OnValidate()

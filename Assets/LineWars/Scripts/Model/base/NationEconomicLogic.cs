@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using LineWars.Extensions.Attributes;
 using UnityEngine;
 
 namespace LineWars.Model

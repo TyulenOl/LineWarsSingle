@@ -1,4 +1,4 @@
-﻿using LineWars.Extensions.Attributes;
+﻿using LineWars;
 using UnityEditor;
 using UnityEngine;
 

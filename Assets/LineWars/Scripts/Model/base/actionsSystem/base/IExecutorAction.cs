@@ -9,5 +9,7 @@ namespace LineWars.Model
         public event Action ActionCompleted;
 
         public CommandType CommandType { get; }
+
+        public void OnReplenish();
     }
 }

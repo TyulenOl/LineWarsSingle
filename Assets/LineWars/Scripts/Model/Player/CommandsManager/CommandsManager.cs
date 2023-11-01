@@ -1,4 +1,3 @@
-using LineWars.Extensions.Attributes;
 using UnityEngine;
 using UnityEngine.Events;
 using LineWars.Model;
