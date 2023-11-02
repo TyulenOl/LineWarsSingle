@@ -179,7 +179,7 @@ namespace LineWars.Model
         
         private void Awake()
         {
-            dj = new RandomDJ(1);
+            dj = new RandomDJ(0.5f);
             
             currentHp = maxHp;
             currentArmor = 0;
