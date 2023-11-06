@@ -49,16 +49,12 @@ namespace LineWars.Model
         {
             var resultScore = 0;
 
-            foreach(var node in player.OwnedObjects
-                .Where(owned => owned is NodeProjection)
-                .Select(owned => (NodeProjection)owned))
+            foreach(var node in player.OwnedObjects.OfType<NodeProjection>())
             {
                 resultScore += node.Score * nodeMultiplier;
             }
 
-            foreach(var unit in player.OwnedObjects
-                .Where(owned => owned is UnitProjection)
-                .Select(owned => (UnitProjection)owned))
+            foreach(var unit in player.OwnedObjects.OfType<UnitProjection>())
             {
                 resultScore += unit.CurrentHp * hpMultiplier;
                 resultScore += unit.MaxArmor * hpMultiplier;

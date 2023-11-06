@@ -3,8 +3,8 @@
 namespace LineWars.Model
 {
     public class MonoBlowWithSwingAction: 
-        MonoUnitAction<BlowWithSwingAction<Node, Edge, Unit, Owned, BasePlayer>>,
-        IBlowWithSwingAction<Node, Edge, Unit, Owned, BasePlayer>
+        MonoUnitAction<BlowWithSwingAction<Node, Edge, Unit>>,
+        IBlowWithSwingAction<Node, Edge, Unit>
     {
         [field: SerializeField] public int InitialDamage { get; private set; }
         public int Damage => Action.Damage;
@@ -16,14 +16,14 @@ namespace LineWars.Model
             Action.ExecuteBlowWithSwing();
         }
         
-        protected override BlowWithSwingAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
+        protected override BlowWithSwingAction<Node, Edge, Unit> GetAction()
         {
-            return new BlowWithSwingAction<Node, Edge, Unit, Owned, BasePlayer>(Unit, InitialDamage);
+            return new BlowWithSwingAction<Node, Edge, Unit>(Unit, InitialDamage);
         }
         
         public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
-        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit, Owned, BasePlayer> visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit> visitor) => visitor.Visit(this);
 
-        public ICommandWithCommandType GenerateCommand() => new BlowWithSwingCommand<Node, Edge, Unit, Owned, BasePlayer>(this);
+        public ICommandWithCommandType GenerateCommand() => new BlowWithSwingCommand<Node, Edge, Unit>(this);
     }
 }

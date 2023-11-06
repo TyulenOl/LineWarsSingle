@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using LineWars.Extensions.Attributes;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -9,9 +8,10 @@ using UnityEngine.EventSystems;
 namespace LineWars.Model
 {
     public class Edge : MonoBehaviour,
-        IEdgeForGame<Node, Edge, Unit, Owned, BasePlayer>,
+        IEdgeForGame<Node, Edge, Unit>,
         ISerializationCallbackReceiver,
-        IPointerClickHandler
+        IPointerClickHandler,
+        INumbered
     {
         [Header("Graph Settings")]
         [SerializeField] private int index;

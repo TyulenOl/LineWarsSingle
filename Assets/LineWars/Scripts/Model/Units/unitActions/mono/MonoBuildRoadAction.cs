@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    public class MonoBuildRoadAction : MonoUnitAction<BuildAction<Node, Edge, Unit, Owned, BasePlayer>>,
-        IBuildAction<Node, Edge, Unit, Owned, BasePlayer>
+    public class MonoBuildRoadAction : MonoUnitAction<BuildAction<Node, Edge, Unit>>,
+        IBuildAction<Node, Edge, Unit>
     {
         [SerializeField] private SFXData buildSfx;
 
@@ -23,15 +23,15 @@ namespace LineWars.Model
 
         public ICommandWithCommandType GenerateCommand(ITarget target)
         {
-            return new BuildCommand<Node, Edge, Unit, Owned, BasePlayer>(this, (Edge) target);
+            return new BuildCommand<Node, Edge, Unit>(this, (Edge) target);
         }
 
-        protected override BuildAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
+        protected override BuildAction<Node, Edge, Unit> GetAction()
         {
-            return new BuildAction<Node, Edge, Unit, Owned, BasePlayer>(Unit);
+            return new BuildAction<Node, Edge, Unit>(Unit);
         }
 
         public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
-        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit, Owned, BasePlayer> visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit> visitor) => visitor.Visit(this);
     }
 }

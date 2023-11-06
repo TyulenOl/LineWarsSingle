@@ -6,8 +6,7 @@ using System.Linq;
 namespace LineWars.Model
 {
     public class NodeProjection
-        : OwnedProjection, INodeForGame<NodeProjection, EdgeProjection,
-            UnitProjection, OwnedProjection, BasePlayerProjection>, 
+        : OwnedProjection, INodeForGame<NodeProjection, EdgeProjection, UnitProjection>, 
         IReadOnlyNodeProjection, INumbered
     {
         private List<EdgeProjection> edges;

@@ -1,28 +1,25 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using UnityEngine;
-
 namespace LineWars.Model
 {
-    public class BlockAction<TNode, TEdge, TUnit, TOwned, TPlayer> :
-        UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>, 
-        IBlockAction<TNode, TEdge, TUnit, TOwned, TPlayer>
+    public class BlockAction<TNode, TEdge, TUnit> :
+        UnitAction<TNode, TEdge, TUnit>, 
+        IBlockAction<TNode, TEdge, TUnit>
     
         #region Сonstraints
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer> 
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TOwned : class, IOwned<TOwned, TPlayer>
-        where TPlayer: class, IBasePlayer<TOwned, TPlayer>
+        where TNode : class, INodeForGame<TNode, TEdge, TUnit>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit> 
+        where TUnit : class, IUnit<TNode, TEdge, TUnit>
         #endregion 
     {
+        private readonly IAttackAction<TNode, TEdge, TUnit> attackAction;
+        
         private bool isBlocked;
         public IntModifier ContrAttackDamageModifier { get; set; }
-        private readonly IAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> attackAction;
-
+        public bool Protection { get;  set; }
+        
         public event Action<bool, bool> CanBlockChanged;
         
-        public bool Protection { get;  set; }
         public bool IsBlocked => isBlocked || Protection;
         
         public BlockAction(
@@ -32,7 +29,7 @@ namespace LineWars.Model
         {
             ContrAttackDamageModifier = contrAttackDamageModifier;
             Protection = protection;
-            attackAction = MyUnit.GetUnitAction<IAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>>();
+            attackAction = MyUnit.GetUnitAction<IAttackAction<TNode, TEdge, TUnit>>();
         }
         
         public bool CanBlock()
@@ -75,10 +72,10 @@ namespace LineWars.Model
 
         public ICommandWithCommandType GenerateCommand()
         {
-            return new BlockCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this);
+            return new BlockCommand<TNode, TEdge, TUnit>(this);
         }
 
-        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor) => visitor.Visit(this);
-        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit, TOwned, TPlayer> visitor) => visitor.Visit(this);
+        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit> visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit> visitor) => visitor.Visit(this);
     }
 }

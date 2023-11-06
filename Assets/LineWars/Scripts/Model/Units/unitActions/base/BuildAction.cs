@@ -4,16 +4,14 @@ using System.Linq;
 
 namespace LineWars.Model
 {
-    public class BuildAction <TNode, TEdge, TUnit, TOwned, TPlayer> :
-        UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>, 
-        IBuildAction<TNode, TEdge, TUnit, TOwned, TPlayer>
+    public class BuildAction <TNode, TEdge, TUnit> :
+        UnitAction<TNode, TEdge, TUnit>, 
+        IBuildAction<TNode, TEdge, TUnit>
     
         #region Сonstraints
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer> 
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TOwned : class, IOwned<TOwned, TPlayer>
-        where TPlayer: class, IBasePlayer<TOwned, TPlayer>
+        where TNode : class, INodeForGame<TNode, TEdge, TUnit>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit> 
+        where TUnit : class, IUnit<TNode, TEdge, TUnit>
         #endregion 
     {
         public BuildAction(TUnit executor) : base(executor)
@@ -48,10 +46,10 @@ namespace LineWars.Model
 
         public ICommandWithCommandType GenerateCommand(ITarget target)
         {
-            return new BuildCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this, (TEdge)target);
+            return new BuildCommand<TNode, TEdge, TUnit>(this, (TEdge)target);
         }
 
-        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor) => visitor.Visit(this);
-        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit, TOwned, TPlayer> visitor) => visitor.Visit(this);
+        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit> visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit> visitor) => visitor.Visit(this);
     }
 }

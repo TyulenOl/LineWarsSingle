@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    public class MonoHealAction : MonoUnitAction<HealAction<Node, Edge, Unit, Owned, BasePlayer>>,
-        IHealAction<Node, Edge, Unit, Owned, BasePlayer>
+    public class MonoHealAction : MonoUnitAction<HealAction<Node, Edge, Unit>>,
+        IHealAction<Node, Edge, Unit>
     {
         [SerializeField] private SFXData healSfx;
         [field: SerializeField] public bool InitialIsMassHeal { get; private set; }
@@ -28,12 +28,12 @@ namespace LineWars.Model
 
         public ICommandWithCommandType GenerateCommand(ITarget target)
         {
-            return new HealCommand<Node, Edge, Unit, Owned, BasePlayer>(this, (Unit) target);
+            return new HealCommand<Node, Edge, Unit>(this, (Unit) target);
         }
         
-        protected override HealAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
+        protected override HealAction<Node, Edge, Unit> GetAction()
         {
-            var action = new HealAction<Node, Edge, Unit, Owned, BasePlayer>(
+            var action = new HealAction<Node, Edge, Unit>(
                 Unit,
                 InitialIsMassHeal,
                 InitialHealingAmount);
@@ -41,6 +41,6 @@ namespace LineWars.Model
         }
         
         public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
-        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit, Owned, BasePlayer> visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit> visitor) => visitor.Visit(this);
     }
 }

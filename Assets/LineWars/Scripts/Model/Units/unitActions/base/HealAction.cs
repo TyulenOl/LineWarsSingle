@@ -4,21 +4,19 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace LineWars.Model
 {
-    public class HealAction<TNode, TEdge, TUnit, TOwned, TPlayer> :
-        UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>, 
-        IHealAction<TNode, TEdge, TUnit, TOwned, TPlayer>
+    public class HealAction<TNode, TEdge, TUnit> :
+        UnitAction<TNode, TEdge, TUnit>, 
+        IHealAction<TNode, TEdge, TUnit>
     
         #region Сonstraints
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer> 
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TOwned : class, IOwned<TOwned, TPlayer>
-        where TPlayer: class, IBasePlayer<TOwned, TPlayer>
+        where TNode : class, INodeForGame<TNode, TEdge, TUnit>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit> 
+        where TUnit : class, IUnit<TNode, TEdge, TUnit>
         #endregion 
     {
-        public bool IsMassHeal { get; private set; }
-        public int HealingAmount { get; private set; }
-        public bool HealLocked { get; private set; }
+        public bool IsMassHeal { get;  set; }
+        public int HealingAmount { get;  set; }
+        public bool HealLocked { get;  set; }
         
         public HealAction(TUnit executor, bool isMassHeal, int healingAmount) : base(executor)
         {
@@ -43,7 +41,7 @@ namespace LineWars.Model
 
             bool OwnerCondition()
             {
-                return target.Owner == MyUnit.Owner;
+                return target.OwnerId == MyUnit.OwnerId;
             }
         }
 
@@ -64,10 +62,10 @@ namespace LineWars.Model
 
         public ICommandWithCommandType GenerateCommand(ITarget target)
         {
-            return new HealCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this, (TUnit) target);
+            return new HealCommand<TNode, TEdge, TUnit>(this, (TUnit) target);
         }
 
-        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor) => visitor.Visit(this);
-        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit, TOwned, TPlayer> visitor) => visitor.Visit(this);
+        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit> visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit> visitor) => visitor.Visit(this);
     }
 }

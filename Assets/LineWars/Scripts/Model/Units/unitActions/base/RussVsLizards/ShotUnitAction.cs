@@ -4,19 +4,12 @@ using JetBrains.Annotations;
 
 namespace LineWars.Model
 {
-    public class ShotUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer> :
-            UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>,
-            IShotUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>
-
-        #region Сonstraints
-
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TOwned : class, IOwned<TOwned, TPlayer>
-        where TPlayer : class, IBasePlayer<TOwned, TPlayer>
-
-    #endregion
+    public class ShotUnitAction<TNode, TEdge, TUnit> :
+        UnitAction<TNode, TEdge, TUnit>,
+        IShotUnitAction<TNode, TEdge, TUnit>
+        where TNode : class, INodeForGame<TNode, TEdge, TUnit>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
+        where TUnit : class, IUnit<TNode, TEdge, TUnit>
 
     {
         public override CommandType CommandType => CommandType.ShotUnit;
@@ -37,9 +30,7 @@ namespace LineWars.Model
 
         public void TakeUnit([NotNull] TUnit unit)
         {
-            if (unit == null) throw new ArgumentNullException(nameof(unit));
-
-            TakenUnit = unit;
+            TakenUnit = unit ?? throw new ArgumentNullException(nameof(unit));
         }
 
         public bool CanShotUnitTo(TNode node)
@@ -55,8 +46,7 @@ namespace LineWars.Model
             }
             else
             {
-                var enemies = node.Units
-                    .ToArray();
+                var enemies = node.Units.ToArray();
                 var myDamage = (TakenUnit.CurrentHp + TakenUnit.CurrentArmor) / enemies.Length;
                 var enemyDamage = enemies.Select(x => x.CurrentHp + x.CurrentArmor).Sum();
                 foreach (var enemy in enemies)
@@ -80,14 +70,16 @@ namespace LineWars.Model
         {
             if (TakenUnit == null)
             {
-                return new TakeUnitCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this, (TUnit) target);
+                return new TakeUnitCommand<TNode, TEdge, TUnit>(this, (TUnit) target);
             }
 
-            return new ShotUnitCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this, (TNode) target);
+            return new ShotUnitCommand<TNode, TEdge, TUnit>(this, (TNode) target);
         }
 
 
-        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor) => visitor.Visit(this);
-        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit, TOwned, TPlayer> visitor) => visitor.Visit(this);
+        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit> visitor) => visitor.Visit(this);
+
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit> visitor) =>
+            visitor.Visit(this);
     }
 }

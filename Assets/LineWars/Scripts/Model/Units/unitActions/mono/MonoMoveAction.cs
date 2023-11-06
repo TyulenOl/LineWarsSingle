@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    public class MonoMoveAction : MonoUnitAction<MoveAction<Node, Edge, Unit, Owned, BasePlayer>>,
-        IMoveAction<Node, Edge, Unit, Owned, BasePlayer>
+    public class MonoMoveAction : MonoUnitAction<MoveAction<Node, Edge, Unit>>,
+        IMoveAction<Node, Edge, Unit>
     {
         [SerializeField] private SFXData moveSfx;
         [SerializeField] private SFXList reactionsSfx;
@@ -31,6 +31,7 @@ namespace LineWars.Model
             Unit.MovementLogic.MoveTo(target.transform);
             SfxManager.Instance.Play(moveSfx);
             SfxManager.Instance.Play(dj.GetSound(reactionsSfx));
+            Player.LocalPlayer.RecalculateVisibility();
         }
 
         private void MovementLogicOnMovementIsOver(Transform obj) => MoveAnimationEnded?.Invoke();
@@ -40,7 +41,7 @@ namespace LineWars.Model
 
         public ICommandWithCommandType GenerateCommand(ITarget target)
         {
-            return new MoveCommand<Node, Edge, Unit, Owned, BasePlayer>(this, (Node) target);
+            return new MoveCommand<Node, Edge, Unit>(this, (Node) target);
         }
         
         private void OnDestroy()
@@ -48,13 +49,13 @@ namespace LineWars.Model
             Unit.MovementLogic.MovementIsOver -= MovementLogicOnMovementIsOver;
         }
 
-        protected override MoveAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
+        protected override MoveAction<Node, Edge, Unit> GetAction()
         {
-            var action = new MoveAction<Node, Edge, Unit, Owned, BasePlayer>(Unit);
+            var action = new MoveAction<Node, Edge, Unit>(Unit);
             return action;
         }
         
         public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
-        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit, Owned, BasePlayer> visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit> visitor) => visitor.Visit(this);
     }
 }

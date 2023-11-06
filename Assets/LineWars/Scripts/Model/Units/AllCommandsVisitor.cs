@@ -10,26 +10,21 @@ namespace LineWars.Model
         public ITarget Target;
     }
 
-    public class AllCommandsVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> :
-            IIUnitActionVisitor<IEnumerable<CommandContext>, TNode, TEdge, TUnit, TOwned, TPlayer>
-
-        #region Сonstraints
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TOwned : class, IOwned<TOwned, TPlayer>
-        where TPlayer : class, IBasePlayer<TOwned, TPlayer>
-        #endregion
+    public class AllCommandsVisitor<TNode, TEdge, TUnit> :
+        IIUnitActionVisitor<IEnumerable<CommandContext>, TNode, TEdge, TUnit>
+        where TNode : class, INodeForGame<TNode, TEdge, TUnit>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
+        where TUnit : class, IUnit<TNode, TEdge, TUnit>
 
     {
-        public IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer> GraphForGame { get; }
+        public IGraphForGame<TNode, TEdge, TUnit> GraphForGame { get; }
 
-        public AllCommandsVisitor(IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer> graphForGame)
+        public AllCommandsVisitor(IGraphForGame<TNode, TEdge, TUnit> graphForGame)
         {
             GraphForGame = graphForGame;
         }
 
-        public IEnumerable<CommandContext> Visit(IBuildAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
+        public IEnumerable<CommandContext> Visit(IBuildAction<TNode, TEdge, TUnit> action)
         {
             return action.MyUnit.Node.Edges
                 .Select(edge => new CommandContext()
@@ -40,62 +35,62 @@ namespace LineWars.Model
                 });
         }
 
-        public IEnumerable<CommandContext> Visit(IBlockAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
+        public IEnumerable<CommandContext> Visit(IBlockAction<TNode, TEdge, TUnit> action)
         {
             return GetCommandsForSimpleAction(action);
         }
 
-        public IEnumerable<CommandContext> Visit(IMoveAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
+        public IEnumerable<CommandContext> Visit(IMoveAction<TNode, TEdge, TUnit> action)
         {
             return GetCommandsForNodesInRange(action, 1);
         }
 
-        public IEnumerable<CommandContext> Visit(IHealAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
+        public IEnumerable<CommandContext> Visit(IHealAction<TNode, TEdge, TUnit> action)
         {
             return GetCommandsForUnitsInRange(action, 1);
         }
 
-        public IEnumerable<CommandContext> Visit(IDistanceAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
+        public IEnumerable<CommandContext> Visit(IDistanceAttackAction<TNode, TEdge, TUnit> action)
         {
             return GetCommandsForUnitsInRange(action, action.Distance);
         }
 
-        public IEnumerable<CommandContext> Visit(IArtilleryAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
+        public IEnumerable<CommandContext> Visit(IArtilleryAttackAction<TNode, TEdge, TUnit> action)
         {
             return GetCommandsForUnitsInRange(action, action.Distance);
         }
 
-        public IEnumerable<CommandContext> Visit(IMeleeAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
+        public IEnumerable<CommandContext> Visit(IMeleeAttackAction<TNode, TEdge, TUnit> action)
         {
             return GetCommandsForUnitsInRange(action, 1);
         }
 
-        public IEnumerable<CommandContext> Visit(IRLBlockAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
+        public IEnumerable<CommandContext> Visit(IRLBlockAction<TNode, TEdge, TUnit> action)
         {
             return GetCommandsForSimpleAction(action);
         }
 
-        public IEnumerable<CommandContext> Visit(ISacrificeForPerunAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
+        public IEnumerable<CommandContext> Visit(ISacrificeForPerunAction<TNode, TEdge, TUnit> action)
         {
             throw new System.NotImplementedException();
         }
 
-        public IEnumerable<CommandContext> Visit(IRamAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
+        public IEnumerable<CommandContext> Visit(IRamAction<TNode, TEdge, TUnit> action)
         {
             return GetCommandsForNodesInRange(action, 1);
         }
 
-        public IEnumerable<CommandContext> Visit(IBlowWithSwingAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
+        public IEnumerable<CommandContext> Visit(IBlowWithSwingAction<TNode, TEdge, TUnit> action)
         {
             return GetCommandsForSimpleAction(action);
         }
 
-        public IEnumerable<CommandContext> Visit(IShotUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
+        public IEnumerable<CommandContext> Visit(IShotUnitAction<TNode, TEdge, TUnit> action)
         {
             throw new System.NotImplementedException();
         }
 
-        public IEnumerable<CommandContext> Visit(IRLBuildAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
+        public IEnumerable<CommandContext> Visit(IRLBuildAction<TNode, TEdge, TUnit> action)
         {
             throw new System.NotImplementedException();
         }
@@ -106,7 +101,7 @@ namespace LineWars.Model
         /// Будте бдительны! Если action не работает с НОДАМИ, то этот код вызовет исключение.
         /// </summary>
         private IEnumerable<CommandContext> GetCommandsForNodesInRange<TAction>(TAction action, uint distance)
-            where TAction : IUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>, ITargetedAction
+            where TAction : IUnitAction<TNode, TEdge, TUnit>, ITargetedAction
         {
             return GraphForGame.GetNodesInRange(action.MyUnit.Node, distance)
                 .Select(node => new CommandContext()
@@ -122,7 +117,7 @@ namespace LineWars.Model
         /// Будте бдительны! Если action не работает с ЮНИТАМИ, то этот код вызовет исключение.
         /// </summary>
         private IEnumerable<CommandContext> GetCommandsForUnitsInRange<TAction>(TAction action, uint distance)
-            where TAction : IUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>, ITargetedAction
+            where TAction : IUnitAction<TNode, TEdge, TUnit>, ITargetedAction
         {
             return GraphForGame.GetNodesInRange(action.MyUnit.Node, distance)
                 .SelectMany(node => node.Units)
@@ -135,7 +130,7 @@ namespace LineWars.Model
         }
 
         private IEnumerable<CommandContext> GetCommandsForSimpleAction<TAction>(TAction action)
-            where TAction : IUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>, ISimpleAction
+            where TAction : IUnitAction<TNode, TEdge, TUnit>, ISimpleAction
         {
             return new[]
             {

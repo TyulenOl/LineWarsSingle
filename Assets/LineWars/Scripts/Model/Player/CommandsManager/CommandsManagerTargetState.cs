@@ -20,6 +20,7 @@ namespace LineWars.Controllers
 
             public override void OnEnter()
             {
+                manager.state = CommandsManagerStateType.Target;
                 Selector.SelectedObjectChanged += OnSelectedObjectChanged;
                 isCancelable = true;
             }
