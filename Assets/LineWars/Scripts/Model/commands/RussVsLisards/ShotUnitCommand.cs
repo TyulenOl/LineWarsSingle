@@ -3,21 +3,13 @@ using JetBrains.Annotations;
 
 namespace LineWars.Model
 {
-    public class ShotUnitCommand<TNode, TEdge, TUnit, TOwned, TPlayer> :
-            ICommandWithCommandType
-
-        #region Сonstraints
-
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TOwned : class, IOwned<TOwned, TPlayer>
-        where TPlayer : class, IBasePlayer<TOwned, TPlayer>
-
-    #endregion
-
+    public class ShotUnitCommand<TNode, TEdge, TUnit> :
+        ICommandWithCommandType
+        where TNode : class, INodeForGame<TNode, TEdge, TUnit>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
+        where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
-        private readonly IShotUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer> action;
+        private readonly IShotUnitAction<TNode, TEdge, TUnit> action;
         private readonly TUnit unit;
         private readonly TNode targetNode;
         private readonly TUnit takenUnit;
@@ -25,16 +17,16 @@ namespace LineWars.Model
         public ShotUnitCommand(
             [NotNull] TUnit unit,
             [NotNull] TNode targetNode) :
-            this(unit.TryGetUnitAction<IShotUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>>(out var action)
+            this(unit.TryGetUnitAction<IShotUnitAction<TNode, TEdge, TUnit>>(out var action)
                     ? action
                     : throw new ArgumentException(
-                        $"{nameof(TUnit)} does not contain {nameof(IShotUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>)}"),
+                        $"{nameof(TUnit)} does not contain {nameof(IShotUnitAction<TNode, TEdge, TUnit>)}"),
                 targetNode)
         {
         }
 
         public ShotUnitCommand(
-            [NotNull] IShotUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer> action,
+            [NotNull] IShotUnitAction<TNode, TEdge, TUnit> action,
             [NotNull] TNode targetNode)
         {
             this.action = action;

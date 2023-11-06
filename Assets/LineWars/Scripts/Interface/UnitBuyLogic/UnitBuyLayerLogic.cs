@@ -49,7 +49,7 @@ public class UnitBuyLayerLogic : MonoBehaviour
         var player = Player.LocalPlayer;
         if (PhaseManager.Instance.CurrentPhase != PhaseType.Buy) return;
         UnitsController.ExecuteCommand(
-            new SpawnPresetCommand<Node, Edge, Unit, Owned, BasePlayer>(
+            new SpawnPresetCommand<Node, Edge, Unit, BasePlayer>(
                 player,
                 CurrentPreset
             ), false);

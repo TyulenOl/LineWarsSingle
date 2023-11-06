@@ -4,8 +4,8 @@ using UnityEngine;
 namespace LineWars.Model
 {
     public class MonoRLBuildAction :
-        MonoUnitAction<RLBuildAction<Node, Edge, Unit, Owned, BasePlayer>>,
-        IRLBuildAction<Node, Edge, Unit, Owned, BasePlayer>
+        MonoUnitAction<RLBuildAction<Node, Edge, Unit>>,
+        IRLBuildAction<Node, Edge, Unit>
     {
         [SerializeField] public List<BuildingType> initialPossibleBuildingTypes;
         public IEnumerable<BuildingType> PossibleBuildings => Action.PossibleBuildings;
@@ -23,14 +23,14 @@ namespace LineWars.Model
             Action.Build(node, buildingType);
         }
 
-        protected override RLBuildAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
+        protected override RLBuildAction<Node, Edge, Unit> GetAction()
         {
-            return new RLBuildAction<Node, Edge, Unit, Owned, BasePlayer>(
+            return new RLBuildAction<Node, Edge, Unit>(
                 Unit,
                 initialPossibleBuildingTypes,
                 new MonoBuildingFactory());
         }
         public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
-        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit, Owned, BasePlayer> visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit> visitor) => visitor.Visit(this);
     }
 }

@@ -4,16 +4,14 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace LineWars.Model
 {
-    public abstract class UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer> :
+    public abstract class UnitAction<TNode, TEdge, TUnit> :
         ExecutorAction<TUnit>,
-        IUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>
+        IUnitAction<TNode, TEdge, TUnit>
     
         #region Сonstraints
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer> 
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TOwned : class, IOwned<TOwned, TPlayer>
-        where TPlayer: class, IBasePlayer<TOwned, TPlayer>
+        where TNode : class, INodeForGame<TNode, TEdge, TUnit>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit> 
+        where TUnit : class, IUnit<TNode, TEdge, TUnit>
         #endregion
 
     {
@@ -25,7 +23,7 @@ namespace LineWars.Model
         
         public virtual uint GetPossibleMaxRadius() => (uint) MyUnit.CurrentActionPoints;
 
-        public abstract void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor);
-        public abstract TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit, TOwned, TPlayer> visitor);
+        public abstract void Accept(IUnitActionVisitor<TNode, TEdge, TUnit> visitor);
+        public abstract TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit> visitor);
     }
 }

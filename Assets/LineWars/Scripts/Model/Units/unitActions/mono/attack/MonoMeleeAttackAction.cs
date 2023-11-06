@@ -1,11 +1,12 @@
-﻿using UnityEngine;
+﻿using LineWars.Interface;
+using UnityEngine;
 
 namespace LineWars.Model
 {
     [RequireComponent(typeof(MonoMoveAction))]
     public class MonoMeleeAttackAction :
-        MonoAttackAction<MeleeAttackAction<Node, Edge, Unit, Owned, BasePlayer>>,
-        IMeleeAttackAction<Node, Edge, Unit, Owned, BasePlayer>
+        MonoAttackAction<MeleeAttackAction<Node, Edge, Unit>>,
+        IMeleeAttackAction<Node, Edge, Unit>
     {
         [field: SerializeField] public UnitBlockerSelector InitialBlockerSelector { get; private set; }
 
@@ -41,9 +42,9 @@ namespace LineWars.Model
             base.Attack(enemy);
         }
 
-        protected override MeleeAttackAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
+        protected override MeleeAttackAction<Node, Edge, Unit> GetAction()
         {
-            return new MeleeAttackAction<Node, Edge, Unit, Owned, BasePlayer>(
+            return new MeleeAttackAction<Node, Edge, Unit>(
                 Unit,
                 InitialDamage,
                 InitialIsPenetratingDamage,
@@ -54,7 +55,6 @@ namespace LineWars.Model
 
         public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
 
-        public override TResult Accept<TResult>(
-            IIUnitActionVisitor<TResult, Node, Edge, Unit, Owned, BasePlayer> visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit> visitor) => visitor.Visit(this);
     }
 }

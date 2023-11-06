@@ -1,7 +1,10 @@
 using UnityEngine;
 
-public class UnitAnimationHelper : MonoBehaviour
+namespace LineWars.Interface
 {
-    public GameObject LeftCenter;
-    public GameObject RightCenter;
+    public class UnitAnimationHelper : MonoBehaviour
+    {
+        public GameObject LeftCenter;
+        public GameObject RightCenter;
+    }
 }

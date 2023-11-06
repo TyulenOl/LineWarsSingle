@@ -1,28 +1,27 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using LineWars;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-public class WinLoseUI : MonoBehaviour
+namespace LineWars.Interface
 {
-    public static bool isWin;
-    [SerializeField] private GameObject winPanel;
-    [SerializeField] private GameObject losePanel;
-    private void Awake()
+    public class WinLoseUI : MonoBehaviour
     {
-        if (isWin)
+        public static bool isWin;
+        [SerializeField] private GameObject winPanel;
+        [SerializeField] private GameObject losePanel;
+        private void Awake()
         {
-            winPanel.SetActive(true);
-            losePanel.SetActive(false);
+            if (isWin)
+            {
+                winPanel.SetActive(true);
+                losePanel.SetActive(false);
+            }
+            else
+            {
+                winPanel.SetActive(false);
+                losePanel.SetActive(true);
+            }
         }
-        else
-        {
-            winPanel.SetActive(false);
-            losePanel.SetActive(true);
-        }
+
+        public void ToMainMenu() => SceneTransition.LoadScene(SceneName.MainMenu);
     }
 
-    public void ToMainMenu() => SceneTransition.LoadScene(SceneName.MainMenu);
 }

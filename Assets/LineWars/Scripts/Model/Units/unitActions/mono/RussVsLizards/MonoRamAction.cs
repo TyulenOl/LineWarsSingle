@@ -5,10 +5,9 @@ using UnityEngine;
 namespace LineWars.Model
 {
     public class MonoRamAction :
-        MonoUnitAction<RamAction<Node, Edge, Unit, Owned, BasePlayer>>,
-        IRamAction<Node, Edge, Unit, Owned, BasePlayer>
+        MonoUnitAction<RamAction<Node, Edge, Unit>>,
+        IRamAction<Node, Edge, Unit>
     {
-       
         private MonoMoveAction moveAction;
         [field: SerializeField] public int InitialDamage { get; private set; }
 
@@ -62,19 +61,18 @@ namespace LineWars.Model
 
         public Type TargetType => typeof(Node);
         public bool IsMyTarget(ITarget target) => target is Node;
+        public ICommandWithCommandType GenerateCommand(ITarget target) => GenerateCommand((Node) target);
+        public ICommandWithCommandType GenerateCommand(Node target) => new RamCommand<Node, Edge, Unit>(this, target);
+        public bool CanExecute(Node target) => CanRam(target);
+        public void Execute(Node target) => Ram(target);
 
-        public ICommandWithCommandType GenerateCommand(ITarget target)
+        protected override RamAction<Node, Edge, Unit> GetAction()
         {
-            return new RamCommand<Node, Edge, Unit, Owned, BasePlayer>(Unit, (Node) target);
-        }
-        
-        protected override RamAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
-        {
-            var action = new RamAction<Node, Edge, Unit, Owned, BasePlayer>(Unit, InitialDamage);
+            var action = new RamAction<Node, Edge, Unit>(Unit, InitialDamage);
             return action;
         }
 
         public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
-        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit, Owned, BasePlayer> visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit> visitor) => visitor.Visit(this);
     }
 }

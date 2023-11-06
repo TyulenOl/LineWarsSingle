@@ -4,10 +4,9 @@ using System.Collections.Generic;
 
 namespace LineWars.Model
 {
-    public class GraphProjection
-        : GraphForGame<NodeProjection, EdgeProjection,
-            UnitProjection, OwnedProjection,
-            BasePlayerProjection>, IReadOnlyGraphProjection
+    public class GraphProjection :
+        GraphForGame<NodeProjection, EdgeProjection, UnitProjection>,
+        IReadOnlyGraphProjection
     {
         public IndexList<NodeProjection> NodesIndexList { get; private set; }
         public IndexList<EdgeProjection> EdgesIndexList { get; private set; }
@@ -15,7 +14,7 @@ namespace LineWars.Model
 
         public GraphProjection(IEnumerable<NodeProjection> nodes, IEnumerable<EdgeProjection> edges)
             : base(nodes, edges)
-        { 
+        {
             NodesIndexList = new IndexList<NodeProjection>();
             EdgesIndexList = new IndexList<EdgeProjection>();
             UnitsIndexList = new IndexList<UnitProjection>();
@@ -23,10 +22,10 @@ namespace LineWars.Model
             foreach (var node in nodes)
                 AddNode(node);
 
-            foreach(var edge in edges)
+            foreach (var edge in edges)
                 EdgesIndexList.Add(edge.Id, edge);
 
-            foreach(var unit in UnitsIndexList.Values)
+            foreach (var unit in UnitsIndexList.Values)
                 unit.InitializeActions(this);
         }
 
@@ -53,8 +52,8 @@ namespace LineWars.Model
 
         private void OnUnitAdded(UnitProjection unit)
         {
-            if(unit == null) return;
-            if(UnitsIndexList.ContainsKey(unit.Id)) return;
+            if (unit == null) return;
+            if (UnitsIndexList.ContainsKey(unit.Id)) return;
             else
             {
                 if (unit.HasId)
@@ -69,34 +68,35 @@ namespace LineWars.Model
             }
         }
 
-        public static GraphProjection GetCopy(IReadOnlyGraphProjection projection, 
+        public static GraphProjection GetCopy(IReadOnlyGraphProjection projection,
             IReadOnlyDictionary<BasePlayerProjection, BasePlayerProjection> oldPlayersToNew)
         {
             var oldNodesToNew = new Dictionary<NodeProjection, NodeProjection>();
             var oldEdgesToNew = new Dictionary<EdgeProjection, EdgeProjection>();
 
-            foreach(var oldNode in projection.Nodes)
+            foreach (var oldNode in projection.Nodes)
             {
                 var newNode = new NodeProjection(oldNode);
-                if(oldNode.Owner != null)
+                if (oldNode.Owner != null)
                 {
                     var ownerProjection = oldPlayersToNew[oldNode.Owner];
                     newNode.ConnectTo(ownerProjection);
-                    if(oldNode.IsBase)
+                    if (oldNode.IsBase)
                     {
                         ownerProjection.Base = newNode;
                     }
                 }
 
-                if(oldNode.LeftUnit != null)
+                if (oldNode.LeftUnit != null)
                 {
                     ConnectUnit(oldNode.LeftUnit, newNode, UnitDirection.Left, oldPlayersToNew);
-                    if(oldNode.RightUnit == oldNode.LeftUnit)
+                    if (oldNode.RightUnit == oldNode.LeftUnit)
                     {
                         newNode.RightUnit = newNode.LeftUnit;
                     }
                 }
-                if(oldNode.RightUnit != null && oldNode.RightUnit != oldNode.LeftUnit)
+
+                if (oldNode.RightUnit != null && oldNode.RightUnit != oldNode.LeftUnit)
                 {
                     ConnectUnit(oldNode.RightUnit, newNode, UnitDirection.Right, oldPlayersToNew);
                 }
@@ -104,7 +104,7 @@ namespace LineWars.Model
                 oldNodesToNew[oldNode] = newNode;
             }
 
-            foreach(var oldEdge in projection.Edges)
+            foreach (var oldEdge in projection.Edges)
             {
                 var firstNode = oldNodesToNew[oldEdge.FirstNode];
                 var secondNode = oldNodesToNew[oldEdge.SecondNode];
@@ -112,7 +112,7 @@ namespace LineWars.Model
                 firstNode.AddEdge(newEdge);
                 secondNode.AddEdge(newEdge);
 
-                oldEdgesToNew[oldEdge] = newEdge;    
+                oldEdgesToNew[oldEdge] = newEdge;
             }
 
             return new GraphProjection(oldNodesToNew.Values, oldEdgesToNew.Values);
@@ -125,7 +125,7 @@ namespace LineWars.Model
             var owner = oldPlayersToNew[oldUnit.Owner];
             newUnit.ConnectTo(owner);
             //newUnit.Died += owner.RemoveOwned;
-            switch(unitDirection)
+            switch (unitDirection)
             {
                 case UnitDirection.Any:
                 case UnitDirection.Right:
@@ -148,30 +148,33 @@ namespace LineWars.Model
             foreach (var oldNode in monoGraph.Nodes)
             {
                 var score = 1;
-                if(oldNode.TryGetComponent<NodeScore>(out NodeScore nodeScore))
+                if (oldNode.TryGetComponent<NodeScore>(out NodeScore nodeScore))
                 {
                     score = nodeScore.Score;
                 }
+
                 var nodeProjection = new NodeProjection(oldNode, score);
                 if (oldNode.Owner != null)
                 {
                     var nodeOwnerProjection = players[oldNode.Owner];
                     nodeProjection.ConnectTo(nodeOwnerProjection);
-                    if(oldNode.IsBase)
+                    if (oldNode.IsBase)
                     {
                         nodeOwnerProjection.Base = nodeProjection;
                     }
                 }
+
                 if (!oldNode.LeftIsFree)
                 {
                     var leftUnitProjection = InitializeUnitFromMono(oldNode.LeftUnit);
                     leftUnitProjection.Node = nodeProjection;
                     nodeProjection.LeftUnit = leftUnitProjection;
-                    if(oldNode.RightUnit == oldNode.LeftUnit)
+                    if (oldNode.RightUnit == oldNode.LeftUnit)
                     {
                         nodeProjection.RightUnit = leftUnitProjection;
                     }
                 }
+
                 if (!oldNode.RightIsFree && oldNode.RightUnit != oldNode.LeftUnit)
                 {
                     var rightUnitProjection = InitializeUnitFromMono(oldNode.RightUnit);
@@ -212,4 +215,3 @@ namespace LineWars.Model
         public IReadOnlyList<EdgeProjection> Edges { get; }
     }
 }
-

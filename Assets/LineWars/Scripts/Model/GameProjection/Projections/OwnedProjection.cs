@@ -2,10 +2,10 @@
 
 namespace LineWars.Model
 {
-    public abstract class OwnedProjection
-        : IOwned<OwnedProjection, BasePlayerProjection>
+    public abstract class OwnedProjection : IOwned
     {
         private BasePlayerProjection owner;
+        public int OwnerId => owner?.Id ?? -1;
         public BasePlayerProjection Owner 
         {
             get => owner;
@@ -23,7 +23,7 @@ namespace LineWars.Model
             }
         }
 
-        public Action<OwnedProjection, BasePlayerProjection, BasePlayerProjection> OwnerChanged;
+        public event Action<OwnedProjection, BasePlayerProjection, BasePlayerProjection> OwnerChanged;
         public void ConnectTo(BasePlayerProjection basePlayer)
         {
             var otherOwner = Owner;
@@ -40,6 +40,11 @@ namespace LineWars.Model
 
         public virtual void Replenish()
         {
+        }
+
+        public void ConnectTo(int basePlayerID)
+        {
+            throw new NotImplementedException();
         }
     }
 }

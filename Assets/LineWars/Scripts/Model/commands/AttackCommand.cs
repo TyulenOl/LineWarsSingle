@@ -3,18 +3,13 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace LineWars.Model
 {
-    public class AttackCommand<TNode, TEdge, TUnit, TOwned, TPlayer>:
+    public class AttackCommand<TNode, TEdge, TUnit> :
         ICommandWithCommandType
-    
-        #region Сonstraints
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer> 
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TOwned : class, IOwned<TOwned, TPlayer>
-        where TPlayer: class, IBasePlayer<TOwned, TPlayer>
-        #endregion 
+        where TNode : class, INodeForGame<TNode, TEdge, TUnit>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
+        where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
-        private readonly IAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> attackAction;
+        private readonly IAttackAction<TNode, TEdge, TUnit> attackAction;
 
         protected readonly TUnit Attacker;
         protected readonly IAlive Defender;
@@ -24,13 +19,14 @@ namespace LineWars.Model
             Attacker = attacker ?? throw new ArgumentNullException(nameof(attacker));
             Defender = defender ?? throw new ArgumentNullException(nameof(defender));
 
-            attackAction = attacker.TryGetUnitAction<IAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>>(out var action) 
-                ? action 
-                : throw new ArgumentException($"{Attacker} does not contain {nameof(IAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>)}");
+            attackAction = attacker.TryGetUnitAction<IAttackAction<TNode, TEdge, TUnit>>(out var action)
+                ? action
+                : throw new ArgumentException(
+                    $"{Attacker} does not contain {nameof(IAttackAction<TNode, TEdge, TUnit>)}");
         }
 
         public AttackCommand(
-            [NotNull] IAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> attackAction,
+            [NotNull] IAttackAction<TNode, TEdge, TUnit> attackAction,
             [NotNull] IAlive alive)
         {
             this.attackAction = attackAction ?? throw new ArgumentNullException(nameof(attackAction));

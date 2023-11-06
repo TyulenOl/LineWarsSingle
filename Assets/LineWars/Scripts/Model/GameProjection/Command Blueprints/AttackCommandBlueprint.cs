@@ -27,14 +27,10 @@ namespace LineWars.Model
             {
                 case Target.Edge:
                     var edge = projection.EdgesIndexList[TargetId];
-                    return new AttackCommand
-                        <NodeProjection, EdgeProjection, UnitProjection, 
-                        OwnedProjection, BasePlayerProjection>(unit, edge);
+                    return new AttackCommand<NodeProjection, EdgeProjection, UnitProjection>(unit, edge);
                 case Target.Unit:
                     var targetUnit = projection.UnitsIndexList[TargetId];
-                    return new AttackCommand
-                        <NodeProjection, EdgeProjection, UnitProjection,
-                        OwnedProjection, BasePlayerProjection>(unit, targetUnit);
+                    return new AttackCommand<NodeProjection, EdgeProjection, UnitProjection>(unit, targetUnit);
             }
 
             throw new ArgumentException("Failed to generate Command!");
@@ -47,14 +43,10 @@ namespace LineWars.Model
             {
                 case Target.Edge:
                     var edge = projection.EdgesIndexList[TargetId].Original;
-                    return new AttackCommand
-                        <Node, Edge, Unit,
-                        Owned, BasePlayer>(unit, edge);
+                    return new AttackCommand<Node, Edge, Unit>(unit, edge);
                 case Target.Unit:
                     var targetUnit = projection.UnitsIndexList[TargetId].Original;
-                    return new AttackCommand
-                        <Node, Edge, Unit,
-                        Owned, BasePlayer>(unit, targetUnit);
+                    return new AttackCommand<Node, Edge, Unit>(unit, targetUnit);
             }
 
             throw new ArgumentException("Failed to generate Command!");

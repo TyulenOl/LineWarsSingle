@@ -21,8 +21,7 @@ namespace LineWars.Model
             var doctor = projection.UnitsIndexList[UnitId];
             var unit = projection.UnitsIndexList[UnitId];
 
-            return new HealCommand<NodeProjection, EdgeProjection, UnitProjection, 
-                OwnedProjection, BasePlayerProjection>(doctor, unit);
+            return new HealCommand<NodeProjection, EdgeProjection, UnitProjection>(doctor, unit);
         }
 
         public ICommand GenerateMonoCommand(GameProjection projection)
@@ -30,8 +29,7 @@ namespace LineWars.Model
             var doctor = projection.UnitsIndexList[UnitId].Original;
             var unit = projection.UnitsIndexList[UnitId].Original;
 
-            return new HealCommand<Node, Edge, Unit,
-                Owned, BasePlayer>(doctor, unit);
+            return new HealCommand<Node, Edge, Unit>(doctor, unit);
         }
     }
 }

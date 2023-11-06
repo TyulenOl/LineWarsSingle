@@ -6,7 +6,6 @@ namespace LineWars.Model
 {
     public static class BasePlayerUtility
     {
-        private static int globalUnitIndex;
         public static bool CanSpawnUnit(Node node, Unit unit, UnitDirection unitDirection = UnitDirection.Any)
         {
             return node != null && unit != null &&
@@ -18,7 +17,10 @@ namespace LineWars.Model
                    );
         }
 
-        public static Unit CreateUnitForPlayer(BasePlayer player, Node node, Unit unitPrefab,
+        public static Unit CreateUnitForPlayer(
+            BasePlayer player,
+            Node node,
+            Unit unitPrefab,
             UnitDirection unitDirection = UnitDirection.Any)
         {
             var unit = Object.Instantiate(unitPrefab, player.transform);
@@ -47,9 +49,6 @@ namespace LineWars.Model
                 }
 
             Owned.Connect(player, unit);
-
-            unit.name = $"{unit.UnitName}{globalUnitIndex}";
-            globalUnitIndex++;
             return unit;
         }
         

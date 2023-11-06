@@ -9,9 +9,9 @@ namespace LineWars.Model
     [RequireComponent(typeof(RenderNodeV3))]
     public class Node :
         Owned,
-        INodeForGame<Node, Edge, Unit, Owned, BasePlayer>,
-        ITargetsEnumerable,
-        IPointerClickHandler
+        INodeForGame<Node, Edge, Unit>,
+        IPointerClickHandler,
+        INumbered
     {
         [SerializeField] private int index;
         
@@ -99,17 +99,7 @@ namespace LineWars.Model
             nodeInfoDrawer.ReDrawCapturingInfo(Player.LocalPlayer.GetMyCapturingMoneyFromNode(this));
             nodeInfoDrawer.ReDrawIncomeInfo(Player.LocalPlayer.GetMyIncomeFromNode(this));
         }
-
-        private void OnEnable()
-        {
-        }
-
-        protected override void OnDisable()
-        {
-            base.OnDisable();
-        }
-
-
+        
         public IEnumerable<ITarget> Targets
         {
             get
@@ -183,7 +173,6 @@ namespace LineWars.Model
         }
 
         public bool RemoveEdge(Edge edge) => edges.Remove(edge);
-
         public bool ContainsEdge(Edge edge) => edges.Contains(edge);
 
         public void SetActiveOutline(bool value)

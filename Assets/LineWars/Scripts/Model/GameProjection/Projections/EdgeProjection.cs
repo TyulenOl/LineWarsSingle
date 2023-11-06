@@ -1,8 +1,9 @@
 ﻿namespace LineWars.Model
 {
-    public class EdgeProjection : OwnedProjection, IEdgeForGame<NodeProjection, EdgeProjection,
-            UnitProjection, OwnedProjection,
-            BasePlayerProjection>, IReadOnlyEdgeProjection
+    public class EdgeProjection : 
+        OwnedProjection, 
+        IEdgeForGame<NodeProjection, EdgeProjection, UnitProjection>,
+        IReadOnlyEdgeProjection
     {
         public Edge Original { get; private set; }
         public CommandPriorityData CommandPriorityData { get; private set; }

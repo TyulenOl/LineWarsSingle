@@ -5,9 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace LineWars.Model
 {
-    public class BasePlayerProjection :
-        IBasePlayer<OwnedProjection,
-            BasePlayerProjection>, IReadOnlyBasePlayerProjection
+    public class BasePlayerProjection : IBasePlayer, IReadOnlyBasePlayerProjection
     {
         private NodeProjection baseProjection;
         private HashSet<OwnedProjection> ownedObjects;

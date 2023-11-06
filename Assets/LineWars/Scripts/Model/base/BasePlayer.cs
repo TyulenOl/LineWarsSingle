@@ -10,7 +10,7 @@ namespace LineWars.Model
     /// <summary>
     /// класс, содержащий всю логику, которая объединяет ИИ и игрока
     /// </summary>
-    public abstract class BasePlayer : MonoBehaviour, IActor, IBasePlayer<Owned, BasePlayer>
+    public abstract class BasePlayer : MonoBehaviour, IActor, IBasePlayer
     {
         [field: SerializeField, ReadOnlyInspector] public int Id { get;  private set; }
         [SerializeField, ReadOnlyInspector] private int money;
@@ -20,7 +20,7 @@ namespace LineWars.Model
         [SerializeField, ReadOnlyInspector] private int income;
 
         [field:SerializeField] public PhaseExecutorsData PhaseExecutorsData { get; private set; }
-        [field:SerializeField] public NationEconomicLogic EconomicLogic { get; private set; }  
+        [field:SerializeField] public NationEconomicLogic EconomicLogic { get; private set; }
         [field: SerializeField, ReadOnlyInspector] public Node Base { get; private set; }
         [field: SerializeField, ReadOnlyInspector] public PlayerRules Rules { get; set; }
 
@@ -28,7 +28,7 @@ namespace LineWars.Model
         public Nation Nation { get; private set; }
         
 
-        private HashSet<Owned> myOwned;
+        private HashSet<Owned> myOwned = new();
         private readonly List<Node> nodes = new ();
         private readonly List<Unit> units = new ();
         
@@ -44,7 +44,6 @@ namespace LineWars.Model
         public event Action<int, int> IncomeChanged;
         public event Action Defeated; 
         public IReadOnlyCollection<Owned> OwnedObjects => myOwned;
-        
         public bool IsMyOwn(Owned owned) => myOwned.Contains(owned);
 
         public int CurrentMoney
@@ -73,7 +72,7 @@ namespace LineWars.Model
 
         protected virtual void Awake()
         {
-            myOwned = new HashSet<Owned>();
+            
         }
 
         protected virtual void Start()
@@ -95,15 +94,21 @@ namespace LineWars.Model
 
         public virtual void Initialize(SpawnInfo spawnInfo)
         {
-            name = $"{GetType().Name}{spawnInfo.PlayerIndex} {spawnInfo.SpawnNode.name}";
             Id = spawnInfo.PlayerIndex;
-            SingleGame.Instance.AllPlayers.Add(Id, this);
             Base = spawnInfo.SpawnNode.Node;
             Rules = spawnInfo.SpawnNode.Rules ? spawnInfo.SpawnNode.Rules : PlayerRules.DefaultRules;
 
             CurrentMoney = Rules.StartMoney;
             Income = Rules.DefaultIncome;
             Nation = spawnInfo.SpawnNode.Nation;
+            
+            SingleGame.Instance.AllPlayers.Add(spawnInfo.PlayerIndex, this);
+            name = $"{GetType().Name}{spawnInfo.PlayerIndex} {spawnInfo.SpawnNode.name}";
+        }
+
+        protected virtual void OnDestroy()
+        {
+            SingleGame.Instance.AllPlayers.Remove(this);
         }
 
         public bool CanSpawnPreset(UnitBuyPreset preset)

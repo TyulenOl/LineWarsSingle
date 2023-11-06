@@ -5,28 +5,20 @@ using DataStructures.PriorityQueue;
 
 namespace LineWars.Model
 {
-    public class GraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer> :
-            Graph<TNode, TEdge>,
-            IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-    
-        #region Сonstraints
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer> 
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TOwned : class, IOwned<TOwned, TPlayer>
-        where TPlayer: class, IBasePlayer<TOwned, TPlayer>
-        #endregion
+    public class GraphForGame<TNode, TEdge, TUnit> :
+        Graph<TNode, TEdge>,
+        IGraphForGame<TNode, TEdge, TUnit>
+        where TNode : class, INodeForGame<TNode, TEdge, TUnit>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
+        where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
         public GraphForGame(IEnumerable<TNode> nodes, IEnumerable<TEdge> edges) : base(nodes, edges)
         {
         }
-        
-        public Dictionary<TNode, bool> GetVisibilityInfo(TPlayer player)
+
+        public Dictionary<TNode, bool> GetVisibilityInfo(IEnumerable<TNode> ownedNodes)
         {
             var result = new Dictionary<TNode, bool>(Nodes.Count());
-
-            var ownedNodes = player.OwnedObjects.OfType<TNode>().ToArray();
-
             foreach (var node in Nodes)
                 result[node] = false;
             foreach (var visibilityNode in GetVisibilityNodes(ownedNodes))
@@ -34,12 +26,13 @@ namespace LineWars.Model
 
             return result;
         }
-        public IEnumerable<TNode> GetVisibilityNodes(IEnumerable<TNode> _startNodes)
+
+        public IEnumerable<TNode> GetVisibilityNodes(IEnumerable<TNode> ownedNodes)
         {
-            var startNodes = _startNodes.ToArray();
+            var startNodes = ownedNodes.ToArray();
             if (startNodes.Length == 0) throw new ArgumentException();
             if (startNodes.Any(x => !Nodes.Contains(x))) throw new InvalidOperationException();
-            
+
             var closedNodes = new HashSet<TNode>();
             var priorityQueue = new PriorityQueue<TNode, int>(0);
             foreach (var ownedNode in startNodes)
@@ -49,7 +42,7 @@ namespace LineWars.Model
             {
                 var (node, currentVisibility) = priorityQueue.Dequeue();
                 if (closedNodes.Contains(node)) continue;
-                
+
                 closedNodes.Add(node);
                 yield return node;
                 if (currentVisibility == 0) continue;

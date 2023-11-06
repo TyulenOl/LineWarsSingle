@@ -1,13 +1,11 @@
 ﻿namespace LineWars.Model
 {
-    public interface IOwned<TOwned, TPlayer>
-        
-        #region Сonstraints
-        where TOwned : class, IOwned<TOwned, TPlayer>
-        where TPlayer: class, IBasePlayer<TOwned, TPlayer>
-        #endregion
+    public interface IOwned
     {
-        public TPlayer Owner { get; set; }
-        public void ConnectTo(TPlayer basePlayer);
+        /// <summary>
+        /// -1 означает что владельца нет 
+        /// </summary>
+        public int OwnerId { get; } 
+        public void ConnectTo(int basePlayerID);
     }
 }

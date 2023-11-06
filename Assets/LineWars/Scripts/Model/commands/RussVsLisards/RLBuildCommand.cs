@@ -3,19 +3,13 @@ using JetBrains.Annotations;
 
 namespace LineWars.Model
 {
-    public class RLBuildCommand<TNode, TEdge, TUnit, TOwned, TPlayer> :
-            ICommandWithCommandType
-
-        #region Сonstraints
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TOwned : class, IOwned<TOwned, TPlayer>
-        where TPlayer : class, IBasePlayer<TOwned, TPlayer>
-        #endregion
-
+    public class RLBuildCommand<TNode, TEdge, TUnit> :
+        ICommandWithCommandType
+        where TNode : class, INodeForGame<TNode, TEdge, TUnit>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
+        where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
-        private readonly IRLBuildAction<TNode, TEdge, TUnit, TOwned, TPlayer> action;
+        private readonly IRLBuildAction<TNode, TEdge, TUnit> action;
         private readonly TUnit unit;
         private readonly TNode targetNode;
         private readonly BuildingType buildingType;
@@ -24,16 +18,16 @@ namespace LineWars.Model
             [NotNull] TUnit unit,
             [NotNull] TNode targetNode,
             BuildingType type) :
-            this(unit.TryGetUnitAction<IRLBuildAction<TNode, TEdge, TUnit, TOwned, TPlayer>>(out var action)
+            this(unit.TryGetUnitAction<IRLBuildAction<TNode, TEdge, TUnit>>(out var action)
                     ? action
                     : throw new ArgumentException(
-                        $"{nameof(TUnit)} does not contain {nameof(IRLBuildAction<TNode, TEdge, TUnit, TOwned, TPlayer>)}"),
+                        $"{nameof(TUnit)} does not contain {nameof(IRLBuildAction<TNode, TEdge, TUnit>)}"),
                 targetNode, type)
         {
         }
 
         public RLBuildCommand(
-            [NotNull] IRLBuildAction<TNode, TEdge, TUnit, TOwned, TPlayer> action,
+            [NotNull] IRLBuildAction<TNode, TEdge, TUnit> action,
             [NotNull] TNode targetNode,
             BuildingType type)
         {

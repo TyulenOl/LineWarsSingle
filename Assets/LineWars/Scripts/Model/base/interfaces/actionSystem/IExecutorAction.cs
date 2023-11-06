@@ -6,10 +6,9 @@ namespace LineWars.Model
         where TExecutor: IExecutor 
     {
         public TExecutor Executor { get; }
-        public event Action ActionCompleted;
-
         public CommandType CommandType { get; }
-
+        
+        public event Action ActionCompleted;
         public void OnReplenish();
     }
 }

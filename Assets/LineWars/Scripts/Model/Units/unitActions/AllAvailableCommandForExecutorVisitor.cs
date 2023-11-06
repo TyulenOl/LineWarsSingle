@@ -14,7 +14,7 @@ namespace LineWars.Model
                 return Enumerable.Empty<(ITarget, IEnumerable<ICommandWithCommandType>)>();
             return unit.Actions
                 .SelectMany(action =>
-                    action.Accept(new AllCommandsVisitor<Node, Edge, Unit, Owned, BasePlayer>(MonoGraph.Instance)))
+                    action.Accept(new AllCommandsVisitor<Node, Edge, Unit>(MonoGraph.Instance)))
                 .Where(context => context.Command.CanExecute())
                 .GroupBy(
                     context => context.Target,
