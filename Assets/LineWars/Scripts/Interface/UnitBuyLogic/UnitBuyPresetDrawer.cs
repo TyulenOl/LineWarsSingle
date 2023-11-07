@@ -16,7 +16,7 @@ namespace LineWars.Interface
         [SerializeField] private Image ifChosenPanel;
 
         private bool isAvailable;
-        
+
         public Button Button => button;
 
         private UnitBuyPreset unitBuyPreset;
@@ -40,7 +40,7 @@ namespace LineWars.Interface
 
         private void OnPhaseChanged(PhaseType phaseTypeOld, PhaseType phaseTypeNew)
         {
-            if(phaseTypeNew != PhaseType.Buy) return;
+            if (phaseTypeNew != PhaseType.Buy) return;
             SetAvailable(Player.LocalPlayer.CanSpawnPreset(unitBuyPreset));
         }
 
@@ -51,7 +51,7 @@ namespace LineWars.Interface
             SetAvailable(Player.LocalPlayer.CanSpawnPreset(unitBuyPreset));
         }
 
-        
+
         public void SetChosen(bool isChosen)
         {
             if (isAvailable)
@@ -63,10 +63,10 @@ namespace LineWars.Interface
         private void SetAvailable(bool isAvailable)
         {
             button.interactable = isAvailable;
-            var color = isAvailable ? Color.white : new Color(226/255f, 43/255f, 18/255f,255/255f);
+            var color = isAvailable ? Color.white : new Color(226 / 255f, 43 / 255f, 18 / 255f, 255 / 255f);
             cost.color = color;
             moneyImage.color = color;
-            backgroundImage.color =  !isAvailable ? Color.gray : new Color(226/255f, 43/255f, 18/255f,255/255f);
+            backgroundImage.color = !isAvailable ? Color.gray : new Color(226 / 255f, 43 / 255f, 18 / 255f, 255 / 255f);
             image.color = isAvailable ? Color.white : Color.gray;
             this.isAvailable = isAvailable;
         }

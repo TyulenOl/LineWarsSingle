@@ -10,18 +10,18 @@ public class UnitBuyPresetInfoDrawer : MonoBehaviour
 {
     [SerializeField] private TMP_Text unitName;
     [SerializeField] private TMP_Text unitDescription;
-    
+
     [SerializeField] private TMP_Text armorAmount;
     [SerializeField] private TMP_Text hpAmount;
     [SerializeField] private TMP_Text actionPointsAmount;
 
     [SerializeField] private Image unitImage;
-    
+
     public void Init(Unit unit)
     {
         unitName.text = unit.UnitName;
         unitDescription.text = unit.UnitDescription;
-        
+
         armorAmount.text = unit.MaxArmor.ToString();
         hpAmount.text = unit.MaxHp.ToString();
         actionPointsAmount.text = unit.MaxActionPoints.ToString();

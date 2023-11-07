@@ -4,7 +4,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using LineWars.Extensions;
 using LineWars.Interface;
 using LineWars.Model;
 using UnityEngine;

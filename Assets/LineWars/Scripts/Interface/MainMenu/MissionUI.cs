@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace LineWars
 {
-    public class MissionUI: MonoBehaviour
+    public class MissionUI : MonoBehaviour
     {
         [SerializeField] private TMP_Text missionName;
         [SerializeField] private Button completedButton;
@@ -36,7 +36,7 @@ namespace LineWars
             if (missionName == null)
                 Debug.LogError($"{nameof(missionName)} is null on {name}");
         }
-        
+
         public void Initialize(MissionState state, Action<MissionState> clicked)
         {
             var data = state.missionData;

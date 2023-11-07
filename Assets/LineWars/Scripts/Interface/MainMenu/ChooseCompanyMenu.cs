@@ -5,16 +5,17 @@ using UnityEngine.Serialization;
 
 namespace LineWars
 {
-    public class ChooseCompanyMenu: UIStackElement
+    public class ChooseCompanyMenu : UIStackElement
     {
         public static ChooseCompanyMenu Instance { get; private set; }
 
-        [FormerlySerializedAs("companyElementPrefab")]
-        [SerializeField] private CompanyElementUI companyElementUIPrefab;
+        [FormerlySerializedAs("companyElementPrefab")] [SerializeField]
+        private CompanyElementUI companyElementUIPrefab;
+
         [SerializeField] private Transform contentTransform;
-        
+
         private List<CompanyElementUI> companyElements;
-        
+
 
         protected override void Awake()
         {
@@ -26,7 +27,6 @@ namespace LineWars
                 Debug.LogError($"Dublicated {nameof(ChooseCompanyMenu)}");
                 Destroy(gameObject);
             }
-
         }
 
         public void Start()
@@ -46,10 +46,10 @@ namespace LineWars
             foreach (var companyState in companies)
             {
                 var companyElement = Instantiate(companyElementUIPrefab, contentTransform);
-                companyElement.Initialize(companyState, OnCompanyButtonClick); 
+                companyElement.Initialize(companyState, OnCompanyButtonClick);
                 companyElements.Add(companyElement);
             }
-            
+
             Instantiate(companyElementUIPrefab, contentTransform);
             Instantiate(companyElementUIPrefab, contentTransform);
         }

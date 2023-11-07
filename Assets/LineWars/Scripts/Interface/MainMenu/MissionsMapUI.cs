@@ -12,6 +12,5 @@ namespace LineWars
 
         public IReadOnlyList<MissionUI> MissionUIs => missionUis;
         public int UIsCount => missionUis.Count;
-    } 
+    }
 }
-

@@ -24,6 +24,6 @@ namespace LineWars.Scripts.Interface
                 unit.CurrentActionPoints = 0;
             }
             //TODO переписать на команду
-        } 
+        }
     }
 }

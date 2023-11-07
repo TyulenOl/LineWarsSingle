@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 
-namespace LineWars.Extensions
-{
+
     public static class IReadOnlyListExtensions
     {
         public static int FindIndex<T>(this IReadOnlyList<T> list, T obj)
@@ -13,4 +12,4 @@ namespace LineWars.Extensions
             return -1;
         }
     }
-}
+

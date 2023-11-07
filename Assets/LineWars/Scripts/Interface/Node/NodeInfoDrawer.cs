@@ -10,7 +10,7 @@ public class NodeInfoDrawer : MonoBehaviour
 
     [SerializeField] private GameObject inCapturedNodeRectTransform;
     [SerializeField] private GameObject capturedNodeRectTransform;
-    
+
     public void Capture()
     {
         inCapturedNodeRectTransform.gameObject.SetActive(false);
