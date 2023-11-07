@@ -4,20 +4,20 @@ using System.Linq;
 
 namespace LineWars.Model
 {
-    public class BuildAction <TNode, TEdge, TUnit> :
-        UnitAction<TNode, TEdge, TUnit>, 
+    public class BuildAction<TNode, TEdge, TUnit> :
+        UnitAction<TNode, TEdge, TUnit>,
         IBuildAction<TNode, TEdge, TUnit>
-    
-        #region Сonstraints
         where TNode : class, INodeForGame<TNode, TEdge, TUnit>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit> 
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
-        #endregion 
     {
+        public override CommandType CommandType => CommandType.Build;
+        public override ActionType ActionType => ActionType.Targeted;
+
         public BuildAction(TUnit executor) : base(executor)
         {
         }
-        
+
         public bool CanUpRoad([NotNull] TEdge edge, bool ignoreActionPointsCondition = false)
             => CanUpRoad(edge, MyUnit.Node, ignoreActionPointsCondition);
 
@@ -38,18 +38,10 @@ namespace LineWars.Model
 
             CompleteAndAutoModify();
         }
-
-        public override CommandType CommandType => CommandType.Build;
-
-        public Type TargetType => typeof(TEdge);
-        public bool IsMyTarget(ITarget target) => target is TEdge;
-
-        public ICommandWithCommandType GenerateCommand(ITarget target)
-        {
-            return new BuildCommand<TNode, TEdge, TUnit>(this, (TEdge)target);
-        }
-
+        
         public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit> visitor) => visitor.Visit(this);
-        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit> visitor) => visitor.Visit(this);
+
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit> visitor) =>
+            visitor.Visit(this);
     }
 }

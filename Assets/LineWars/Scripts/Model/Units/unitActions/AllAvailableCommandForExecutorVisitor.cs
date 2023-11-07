@@ -6,12 +6,12 @@ using System.Linq;
 namespace LineWars.Model
 {
     public class AllAvailableCommandForExecutorVisitor :
-        IExecutorVisitor<IEnumerable<(ITarget, IEnumerable<ICommandWithCommandType>)>>
+        IExecutorVisitor<IEnumerable<(ITarget, IEnumerable<IActionCommand>)>>
     {
-        public IEnumerable<(ITarget, IEnumerable<ICommandWithCommandType>)> Visit(Unit unit)
+        public IEnumerable<(ITarget, IEnumerable<IActionCommand>)> Visit(Unit unit)
         {
             if (!unit.CanDoAnyAction)
-                return Enumerable.Empty<(ITarget, IEnumerable<ICommandWithCommandType>)>();
+                return Enumerable.Empty<(ITarget, IEnumerable<IActionCommand>)>();
             return unit.Actions
                 .SelectMany(action =>
                     action.Accept(new AllCommandsVisitor<Node, Edge, Unit>(MonoGraph.Instance)))
@@ -22,9 +22,9 @@ namespace LineWars.Model
                     (target, contexts) => (target, contexts));
         }
 
-        public IEnumerable<(ITarget, IEnumerable<ICommandWithCommandType>)> Visit(UnitProjection unitProjection)
+        public IEnumerable<(ITarget, IEnumerable<IActionCommand>)> Visit(UnitProjection unitProjection)
         {
-            return Enumerable.Empty<(ITarget, IEnumerable<ICommandWithCommandType>)>();;
+            return Enumerable.Empty<(ITarget, IEnumerable<IActionCommand>)>();;
         }
     }
 }

@@ -5,7 +5,7 @@ namespace LineWars.Model
 {
     public class CommandContext
     {
-        public ICommandWithCommandType Command;
+        public IActionCommand Command;
         public IExecutor Executor;
         public ITarget Target;
     }

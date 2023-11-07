@@ -59,9 +59,11 @@ namespace LineWars.Model
         private Dictionary<CommandType, IMonoUnitAction<UnitAction<Node, Edge, Unit>>> monoActionsDictionary;
         public IEnumerable<IMonoUnitAction<UnitAction<Node, Edge, Unit>>> MonoActions => monoActionsDictionary.Values;
         public uint MaxPossibleActionRadius { get; private set; }
-        public IReadOnlyCollection<Type> PossibleTargetsTypes { get; private set; }
+        
+        
+        private static readonly ITargetActionGrouper grouper = new DefaultTargetActionGrouper();
         public TargetTypeActionsDictionary TargetTypeActionsDictionary { get; private set; }
-        private readonly ITargetActionGrouper grouper = new DefaultTargetActionGrouper();
+        public IReadOnlyCollection<Type> PossibleTargetsTypes { get; private set; }
 
         #region Properties
         public int Id => index;
@@ -229,6 +231,8 @@ namespace LineWars.Model
         }
 
         public IEnumerable<IUnitAction<Node, Edge, Unit>> Actions => MonoActions;
+        IEnumerable<IExecutorAction<IExecutor>> IExecutorActionSource.Actions => Actions;
+
         public T GetUnitAction<T>() where T : IUnitAction<Node, Edge, Unit>
             => MonoActions.OfType<T>().FirstOrDefault();
 
@@ -239,7 +243,7 @@ namespace LineWars.Model
         }
 
         public bool TryGetCommandForTarget(CommandType priorityType, ITarget target,
-            out ICommandWithCommandType command)
+            out IActionCommand command)
         {
             if (monoActionsDictionary.TryGetValue(priorityType, out var value)
                 && value is ITargetedAction targetedAction

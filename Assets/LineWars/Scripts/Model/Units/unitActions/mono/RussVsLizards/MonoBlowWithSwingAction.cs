@@ -23,7 +23,5 @@ namespace LineWars.Model
         
         public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
         public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit> visitor) => visitor.Visit(this);
-
-        public ICommandWithCommandType GenerateCommand() => new BlowWithSwingCommand<Node, Edge, Unit>(this);
     }
 }

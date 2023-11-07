@@ -232,6 +232,7 @@ namespace LineWars.Model
         }
 
         public IEnumerable<IUnitAction<NodeProjection, EdgeProjection, UnitProjection>> Actions => actionsDictionary.Values;
+        IEnumerable<IExecutorAction<IExecutor>> IExecutorActionSource.Actions => actionsDictionary.Values;
 
         public T GetUnitAction<T>()
             where T : IUnitAction<NodeProjection, EdgeProjection, UnitProjection>
@@ -247,7 +248,7 @@ namespace LineWars.Model
         }
 
         public bool TryGetCommandForTarget(CommandType priorityType, ITarget target,
-            out ICommandWithCommandType command)
+            out IActionCommand command)
         {
             if (actionsDictionary.TryGetValue(priorityType, out var value)
                 && value is ITargetedAction targetedAction

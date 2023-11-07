@@ -2,20 +2,17 @@ namespace LineWars.Controllers
 {
     public partial class CommandsManager
     {
-        public class CommandsManagerIdleState : State
+        public class CommandsManagerIdleState : CommandsManagerState
         {
-            private readonly CommandsManager manager;
-            
-            public CommandsManagerIdleState(CommandsManager manager)
+            public CommandsManagerIdleState(CommandsManager manager) : base(manager)
             {
-                this.manager = manager;
             }
             public override void OnEnter()
             {
                 base.OnEnter();
-                manager.state = CommandsManagerStateType.Idle;
-                manager.Executor = null;
-                manager.Target = null;
+                Manager.state = CommandsManagerStateType.Idle;
+                Manager.Executor = null;
+                Manager.Target = null;
             }
         }
     }

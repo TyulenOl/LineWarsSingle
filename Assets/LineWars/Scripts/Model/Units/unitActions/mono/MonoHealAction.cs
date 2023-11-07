@@ -22,14 +22,6 @@ namespace LineWars.Model
             Action.Heal(target);
             SfxManager.Instance.Play(healSfx);
         }
-
-        public Type TargetType => typeof(Unit);
-        public bool IsMyTarget(ITarget target) => target is Unit;
-
-        public ICommandWithCommandType GenerateCommand(ITarget target)
-        {
-            return new HealCommand<Node, Edge, Unit>(this, (Unit) target);
-        }
         
         protected override HealAction<Node, Edge, Unit> GetAction()
         {

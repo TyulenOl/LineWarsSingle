@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.Events;
 using LineWars.Model;
@@ -8,7 +12,7 @@ namespace LineWars.Controllers
     public partial class CommandsManager : MonoBehaviour
     {
         public static CommandsManager Instance { get; private set; }
-        
+
         private ITarget target;
         private IExecutor executor;
 
@@ -16,14 +20,29 @@ namespace LineWars.Controllers
         private CommandsManagerExecutorState executorState;
         private CommandsManagerTargetState targetState;
         private CommandsManagerIdleState idleState;
+        private CommandsManagerWaitingCommandState waitingCommandState;
+        private CommandsManagerMultiTargetState multiTargetState;
 
-        [SerializeField, ReadOnlyInspector] private CommandsManagerStateType state; 
+        [SerializeField, ReadOnlyInspector] private CommandsManagerStateType state;
 
         public UnityEvent<ITarget, ITarget> TargetChanged;
         public UnityEvent<IExecutor, IExecutor> ExecutorChanged;
         public UnityEvent<IExecutor, ITarget> CommandExecuted;
 
+        private OnWaitingCommandMessage currentOnWaitingCommandMessage;
+        public UnityEvent<OnWaitingCommandMessage> InWaitingCommandState;
+        public OnWaitingCommandMessage CurrentOnWaitingCommandMessage
+        {
+            get => currentOnWaitingCommandMessage;
+            set
+            {
+                InWaitingCommandState.Invoke(value);
+                currentOnWaitingCommandMessage = value;
+            }
+        }
+        
         #region Attributes
+
         public ITarget Target
         {
             get => target;
@@ -35,7 +54,8 @@ namespace LineWars.Controllers
                     TargetChanged.Invoke(previousTarget, target);
             }
         }
-        public IExecutor Executor 
+
+        public IExecutor Executor
         {
             get => executor;
             private set
@@ -48,11 +68,12 @@ namespace LineWars.Controllers
         }
 
         public StateMachine StateMachine => stateMachine;
+
         #endregion
 
         private void Awake()
         {
-            if(Instance == null)
+            if (Instance == null)
             {
                 Instance = this;
             }
@@ -65,6 +86,8 @@ namespace LineWars.Controllers
             executorState = new CommandsManagerExecutorState(this);
             targetState = new CommandsManagerTargetState(this);
             idleState = new CommandsManagerIdleState(this);
+            waitingCommandState = new CommandsManagerWaitingCommandState(this);
+            multiTargetState = new CommandsManagerMultiTargetState(this);
         }
 
         private void Start()
@@ -73,7 +96,7 @@ namespace LineWars.Controllers
             Player.LocalPlayer.TurnChanged += OnTurnChanged;
         }
 
-        private void OnEnable() 
+        private void OnEnable()
         {
             stateMachine.SetState(executorState);
         }
@@ -92,8 +115,20 @@ namespace LineWars.Controllers
 
         private void OnTurnChanged(PhaseType previousPhase, PhaseType currentPhase)
         {
-            if(currentPhase == PhaseType.Idle) return;
+            if (currentPhase == PhaseType.Idle
+                || stateMachine.CurrentState == executorState) return;
             stateMachine.SetState(executorState);
+        }
+        
+        public void SelectCommand([NotNull] IActionCommand command)
+        {
+            if (command == null)
+                throw new ArgumentNullException(nameof(command));
+            if (stateMachine.CurrentState != waitingCommandState)
+                throw new InvalidOperationException();
+            if (!currentOnWaitingCommandMessage.AllCommands.Contains(command))
+                throw new ArgumentException(nameof(command));
+            UnitsController.ExecuteCommand(command);
         }
     }
 }

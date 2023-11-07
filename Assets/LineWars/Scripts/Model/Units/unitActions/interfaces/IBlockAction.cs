@@ -5,7 +5,8 @@ using System.Diagnostics.CodeAnalysis;
 namespace LineWars.Model
 {
     public interface IBlockAction<TNode, TEdge, TUnit>:
-        IUnitAction<TNode, TEdge, TUnit>, ISimpleAction
+        IUnitAction<TNode, TEdge, TUnit>, 
+        ISimpleAction
     
         #region Сonstraints
         where TNode : class, INodeForGame<TNode, TEdge, TUnit>
@@ -21,5 +22,14 @@ namespace LineWars.Model
         void EnableBlock();
         bool CanContrAttack([NotNull] TUnit enemy);
         void ContrAttack([NotNull] TUnit enemy);
+        
+        
+        bool ISimpleAction.CanExecute() => CanBlock();
+        void ISimpleAction.Execute() => Execute();
+
+        IActionCommand ISimpleAction.GenerateCommand()
+        {
+            return new BlockCommand<TNode, TEdge, TUnit>(this);
+        }
     }
 }

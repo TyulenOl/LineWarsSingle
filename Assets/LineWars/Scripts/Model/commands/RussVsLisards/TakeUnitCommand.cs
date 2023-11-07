@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 namespace LineWars.Model
 {
     public class TakeUnitCommand<TNode, TEdge, TUnit> :
-        ICommandWithCommandType
+        IActionCommand
         where TNode : class, INodeForGame<TNode, TEdge, TUnit>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
@@ -49,5 +49,6 @@ namespace LineWars.Model
         }
 
         public CommandType CommandType => action.CommandType;
+        public ActionType ActionType => action.ActionType;
     }
 }
