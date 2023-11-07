@@ -5,9 +5,8 @@ namespace LineWars.Model
 {
     public abstract class TargetActionCommand<TExecutor, TAction, TTarget> : 
         ActionCommand<TExecutor, TAction>
-        where TAction : IExecutorAction<TExecutor>, ITargetedAction<TTarget>
         where TExecutor : IExecutor<TExecutor, TAction>, IExecutor
-        where TTarget: ITarget
+        where TAction : IExecutorAction<TExecutor>, ITargetedAction<TTarget>
     {
         public TTarget Target { get; }
 

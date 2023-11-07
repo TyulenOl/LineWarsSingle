@@ -32,12 +32,7 @@ namespace LineWars.Model
             action.CanBlockChanged += (before, after) => CanBlockChanged?.Invoke(before, after);
             return action;
         }
-
-        public ICommandWithCommandType GenerateCommand()
-        {
-            return new BlockCommand<Node, Edge, Unit>(this);
-        }
-
+        
         public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
         public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit> visitor) => visitor.Visit(this);
     }

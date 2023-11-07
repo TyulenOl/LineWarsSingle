@@ -4,6 +4,8 @@
     {
         Idle,
         Executor,
-        Target
+        Target,
+        WaitingCommand,
+        MultiTarget
     }
 }

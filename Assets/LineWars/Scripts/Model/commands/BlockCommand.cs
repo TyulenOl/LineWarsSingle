@@ -4,44 +4,32 @@ using JetBrains.Annotations;
 namespace LineWars.Model
 {
     public class BlockCommand<TNode, TEdge, TUnit> :
-        ICommandWithCommandType
+        ActionCommand<TUnit, IBlockAction<TNode, TEdge, TUnit>>
         where TNode : class, INodeForGame<TNode, TEdge, TUnit>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
-        private readonly IBlockAction<TNode, TEdge, TUnit> blockAction;
-        private readonly TUnit unit;
-
-        public BlockCommand([NotNull] TUnit unit)
+        public BlockCommand([NotNull] TUnit executor) : base(executor)
         {
-            this.unit = unit;
-            blockAction = unit.TryGetUnitAction<IBlockAction<TNode, TEdge, TUnit>>(out var action)
-                ? action
-                : throw new ArgumentException(
-                    $"{nameof(TUnit)} does not contain {nameof(IBlockAction<TNode, TEdge, TUnit>)}");
         }
 
-        public BlockCommand(IBlockAction<TNode, TEdge, TUnit> blockAction)
+        public BlockCommand([NotNull] IBlockAction<TNode, TEdge, TUnit> action) : base(action)
         {
-            this.blockAction = blockAction;
-            unit = blockAction.MyUnit;
         }
 
-        public void Execute()
+        public override void Execute()
         {
-            blockAction.EnableBlock();
+            Action.EnableBlock();
         }
 
-        public bool CanExecute()
+        public override bool CanExecute()
         {
-            return blockAction.CanBlock();
+            return Action.CanBlock();
         }
 
-        public string GetLog()
+        public override string GetLog()
         {
-            return $"Юнит {unit} встал в защиту";
+            return $"Юнит {Executor} встал в защиту";
         }
-
-        public CommandType CommandType => blockAction.CommandType;
     }
 }

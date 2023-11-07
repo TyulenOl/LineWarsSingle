@@ -13,6 +13,8 @@ namespace LineWars.Model
 
     {
         public override CommandType CommandType => CommandType.ShotUnit;
+        public override ActionType ActionType => ActionType.MultiTargeted;
+
         public TUnit TakenUnit { get; private set; }
 
         public ShotUnitAction(TUnit executor) : base(executor)
@@ -59,14 +61,14 @@ namespace LineWars.Model
         }
 
         public Type TargetType { get; } = typeof(TUnit);
-        public Type[] MyTargets { get; } = {typeof(TUnit), typeof(TNode)};
+        public Type[] AdditionalTargets { get; } = {typeof(TNode)};
 
         public bool IsMyTarget(ITarget target)
         {
             return TakenUnit == null && target is TUnit || TakenUnit != null && target is TNode;
         }
 
-        public ICommandWithCommandType GenerateCommand(ITarget target)
+        public IActionCommand GenerateCommand(ITarget target)
         {
             if (TakenUnit == null)
             {

@@ -17,10 +17,13 @@ namespace LineWars.Model
         private bool isBlocked;
         public IntModifier ContrAttackDamageModifier { get; set; }
         public bool Protection { get;  set; }
-        
         public event Action<bool, bool> CanBlockChanged;
         
+        
         public bool IsBlocked => isBlocked || Protection;
+        
+        public override CommandType CommandType => CommandType.Block;
+        public override ActionType ActionType => ActionType.Simple;
         
         public BlockAction(
             TUnit executor,
@@ -67,14 +70,6 @@ namespace LineWars.Model
             if (before != value)
                 CanBlockChanged?.Invoke(before, value);
         }
-
-        public override CommandType CommandType => CommandType.Block;
-
-        public ICommandWithCommandType GenerateCommand()
-        {
-            return new BlockCommand<TNode, TEdge, TUnit>(this);
-        }
-
         public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit> visitor) => visitor.Visit(this);
         public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit> visitor) => visitor.Visit(this);
     }

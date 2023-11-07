@@ -3,7 +3,8 @@ using JetBrains.Annotations;
 
 namespace LineWars.Model
 {
-    public abstract class ActionCommand<TExecutor, TAction> : ICommandWithCommandType
+    public abstract class ActionCommand<TExecutor, TAction> : 
+        IActionCommand
         where TExecutor : IExecutor<TExecutor, TAction>, IExecutor
         where TAction : IExecutorAction<TExecutor>
     {
@@ -24,6 +25,7 @@ namespace LineWars.Model
         }
 
         public CommandType CommandType => Action.CommandType;
+        public ActionType ActionType => Action.ActionType;
         
         public abstract void Execute();
         public abstract bool CanExecute();

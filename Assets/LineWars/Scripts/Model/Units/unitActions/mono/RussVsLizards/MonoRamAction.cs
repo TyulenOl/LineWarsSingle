@@ -16,7 +16,7 @@ namespace LineWars.Model
             base.Initialize();
             moveAction = Unit.GetUnitAction<MonoMoveAction>();
         }
-        
+
         public int Damage => Action.Damage;
 
         public bool CanRam(Node node)
@@ -56,15 +56,9 @@ namespace LineWars.Model
                     }
                 }
             }
+
             Player.LocalPlayer.RecalculateVisibility();
         }
-
-        public Type TargetType => typeof(Node);
-        public bool IsMyTarget(ITarget target) => target is Node;
-        public ICommandWithCommandType GenerateCommand(ITarget target) => GenerateCommand((Node) target);
-        public ICommandWithCommandType GenerateCommand(Node target) => new RamCommand<Node, Edge, Unit>(this, target);
-        public bool CanExecute(Node target) => CanRam(target);
-        public void Execute(Node target) => Ram(target);
 
         protected override RamAction<Node, Edge, Unit> GetAction()
         {
@@ -72,7 +66,14 @@ namespace LineWars.Model
             return action;
         }
 
-        public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
-        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit> visitor) => visitor.Visit(this);
+        public override void Accept(IMonoUnitVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit> visitor)
+        {
+            return visitor.Visit(this);
+        }
     }
 }

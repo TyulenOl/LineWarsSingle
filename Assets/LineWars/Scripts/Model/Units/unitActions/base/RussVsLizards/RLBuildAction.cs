@@ -5,14 +5,18 @@ using System.Linq;
 namespace LineWars.Model
 {
     public class RLBuildAction<TNode, TEdge, TUnit> :
-            UnitAction<TNode, TEdge, TUnit>,
-            IRLBuildAction<TNode, TEdge, TUnit>
+        UnitAction<TNode, TEdge, TUnit>,
+        IRLBuildAction<TNode, TEdge, TUnit>
         where TNode : class, INodeForGame<TNode, TEdge, TUnit>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
         public IBuildingFactory Factory { get; private set; }
         public IEnumerable<BuildingType> PossibleBuildings { get; }
+        
+        public override CommandType CommandType => CommandType.Build;
+        public override ActionType ActionType => ActionType.NeedAdditionalParameters;
+
         public bool CanBuild(TNode node, BuildingType buildingType)
         {
             return ActionPointsCondition()
@@ -24,8 +28,6 @@ namespace LineWars.Model
         {
             node.Building = Factory.Create(buildingType);
         }
-        
-        public override CommandType CommandType => CommandType.Build;
 
         public RLBuildAction(
             TUnit executor,
@@ -35,8 +37,10 @@ namespace LineWars.Model
             Factory = factory;
             PossibleBuildings = possibleTypes.ToHashSet();
         }
-        
+
         public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit> visitor) => visitor.Visit(this);
-        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit> visitor) => visitor.Visit(this);
+
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit> visitor) =>
+            visitor.Visit(this);
     }
 }

@@ -11,7 +11,7 @@ namespace LineWars.Model
         public bool CanDoAnyAction => CurrentActionPoints > 0;
 
         public bool TryGetCommandForTarget(CommandType priorityType, ITarget target,
-            out ICommandWithCommandType command);
+            out IActionCommand command);
 
         public T Accept<T>(IExecutorVisitor<T> visitor);
     }

@@ -34,10 +34,10 @@ namespace LineWars.Model
         }
 
         public Type TargetType => Action.TargetType;
-        public Type[] MyTargets => Action.MyTargets;
+        public Type[] AdditionalTargets => Action.AdditionalTargets;
         public bool IsMyTarget(ITarget target) => Action.IsMyTarget(target);
 
-        public ICommandWithCommandType GenerateCommand(ITarget target)
+        public IActionCommand GenerateCommand(ITarget target)
         {
             if (TakenUnit == null)
             {

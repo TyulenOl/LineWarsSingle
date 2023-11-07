@@ -5,9 +5,8 @@ using System.Linq;
 namespace LineWars.Model
 {
     public class RamAction<TNode, TEdge, TUnit> :
-            SimpleTargetedUnitAction<TNode, TEdge, TUnit, TNode>,
-            IRamAction<TNode, TEdge, TUnit>
-
+        UnitAction<TNode, TEdge, TUnit>,
+        IRamAction<TNode, TEdge, TUnit>
         where TNode : class, INodeForGame<TNode, TEdge, TUnit>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
@@ -15,15 +14,17 @@ namespace LineWars.Model
     {
         private readonly IMoveAction<TNode, TEdge, TUnit> moveAction;
 
-        public override CommandType CommandType => CommandType.Ram;
-
         public int Damage { get; }
+
+        public override CommandType CommandType => CommandType.Ram;
+        public override ActionType ActionType => ActionType.Targeted;
 
         public RamAction(TUnit executor, int damage) : base(executor)
         {
             Damage = damage;
             moveAction = MyUnit.GetUnitAction<IMoveAction<TNode, TEdge, TUnit>>();
         }
+
         public bool CanRam(TNode node)
         {
             var line = MyUnit.Node.GetLine(node);
@@ -86,11 +87,15 @@ namespace LineWars.Model
             moveAction.MoveTo(node);
             CompleteAndAutoModify();
         }
-        public override bool CanExecute(TNode target) => CanRam(target);
-        public override void Execute(TNode target) => Ram(target);
-        public override ICommandWithCommandType GenerateCommand(TNode target) => new RamCommand<TNode, TEdge, TUnit>(this, target);
 
-        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit> visitor) => visitor.Visit(this);
-        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit> visitor) => visitor.Visit(this);
+        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit> visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit> visitor)
+        {
+            return visitor.Visit(this);
+        }
     }
 }

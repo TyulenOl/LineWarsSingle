@@ -20,7 +20,6 @@ namespace LineWars.Model
             //TODO: анимации и звуки
             Action.EnableBlock();
         }
-        public ICommandWithCommandType GenerateCommand() => new RLBlockCommand<Node, Edge, Unit>(this);
 
         protected override RLBlockAction<Node, Edge, Unit> GetAction()
         {

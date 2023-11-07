@@ -11,8 +11,9 @@ namespace LineWars.Model
 
         where TNode : class, INodeForGame<TNode, TEdge, TUnit>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
-        where TUnit : class, IUnit<TNode, TEdge, TUnit> 
+        where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
+        public override ActionType ActionType => ActionType.Targeted;
         public bool AttackLocked { get; protected set; }
         public int Damage { get; protected set; }
         public bool IsPenetratingDamage { get; protected set; }
@@ -44,28 +45,21 @@ namespace LineWars.Model
         }
 
 
-        public virtual bool CanAttackFrom(TNode node, TUnit enemy, bool ignoreActionPointsCondition = false) =>
-            false;
-
-        public virtual bool CanAttackFrom(TNode node, TEdge edge, bool ignoreActionPointsCondition = false) =>
-            false;
-
+        public virtual bool CanAttackFrom(TNode node, TUnit enemy, bool ignoreActionPointsCondition = false)
+        {
+            return false;
+        }
+        public virtual bool CanAttackFrom(TNode node, TEdge edge, bool ignoreActionPointsCondition = false)
+        {
+            return false;
+        }
         public virtual void Attack(TUnit unit)
         {
         }
-
         public virtual void Attack(TEdge edge)
         {
         }
-
-        public Type TargetType => typeof(IAlive);
-        public bool IsMyTarget(ITarget target) => target is IAlive;
-
-        public ICommandWithCommandType GenerateCommand(ITarget target)
-        {
-            return new AttackCommand<TNode, TEdge, TUnit>(this, (IAlive) target);
-        }
-
+        
         protected AttackAction(TUnit executor, int damage, bool isPenetratingDamage) : base(executor)
         {
             Damage = damage;

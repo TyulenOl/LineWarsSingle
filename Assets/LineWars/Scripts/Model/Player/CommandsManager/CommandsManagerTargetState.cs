@@ -8,19 +8,17 @@ namespace LineWars.Controllers
 {
     public partial class CommandsManager
     {
-        public class CommandsManagerTargetState : State
+        public class CommandsManagerTargetState : CommandsManagerState
         {
-            private CommandsManager manager;
             private bool isCancelable;
 
-            public CommandsManagerTargetState(CommandsManager manager)
+            public CommandsManagerTargetState(CommandsManager manager) : base(manager)
             {
-                this.manager = manager;
             }
 
             public override void OnEnter()
             {
-                manager.state = CommandsManagerStateType.Target;
+                Manager.state = CommandsManagerStateType.Target;
                 Selector.SelectedObjectChanged += OnSelectedObjectChanged;
                 isCancelable = true;
             }
@@ -28,7 +26,6 @@ namespace LineWars.Controllers
             public override void OnExit()
             {
                 Selector.SelectedObjectChanged -= OnSelectedObjectChanged;
-                
             }
 
             private void OnSelectedObjectChanged(GameObject lastObject, GameObject newObject)
@@ -37,7 +34,7 @@ namespace LineWars.Controllers
                     return;
                 if (Selector.SelectedObjects
                     .Any(x => x.TryGetComponent(out IExecutor executor)
-                              && executor == manager.executor))
+                              && executor == Manager.executor))
                 {
                     CancelExecutor();
                     return;
@@ -49,50 +46,51 @@ namespace LineWars.Controllers
                     .ToArray();
 
                 var targetsAndCommands = targets
-                    .Select(x => (x,GetAvailableCommandForPair(manager.executor, x)))
-                    .Where(x => x.Item2 != null)
+                    .SelectMany(target => GetAllAvailableCommandsForPair(Manager.executor, target)
+                        .Select(command => (target, command)))
                     .ToArray();
-                
-                if (targetsAndCommands.Length == 0)
+                switch (targetsAndCommands.Length)
                 {
-                    
-                }
-                else if (targetsAndCommands.Length == 1)
-                {
-                    manager.Target = targetsAndCommands[0].Item1;
-                    UnitsController.ExecuteCommand(targetsAndCommands[0].Item2);
-                    manager.CommandExecuted.Invoke(manager.executor, manager.target);
-                    isCancelable = false;
-                    manager.target = null;
-                }
-                else
-                {
-                    throw new NotImplementedException();
+                    case 0:
+                        break;
+                    case 1:
+                        Manager.Target = targetsAndCommands[0].target;
+                        Manager.CommandExecuted.Invoke(Manager.executor, Manager.target);
+                        isCancelable = false;
+                        Manager.target = null;
+                        UnitsController.ExecuteCommand(targetsAndCommands[0].Item2);
+                        break;
+                    default:
+                        isCancelable = false;
+                        Manager.CurrentOnWaitingCommandMessage = new OnWaitingCommandMessage(targetsAndCommands, newObject.GetComponent<Node>());
+                        Manager.stateMachine.SetState(Manager.waitingCommandState);
+                        break;
                 }
             }
 
-
-            private ICommand GetAvailableCommandForPair(IExecutor executor, ITarget target)
+            private IEnumerable<IActionCommand> GetAllAvailableCommandsForPair(
+                IExecutor executor,
+                ITarget target)
             {
-                foreach (var commandType in target.CommandPriorityData)
+                if (executor is IExecutorActionSource source)
                 {
-                    if (executor.TryGetCommandForTarget(commandType, target, out var command)
-                        && command.CanExecute())
-                    {
-                        return command;
-                    }
+                    return source.Actions
+                        .OfType<ITargetedAction>()
+                        .Where(x => x.IsMyTarget(target))
+                        .Select(x => x.GenerateCommand(target))
+                        .Where(x => x.CanExecute());
                 }
 
-                return null;
+                return Enumerable.Empty<IActionCommand>();
             }
 
             private void CancelExecutor()
             {
                 if (!isCancelable) return;
-                manager.Executor = null;
+                Manager.Executor = null;
                 Debug.Log("EXECUTOR CANCELED");
 
-                manager.stateMachine.SetState(manager.executorState);
+                Manager.stateMachine.SetState(Manager.executorState);
             }
         }
     }

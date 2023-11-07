@@ -51,7 +51,7 @@ namespace LineWars.Model
         public Type TargetType => typeof(IAlive);
         public bool IsMyTarget(ITarget target) => target is IAlive;
 
-        public ICommandWithCommandType GenerateCommand(ITarget target)
+        public IActionCommand GenerateCommand(ITarget target)
         {
             return new AttackCommand<Node, Edge, Unit>(this, (IAlive) target);
         }
