@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace LineWars.Extensions
-{
+
     public static class IEnumerableExtension
     {
         public static Stack<T> ToStack<T>(this IEnumerable<T> enumerable, bool useReverse = false)
@@ -39,4 +38,3 @@ namespace LineWars.Extensions
             return enumerable.Aggregate((i1, i2) => comparison(i1, i2) < 0 ? i1 : i2);
         }
     }
-}

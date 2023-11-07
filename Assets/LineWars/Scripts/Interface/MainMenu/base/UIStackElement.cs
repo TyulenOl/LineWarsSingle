@@ -8,6 +8,7 @@ namespace LineWars
     public class UIStackElement : MonoBehaviour
     {
         private bool isOpen;
+
         protected virtual void Awake()
         {
             if (!isOpen)
@@ -27,4 +28,3 @@ namespace LineWars
         }
     }
 }
-

@@ -6,9 +6,9 @@ namespace LineWars.Scripts.Interface
     {
         private static Map Instance { get; set; }
         private static SpriteRenderer mapSpriteRenderer;
-    
+
         public static SpriteRenderer MapSpriteRenderer => Instance != null ? mapSpriteRenderer : null;
-        
+
 
         private void Awake()
         {

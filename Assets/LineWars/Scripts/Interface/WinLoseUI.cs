@@ -7,6 +7,7 @@ namespace LineWars.Interface
         public static bool isWin;
         [SerializeField] private GameObject winPanel;
         [SerializeField] private GameObject losePanel;
+
         private void Awake()
         {
             if (isWin)
@@ -23,5 +24,4 @@ namespace LineWars.Interface
 
         public void ToMainMenu() => SceneTransition.LoadScene(SceneName.MainMenu);
     }
-
 }

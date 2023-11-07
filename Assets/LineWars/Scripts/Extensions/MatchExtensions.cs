@@ -2,8 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace LineWars.Extensions
-{
+
     public static class MatchExtension
     { 
         public static Guid ToGuid(this string id)
@@ -15,4 +14,3 @@ namespace LineWars.Extensions
             return new Guid(hasBytes);
         }
     }
-}

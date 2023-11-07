@@ -8,12 +8,12 @@ namespace LineWars.Interface
     {
         [SerializeField] private VolumeType channelType;
         [SerializeField] private Scrollbar scrollbar;
-        
+
 
         private void Start()
         {
             var volume = VolumeUpdater.Instance.GetVolume(channelType);
-            if(scrollbar == null)
+            if (scrollbar == null)
                 Debug.Log(name);
             scrollbar.value = volume;
             scrollbar.onValueChanged.AddListener(OnValueChanged);
@@ -25,4 +25,3 @@ namespace LineWars.Interface
         }
     }
 }
-

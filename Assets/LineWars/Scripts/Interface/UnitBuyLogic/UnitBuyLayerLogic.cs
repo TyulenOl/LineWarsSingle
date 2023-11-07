@@ -28,8 +28,8 @@ public class UnitBuyLayerLogic : MonoBehaviour
     }
 
     public UnitBuyPreset CurrentPreset { get; set; }
-    
-    
+
+
     private void Start()
     {
         PhaseManager.Instance.PhaseChanged.AddListener(OnPhaseChanged);
@@ -37,7 +37,7 @@ public class UnitBuyLayerLogic : MonoBehaviour
 
     private void OnPhaseChanged(PhaseType phaseTypeOld, PhaseType phaseTypeNew)
     {
-        if(phaseTypeNew != PhaseType.Buy) return;
+        if (phaseTypeNew != PhaseType.Buy) return;
         CurrentPreset = null;
         ChosenUnitPresetDrawer = null;
         buyUnitsLayer.gameObject.SetActive(true);

@@ -25,13 +25,13 @@ namespace LineWars
 
         private void OnEnable()
         {
-            if(companyElementButton != null)
+            if (companyElementButton != null)
                 companyElementButton.onClick.AddListener(OnClick);
         }
 
         private void OnDisable()
         {
-            if(companyElementButton != null)
+            if (companyElementButton != null)
                 companyElementButton.onClick.RemoveListener(OnClick);
         }
 
@@ -53,7 +53,7 @@ namespace LineWars
                 Debug.LogError($"{nameof(missionsProgress)} is null on {name}");
 
             //if (companyElementButton == null)
-                //Debug.LogError($"{nameof(companyElementButton)} is null on {name}");
+            //Debug.LogError($"{nameof(companyElementButton)} is null on {name}");
         }
 
         public void Initialize(CompanyState companyState, Action<CompanyState> clicked)

@@ -16,14 +16,14 @@ namespace LineWars.Interface
         [SerializeField] private EnemyTurnPanel enemyTurnPanel;
         [SerializeField] private List<Button> buttonsToBlockIfEnemyTurn;
 
-        private List<UnitDrawer> activeUnitDrawersHash = new ();
+        private List<UnitDrawer> activeUnitDrawersHash = new();
 
         private IExecutor currentExecutor;
-        private List<TargetDrawer> currentDrawers = new ();
+        private List<TargetDrawer> currentDrawers = new();
 
         private void Awake()
         {
-            if(Instance == null)
+            if (Instance == null)
             {
                 Instance = this;
             }
@@ -37,7 +37,7 @@ namespace LineWars.Interface
         private void Start()
         {
             CommandsManager.Instance.ExecutorChanged.AddListener(OnExecutorChanged);
-            
+
             SubscribeEventForGameReferee();
         }
 
@@ -52,20 +52,20 @@ namespace LineWars.Interface
                         scoreText.text = $"{after}/{scoreReferee.ScoreForWin}";
                     }
                 };
-                
+
                 scoreText.text = $"{scoreReferee.GetScoreForPlayer(Player.LocalPlayer)}/{scoreReferee.ScoreForWin}";
             }
         }
-        
+
         private void OnExecutorChanged(IExecutor before, IExecutor after)
         {
             if (before != null)
                 before.AnyActionCompleted -= ReDrawCurrentTargets;
-            
+
             currentExecutor = after;
             ReDrawCurrentTargets();
             ReDrawAllAvailability(before, after);
-            if(currentExecutor == null) return;
+            if (currentExecutor == null) return;
             currentExecutor.AnyActionCompleted += ReDrawCurrentTargets;
         }
 
@@ -74,7 +74,7 @@ namespace LineWars.Interface
             var unitsToReDraw = Player.LocalPlayer.GetAllUnitsByPhase(PhaseManager.Instance.CurrentPhase);
             if (after is null)
             {
-                if(before is { CanDoAnyAction: true })
+                if (before is {CanDoAnyAction: true})
                     ReDrawAllAvailability(unitsToReDraw, true);
             }
             else
@@ -87,7 +87,7 @@ namespace LineWars.Interface
         {
             foreach (var unit in units)
             {
-                if(!unit.CanDoAnyAction) continue;
+                if (!unit.CanDoAnyAction) continue;
                 var drawer = unit.GetComponent<UnitDrawer>();
                 drawer.ReDrawAvailability(isAvailable);
                 activeUnitDrawersHash.Add(drawer);
@@ -102,14 +102,15 @@ namespace LineWars.Interface
                 button.interactable = !isEnemyTurn;
             }
         }
-        
+
         private void ReDrawCurrentTargets()
         {
             foreach (var currentDrawer in currentDrawers)
             {
-                if(currentDrawer == null) continue;
+                if (currentDrawer == null) continue;
                 currentDrawer.ReDraw(CommandType.None);
             }
+
             currentDrawers = new List<TargetDrawer>();
             if (currentExecutor != null)
             {

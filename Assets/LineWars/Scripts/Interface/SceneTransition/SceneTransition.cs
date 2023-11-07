@@ -132,7 +132,7 @@ public class SceneTransition : MonoBehaviour
 
     private void UpdateProgress(float value)
     {
-        if(loadingPercent != null)
+        if (loadingPercent != null)
             loadingPercent.text = $"{Math.Round(value * 100)}%";
         loadingProgress.fillAmount = value;
     }

@@ -9,7 +9,7 @@ namespace LineWars
     {
         [SerializeField] private GameObject guide;
         private const string KEY = "Guide";
-        
+
         public void Activate()
         {
             var isActive = PlayerPrefs.HasKey(KEY) && PlayerPrefs.GetInt(KEY) == 1;
