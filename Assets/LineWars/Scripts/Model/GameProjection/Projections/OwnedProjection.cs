@@ -4,7 +4,9 @@ namespace LineWars.Model
 {
     public abstract class OwnedProjection : IOwned
     {
+        
         private BasePlayerProjection owner;
+        public GameProjection Game { get; set; }
         public int OwnerId => owner?.Id ?? -1;
         public BasePlayerProjection Owner 
         {
@@ -18,8 +20,7 @@ namespace LineWars.Model
                     OwnerChanged?.Invoke(this, oldOwner, value);
                     if(oldOwner != null)
                         oldOwner.RemoveOwned(this);
-                }    
-                    
+                }          
             }
         }
 
@@ -44,7 +45,16 @@ namespace LineWars.Model
 
         public void ConnectTo(int basePlayerID)
         {
-            throw new NotImplementedException();
+            var otherOwnerId = Owner != null ? Owner.Id : -1;
+            if (otherOwnerId != -1)
+            {
+                Owner = null;
+                if(otherOwnerId != basePlayerID)
+                    Game.PlayersIndexList[otherOwnerId].RemoveOwned(this);
+            }
+
+            owner = Game.PlayersIndexList[basePlayerID];
+            owner.AddOwned(this);
         }
     }
 }
