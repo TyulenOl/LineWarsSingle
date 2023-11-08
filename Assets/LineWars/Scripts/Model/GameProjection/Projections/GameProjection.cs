@@ -9,44 +9,42 @@ namespace LineWars.Model
     public class GameProjection : IReadOnlyGameProjection
     { 
         private static int cycleTurnFailCounter = 1000;
-        private List<int> playersSequence;
-        private Dictionary<BasePlayer, BasePlayerProjection> originalToProjectionPlayers;
-        public GraphProjection Graph { get; private set; }
-        public PhaseType CurrentPhase { get; private set; }     
-        public PhaseOrderData PhaseOrder { get; private set; }
-        public int CurrentPlayerPosition { get; private set; }
-        public IndexList<BasePlayerProjection> PlayersIndexList { get; private set; }
+        public Dictionary<BasePlayer, BasePlayerProjection> OriginalToProjectionPlayers { get; set; }
+        public List<int> PlayersSequence { get; set; }
+        public IndexList<BasePlayerProjection> PlayersIndexList { get; set; }
+        public int CurrentPlayerPosition { get; set; }
+        public GraphProjection Graph { get; set; }
+        public PhaseType CurrentPhase { get; set; }     
+        public PhaseOrderData PhaseOrder { get; set; }
 
         public BasePlayerProjection CurrentPlayer => 
-            PlayersIndexList[playersSequence[CurrentPlayerPosition]];
-        public IReadOnlyList<int> PlayersSequence => playersSequence;
+            PlayersIndexList[PlayersSequence[CurrentPlayerPosition]];
+  
         IReadOnlyIndexList<BasePlayerProjection> IReadOnlyGameProjection.PlayersIndexList 
             => PlayersIndexList;
+        IReadOnlyList<int> IReadOnlyGameProjection.PlayersSequence => PlayersSequence;
 
         public IndexList<NodeProjection> NodesIndexList => Graph.NodesIndexList;
         public IndexList<EdgeProjection> EdgesIndexList => Graph.EdgesIndexList;
         public IndexList<UnitProjection> UnitsIndexList => Graph.UnitsIndexList;
-        public IReadOnlyDictionary<BasePlayer, BasePlayerProjection> OriginalToProjectionPlayers 
-            => originalToProjectionPlayers;
 
-        public GameProjection(IEnumerable<BasePlayerProjection> players, GraphProjection graph,
-            PhaseType phase, int playerPosition, PhaseOrderData orderData)
+        public GameProjection()
         {
-            originalToProjectionPlayers = new Dictionary<BasePlayer, BasePlayerProjection>();
+
+        }
+
+        public void SetPlayers(IEnumerable<BasePlayerProjection> players)
+        {
+            OriginalToProjectionPlayers = new Dictionary<BasePlayer, BasePlayerProjection>();
             PlayersIndexList = new IndexList<BasePlayerProjection>();
-            playersSequence = new List<int>();
+            PlayersSequence = new List<int>();
             foreach (var player in players)
             {
                 PlayersIndexList.Add(player.Id, player);
-                playersSequence.Add(player.Id);
+                PlayersSequence.Add(player.Id);
                 player.Game = this;
-                originalToProjectionPlayers[player.Original] = player;
+                OriginalToProjectionPlayers[player.Original] = player;
             }
-
-            Graph = graph;
-            CurrentPhase = phase;
-            CurrentPlayerPosition = playerPosition;
-            PhaseOrder = orderData;
         }
         public void SimulateReplenish()
         {
@@ -73,7 +71,7 @@ namespace LineWars.Model
             {
                 tempPlayerPosition = (tempPlayerPosition + 1) % PlayersIndexList.Count; 
 
-                var tempPlayerId = playersSequence[tempPlayerPosition];
+                var tempPlayerId = PlayersSequence[tempPlayerPosition];
                 var tempPlayer = PlayersIndexList[tempPlayerId];
                 if (CanPlayerPlayTurn(tempPlayer, phase))
                     break;
@@ -136,57 +134,6 @@ namespace LineWars.Model
             }
 
             return false;
-        }
-
-        public static GameProjection GetCopy(IReadOnlyGameProjection oldProjection)
-        {
-            var oldPlayersToNew = new Dictionary<BasePlayerProjection, BasePlayerProjection>();
-            var newPlayerList = new List<BasePlayerProjection>();
-            foreach (var oldPlayer in oldProjection.PlayersIndexList.Values)
-            {
-                var newPlayerProjection = new BasePlayerProjection(oldPlayer);
-                newPlayerList.Add(newPlayerProjection);
-                oldPlayersToNew[oldPlayer] = newPlayerProjection;
-
-                if (newPlayerProjection.OwnedObjects.Count != 0) throw new ArgumentException("YOU FUCKING IDIOT");
-            }
-
-
-            var newGraphProjection = GraphProjection.GetCopy(oldProjection.Graph, oldPlayersToNew);
-
-            foreach(var oldNewPlayerPair in oldPlayersToNew)
-            {
-                var baseId = oldNewPlayerPair.Key.Base.Id;
-                var newBase = newGraphProjection.NodesIndexList[baseId];
-                oldNewPlayerPair.Value.Base = newBase;
-            }
-            return new GameProjection(newPlayerList, newGraphProjection, oldProjection.CurrentPhase, 
-                oldProjection.CurrentPlayerPosition, oldProjection.PhaseOrder);
-        }
-
-        public static GameProjection 
-            GetProjectionFromMono(IEnumerable<BasePlayer> players, MonoGraph graph, 
-            PhaseManager phaseManager)
-        {
-            if(phaseManager.CurrentActor is not BasePlayer currentPlayer)    
-                throw new ArgumentException("Cannot get projection: IActor is in control");
-
-            var playerDict = new Dictionary<BasePlayer, BasePlayerProjection>();
-            var playerList = new List<BasePlayerProjection>();
-            foreach (var player in players)
-            {
-                var playerProjection = new BasePlayerProjection(player);
-                playerDict[player] = playerProjection;
-                playerList.Add(playerProjection);
-            }
-
-            var graphProjection = GraphProjection.GetProjectionFromMono(graph, playerDict);
-            var currentPlayerProjection = playerDict[currentPlayer];
-
-            var currentPlayerIndex = 
-                playerList.FindIndex((projection) => projection == currentPlayerProjection);
-            return new GameProjection(playerList, graphProjection, 
-                phaseManager.CurrentPhase, currentPlayerIndex, phaseManager.OrderData);
         }
     }
 

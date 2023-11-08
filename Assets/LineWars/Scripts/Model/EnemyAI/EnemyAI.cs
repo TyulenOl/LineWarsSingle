@@ -57,8 +57,7 @@ namespace LineWars.Model
         public async void ExecuteAITurn(PhaseType phase)
         {
             var gameProjection = 
-                GameProjection.GetProjectionFromMono(SingleGame.Instance.AllPlayers.Values, MonoGraph.Instance, PhaseManager.Instance);
-
+                GameProjectionCreator.FromMono(SingleGame.Instance.AllPlayers.Values, MonoGraph.Instance, PhaseManager.Instance);
             var possibleCommands = CommandBlueprintCollector.CollectAllCommands(gameProjection);
             var tasksList = new List<Task<(int, List<ICommandBlueprint>)>>();
             foreach ( var command in possibleCommands )
@@ -103,7 +102,7 @@ namespace LineWars.Model
                 throw new ArgumentException();
 
             currentExecutorId = blueprint.ExecutorId;
-            var newGame = GameProjection.GetCopy(gameProjection);
+            var newGame = GameProjectionCreator.FromProjection(gameProjection);
             var thisCommand = blueprint.GenerateCommand(newGame);
             thisCommand.Execute();
 

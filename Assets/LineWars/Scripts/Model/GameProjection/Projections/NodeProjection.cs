@@ -9,19 +9,17 @@ namespace LineWars.Model
         : OwnedProjection, INodeForGame<NodeProjection, EdgeProjection, UnitProjection>, 
         IReadOnlyNodeProjection, INumbered
     {
-        private List<EdgeProjection> edges;
         private UnitProjection leftUnit;
         private UnitProjection rightUnit;
 
-        public int Score { get; private set; }
-        public Node Original { get; private set; } 
-        public CommandPriorityData CommandPriorityData { get; private set; }
-        public IEnumerable<EdgeProjection> Edges => edges;
-        public bool IsBase { get; private set; }
-        public int Id { get; private set; }
-        public int Visibility { get; private set; }
-        public int ValueOfHidden { get; private set; }
-
+        public int Score { get; set; }
+        public Node Original { get; set; } 
+        public CommandPriorityData CommandPriorityData { get; set; }
+        public List<EdgeProjection> EdgesList { get; set; }
+        public bool IsBase { get; set; }
+        public int Id { get; set; }
+        public int Visibility { get; set; }
+        public int ValueOfHidden { get; set; }
 
         public UnitProjection LeftUnit 
         {
@@ -42,49 +40,23 @@ namespace LineWars.Model
             }
         }
 
+
+        public IEnumerable<EdgeProjection> Edges => EdgesList;
         public IBuilding Building { get; set; }
         public IEnumerable<UnitProjection> Units => new[] {LeftUnit, RightUnit}
             .Where(x => x != null)
             .Distinct();
 
         public Action<UnitProjection> UnitAdded;
-        public NodeProjection(CommandPriorityData commandPriorityData,
-            bool isBase, int index, int score, int visibility,
-            int valueOfHidden, Node original = null,
-            IEnumerable<EdgeProjection> edgeProjections = null, UnitProjection leftUnit = null,
-            UnitProjection rightUnit = null)
-        {
-            CommandPriorityData = commandPriorityData;
-            IsBase = isBase;
-            Id = index;
-            Score = score;
-            Visibility = visibility;
-            ValueOfHidden = valueOfHidden;
-            this.leftUnit = leftUnit;
-            this.rightUnit = rightUnit;
-            Original = original;
-            edges = edgeProjections == null ? 
-                new List<EdgeProjection>() : new List<EdgeProjection>(edgeProjections);
-        }
 
-        public NodeProjection(IReadOnlyNodeProjection node, IEnumerable<EdgeProjection> edges = null,
-            UnitProjection leftUnit = null, UnitProjection rightUnit = null) 
-            : this(node.CommandPriorityData, node.IsBase,
-            node.Id, node.Score, node.Visibility, node.ValueOfHidden,
-            node.Original, edges, leftUnit, rightUnit)
+        public NodeProjection()
         {
-        }
 
-        public NodeProjection(Node original, int score, IEnumerable<EdgeProjection> edgeProjections = null, UnitProjection leftUnit = null,
-            UnitProjection rightUnit = null) 
-            : this(original.CommandPriorityData, original.IsBase, original.Id, score,
-                  original.Visibility, original.ValueOfHidden, original, edgeProjections, leftUnit, rightUnit)
-        {
         }
 
         public IEnumerable<NodeProjection> GetNeighbors()
         {
-            foreach (var edge in Edges)
+            foreach (var edge in EdgesList)
             {
                 if (edge.SecondNode == this) yield return edge.FirstNode;
                 else yield return edge.SecondNode;
@@ -96,7 +68,7 @@ namespace LineWars.Model
             if (edge.FirstNode != this && edge.SecondNode != this)
                 throw new ArgumentException();
 
-            edges.Add(edge);
+            EdgesList.Add(edge);
         }
         
         public T Accept<T>(INodeVisitor<T> visitor) => visitor.Visit(this);
