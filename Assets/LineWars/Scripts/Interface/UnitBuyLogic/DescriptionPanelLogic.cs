@@ -19,6 +19,7 @@ public class DescriptionPanelLogic : MonoBehaviour
             unitDescription.text = "";
             return;
         }
+
         unitName.text = unitBuyPreset.Name;
         unitDescription.text = unitBuyPreset.Description;
     }

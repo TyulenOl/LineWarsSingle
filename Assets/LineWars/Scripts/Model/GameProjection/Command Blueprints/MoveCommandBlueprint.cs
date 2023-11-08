@@ -15,10 +15,7 @@ namespace LineWars.Model
             var unit = projection.UnitsIndexList[ExecutorId];
             var node = projection.NodesIndexList[NodeId];
 
-            return new MoveCommand
-                <NodeProjection, EdgeProjection, UnitProjection, 
-                OwnedProjection, BasePlayerProjection>
-                (unit, node);
+            return new MoveCommand<NodeProjection, EdgeProjection, UnitProjection>(unit, node);
         }
 
         public ICommand GenerateMonoCommand(GameProjection projection)
@@ -26,7 +23,7 @@ namespace LineWars.Model
             var unit = projection.UnitsIndexList[ExecutorId].Original;
             var node = projection.NodesIndexList[NodeId].Original;
 
-            return new MoveCommand<Node, Edge, Unit, Owned, BasePlayer>(unit, node);
+            return new MoveCommand<Node, Edge, Unit>(unit, node);
         }
     }
 }

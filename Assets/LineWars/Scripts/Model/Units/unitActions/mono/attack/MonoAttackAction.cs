@@ -9,8 +9,8 @@ namespace LineWars.Model
     [DisallowMultipleComponent]
     public abstract class MonoAttackAction<TAction> :
         MonoUnitAction<TAction>,
-        IAttackAction<Node, Edge, Unit, Owned, BasePlayer>
-        where TAction : AttackAction<Node, Edge, Unit, Owned, BasePlayer>
+        IAttackAction<Node, Edge, Unit>
+        where TAction : AttackAction<Node, Edge, Unit>
     {
         [SerializeField] protected SFXData attackSfx;
 
@@ -51,9 +51,9 @@ namespace LineWars.Model
         public Type TargetType => typeof(IAlive);
         public bool IsMyTarget(ITarget target) => target is IAlive;
 
-        public ICommandWithCommandType GenerateCommand(ITarget target)
+        public IActionCommand GenerateCommand(ITarget target)
         {
-            return new AttackCommand<Node, Edge, Unit, Owned, BasePlayer>(this, (IAlive) target);
+            return new AttackCommand<Node, Edge, Unit>(this, (IAlive) target);
         }
     }
 }

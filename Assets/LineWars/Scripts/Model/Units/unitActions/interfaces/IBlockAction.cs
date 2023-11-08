@@ -4,15 +4,14 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace LineWars.Model
 {
-    public interface IBlockAction<TNode, TEdge, TUnit, TOwned, TPlayer>:
-        IUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>, ISimpleAction
+    public interface IBlockAction<TNode, TEdge, TUnit>:
+        IUnitAction<TNode, TEdge, TUnit>, 
+        ISimpleAction
     
         #region Сonstraints
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer> 
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TOwned : class, IOwned<TOwned, TPlayer>
-        where TPlayer: class, IBasePlayer<TOwned, TPlayer>
+        where TNode : class, INodeForGame<TNode, TEdge, TUnit>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit> 
+        where TUnit : class, IUnit<TNode, TEdge, TUnit>
         #endregion 
     {
         bool IsBlocked { get; }
@@ -23,5 +22,14 @@ namespace LineWars.Model
         void EnableBlock();
         bool CanContrAttack([NotNull] TUnit enemy);
         void ContrAttack([NotNull] TUnit enemy);
+        
+        
+        bool ISimpleAction.CanExecute() => CanBlock();
+        void ISimpleAction.Execute() => Execute();
+
+        IActionCommand ISimpleAction.GenerateCommand()
+        {
+            return new BlockCommand<TNode, TEdge, TUnit>(this);
+        }
     }
 }

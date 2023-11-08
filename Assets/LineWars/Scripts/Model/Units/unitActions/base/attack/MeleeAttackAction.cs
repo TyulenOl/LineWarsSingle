@@ -5,23 +5,19 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    public sealed class MeleeAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> :
-            AttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>,
-            IMeleeAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>
+    public sealed class MeleeAttackAction<TNode, TEdge, TUnit> :
+            AttackAction<TNode, TEdge, TUnit>,
+            IMeleeAttackAction<TNode, TEdge, TUnit>
 
-        #region Сonstraints
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TOwned : class, IOwned<TOwned, TPlayer>
-        where TPlayer : class, IBasePlayer<TOwned, TPlayer>
-        #endregion
+        where TNode : class, INodeForGame<TNode, TEdge, TUnit>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
+        where TUnit : class, IUnit<TNode, TEdge, TUnit>
 
     {
         public UnitBlockerSelector BlockerSelector { get; }
         public bool Onslaught { get; }
         
-        private readonly IMoveAction<TNode, TEdge, TUnit, TOwned, TPlayer> moveAction;
+        private readonly IMoveAction<TNode, TEdge, TUnit> moveAction;
         
         public override CommandType CommandType => CommandType.MeleeAttack;
 
@@ -34,7 +30,7 @@ namespace LineWars.Model
             var line = node.GetLine(enemy.Node);
             return !AttackLocked
                    && Damage > 0
-                   && enemy.Owner != MyUnit.Owner
+                   && enemy.OwnerId != MyUnit.OwnerId
                    && line != null
                    && MyUnit.CanMoveOnLineWithType(line.LineType)
                    && (ignoreActionPointsCondition || ActionPointsCondition());
@@ -50,8 +46,7 @@ namespace LineWars.Model
             // иначе выбрать того, кто будет блокировать урон
             else
             {
-                var selectedUnit =
-                    BlockerSelector.SelectBlocker<TNode, TEdge, TUnit, TOwned, TPlayer>(enemy, neighbour);
+                var selectedUnit = BlockerSelector.SelectBlocker<TNode, TEdge, TUnit>(enemy, neighbour);
                 AttackUnitButIgnoreBlock(selectedUnit);
                 if (selectedUnit != enemy)
                 {
@@ -78,7 +73,7 @@ namespace LineWars.Model
 
         private void MeleeAttack(TUnit target)
         {
-            var enemyDamage = target.GetMaxDamage<TNode, TEdge, TUnit, TOwned, TPlayer>();
+            var enemyDamage = target.GetMaxDamage<TNode, TEdge, TUnit>();
             target.DealDamageThroughArmor(Damage);
             if(!target.IsDied)
                 MyUnit.DealDamageThroughArmor(enemyDamage/2);
@@ -97,10 +92,10 @@ namespace LineWars.Model
             if (blockerSelector == null)
                 throw new ArgumentException($"blocker selector is null");
             BlockerSelector = blockerSelector;
-            moveAction = executor.GetUnitAction<IMoveAction<TNode, TEdge, TUnit, TOwned, TPlayer>>();
+            moveAction = executor.GetUnitAction<IMoveAction<TNode, TEdge, TUnit>>();
         }
         
-        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor) => visitor.Visit(this);
-        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit, TOwned, TPlayer> visitor) => visitor.Visit(this);
+        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit> visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit> visitor) => visitor.Visit(this);
     }
 }

@@ -7,17 +7,15 @@ namespace LineWars.Controllers
 {
     public partial class CommandsManager
     {
-        public class CommandsManagerExecutorState : State
+        public class CommandsManagerExecutorState : CommandsManagerState
         {
-            private CommandsManager manager;
-
-            public CommandsManagerExecutorState(CommandsManager manager)
+            public CommandsManagerExecutorState(CommandsManager manager) : base(manager)
             {
-                this.manager = manager;
             }
 
             public override void OnEnter()
             {
+                Manager.state = CommandsManagerStateType.Executor;
                 Selector.SelectedObjectChanged += OnSelectedObjectChanged;
             }
 
@@ -39,9 +37,9 @@ namespace LineWars.Controllers
                 if (!executor.CanDoAnyAction)
                     return;
 
-                manager.Executor = executor;
+                Manager.Executor = executor;
 
-                manager.stateMachine.SetState(manager.targetState);
+                Manager.stateMachine.SetState(Manager.targetState);
             }
         }
     }

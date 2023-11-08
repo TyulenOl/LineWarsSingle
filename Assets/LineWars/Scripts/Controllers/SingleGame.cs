@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using LineWars.Extensions;
+using LineWars.Interface;
 using LineWars.Model;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -23,8 +23,9 @@ namespace LineWars
         [Header("Debug")] 
         [SerializeField] private bool isAI;
 
-        public readonly IndexList<BasePlayer> AllPlayers = new IndexList<BasePlayer> ();
-        public readonly IndexList<Unit> AllUnits = new IndexList<Unit>();//сру и не стесняюсь!
+        public readonly IndexList<BasePlayer> AllPlayers = new();
+        public readonly IndexList<Unit> AllUnits = new();
+        
         private Player player;
         
 

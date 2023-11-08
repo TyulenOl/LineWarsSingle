@@ -4,22 +4,20 @@ using System.Linq;
 
 namespace LineWars.Model
 {
-    public class BuildAction <TNode, TEdge, TUnit, TOwned, TPlayer> :
-        UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>, 
-        IBuildAction<TNode, TEdge, TUnit, TOwned, TPlayer>
-    
-        #region Сonstraints
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer> 
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TOwned : class, IOwned<TOwned, TPlayer>
-        where TPlayer: class, IBasePlayer<TOwned, TPlayer>
-        #endregion 
+    public class BuildAction<TNode, TEdge, TUnit> :
+        UnitAction<TNode, TEdge, TUnit>,
+        IBuildAction<TNode, TEdge, TUnit>
+        where TNode : class, INodeForGame<TNode, TEdge, TUnit>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
+        where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
+        public override CommandType CommandType => CommandType.Build;
+        public override ActionType ActionType => ActionType.Targeted;
+
         public BuildAction(TUnit executor) : base(executor)
         {
         }
-        
+
         public bool CanUpRoad([NotNull] TEdge edge, bool ignoreActionPointsCondition = false)
             => CanUpRoad(edge, MyUnit.Node, ignoreActionPointsCondition);
 
@@ -40,18 +38,10 @@ namespace LineWars.Model
 
             CompleteAndAutoModify();
         }
+        
+        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit> visitor) => visitor.Visit(this);
 
-        public override CommandType CommandType => CommandType.Build;
-
-        public Type TargetType => typeof(TEdge);
-        public bool IsMyTarget(ITarget target) => target is TEdge;
-
-        public ICommandWithCommandType GenerateCommand(ITarget target)
-        {
-            return new BuildCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this, (TEdge)target);
-        }
-
-        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor) => visitor.Visit(this);
-        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit, TOwned, TPlayer> visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit> visitor) =>
+            visitor.Visit(this);
     }
 }

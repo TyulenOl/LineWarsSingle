@@ -5,8 +5,8 @@ using UnityEngine;
 namespace LineWars.Model
 {
     public class MonoBlockAction :
-        MonoUnitAction<BlockAction<Node, Edge, Unit, Owned, BasePlayer>>,
-        IBlockAction<Node, Edge, Unit, Owned, BasePlayer>
+        MonoUnitAction<BlockAction<Node, Edge, Unit>>,
+        IBlockAction<Node, Edge, Unit>
     {
         [SerializeField] private bool initialProtection = false;
         [SerializeField] private IntModifier initialContrAttackDamageModifier;
@@ -24,21 +24,16 @@ namespace LineWars.Model
         public bool CanContrAttack(Unit enemy) => Action.CanContrAttack(enemy);
         public void ContrAttack(Unit enemy) => Action.CanContrAttack(enemy);
 
-        protected override BlockAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
+        protected override BlockAction<Node, Edge, Unit> GetAction()
         {
-            var action = new BlockAction<Node, Edge, Unit, Owned, BasePlayer>(Unit,
+            var action = new BlockAction<Node, Edge, Unit>(Unit,
                 InitialContrAttackDamageModifier,
                 InitialProtection);
             action.CanBlockChanged += (before, after) => CanBlockChanged?.Invoke(before, after);
             return action;
         }
-
-        public ICommandWithCommandType GenerateCommand()
-        {
-            return new BlockCommand<Node, Edge, Unit, Owned, BasePlayer>(this);
-        }
-
+        
         public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
-        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit, Owned, BasePlayer> visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit> visitor) => visitor.Visit(this);
     }
 }

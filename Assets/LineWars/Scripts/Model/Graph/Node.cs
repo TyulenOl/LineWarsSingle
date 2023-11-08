@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using LineWars.Extensions.Attributes;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -10,11 +9,13 @@ namespace LineWars.Model
     [RequireComponent(typeof(RenderNodeV3))]
     public class Node :
         Owned,
-        INodeForGame<Node, Edge, Unit, Owned, BasePlayer>,
-        ITargetsEnumerable,
-        IPointerClickHandler
+        INodeForGame<Node, Edge, Unit>,
+        IPointerClickHandler,
+        INumbered
     {
         [SerializeField] private int index;
+        
+        [SerializeField] private Sprite defaultSprite;
         [SerializeField] private List<Edge> edges;
 
         //Если visibility равно 0, то видна только нода, если 1, то нода и ее соседи
@@ -28,16 +29,14 @@ namespace LineWars.Model
         [SerializeField] private RenderNodeV3 renderNodeV3;
         [SerializeField] private CommandPriorityData priorityData;
 
-        [field: Header("Sprite Info")] [SerializeField]
-        private SpriteRenderer spriteRenderer;
+        [field: Header("Sprite Info")] [SerializeField] private SpriteRenderer spriteRenderer;
 
-        [field: Header("Initial Info")]
-        [field: SerializeField] public Spawn ReferenceToSpawn { get; set; }
+        [field: Header("Initial Info")] [field: SerializeField] public Spawn ReferenceToSpawn { get; set; }
 
         [field: SerializeField] public UnitType LeftUnitType { get; private set; }
         [field: SerializeField] public UnitType RightUnitType { get; private set; }
-
-
+        
+        
         private Camera mainCamera;
 
         /// <summary>
@@ -100,17 +99,7 @@ namespace LineWars.Model
             nodeInfoDrawer.ReDrawCapturingInfo(Player.LocalPlayer.GetMyCapturingMoneyFromNode(this));
             nodeInfoDrawer.ReDrawIncomeInfo(Player.LocalPlayer.GetMyIncomeFromNode(this));
         }
-
-        private void OnEnable()
-        {
-        }
-
-        protected override void OnDisable()
-        {
-            base.OnDisable();
-        }
-
-
+        
         public IEnumerable<ITarget> Targets
         {
             get
@@ -132,10 +121,9 @@ namespace LineWars.Model
             var absolutePosition = mainCamera.ScreenToWorldPoint(eventData.position);
             var relativePosition = absolutePosition - transform.position;
 
-            if (relativePosition.x > 0)
+            if (relativePosition.x > 0 && rightUnit != null)
             {
-                if (rightUnit != null)
-                    Selector.SelectedObjects = new []{rightUnit.gameObject, gameObject};
+                Selector.SelectedObjects = new []{rightUnit.gameObject, gameObject};
             }
             else if (leftUnit != null)
             {
@@ -185,7 +173,6 @@ namespace LineWars.Model
         }
 
         public bool RemoveEdge(Edge edge) => edges.Remove(edge);
-
         public bool ContainsEdge(Edge edge) => edges.Contains(edge);
 
         public void SetActiveOutline(bool value)
@@ -241,7 +228,7 @@ namespace LineWars.Model
         private void DrawToDefault()
         {
             gameObject.name = $"Node{Id}";
-            spriteRenderer.sprite = null;
+            spriteRenderer.sprite = defaultSprite;
         }
 
         private void OnValidate()

@@ -4,28 +4,26 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace LineWars.Model
 {
-    public class HealAction<TNode, TEdge, TUnit, TOwned, TPlayer> :
-        UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>, 
-        IHealAction<TNode, TEdge, TUnit, TOwned, TPlayer>
-    
-        #region Сonstraints
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer> 
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TOwned : class, IOwned<TOwned, TPlayer>
-        where TPlayer: class, IBasePlayer<TOwned, TPlayer>
-        #endregion 
+    public class HealAction<TNode, TEdge, TUnit> :
+        UnitAction<TNode, TEdge, TUnit>,
+        IHealAction<TNode, TEdge, TUnit>
+        where TNode : class, INodeForGame<TNode, TEdge, TUnit>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
+        where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
-        public bool IsMassHeal { get; private set; }
-        public int HealingAmount { get; private set; }
-        public bool HealLocked { get; private set; }
+        public bool IsMassHeal { get; set; }
+        public int HealingAmount { get; set; }
+        public bool HealLocked { get; set; }
         
+        public override CommandType CommandType => CommandType.Heal;
+        public override ActionType ActionType => ActionType.Targeted;
+
         public HealAction(TUnit executor, bool isMassHeal, int healingAmount) : base(executor)
         {
             IsMassHeal = isMassHeal;
             HealingAmount = healingAmount;
         }
-        
+
         public bool CanHeal([NotNull] TUnit target, bool ignoreActionPointsCondition = false)
         {
             return !HealLocked
@@ -43,7 +41,7 @@ namespace LineWars.Model
 
             bool OwnerCondition()
             {
-                return target.Owner == MyUnit.Owner;
+                return target.OwnerId == MyUnit.OwnerId;
             }
         }
 
@@ -56,18 +54,15 @@ namespace LineWars.Model
 
             CompleteAndAutoModify();
         }
-
-        public override CommandType CommandType => CommandType.Heal;
-
-        public Type TargetType => typeof(TUnit);
-        public bool IsMyTarget(ITarget target) => target is TUnit;
-
-        public ICommandWithCommandType GenerateCommand(ITarget target)
+        
+        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit> visitor)
         {
-            return new HealCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this, (TUnit) target);
+            visitor.Visit(this);
         }
 
-        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor) => visitor.Visit(this);
-        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit, TOwned, TPlayer> visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit> visitor)
+        {
+            return visitor.Visit(this);
+        }
     }
 }

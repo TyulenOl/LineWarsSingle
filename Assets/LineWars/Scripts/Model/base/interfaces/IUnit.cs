@@ -6,22 +6,18 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    public interface IUnit<TNode, TEdge, TUnit, TOwned, TPlayer> :
-            INumbered,
-            IOwned<TOwned, TPlayer>,
-            ITarget,
-            IExecutor,
-            IAlive
-
-        #region Сonstraints
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TOwned : class, IOwned<TOwned, TPlayer>
-        where TPlayer : class, IBasePlayer<TOwned, TPlayer>
-        #endregion
+    public interface IUnit<TNode, TEdge, TUnit> :
+        IOwned,
+        ITarget,
+        IAlive,
+        IExecutor<TUnit, IUnitAction<TNode, TEdge, TUnit>>,
+        IExecutorActionSource
+        where TNode : class, INodeForGame<TNode, TEdge, TUnit>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
+        where TUnit : class, IUnit<TNode, TEdge, TUnit>
 
     {
+        public int Id { get; }
         public int MaxArmor { get; set; }
         public int CurrentArmor { get; set; }
         public int Visibility { get; set; }
@@ -31,10 +27,7 @@ namespace LineWars.Model
         public UnitDirection UnitDirection { get; set; }
         public TNode Node { get; set; }
 
-        public IEnumerable<IUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>> Actions { get; }
-        public T GetUnitAction<T>() where T : IUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>;
-        public bool TryGetUnitAction<T>(out T action) where T : IUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>;
-
+        public IEnumerable<IUnitAction<TNode, TEdge, TUnit>> Actions { get; }
 
         public void DealDamageThroughArmor(int value)
         {
@@ -42,14 +35,14 @@ namespace LineWars.Model
                 throw new ArgumentException();
             if (value == 0)
                 return;
-            
+
             var blockedDamage = Mathf.Min(value, CurrentArmor);
             var notBlockedDamage = value - blockedDamage;
 
             CurrentArmor -= blockedDamage;
             CurrentHp -= notBlockedDamage;
         }
-        
+
         public bool IsDied => CurrentHp <= 0;
         public bool CanMoveOnLineWithType(LineType lineType) => lineType >= MovementLineType;
 

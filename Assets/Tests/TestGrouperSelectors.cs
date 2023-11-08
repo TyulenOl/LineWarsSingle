@@ -69,7 +69,7 @@ public class TestGrouperSelectors
             throw new NotImplementedException();
         }
     
-        public ICommandWithCommandType GenerateCommand(ITarget target)
+        public IActionCommand GenerateCommand(ITarget target)
         {
             throw new NotImplementedException();
         }

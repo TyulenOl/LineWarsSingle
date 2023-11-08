@@ -60,8 +60,7 @@ namespace LineWars.Model
         private static void CollectUsualState(PhaseType type, List<ICommandBlueprint> commands, IReadOnlyGameProjection gameProjection)
         {
             var units = gameProjection.CurrentPlayer.OwnedObjects
-                .Where(owned => owned is UnitProjection)
-                .Select(owned => (UnitProjection)owned)
+                .OfType<UnitProjection>()
                 .ToList();
             foreach (var unit in units)
             {
@@ -71,7 +70,9 @@ namespace LineWars.Model
             }
         }
 
-        private static void ProcessUnit(List<ICommandBlueprint> commands, IReadOnlyUnitProjection projection,
+        private static void ProcessUnit(
+            List<ICommandBlueprint> commands,
+            IReadOnlyUnitProjection projection,
             IReadOnlyGameProjection gameProjection)
         {
             foreach(var action in projection.ActionsDictionary.Values)

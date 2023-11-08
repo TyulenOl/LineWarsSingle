@@ -6,10 +6,9 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    public class MonoGraph : MonoBehaviour,
-        IGraphForGame<Node, Edge, Unit, Owned, BasePlayer>
+    public class MonoGraph : MonoBehaviour, IGraphForGame<Node, Edge, Unit>
     {
-        private GraphForGame<Node, Edge, Unit, Owned, BasePlayer> modelGraph;
+        private GraphForGame<Node, Edge, Unit> modelGraph;
         public static MonoGraph Instance { get; private set; }
 
         [field: SerializeField] public GameObject NodesParent { get; set; }
@@ -40,7 +39,7 @@ namespace LineWars.Model
             allNodes = FindObjectsOfType<Node>();
             allEdges = FindObjectsOfType<Edge>();
             GenerateSpawnInfo();
-            modelGraph = new GraphForGame<Node, Edge, Unit, Owned, BasePlayer>(allNodes, allEdges);
+            modelGraph = new GraphForGame<Node, Edge, Unit>(allNodes, allEdges);
         }
 
         private void GenerateSpawnInfo()
@@ -64,8 +63,8 @@ namespace LineWars.Model
         }
 
 
-        public Dictionary<Node, bool> GetVisibilityInfo(BasePlayer player) =>
-            Instance.modelGraph.GetVisibilityInfo(player);
+        public Dictionary<Node, bool> GetVisibilityInfo(BasePlayer player) 
+            => modelGraph.GetVisibilityInfo(player.MyNodes);
 
         public IEnumerable<Node> GetVisibilityNodes(IEnumerable<Node> ownedNodes)
             => modelGraph.GetVisibilityNodes(ownedNodes);

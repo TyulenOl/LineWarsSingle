@@ -7,6 +7,7 @@ namespace LineWars
 {
     public partial class PhaseManager
     {
+        // оновременно
         public class PhaseSimultaneousState : Phase
         {
             private int actorsLeft;

@@ -3,8 +3,8 @@
 namespace LineWars.Model
 {
     public class MonoSacrificeForPerunAction :
-        MonoUnitAction<SacrificeForPerunAction<Node, Edge, Unit, Owned, BasePlayer>>,
-        ISacrificeForPerunAction<Node, Edge, Unit, Owned, BasePlayer>
+        MonoUnitAction<SacrificeForPerunAction<Node, Edge, Unit>>,
+        ISacrificeForPerunAction<Node, Edge, Unit>
     {
 
         public bool CanSacrifice(Node node) => Action.CanSacrifice(node);
@@ -17,19 +17,12 @@ namespace LineWars.Model
             Player.LocalPlayer.RecalculateVisibility();
         }
 
-        protected override SacrificeForPerunAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
+        protected override SacrificeForPerunAction<Node, Edge, Unit> GetAction()
         {
-            return new SacrificeForPerunAction<Node, Edge, Unit, Owned, BasePlayer>(Unit);
-        }
-        
-        public Type TargetType => typeof(Node);
-        public bool IsMyTarget(ITarget target) => target is Node;
-        public ICommandWithCommandType GenerateCommand(ITarget target)
-        {
-            return new SacrificeForPerunCommand<Node, Edge, Unit, Owned, BasePlayer>(this, (Node) target);
+            return new SacrificeForPerunAction<Node, Edge, Unit>(Unit);
         }
         
         public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
-        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit, Owned, BasePlayer> visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit> visitor) => visitor.Visit(this);
     }
 }

@@ -5,10 +5,9 @@ using UnityEngine;
 namespace LineWars.Model
 {
     public class MonoRamAction :
-        MonoUnitAction<RamAction<Node, Edge, Unit, Owned, BasePlayer>>,
-        IRamAction<Node, Edge, Unit, Owned, BasePlayer>
+        MonoUnitAction<RamAction<Node, Edge, Unit>>,
+        IRamAction<Node, Edge, Unit>
     {
-       
         private MonoMoveAction moveAction;
         [field: SerializeField] public int InitialDamage { get; private set; }
 
@@ -17,7 +16,7 @@ namespace LineWars.Model
             base.Initialize();
             moveAction = Unit.GetUnitAction<MonoMoveAction>();
         }
-        
+
         public int Damage => Action.Damage;
 
         public bool CanRam(Node node)
@@ -57,23 +56,24 @@ namespace LineWars.Model
                     }
                 }
             }
+
+            Player.LocalPlayer.RecalculateVisibility();
         }
 
-        public Type TargetType => typeof(Node);
-        public bool IsMyTarget(ITarget target) => target is Node;
-
-        public ICommandWithCommandType GenerateCommand(ITarget target)
+        protected override RamAction<Node, Edge, Unit> GetAction()
         {
-            return new RamCommand<Node, Edge, Unit, Owned, BasePlayer>(Unit, (Node) target);
-        }
-        
-        protected override RamAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
-        {
-            var action = new RamAction<Node, Edge, Unit, Owned, BasePlayer>(Unit, InitialDamage);
+            var action = new RamAction<Node, Edge, Unit>(Unit, InitialDamage);
             return action;
         }
 
-        public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
-        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit, Owned, BasePlayer> visitor) => visitor.Visit(this);
+        public override void Accept(IMonoUnitVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit> visitor)
+        {
+            return visitor.Visit(this);
+        }
     }
 }

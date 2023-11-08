@@ -11,6 +11,7 @@ namespace LineWars.Model
         public IntModifier ActionModifier { get; set; }
         public event Action ActionCompleted;
         public abstract CommandType CommandType { get; }
+        public abstract ActionType ActionType { get; }
 
         protected ExecutorAction(T executor)
         {

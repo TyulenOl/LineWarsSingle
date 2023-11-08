@@ -24,6 +24,7 @@ public class MoneyDrawer : MonoBehaviour
 
     private void ReDrawText()
     {
-        moneyAmountText.text = $"{Player.LocalPlayer.CurrentMoney} (<color={RedColorHex}>+{Player.LocalPlayer.Income.ToString()}</color>)";
+        moneyAmountText.text =
+            $"{Player.LocalPlayer.CurrentMoney} (<color={RedColorHex}>+{Player.LocalPlayer.Income.ToString()}</color>)";
     }
 }

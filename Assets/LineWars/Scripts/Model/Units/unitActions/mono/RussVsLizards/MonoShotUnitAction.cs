@@ -3,12 +3,12 @@
 namespace LineWars.Model
 {
     public class MonoShotUnitAction :
-        MonoUnitAction<ShotUnitAction<Node, Edge, Unit, Owned, BasePlayer>>,
-        IShotUnitAction<Node, Edge, Unit, Owned, BasePlayer>
+        MonoUnitAction<ShotUnitAction<Node, Edge, Unit>>,
+        IShotUnitAction<Node, Edge, Unit>
     {
-        protected override ShotUnitAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
+        protected override ShotUnitAction<Node, Edge, Unit> GetAction()
         {
-            return new ShotUnitAction<Node, Edge, Unit, Owned, BasePlayer>(Unit);
+            return new ShotUnitAction<Node, Edge, Unit>(Unit);
         }
         
         public Unit TakenUnit => Action.TakenUnit;
@@ -34,20 +34,20 @@ namespace LineWars.Model
         }
 
         public Type TargetType => Action.TargetType;
-        public Type[] MyTargets => Action.MyTargets;
+        public Type[] AdditionalTargets => Action.AdditionalTargets;
         public bool IsMyTarget(ITarget target) => Action.IsMyTarget(target);
 
-        public ICommandWithCommandType GenerateCommand(ITarget target)
+        public IActionCommand GenerateCommand(ITarget target)
         {
             if (TakenUnit == null)
             {
-                return new TakeUnitCommand<Node, Edge, Unit, Owned, BasePlayer>(this, (Unit) target);
+                return new TakeUnitCommand<Node, Edge, Unit>(this, (Unit) target);
             }
 
-            return new ShotUnitCommand<Node, Edge, Unit, Owned, BasePlayer>(this, (Node) target);
+            return new ShotUnitCommand<Node, Edge, Unit>(this, (Node) target);
         }
         
         public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
-        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit, Owned, BasePlayer> visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit> visitor) => visitor.Visit(this);
     }
 }

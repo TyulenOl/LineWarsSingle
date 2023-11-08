@@ -1,8 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using LineWars.Extensions;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,10 +9,10 @@ public class EnemyTurnPanel : MonoBehaviour
 
     [SerializeField] private Image lizardsImage;
     [SerializeField] private Image rusImage;
-    
+
     private const float MIN_ALPHA = 130f;
     private const float ALPHA_DECREASE_MODIFIER = -3f;
-    
+
     private bool isCoroutinActive;
 
     public bool IsCoroutinActive
@@ -24,7 +21,7 @@ public class EnemyTurnPanel : MonoBehaviour
         set
         {
             isCoroutinActive = value;
-            if(value)
+            if (value)
                 RestoreDefaults();
             else
                 Hide();
@@ -49,7 +46,7 @@ public class EnemyTurnPanel : MonoBehaviour
         lizardsImage.gameObject.SetActive(false);
         StartCoroutine(HideCoroutine());
     }
-    
+
     private void ChangeAlpha()
     {
         var currentAlpha = lizardsImage.color.a * 255;
@@ -63,9 +60,10 @@ public class EnemyTurnPanel : MonoBehaviour
         }
 
         var resultAlpha = currentAlpha + alphaDecreaseModifier;
-        lizardsImage.color = new Color(lizardsImage.color.r, lizardsImage.color.g, lizardsImage.color.b, resultAlpha/255f);
+        lizardsImage.color = new Color(lizardsImage.color.r, lizardsImage.color.g, lizardsImage.color.b,
+            resultAlpha / 255f);
     }
-    
+
     IEnumerator HideCoroutine()
     {
         rusImage.gameObject.SetActive(true);
@@ -75,8 +73,9 @@ public class EnemyTurnPanel : MonoBehaviour
         {
             resultAlpha -= 2f;
             yield return new WaitForSeconds(0.01f);
-            rusImage.color = new Color(rusImage.color.r, rusImage.color.g, rusImage.color.b, resultAlpha/255f);
+            rusImage.color = new Color(rusImage.color.r, rusImage.color.g, rusImage.color.b, resultAlpha / 255f);
         }
+
         rusImage.gameObject.SetActive(false);
     }
 

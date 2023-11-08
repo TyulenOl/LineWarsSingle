@@ -4,28 +4,24 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    public class ConvertUnitActionToBlueprints<TNode, TEdge, TUnit, TOwned, TPlayer> 
-        : IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer>
-        #region Сonstraints
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TOwned : class, IOwned<TOwned, TPlayer>
-        where TPlayer : class, IBasePlayer<TOwned, TPlayer>
-        #endregion 
+    public class ConvertUnitActionToBlueprints<TNode, TEdge, TUnit> 
+        : IUnitActionVisitor<TNode, TEdge, TUnit>
+        where TNode : class, INodeForGame<TNode, TEdge, TUnit>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
+        where TUnit : class, IUnit<TNode, TEdge, TUnit> 
     {
-        public IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer> Graph {  get; private set; }
+        public IGraphForGame<TNode, TEdge, TUnit> Graph {  get; private set; }
         public List<ICommandBlueprint> BlueprintList { get; private set; }
 
 
-        public ConvertUnitActionToBlueprints(IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer> graph,
+        public ConvertUnitActionToBlueprints(IGraphForGame<TNode, TEdge, TUnit> graph,
             List<ICommandBlueprint> list)
         {
             Graph = graph;
             BlueprintList = list;
         }
 
-        public void Visit(BuildAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
+        public void Visit(BuildAction<TNode, TEdge, TUnit> action)
         {
             foreach(var edge in action.MyUnit.Node.Edges)
             {
@@ -37,7 +33,7 @@ namespace LineWars.Model
             }
         }
 
-        public void Visit(BlockAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
+        public void Visit(BlockAction<TNode, TEdge, TUnit> action)
         {
             if(action.CanBlock())
             {
@@ -47,12 +43,12 @@ namespace LineWars.Model
             }
         }
 
-        public void Visit(MoveAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
+        public void Visit(MoveAction<TNode, TEdge, TUnit> action)
         {
             foreach (var node in Graph.GetNodesInRange(action.MyUnit.Node, 1))
             {
                 
-                if(action.CanMoveTo(node) && (!node.IsBase || action.MyUnit.Owner == node.Owner))
+                if(action.CanMoveTo(node) && (!node.IsBase || action.MyUnit.OwnerId == node.OwnerId))
                 {
 
                     var command = new MoveCommandBlueprint(action.MyUnit.Id, node.Id);
@@ -62,7 +58,7 @@ namespace LineWars.Model
             }
         }
 
-        public void Visit(HealAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
+        public void Visit(HealAction<TNode, TEdge, TUnit> action)
         {
             foreach (var node in Graph.GetNodesInRange(action.MyUnit.Node, 1))
             {
@@ -84,22 +80,22 @@ namespace LineWars.Model
             }
         }
 
-        public void Visit(DistanceAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
+        public void Visit(DistanceAttackAction<TNode, TEdge, TUnit> action)
         {
             ProcessAttackAction(action, (uint)action.MyUnit.MaxActionPoints);
         }
 
-        public void Visit(ArtilleryAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
+        public void Visit(ArtilleryAttackAction<TNode, TEdge, TUnit> action)
         {
             ProcessAttackAction(action, (uint)action.MyUnit.MaxActionPoints);
         }
 
-        public void Visit(MeleeAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
+        public void Visit(MeleeAttackAction<TNode, TEdge, TUnit> action)
         {
             ProcessAttackAction(action, 2);
         }
 
-        public void Visit(RLBlockAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
+        public void Visit(RLBlockAction<TNode, TEdge, TUnit> action)
         {
             if(action.CanBlock())
             {
@@ -109,14 +105,14 @@ namespace LineWars.Model
             }
         }
 
-        public void Visit(SacrificeForPerunAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
+        public void Visit(SacrificeForPerunAction<TNode, TEdge, TUnit> action)
         {
             
         }
 
-        public void Visit(RamAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
+        public void Visit(RamAction<TNode, TEdge, TUnit> action)
         {
-            foreach (var node in Graph.GetNodesInRange(action.MyUnit.Node, 2)) //TODO: 2 -> 1
+            foreach (var node in Graph.GetNodesInRange(action.MyUnit.Node, 1))
             {
                 if(action.CanRam(node))
                 {
@@ -129,23 +125,23 @@ namespace LineWars.Model
             }
         }
 
-        public void Visit(BlowWithSwingAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
+        public void Visit(BlowWithSwingAction<TNode, TEdge, TUnit> action)
         {
           
         }
 
-        public void Visit(ShotUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
+        public void Visit(ShotUnitAction<TNode, TEdge, TUnit> action)
         {
            
         }
 
-        public void Visit(RLBuildAction<TNode, TEdge, TUnit, TOwned, TPlayer> action)
+        public void Visit(RLBuildAction<TNode, TEdge, TUnit> action)
         {
             
         }
 
 
-        private void ProcessAttackAction(AttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> action, uint range)
+        private void ProcessAttackAction(AttackAction<TNode, TEdge, TUnit> action, uint range)
         {
             foreach (var node in Graph.GetNodesInRange(action.MyUnit.Node, range))
             {
@@ -170,21 +166,14 @@ namespace LineWars.Model
 
     public static class ConvertUnitActionToBlueprints
     {
-        public static ConvertUnitActionToBlueprints<TNode, TEdge, TUnit, TOwned, TPlayer>
-            Create<TNode, TEdge, TUnit, TOwned, TPlayer>
-            (IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer> graph,
+        public static ConvertUnitActionToBlueprints<TNode, TEdge, TUnit> Create<TNode, TEdge, TUnit>(
+            IGraphForGame<TNode, TEdge, TUnit> graph,
             List<ICommandBlueprint> list)
-            #region Сonstraints
-            where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-            where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-            where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
-            where TOwned : class, IOwned<TOwned, TPlayer>
-            where TPlayer : class, IBasePlayer<TOwned, TPlayer>
-            #endregion
+            where TNode : class, INodeForGame<TNode, TEdge, TUnit>
+            where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
+            where TUnit : class, IUnit<TNode, TEdge, TUnit>
         {
-            return new ConvertUnitActionToBlueprints
-                <TNode, TEdge, TUnit, TOwned, TPlayer> 
-                (graph, list);
+            return new ConvertUnitActionToBlueprints<TNode, TEdge, TUnit>(graph, list);
         }
     }
 }

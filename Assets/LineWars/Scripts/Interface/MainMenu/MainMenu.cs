@@ -1,7 +1,6 @@
 ﻿namespace LineWars
 {
-    public class MainMenu: UIStackElement
+    public class MainMenu : UIStackElement
     {
-        
     }
 }

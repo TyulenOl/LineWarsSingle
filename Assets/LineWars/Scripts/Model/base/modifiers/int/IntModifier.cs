@@ -8,7 +8,5 @@ namespace LineWars.Model
     public abstract class IntModifier : ScriptableObject
     {
         public abstract int Modify(int points);
-
-        protected virtual void Awake() { }
     }
 }

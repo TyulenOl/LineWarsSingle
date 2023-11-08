@@ -28,8 +28,8 @@ public class UnitBuyLayerLogic : MonoBehaviour
     }
 
     public UnitBuyPreset CurrentPreset { get; set; }
-    
-    
+
+
     private void Start()
     {
         PhaseManager.Instance.PhaseChanged.AddListener(OnPhaseChanged);
@@ -37,7 +37,7 @@ public class UnitBuyLayerLogic : MonoBehaviour
 
     private void OnPhaseChanged(PhaseType phaseTypeOld, PhaseType phaseTypeNew)
     {
-        if(phaseTypeNew != PhaseType.Buy) return;
+        if (phaseTypeNew != PhaseType.Buy) return;
         CurrentPreset = null;
         ChosenUnitPresetDrawer = null;
         buyUnitsLayer.gameObject.SetActive(true);
@@ -49,7 +49,7 @@ public class UnitBuyLayerLogic : MonoBehaviour
         var player = Player.LocalPlayer;
         if (PhaseManager.Instance.CurrentPhase != PhaseType.Buy) return;
         UnitsController.ExecuteCommand(
-            new SpawnPresetCommand<Node, Edge, Unit, Owned, BasePlayer>(
+            new SpawnPresetCommand<Node, Edge, Unit, BasePlayer>(
                 player,
                 CurrentPreset
             ), false);

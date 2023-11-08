@@ -13,14 +13,14 @@ namespace LineWars.Model
         {
             var unit = projection.UnitsIndexList[ExecutorId];
 
-            return new RLBlockCommand<NodeProjection, EdgeProjection, UnitProjection, OwnedProjection, BasePlayerProjection>(unit);
+            return new RLBlockCommand<NodeProjection, EdgeProjection, UnitProjection>(unit);
         }
 
         public ICommand GenerateMonoCommand(GameProjection projection)
         {
             var unit = projection.UnitsIndexList[ExecutorId].Original;
 
-            return new RLBlockCommand<Node, Edge, Unit, Owned, BasePlayer>(unit);
+            return new RLBlockCommand<Node, Edge, Unit>(unit);
         }
     }
 }

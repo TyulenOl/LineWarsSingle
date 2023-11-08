@@ -1,29 +1,29 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using LineWars.Extensions.Attributes;
-using LineWars.Model;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace LineWars.Model
 {
     /// <summary>
     /// класс, который объединяет все принадлежащее (ноды, юнитов и т.д.)
     /// </summary>
-    public abstract class Owned: MonoBehaviour, IOwned<Owned, BasePlayer>
+    public abstract class Owned : MonoBehaviour, IOwned
     {
-        [Header("Accessory settings")]
-        [SerializeField] [ReadOnlyInspector] protected BasePlayer basePlayer;
+        [Header("Accessory settings")] [SerializeField, ReadOnlyInspector]
+        protected BasePlayer basePlayer;
+
         public event Action<BasePlayer, BasePlayer> OwnerChanged;
         public event Action Replenished;
+
+        public int OwnerId => Owner != null ? Owner.Id : -1;
 
         public BasePlayer Owner
         {
             get => basePlayer;
             set => SetOwner(value);
         }
-        
-        private void SetOwner([MaybeNull]BasePlayer newBasePlayer)
+
+        private void SetOwner([MaybeNull] BasePlayer newBasePlayer)
         {
             var temp = basePlayer;
             basePlayer = newBasePlayer;
@@ -31,7 +31,26 @@ namespace LineWars.Model
             OwnerChanged?.Invoke(temp, newBasePlayer);
         }
 
-        public void ConnectTo(BasePlayer basePlayer) => Connect(basePlayer, this);
+        public void ConnectTo(int basePlayerID)
+        {
+            var player = basePlayerID != -1 ? SingleGame.Instance.AllPlayers[basePlayerID] : null;
+            Connect(player, this);
+        }
+
+        public void Replenish()
+        {
+            OnReplenish();
+            Replenished?.Invoke();
+        }
+
+        protected virtual void OnReplenish()
+        {
+        }
+
+        protected virtual void OnSetOwner(BasePlayer oldPlayer, BasePlayer newPlayer)
+        {
+        }
+
         public static void Connect(BasePlayer basePlayer, Owned owned)
         {
             var otherOwner = owned.Owner;
@@ -41,24 +60,10 @@ namespace LineWars.Model
                 if (otherOwner != basePlayer)
                     otherOwner.RemoveOwned(owned);
             }
-        
-            
+
+
             basePlayer.AddOwned(owned);
             owned.Owner = basePlayer;
         }
-        
-        protected virtual void OnDisable()
-        {
-        }
-
-        protected virtual void OnSetOwner(BasePlayer oldPlayer, BasePlayer newPlayer) {}
-
-        public void Replenish()
-        {
-            OnReplenish();
-            Replenished?.Invoke();
-        }
-
-        protected virtual void OnReplenish() {}
     }
 }

@@ -1,23 +1,20 @@
 ﻿namespace LineWars.Model
 {
-    public class BlowWithSwingAction<TNode, TEdge, TUnit, TOwned, TPlayer> :
-            UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>,
-            IBlowWithSwingAction<TNode, TEdge, TUnit, TOwned, TPlayer>
-
-        #region Сonstraints
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TOwned : class, IOwned<TOwned, TPlayer>
-        where TPlayer : class, IBasePlayer<TOwned, TPlayer>
-        #endregion
+    public class BlowWithSwingAction<TNode, TEdge, TUnit> :
+        UnitAction<TNode, TEdge, TUnit>,
+        IBlowWithSwingAction<TNode, TEdge, TUnit>
+        where TNode : class, INodeForGame<TNode, TEdge, TUnit>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
+        where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
-        public override CommandType CommandType => CommandType.BlowWithSwing;
-
-        public ICommandWithCommandType GenerateCommand() => new BlowWithSwingCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this);
-
         public int Damage { get; }
-        public bool CanBlowWithSwing() => ActionPointsCondition();
+        public override CommandType CommandType => CommandType.BlowWithSwing;
+        public override ActionType ActionType => ActionType.Simple;
+
+        public bool CanBlowWithSwing()
+        {
+            return ActionPointsCondition();
+        }
 
         public void ExecuteBlowWithSwing()
         {
@@ -25,13 +22,14 @@
             {
                 if (neighbor.AllIsFree)
                     continue;
-                if (neighbor.Owner == MyUnit.Owner)
+                if (neighbor.OwnerId == MyUnit.OwnerId)
                     continue;
                 foreach (var unit in neighbor.Units)
                 {
-                    unit.DealDamageThroughArmor(Damage); 
+                    unit.DealDamageThroughArmor(Damage);
                 }
             }
+
             CompleteAndAutoModify();
         }
 
@@ -39,8 +37,15 @@
         {
             Damage = damage;
         }
-        
-        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor) => visitor.Visit(this);
-        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit, TOwned, TPlayer> visitor) => visitor.Visit(this);
+
+        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit> visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit> visitor)
+        {
+            return visitor.Visit(this);
+        }
     }
 }

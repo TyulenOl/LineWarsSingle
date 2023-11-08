@@ -60,7 +60,6 @@ namespace LineWars
             base.OnEnable();
             OwnedAdded += OnOwnedAdded;
             OwnedRemoved += OnOwnerRemoved;
-            CommandsManager.Instance.CommandExecuted.AddListener(OnExecuteCommand);
         }
 
         protected override void OnDisable()
@@ -68,7 +67,6 @@ namespace LineWars
             base.OnDisable();
             OwnedAdded -= OnOwnedAdded;
             OwnedRemoved -= OnOwnerRemoved;
-            CommandsManager.Instance.CommandExecuted.RemoveListener(OnExecuteCommand);
         }
 
         private void InitializeStateMachine()
@@ -228,10 +226,6 @@ namespace LineWars
                     ExecuteTurn(PhaseType.Idle);
                 }
             }
-        }
-        private void OnExecuteCommand(IExecutor executor, ITarget target)
-        {
-            RecalculateVisibility();
         }
 
         public void RecalculateVisibility(bool useLerp = true)

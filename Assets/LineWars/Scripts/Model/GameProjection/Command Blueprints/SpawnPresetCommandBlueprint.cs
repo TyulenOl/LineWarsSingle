@@ -2,7 +2,11 @@ namespace LineWars.Model
 {
     public class SpawnPresetCommandBlueprint : ICommandBlueprint
     {
-        public int ExecutorId { get => -1; }
+        public int ExecutorId
+        {
+            get => -1;
+        }
+
         public int PlayerId { get; private set; }
         public UnitBuyPreset UnitBuyPreset { get; private set; }
 
@@ -16,16 +20,15 @@ namespace LineWars.Model
         {
             var player = projection.PlayersIndexList[PlayerId];
 
-            return new SpawnPresetCommand<NodeProjection, EdgeProjection, UnitProjection,
-                OwnedProjection, BasePlayerProjection>(player, UnitBuyPreset);
+            return new SpawnPresetCommand<NodeProjection, EdgeProjection, UnitProjection, BasePlayerProjection>(player,
+                UnitBuyPreset);
         }
 
         public ICommand GenerateMonoCommand(GameProjection projection)
         {
             var player = projection.PlayersIndexList[PlayerId].Original;
 
-            return new SpawnPresetCommand<Node, Edge, Unit,
-                Owned, BasePlayer>(player, UnitBuyPreset);
+            return new SpawnPresetCommand<Node, Edge, Unit, BasePlayer>(player, UnitBuyPreset);
         }
     }
 }

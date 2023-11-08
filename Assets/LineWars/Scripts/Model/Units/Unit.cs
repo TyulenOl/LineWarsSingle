@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using LineWars.Controllers;
-using LineWars.Extensions.Attributes;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace LineWars.Model
 {
     [RequireComponent(typeof(UnitMovementLogic))]
-    public sealed class Unit : Owned, IUnit<Node, Edge, Unit, Owned, BasePlayer>
+    public sealed class Unit : Owned, IUnit<Node, Edge, Unit>
     {
         [Header("Units Settings")] 
         [SerializeField, ReadOnlyInspector] private int index;
@@ -57,12 +56,14 @@ namespace LineWars.Model
         private UnitMovementLogic movementLogic;
         
         
-        private Dictionary<CommandType, IMonoUnitAction<UnitAction<Node, Edge, Unit, Owned, BasePlayer>>> monoActionsDictionary;
-        public IEnumerable<IMonoUnitAction<UnitAction<Node, Edge, Unit, Owned, BasePlayer>>> MonoActions => monoActionsDictionary.Values;
+        private Dictionary<CommandType, IMonoUnitAction<UnitAction<Node, Edge, Unit>>> monoActionsDictionary;
+        public IEnumerable<IMonoUnitAction<UnitAction<Node, Edge, Unit>>> MonoActions => monoActionsDictionary.Values;
         public uint MaxPossibleActionRadius { get; private set; }
-        public IReadOnlyCollection<Type> PossibleTargetsTypes { get; private set; }
+        
+        
+        private static readonly ITargetActionGrouper grouper = new DefaultTargetActionGrouper();
         public TargetTypeActionsDictionary TargetTypeActionsDictionary { get; private set; }
-        private readonly ITargetActionGrouper grouper = new DefaultTargetActionGrouper();
+        public IReadOnlyCollection<Type> PossibleTargetsTypes { get; private set; }
 
         #region Properties
         public int Id => index;
@@ -180,7 +181,7 @@ namespace LineWars.Model
         
         private void Awake()
         {
-            dj = new RandomDJ(1);
+            dj = new RandomDJ(0.5f);
             
             currentHp = maxHp;
             currentArmor = 0;
@@ -193,11 +194,11 @@ namespace LineWars.Model
             void InitialiseAllActions()
             {
                 var serializeActions = gameObject.GetComponents<Component>()
-                    .OfType<IMonoUnitAction<UnitAction<Node, Edge, Unit, Owned, BasePlayer>>>()
+                    .OfType<IMonoUnitAction<UnitAction<Node, Edge, Unit>>>()
                     .OrderByDescending(x => x.Priority)
                     .ToArray();
 
-                monoActionsDictionary = new Dictionary<CommandType, IMonoUnitAction<UnitAction<Node, Edge, Unit, Owned, BasePlayer>>>(serializeActions.Length);
+                monoActionsDictionary = new Dictionary<CommandType, IMonoUnitAction<UnitAction<Node, Edge, Unit>>>(serializeActions.Length);
                 foreach (var serializeAction in serializeActions)
                 {
                     serializeAction.Initialize();
@@ -229,18 +230,20 @@ namespace LineWars.Model
             UnitDirection = direction;
         }
 
-        public IEnumerable<IUnitAction<Node, Edge, Unit, Owned, BasePlayer>> Actions => MonoActions;
-        public T GetUnitAction<T>() where T : IUnitAction<Node, Edge, Unit, Owned, BasePlayer>
+        public IEnumerable<IUnitAction<Node, Edge, Unit>> Actions => MonoActions;
+        IEnumerable<IExecutorAction<IExecutor>> IExecutorActionSource.Actions => Actions;
+
+        public T GetUnitAction<T>() where T : IUnitAction<Node, Edge, Unit>
             => MonoActions.OfType<T>().FirstOrDefault();
 
-        public bool TryGetUnitAction<T>(out T action) where T : IUnitAction<Node, Edge, Unit, Owned, BasePlayer>
+        public bool TryGetUnitAction<T>(out T action) where T : IUnitAction<Node, Edge, Unit>
         {
             action = GetUnitAction<T>();
             return action != null;
         }
 
         public bool TryGetCommandForTarget(CommandType priorityType, ITarget target,
-            out ICommandWithCommandType command)
+            out IActionCommand command)
         {
             if (monoActionsDictionary.TryGetValue(priorityType, out var value)
                 && value is ITargetedAction targetedAction
