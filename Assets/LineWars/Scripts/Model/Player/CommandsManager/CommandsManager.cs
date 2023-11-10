@@ -31,7 +31,7 @@ namespace LineWars.Controllers
 
         private OnWaitingCommandMessage currentOnWaitingCommandMessage;
         public UnityEvent<OnWaitingCommandMessage> InWaitingCommandState;
-        public OnWaitingCommandMessage CurrentOnWaitingCommandMessage
+        private OnWaitingCommandMessage CurrentOnWaitingCommandMessage
         {
             get => currentOnWaitingCommandMessage;
             set
