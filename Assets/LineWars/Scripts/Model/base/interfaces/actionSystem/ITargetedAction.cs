@@ -2,7 +2,7 @@
 
 namespace LineWars.Model
 {
-    public interface ITargetedAction
+    public interface ITargetedAction : IExecutorAction
     {
         public bool IsAvailable(ITarget target);
     }

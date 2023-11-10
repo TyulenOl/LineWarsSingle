@@ -7,7 +7,7 @@ namespace LineWars.Controllers
     public class OnWaitingCommandMessage
     {
         public Node SelectedNode { get; }
-        public IEnumerable<ITargetedAction> AllActions { get; }
+        public IEnumerable<IExecutorAction> AllActions { get; }
         public IEnumerable<CommandPreset> Data { get; }
 
         public OnWaitingCommandMessage(
@@ -25,9 +25,9 @@ namespace LineWars.Controllers
     public class CommandPreset
     {
         public ITarget Target { get; }
-        public ITargetedAction Action { get; }
+        public IExecutorAction Action { get; }
 
-        public CommandPreset(ITarget target, ITargetedAction action)
+        public CommandPreset(ITarget target, IExecutorAction action)
         {
             Target = target;
             Action = action;

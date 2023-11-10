@@ -31,8 +31,7 @@ namespace LineWars.Controllers
 
         private OnWaitingCommandMessage currentOnWaitingCommandMessage;
         public UnityEvent<OnWaitingCommandMessage> InWaitingCommandState;
-
-        public OnWaitingCommandMessage CurrentOnWaitingCommandMessage
+        private OnWaitingCommandMessage CurrentOnWaitingCommandMessage
         {
             get => currentOnWaitingCommandMessage;
             set
@@ -148,6 +147,8 @@ namespace LineWars.Controllers
                     var command = generator.GenerateCommand(presetTarget);
                     CommandExecuted.Invoke(executor, presetTarget);
                     UnitsController.ExecuteCommand(command);
+                    if(stateMachine.CurrentState != targetState)
+                        stateMachine.SetState(targetState);
                     break;
                 }
                 default: throw new Exception();
