@@ -7,18 +7,30 @@ namespace LineWars.Controllers
     public class OnWaitingCommandMessage
     {
         public Node SelectedNode { get; }
-        public IEnumerable<(ITarget,IActionCommand)> Data { get; }
-        public IEnumerable<IActionCommand> AllCommands { get; }
+        public IEnumerable<ITargetedAction> AllActions { get; }
+        public IEnumerable<CommandPreset> Data { get; }
 
         public OnWaitingCommandMessage(
-            IEnumerable<(ITarget, IActionCommand)> data,
+            IEnumerable<CommandPreset> data,
             Node selectedNode)
         {
             Data = data.ToArray();
-            AllCommands = Data
-                .Select(x => x.Item2)
+            AllActions = Data
+                .Select(x => x.Action)
                 .ToHashSet();
             SelectedNode = selectedNode;
+        }
+    }
+
+    public class CommandPreset
+    {
+        public ITarget Target { get; }
+        public ITargetedAction Action { get; }
+
+        public CommandPreset(ITarget target, ITargetedAction action)
+        {
+            Target = target;
+            Action = action;
         }
     }
 }

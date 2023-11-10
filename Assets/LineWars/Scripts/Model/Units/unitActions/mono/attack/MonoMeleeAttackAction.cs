@@ -21,7 +21,7 @@ namespace LineWars.Model
         public bool Onslaught => Action.Onslaught;
         public UnitBlockerSelector BlockerSelector => Action.BlockerSelector;
 
-        public override void Attack(IAlive enemy)
+        public override void Attack(ITargetedAlive enemy)
         {
             if (enemy is Unit unit)
             {

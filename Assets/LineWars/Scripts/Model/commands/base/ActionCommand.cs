@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 namespace LineWars.Model
 {
     public abstract class ActionCommand<TExecutor, TAction> : 
-        IActionCommand
+        IActionCommand<TAction>
         where TExecutor : IExecutor<TExecutor, TAction>, IExecutor
         where TAction : IExecutorAction<TExecutor>
     {

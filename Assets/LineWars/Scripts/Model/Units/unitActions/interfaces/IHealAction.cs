@@ -17,7 +17,7 @@ namespace LineWars.Model
         bool CanHeal([NotNull] TUnit target, bool ignoreActionPointsCondition = false);
         void Heal([NotNull] TUnit target);
         
-        bool ITargetedAction<TUnit>.CanExecute(TUnit target) => CanHeal(target);
+        bool ITargetedAction<TUnit>.IsAvailable(TUnit target) => CanHeal(target);
         void ITargetedAction<TUnit>.Execute(TUnit target) => Heal(target);
         IActionCommand ITargetedAction<TUnit>.GenerateCommand(TUnit target)
         {

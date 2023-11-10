@@ -9,4 +9,8 @@ namespace LineWars.Model
         public int MaxHp { get; set; }
         public int CurrentHp { get; set; }
     }
+    
+    public interface ITargetedAlive: ITarget, IAlive
+    {
+    }
 }

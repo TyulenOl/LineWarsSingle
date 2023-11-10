@@ -12,7 +12,7 @@
         public bool CanRam(TNode node);
         public void Ram(TNode node);
         
-        bool ITargetedAction<TNode>.CanExecute(TNode target) => CanRam(target);
+        bool ITargetedAction<TNode>.IsAvailable(TNode target) => CanRam(target);
         void ITargetedAction<TNode>.Execute(TNode target) => Ram(target);
         IActionCommand ITargetedAction<TNode>.GenerateCommand(TNode target)
         {

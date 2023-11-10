@@ -21,7 +21,10 @@ using UnityEngine;
             return result;
         }
 
-        public static IEnumerable<TComponent> GetComponentMany<TComponent>(this IEnumerable<MonoBehaviour> enumerable)
+        /// <summary>
+        /// Берет компонент у каждого элемента коллекции
+        /// </summary>
+        public static IEnumerable<TComponent> GetComponentMany<TComponent>(this IEnumerable<GameObject> enumerable)
         {
             return enumerable
                 .Select(x => x.GetComponent<TComponent>())

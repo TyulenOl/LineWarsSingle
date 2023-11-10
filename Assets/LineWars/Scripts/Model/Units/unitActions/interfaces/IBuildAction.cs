@@ -14,7 +14,7 @@ namespace LineWars.Model
         bool CanUpRoad([NotNull] TEdge edge, bool ignoreActionPointsCondition = false);
         void UpRoad([NotNull] TEdge edge);
 
-        bool ITargetedAction<TEdge>.CanExecute(TEdge target) => CanUpRoad(target);
+        bool ITargetedAction<TEdge>.IsAvailable(TEdge target) => CanUpRoad(target);
         void ITargetedAction<TEdge>.Execute(TEdge target) => UpRoad(target);
 
         IActionCommand ITargetedAction<TEdge>.GenerateCommand(TEdge target)
