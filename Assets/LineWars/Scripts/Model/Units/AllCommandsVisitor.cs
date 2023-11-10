@@ -98,10 +98,9 @@ namespace LineWars.Model
 
         /// <summary>
         /// Генерирует все команды для всех НОД в радиусе distance.
-        /// Будте бдительны! Если action не работает с НОДАМИ, то этот код вызовет исключение.
         /// </summary>
         private IEnumerable<CommandContext> GetCommandsForNodesInRange<TAction>(TAction action, uint distance)
-            where TAction : IUnitAction<TNode, TEdge, TUnit>, ITargetedAction
+            where TAction : IUnitAction<TNode, TEdge, TUnit>, ITargetedAction<TNode>
         {
             return GraphForGame.GetNodesInRange(action.MyUnit.Node, distance)
                 .Select(node => new CommandContext()
@@ -114,10 +113,9 @@ namespace LineWars.Model
 
         /// <summary>
         /// Генерирует все команды для всех ЮНИТОВ в радиусе distance.
-        /// Будте бдительны! Если action не работает с ЮНИТАМИ, то этот код вызовет исключение.
         /// </summary>
         private IEnumerable<CommandContext> GetCommandsForUnitsInRange<TAction>(TAction action, uint distance)
-            where TAction : IUnitAction<TNode, TEdge, TUnit>, ITargetedAction
+            where TAction : IUnitAction<TNode, TEdge, TUnit>, ITargetedAction<TUnit>
         {
             return GraphForGame.GetNodesInRange(action.MyUnit.Node, distance)
                 .SelectMany(node => node.Units)

@@ -12,7 +12,9 @@ namespace LineWars.Model
 {
     public static class GameProjectionCreator
     {
-        public static GameProjection FromMono(IEnumerable<BasePlayer> players, MonoGraph graph,
+        public static GameProjection FromMono(
+            IEnumerable<BasePlayer> players,
+            MonoGraph graph,
             PhaseManager phaseManager)
         {
             if (phaseManager.CurrentActor is not BasePlayer currentPlayer)

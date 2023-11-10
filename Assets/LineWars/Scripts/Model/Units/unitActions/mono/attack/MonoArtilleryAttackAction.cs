@@ -12,7 +12,7 @@ namespace LineWars.Model
         [SerializeField] private SimpleEffect explosionPrefab;
         public uint Distance => Action.Distance;
 
-        public override void Attack(IAlive enemy)
+        public override void Attack(ITargetedAlive enemy)
         {
             if (enemy is not MonoBehaviour mono) return;
             var explosion = Instantiate(explosionPrefab);

@@ -31,6 +31,7 @@ namespace LineWars.Controllers
 
         private OnWaitingCommandMessage currentOnWaitingCommandMessage;
         public UnityEvent<OnWaitingCommandMessage> InWaitingCommandState;
+
         public OnWaitingCommandMessage CurrentOnWaitingCommandMessage
         {
             get => currentOnWaitingCommandMessage;
@@ -40,7 +41,7 @@ namespace LineWars.Controllers
                 currentOnWaitingCommandMessage = value;
             }
         }
-        
+
         #region Attributes
 
         public ITarget Target
@@ -119,16 +120,38 @@ namespace LineWars.Controllers
                 || stateMachine.CurrentState == executorState) return;
             stateMachine.SetState(executorState);
         }
-        
-        public void SelectCommand([NotNull] IActionCommand command)
+
+        public void SelectAction(CommandPreset preset)
         {
-            if (command == null)
-                throw new ArgumentNullException(nameof(command));
             if (stateMachine.CurrentState != waitingCommandState)
                 throw new InvalidOperationException();
-            if (!currentOnWaitingCommandMessage.AllCommands.Contains(command))
-                throw new ArgumentException(nameof(command));
-            UnitsController.ExecuteCommand(command);
+            if (!currentOnWaitingCommandMessage.AllActions.Contains(preset.Action))
+                throw new ArgumentException(nameof(preset.Action));
+            ProcessTargetedAction(preset);
+        }
+
+        private void ProcessTargetedAction(CommandPreset preset)
+        {
+            var presetAction = preset.Action;
+            var presetTarget = preset.Target;
+            switch (presetAction)
+            {
+                case IMultiTargetedAction targetedAction:
+                {
+                    multiTargetState.Prepare(targetedAction, presetTarget);
+                    stateMachine.SetState(multiTargetState);
+                    break;
+                }
+                case ITargetedActionCommandGenerator generator:
+                {
+                    Target = presetTarget;
+                    var command = generator.GenerateCommand(presetTarget);
+                    CommandExecuted.Invoke(executor, presetTarget);
+                    UnitsController.ExecuteCommand(command);
+                    break;
+                }
+                default: throw new Exception();
+            }
         }
     }
 }

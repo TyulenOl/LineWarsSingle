@@ -18,10 +18,10 @@ namespace LineWars.Model
         public int Damage { get; protected set; }
         public bool IsPenetratingDamage { get; protected set; }
         
-        public bool CanAttack(IAlive enemy, bool ignoreActionPointsCondition = false) =>
+        public bool CanAttack(ITargetedAlive enemy, bool ignoreActionPointsCondition = false) =>
             CanAttackFrom(MyUnit.Node, enemy, ignoreActionPointsCondition);
 
-        public bool CanAttackFrom(TNode node, IAlive enemy, bool ignoreActionPointsCondition = false)
+        public bool CanAttackFrom(TNode node, ITargetedAlive enemy, bool ignoreActionPointsCondition = false)
         {
             return enemy switch
             {
@@ -31,7 +31,7 @@ namespace LineWars.Model
             };
         }
 
-        public void Attack(IAlive enemy)
+        public void Attack(ITargetedAlive enemy)
         {
             switch (enemy)
             {

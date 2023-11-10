@@ -17,7 +17,7 @@ namespace LineWars.Model
         void MoveTo([NotNull] TNode target);
         
         
-        bool ITargetedAction<TNode>.CanExecute(TNode target) => CanMoveTo(target);
+        bool ITargetedAction<TNode>.IsAvailable(TNode target) => CanMoveTo(target);
         void ITargetedAction<TNode>.Execute(TNode target) => MoveTo(target);
         IActionCommand ITargetedAction<TNode>.GenerateCommand(TNode target)
         {

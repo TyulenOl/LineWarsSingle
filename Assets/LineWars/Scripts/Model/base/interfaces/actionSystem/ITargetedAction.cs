@@ -4,19 +4,32 @@ namespace LineWars.Model
 {
     public interface ITargetedAction
     {
-        public Type TargetType { get; }
-        public bool IsMyTarget(ITarget target);
+        public bool IsAvailable(ITarget target);
+    }
+
+    public interface ITargetedActionCommandGenerator
+    {
         public IActionCommand GenerateCommand(ITarget target);
     }
 
-    public interface ITargetedAction<in TTarget> : ITargetedAction
+    public interface ITargetedAction<in TTarget> :
+        ITargetedAction,
+        ITargetedActionCommandGenerator
+        where TTarget : ITarget
     {
-        public bool CanExecute(TTarget target);
+        public bool IsAvailable(TTarget target);
         public void Execute(TTarget target);
         public IActionCommand GenerateCommand(TTarget target);
 
-        Type ITargetedAction.TargetType => typeof(TTarget);
-        bool ITargetedAction.IsMyTarget(ITarget target) => target is TTarget;
-        IActionCommand ITargetedAction.GenerateCommand(ITarget target) => GenerateCommand((TTarget) target);
+
+        bool ITargetedAction.IsAvailable(ITarget target)
+        {
+            return target is TTarget currentTarget && IsAvailable(currentTarget);
+        }
+
+        IActionCommand ITargetedActionCommandGenerator.GenerateCommand(ITarget target)
+        {
+            return GenerateCommand((TTarget) target);
+        }
     }
 }

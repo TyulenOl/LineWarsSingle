@@ -28,11 +28,6 @@ namespace LineWars.Model
         public IndexList<EdgeProjection> EdgesIndexList => Graph.EdgesIndexList;
         public IndexList<UnitProjection> UnitsIndexList => Graph.UnitsIndexList;
 
-        public GameProjection()
-        {
-
-        }
-
         public void SetPlayers(IEnumerable<BasePlayerProjection> players)
         {
             OriginalToProjectionPlayers = new Dictionary<BasePlayer, BasePlayerProjection>();

@@ -6,21 +6,26 @@ namespace LineWars.Model
 {
     public static class NodeProjectionCreator
     { 
-        public static NodeProjection FromMono(Node original,
-            IEnumerable<EdgeProjection> edgeProjections = null, UnitProjection leftUnit = null,
+        public static NodeProjection FromMono(
+            Node original,
+            IEnumerable<EdgeProjection> edgeProjections = null,
+            UnitProjection leftUnit = null,
             UnitProjection rightUnit = null)
         {
-            var newNode = new NodeProjection();
-            newNode.CommandPriorityData = original.CommandPriorityData;
-            newNode.IsBase = original.IsBase;
-            newNode.Id = original.Id;
-            newNode.Visibility = original.Visibility;
-            newNode.ValueOfHidden = original.ValueOfHidden;
-            newNode.LeftUnit = leftUnit;
-            newNode.RightUnit = rightUnit;
-            newNode.Original = original;
-            newNode.EdgesList = edgeProjections == null ?
-                new List<EdgeProjection>() : new List<EdgeProjection>(edgeProjections);
+            var newNode = new NodeProjection
+            {
+                CommandPriorityData = original.CommandPriorityData,
+                IsBase = original.IsBase,
+                Id = original.Id,
+                Visibility = original.Visibility,
+                ValueOfHidden = original.ValueOfHidden,
+                LeftUnit = leftUnit,
+                RightUnit = rightUnit,
+                Original = original,
+                EdgesList = edgeProjections == null
+                    ? new List<EdgeProjection>() 
+                    : new List<EdgeProjection>(edgeProjections)
+            };
 
             if (original.TryGetComponent(out NodeScore nodeScore))
                 newNode.Score = nodeScore.Score;
@@ -30,21 +35,26 @@ namespace LineWars.Model
             return newNode;
         }
 
-        public static NodeProjection FromProjection(IReadOnlyNodeProjection oldNode, IEnumerable<EdgeProjection> edges = null,
-            UnitProjection leftUnit = null, UnitProjection rightUnit = null)
+        public static NodeProjection FromProjection(
+            IReadOnlyNodeProjection oldNode,
+            IEnumerable<EdgeProjection> edges = null,
+            UnitProjection leftUnit = null,
+            UnitProjection rightUnit = null)
         {
-            var newNode = new NodeProjection();
-            newNode.CommandPriorityData = oldNode.CommandPriorityData;
-            newNode.IsBase = oldNode.IsBase;
-            newNode.Id = oldNode.Id;
-            newNode.Visibility = oldNode.Visibility;
-            newNode.ValueOfHidden = oldNode.ValueOfHidden;
-            newNode.LeftUnit = leftUnit;
-            newNode.RightUnit = rightUnit;
-            newNode.Original = oldNode.Original;
-            newNode.EdgesList = edges == null ?
-                new List<EdgeProjection>() : new List<EdgeProjection>(edges);
-            newNode.Score = oldNode.Score;
+            var newNode = new NodeProjection
+            {
+                CommandPriorityData = oldNode.CommandPriorityData,
+                IsBase = oldNode.IsBase,
+                Id = oldNode.Id,
+                Visibility = oldNode.Visibility,
+                ValueOfHidden = oldNode.ValueOfHidden,
+                LeftUnit = leftUnit,
+                RightUnit = rightUnit,
+                Original = oldNode.Original,
+                EdgesList = edges == null ?
+                    new List<EdgeProjection>() : new List<EdgeProjection>(edges),
+                Score = oldNode.Score
+            };
 
             return newNode;
 
