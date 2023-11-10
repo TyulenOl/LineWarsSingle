@@ -13,6 +13,7 @@ namespace LineWars.Controllers
                 Manager.state = CommandsManagerStateType.Idle;
                 Manager.Executor = null;
                 Manager.Target = null;
+                Manager.NeedRedraw.Invoke(null);
             }
         }
     }

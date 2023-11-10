@@ -13,8 +13,7 @@ namespace LineWars.Controllers
         {
             private IMultiTargetedAction action;
             private List<ITarget> targets;
-            private int targetId;
-            
+
             public CommandsManagerMultiTargetState(CommandsManager manager) : base(manager)
             {
             }
@@ -24,13 +23,13 @@ namespace LineWars.Controllers
                 [NotNull] ITarget firstTarget)
             {
                 if (firstTarget == null) throw new ArgumentNullException(nameof(firstTarget));
-                if (action == null) throw new ArgumentNullException(nameof(multiTargetedAction));
+                if (multiTargetedAction == null) throw new ArgumentNullException(nameof(multiTargetedAction));
 
                 action = multiTargetedAction;
-                targets = new List<ITarget>(){firstTarget};
-                targetId = 1;
+                targets = new List<ITarget>() {firstTarget};
+                Manager.SendMessage(targets);
             }
-            
+
             public override void OnEnter()
             {
                 Manager.state = CommandsManagerStateType.MultiTarget;
@@ -41,7 +40,7 @@ namespace LineWars.Controllers
             {
                 Selector.SelectedObjectChanged -= OnSelectedObjectChanged;
             }
-            
+
             private void OnSelectedObjectChanged(GameObject before, GameObject after)
             {
                 var allTargets = Selector.SelectedObjects
@@ -51,17 +50,18 @@ namespace LineWars.Controllers
                     return;
 
                 var availableTarget = allTargets
-                    .FirstOrDefault(t => action.IsAvailable(targetId, t));
-                
+                    .FirstOrDefault(t => action.IsAvailable(targets.Concat(new[] {t}).ToArray()));
+
                 if (availableTarget == null)
                     return;
                 targets.Add(availableTarget);
-                targetId++;
-                if (targetId == action.TargetsCount)
+                if (targets.Count == action.TargetsCount)
                 {
                     var command = (action as IMultiTargetedActionGenerator).GenerateCommand(targets.ToArray());
                     UnitsController.ExecuteCommand(command);
                 }
+                else
+                    Manager.SendMessage(targets);
             }
         }
     }

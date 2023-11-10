@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -31,6 +32,7 @@ namespace LineWars.Controllers
 
         private OnWaitingCommandMessage currentOnWaitingCommandMessage;
         public UnityEvent<OnWaitingCommandMessage> InWaitingCommandState;
+
         private OnWaitingCommandMessage CurrentOnWaitingCommandMessage
         {
             get => currentOnWaitingCommandMessage;
@@ -40,6 +42,8 @@ namespace LineWars.Controllers
                 currentOnWaitingCommandMessage = value;
             }
         }
+
+        public UnityEvent<ExecutorRedrawMessage> NeedRedraw;
 
         #region Attributes
 
@@ -124,8 +128,8 @@ namespace LineWars.Controllers
         {
             if (stateMachine.CurrentState != waitingCommandState)
                 throw new InvalidOperationException();
-            if (!currentOnWaitingCommandMessage.AllActions.Contains(preset.Action))
-                throw new ArgumentException(nameof(preset.Action));
+            if (!currentOnWaitingCommandMessage.Data.Contains(preset))
+                throw new ArgumentException(nameof(preset));
             ProcessTargetedAction(preset);
         }
 
@@ -147,12 +151,21 @@ namespace LineWars.Controllers
                     var command = generator.GenerateCommand(presetTarget);
                     CommandExecuted.Invoke(executor, presetTarget);
                     UnitsController.ExecuteCommand(command);
-                    if(stateMachine.CurrentState != targetState)
+                    if (stateMachine.CurrentState != targetState)
                         stateMachine.SetState(targetState);
                     break;
                 }
                 default: throw new Exception();
             }
+        }
+
+        private void SendMessage(IEnumerable<ITarget> targets)
+        {
+            var visitor = new GetAllAvailableTargetActionInfoForExecutorVisitor(
+                new GetAvailableTargetActionInfoForShotUnitAction(targets.ToArray()));
+            var data = Executor.Accept(visitor);
+            var message = new ExecutorRedrawMessage(data);
+            NeedRedraw.Invoke(message);
         }
     }
 }

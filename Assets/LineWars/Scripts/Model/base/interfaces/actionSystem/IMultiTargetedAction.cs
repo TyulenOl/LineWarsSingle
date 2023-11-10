@@ -5,11 +5,11 @@ namespace LineWars.Model
     public interface IMultiTargetedAction : ITargetedAction
     {
         public int TargetsCount { get; }
-        public bool IsAvailable(int targetID, ITarget target);
+        public bool IsAvailable(params ITarget[] target);
 
         bool ITargetedAction.IsAvailable(ITarget target)
         {
-            return IsAvailable(0, target);
+            return IsAvailable(target);
         }
     }
 
@@ -22,15 +22,15 @@ namespace LineWars.Model
         IMultiTargetedAction,
         IMultiTargetedActionGenerator
     {
-        public bool IsAvailable1(TTarget1 target1);
-        public bool IsAvailable2(TTarget2 target2);
+        public bool IsAvailable(TTarget1 target1);
+        public bool IsAvailable(TTarget1 target1, TTarget2 target2);
 
 
         public bool CanExecute(TTarget1 target1, TTarget2 target2)
         {
-            return IsAvailable1(target1) && IsAvailable2(target2);
+            return IsAvailable(target1, target2);
         }
-        
+
         public void Execute(TTarget1 target1, TTarget2 target2);
         public IActionCommand GenerateCommand(TTarget1 target1, TTarget2 target2);
 
@@ -42,13 +42,13 @@ namespace LineWars.Model
             return GenerateCommand((TTarget1) targets[0], (TTarget2) targets[1]);
         }
 
-        bool IMultiTargetedAction.IsAvailable(int targetID, ITarget target)
+        bool IMultiTargetedAction.IsAvailable(params ITarget[] target)
         {
-            return targetID switch
+            return target.Length switch
             {
-                0 => target is TTarget1 target1 && IsAvailable1(target1),
-                1 => target is TTarget2 target2 && IsAvailable2(target2),
-                _ => throw new ArgumentOutOfRangeException(nameof(targetID))
+                0 => target[0] is TTarget1 target1 && IsAvailable(target1),
+                1 => target[0] is TTarget1 target1 && target[1] is TTarget2 target2 && IsAvailable(target1, target2),
+                _ => throw new ArgumentOutOfRangeException(nameof(target.Length))
             };
         }
     }

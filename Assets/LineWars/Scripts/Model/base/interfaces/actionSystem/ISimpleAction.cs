@@ -1,6 +1,6 @@
 ﻿namespace LineWars.Model
 {
-    public interface ISimpleAction
+    public interface ISimpleAction : IExecutorAction
     {
         public bool CanExecute();
         public void Execute();
