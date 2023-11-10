@@ -147,6 +147,8 @@ namespace LineWars.Controllers
                     var command = generator.GenerateCommand(presetTarget);
                     CommandExecuted.Invoke(executor, presetTarget);
                     UnitsController.ExecuteCommand(command);
+                    if(stateMachine.CurrentState != targetState)
+                        stateMachine.SetState(targetState);
                     break;
                 }
                 default: throw new Exception();

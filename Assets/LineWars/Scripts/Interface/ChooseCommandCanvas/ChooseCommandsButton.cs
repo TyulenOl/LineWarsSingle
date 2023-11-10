@@ -13,25 +13,26 @@ namespace LineWars
         [SerializeField] private Image commandImage;
         [SerializeField] private Button button;
         
-        private (ITarget, IActionCommand) hash;
-        private ChooseCommandsCanvas canvas;
+        private CommandPreset hash;
+        private ChooseCommandsCanvasPreset preset;
         
         private void Awake()
         {
             button.onClick.AddListener(OnButtonClick);
-            canvas = GetComponentInParent<ChooseCommandsCanvas>();
+            preset = GetComponentInParent<ChooseCommandsCanvasPreset>();
         }
 
-        public void ReDraw((ITarget, IActionCommand) tuple)
+        public void ReDraw(CommandPreset tuple)
         {
             hash = tuple;
-            commandImage.sprite = DrawHelper.GetSpriteByCommandType(tuple.Item2.CommandType);
+            var sprite = DrawHelper.GetSpriteByCommandType(hash.Action.CommandType);
+            commandImage.sprite = sprite;
         }
 
         private void OnButtonClick()
         {
-            CommandsManager.Instance.SelectCommand(hash.Item2);
-            canvas.gameObject.SetActive(false);
+            CommandsManager.Instance.SelectAction(hash);
+            preset.gameObject.SetActive(false);
         }
     }
 }
