@@ -14,14 +14,13 @@ namespace LineWars.Model
     {
         public override CommandType CommandType => CommandType.ShotUnit;
         public override ActionType ActionType => ActionType.MultiTargeted;
-
-        public TUnit TakenUnit { get; private set; }
-
+        
+        
         public ShotUnitAction(TUnit executor) : base(executor)
         {
         }
 
-        public bool CanTakeUnit([NotNull] TUnit unit)
+        public bool IsAvailable1([NotNull] TUnit unit)
         {
             if (unit == null) throw new ArgumentNullException(nameof(unit));
 
@@ -30,55 +29,35 @@ namespace LineWars.Model
                    && line != null;
         }
 
-        public void TakeUnit([NotNull] TUnit unit)
+        public bool IsAvailable2(TNode target2)
         {
-            TakenUnit = unit ?? throw new ArgumentNullException(nameof(unit));
+            return true;
         }
 
-        public bool CanShotUnitTo(TNode node)
+        public void Execute(TUnit takenUnit, TNode node)
         {
-            return TakenUnit != null;
-        }
-
-        public void ShotUnitTo(TNode node)
-        {
+            if (takenUnit.Node.LeftUnit == takenUnit)
+                takenUnit.Node.LeftUnit = null;
+            if (takenUnit.Node.RightUnit == takenUnit)
+                takenUnit.Node.RightUnit = null;
+            
             if (node.AllIsFree)
             {
-                TakenUnit.Node = node;
+                takenUnit.Node = node;
             }
             else
             {
                 var enemies = node.Units.ToArray();
-                var myDamage = (TakenUnit.CurrentHp + TakenUnit.CurrentArmor) / enemies.Length;
+                var myDamage = (takenUnit.CurrentHp + takenUnit.CurrentArmor) / enemies.Length;
                 var enemyDamage = enemies.Select(x => x.CurrentHp + x.CurrentArmor).Sum();
                 foreach (var enemy in enemies)
                     enemy.DealDamageThroughArmor(myDamage);
-                TakenUnit.DealDamageThroughArmor(enemyDamage);
+                takenUnit.DealDamageThroughArmor(enemyDamage);
             }
-
-            TakenUnit = null;
+            
+            
             CompleteAndAutoModify();
         }
-
-        public Type TargetType { get; } = typeof(TUnit);
-        public Type[] AdditionalTargets { get; } = {typeof(TNode)};
-
-        public bool IsMyTarget(ITarget target)
-        {
-            return TakenUnit == null && target is TUnit || TakenUnit != null && target is TNode;
-        }
-
-        public IActionCommand GenerateCommand(ITarget target)
-        {
-            if (TakenUnit == null)
-            {
-                return new TakeUnitCommand<TNode, TEdge, TUnit>(this, (TUnit) target);
-            }
-
-            return new ShotUnitCommand<TNode, TEdge, TUnit>(this, (TNode) target);
-        }
-
-
         public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit> visitor) => visitor.Visit(this);
 
         public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit> visitor) =>

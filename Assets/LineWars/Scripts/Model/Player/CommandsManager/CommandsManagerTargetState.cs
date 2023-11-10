@@ -41,34 +41,35 @@ namespace LineWars.Controllers
                 }
 
                 var targets = Selector.SelectedObjects
-                    .Select(x => x.GetComponent<ITarget>())
-                    .Where(x => x != null)
+                    .GetComponentMany<ITarget>()
                     .ToArray();
 
-                var targetsAndCommands = targets
-                    .SelectMany(target => GetAllAvailableCommandsForPair(Manager.executor, target)
-                        .Select(command => (target, command)))
+                var presets = targets
+                    .SelectMany(target => GetAllActionsForPair(Manager.executor, target)
+                        .Select(action => new CommandPreset(target, action)))
                     .ToArray();
-                switch (targetsAndCommands.Length)
+
+                switch (presets.Length)
                 {
                     case 0:
                         break;
                     case 1:
-                        Manager.Target = targetsAndCommands[0].target;
-                        Manager.CommandExecuted.Invoke(Manager.executor, Manager.target);
                         isCancelable = false;
-                        Manager.target = null;
-                        UnitsController.ExecuteCommand(targetsAndCommands[0].Item2);
+                        Manager.ProcessTargetedAction(presets[0]);
                         break;
                     default:
                         isCancelable = false;
-                        Manager.CurrentOnWaitingCommandMessage = new OnWaitingCommandMessage(targetsAndCommands, newObject.GetComponent<Node>());
+                        Manager.CurrentOnWaitingCommandMessage =
+                            new OnWaitingCommandMessage(
+                                presets,
+                                Selector.SelectedObjects.GetComponentMany<Node>().FirstOrDefault()
+                            );
                         Manager.stateMachine.SetState(Manager.waitingCommandState);
                         break;
                 }
             }
 
-            private IEnumerable<IActionCommand> GetAllAvailableCommandsForPair(
+            private IEnumerable<ITargetedAction> GetAllActionsForPair(
                 IExecutor executor,
                 ITarget target)
             {
@@ -76,12 +77,10 @@ namespace LineWars.Controllers
                 {
                     return source.Actions
                         .OfType<ITargetedAction>()
-                        .Where(x => x.IsMyTarget(target))
-                        .Select(x => x.GenerateCommand(target))
-                        .Where(x => x.CanExecute());
+                        .Where(x => x.IsAvailable(target));
                 }
 
-                return Enumerable.Empty<IActionCommand>();
+                return Enumerable.Empty<ITargetedAction>();
             }
 
             private void CancelExecutor()

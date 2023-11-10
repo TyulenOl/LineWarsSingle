@@ -3,7 +3,7 @@
     public interface IAttackAction<TNode, TEdge, TUnit> :
         IActionWithDamage,
         IUnitAction<TNode, TEdge, TUnit>,
-        ITargetedAction<IAlive>
+        ITargetedAction<ITargetedAlive>
         where TNode : class, INodeForGame<TNode, TEdge, TUnit>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
@@ -11,14 +11,14 @@
     {
         bool IsPenetratingDamage { get; }
 
-        bool CanAttack(IAlive enemy, bool ignoreActionPointsCondition = false);
-        void Attack(IAlive enemy);
+        bool CanAttack(ITargetedAlive enemy, bool ignoreActionPointsCondition = false);
+        void Attack(ITargetedAlive enemy);
 
 
-        bool ITargetedAction<IAlive>.CanExecute(IAlive target) => CanAttack(target);
-        void ITargetedAction<IAlive>.Execute(IAlive target) => Attack(target);
+        bool ITargetedAction<ITargetedAlive>.IsAvailable(ITargetedAlive target) => CanAttack(target);
+        void ITargetedAction<ITargetedAlive>.Execute(ITargetedAlive target) => Attack(target);
 
-        IActionCommand ITargetedAction<IAlive>.GenerateCommand(IAlive target)
+        IActionCommand ITargetedAction<ITargetedAlive>.GenerateCommand(ITargetedAlive target)
         {
             return new AttackCommand<TNode, TEdge, TUnit>(this, target);
         }

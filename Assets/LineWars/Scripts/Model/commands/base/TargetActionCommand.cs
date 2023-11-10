@@ -7,6 +7,7 @@ namespace LineWars.Model
         ActionCommand<TExecutor, TAction>
         where TExecutor : IExecutor<TExecutor, TAction>, IExecutor
         where TAction : IExecutorAction<TExecutor>, ITargetedAction<TTarget>
+        where TTarget: ITarget
     {
         public TTarget Target { get; }
 
@@ -27,7 +28,7 @@ namespace LineWars.Model
 
         public override bool CanExecute()
         {
-            return Action.CanExecute(Target);
+            return Action.IsAvailable(Target);
         }
     }
 }

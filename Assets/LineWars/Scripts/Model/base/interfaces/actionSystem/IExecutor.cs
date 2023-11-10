@@ -9,10 +9,7 @@ namespace LineWars.Model
         public event Action AnyActionCompleted;
 
         public bool CanDoAnyAction => CurrentActionPoints > 0;
-
-        public bool TryGetCommandForTarget(CommandType priorityType, ITarget target,
-            out IActionCommand command);
-
+        
         public T Accept<T>(IExecutorVisitor<T> visitor);
     }
 

@@ -59,11 +59,6 @@ namespace LineWars.Model
         private Dictionary<CommandType, IMonoUnitAction<UnitAction<Node, Edge, Unit>>> monoActionsDictionary;
         public IEnumerable<IMonoUnitAction<UnitAction<Node, Edge, Unit>>> MonoActions => monoActionsDictionary.Values;
         public uint MaxPossibleActionRadius { get; private set; }
-        
-        
-        private static readonly ITargetActionGrouper grouper = new DefaultTargetActionGrouper();
-        public TargetTypeActionsDictionary TargetTypeActionsDictionary { get; private set; }
-        public IReadOnlyCollection<Type> PossibleTargetsTypes { get; private set; }
 
         #region Properties
         public int Id => index;
@@ -210,17 +205,6 @@ namespace LineWars.Model
                 }
 
                 MaxPossibleActionRadius = MonoActions.Max(x => x.GetPossibleMaxRadius());
-
-                var targetActions = MonoActions
-                    .OfType<ITargetedAction>()
-                    .ToArray();
-                
-                PossibleTargetsTypes = targetActions
-                    .Select(x => x.TargetType)
-                    .Distinct()
-                    .ToArray();
-
-                TargetTypeActionsDictionary = grouper.GroupByType(targetActions);
             }
         }
 
@@ -241,22 +225,6 @@ namespace LineWars.Model
             action = GetUnitAction<T>();
             return action != null;
         }
-
-        public bool TryGetCommandForTarget(CommandType priorityType, ITarget target,
-            out IActionCommand command)
-        {
-            if (monoActionsDictionary.TryGetValue(priorityType, out var value)
-                && value is ITargetedAction targetedAction
-                && targetedAction.IsMyTarget(target))
-            {
-                command = targetedAction.GenerateCommand(target);
-                return true;
-            }
-
-            command = null;
-            return false;
-        }
-        
 
         private void OnDied()
         {

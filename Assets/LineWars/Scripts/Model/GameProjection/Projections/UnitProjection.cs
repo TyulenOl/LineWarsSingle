@@ -56,10 +56,6 @@ namespace LineWars.Model
 
         public bool HasOriginal => Original != null;
 
-        public UnitProjection()
-        {
-        }
-
         public void SetId(int id)
         {
             HasId = true;
@@ -132,22 +128,7 @@ namespace LineWars.Model
             action = GetUnitAction<T>();
             return action != null;
         }
-
-        public bool TryGetCommandForTarget(CommandType priorityType, ITarget target,
-            out IActionCommand command)
-        {
-            if (actionsDictionary.TryGetValue(priorityType, out var value)
-                && value is ITargetedAction targetedAction
-                && targetedAction.IsMyTarget(target))
-            {
-                command = targetedAction.GenerateCommand(target);
-                return true;
-            }
-
-            command = null;
-            return false;
-        }
-
+        
         public override void Replenish()
         {
             base.Replenish();

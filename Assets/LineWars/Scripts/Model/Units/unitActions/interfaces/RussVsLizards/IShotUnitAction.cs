@@ -1,20 +1,16 @@
 ﻿namespace LineWars.Model
 {
-    public interface IShotUnitAction<TNode, TEdge, TUnit>: 
+    public interface IShotUnitAction<TNode, TEdge, TUnit> :
         IUnitAction<TNode, TEdge, TUnit>,
-        IMultiStageTargetedAction
-
+        IMultiTargetedAction<TUnit, TNode>
         where TNode : class, INodeForGame<TNode, TEdge, TUnit>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
 
     {
-        public TUnit TakenUnit { get; }
-
-        public bool CanTakeUnit(TUnit unit);
-        public void TakeUnit(TUnit unit);
-
-        public bool CanShotUnitTo(TNode node);
-        public void ShotUnitTo(TNode node);
+        IActionCommand IMultiTargetedAction<TUnit, TNode>.GenerateCommand(TUnit unit, TNode node)
+        {
+            return new ShotUnitCommand<TNode, TEdge, TUnit>(this, unit, node);
+        }
     }
 }

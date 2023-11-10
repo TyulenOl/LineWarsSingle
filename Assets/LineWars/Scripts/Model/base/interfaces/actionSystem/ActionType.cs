@@ -11,6 +11,18 @@ namespace LineWars.Model
         NeedAdditionalParameters = 8, // beta
         
         MultiTargeted = Targeted | MultiStage,
-        MultiSimpleTargeted = Simple | Targeted | MultiStage
+    }
+
+    public static class ActionTypeHelper
+    {
+        public static bool IsMultiStage(this ActionType me)
+        {
+            return me.Is(ActionType.MultiStage);
+        }
+
+        public static bool Is(this ActionType me, ActionType other)
+        {
+            return (me & other) == other;
+        }
     }
 }

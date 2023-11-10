@@ -32,28 +32,20 @@ namespace LineWars.Model
             DJ = new RandomDJ(1);
         }
 
-        public virtual bool CanAttack(IAlive enemy, bool ignoreActionPointsCondition = false) =>
+        public virtual bool CanAttack(ITargetedAlive enemy, bool ignoreActionPointsCondition = false) =>
             Action.CanAttack(enemy, ignoreActionPointsCondition);
 
-        public virtual void Attack(IAlive enemy)
+        public virtual void Attack(ITargetedAlive enemy)
         {
             StartCoroutine(AttackCoroutine(enemy));
         }
 
-        private IEnumerator AttackCoroutine(IAlive enemy)
+        private IEnumerator AttackCoroutine(ITargetedAlive enemy)
         {
             Action.Attack(enemy);
             SfxManager.Instance.Play(attackSfx);
             yield return new WaitForSeconds(attackSfx.LengthInSeconds / 2);
             SfxManager.Instance.Play(DJ.GetSound(sfxList));
-        }
-
-        public Type TargetType => typeof(IAlive);
-        public bool IsMyTarget(ITarget target) => target is IAlive;
-
-        public IActionCommand GenerateCommand(ITarget target)
-        {
-            return new AttackCommand<Node, Edge, Unit>(this, (IAlive) target);
         }
     }
 }

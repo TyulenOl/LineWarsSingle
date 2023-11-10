@@ -1,23 +1,23 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace LineWars.Model
 {
     public static class GraphProjectionCreator
     {
-        public static GraphProjection FromMono(MonoGraph monoGraph,
-            IReadOnlyDictionary<BasePlayer, BasePlayerProjection> players, GameProjection gameProjection)
+        public static GraphProjection FromMono(
+            MonoGraph monoGraph,
+            IReadOnlyDictionary<BasePlayer, BasePlayerProjection> players,
+            GameProjection gameProjection)
         {
             var nodeList = new Dictionary<Node, NodeProjection>();
             var edgeList = new Dictionary<Edge, EdgeProjection>();
 
-            //создает ноды
+
             foreach (var oldNode in monoGraph.Nodes)
             {
                 var nodeProjection = NodeProjectionCreator.FromMono(oldNode);
-                //присоединяет овнера
+
                 if (oldNode.Owner != null)
                 {
                     var nodeOwnerProjection = players[oldNode.Owner];
@@ -27,7 +27,7 @@ namespace LineWars.Model
                         nodeOwnerProjection.Base = nodeProjection;
                     }
                 }
-                //добавляет ноды
+
                 if (!oldNode.LeftIsFree)
                 {
                     var leftUnitProjection = InitializeUnitFromMono(oldNode.LeftUnit);
@@ -48,7 +48,7 @@ namespace LineWars.Model
 
                 nodeList[oldNode] = nodeProjection;
             }
-            //добавляет еджи
+
             foreach (var edge in monoGraph.Edges)
             {
                 var firstNode = nodeList[edge.FirstNode];
@@ -72,8 +72,10 @@ namespace LineWars.Model
             }
         }
 
-        public static GraphProjection FromProjection(IReadOnlyGraphProjection projection,
-            IReadOnlyDictionary<BasePlayerProjection, BasePlayerProjection> oldPlayersToNew, GameProjection gameProjection)
+        public static GraphProjection FromProjection(
+            IReadOnlyGraphProjection projection,
+            IReadOnlyDictionary<BasePlayerProjection, BasePlayerProjection> oldPlayersToNew,
+            GameProjection gameProjection)
         {
             var oldNodesToNew = new Dictionary<NodeProjection, NodeProjection>();
             var oldEdgesToNew = new Dictionary<EdgeProjection, EdgeProjection>();
@@ -122,7 +124,10 @@ namespace LineWars.Model
             return new GraphProjection(oldNodesToNew.Values, oldEdgesToNew.Values, gameProjection);
         }
 
-        private static void ConnectUnit(UnitProjection oldUnit, NodeProjection newNode, UnitDirection unitDirection,
+        private static void ConnectUnit(
+            UnitProjection oldUnit,
+            NodeProjection newNode, 
+            UnitDirection unitDirection,
             in IReadOnlyDictionary<BasePlayerProjection, BasePlayerProjection> oldPlayersToNew)
         {
             var newUnit = UnitProjectionCreator.FromProjection(oldUnit, newNode);
