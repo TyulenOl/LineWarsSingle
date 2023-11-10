@@ -14,24 +14,27 @@ namespace LineWars.Model
     {
         public override CommandType CommandType => CommandType.ShotUnit;
         public override ActionType ActionType => ActionType.MultiTargeted;
-        
-        
+
+
         public ShotUnitAction(TUnit executor) : base(executor)
         {
         }
 
-        public bool IsAvailable1([NotNull] TUnit unit)
+        public bool IsAvailable([NotNull] TUnit unit)
         {
             if (unit == null) throw new ArgumentNullException(nameof(unit));
 
             var line = MyUnit.Node.GetLine(unit.Node);
             return ActionPointsCondition()
-                   && line != null;
+                   && unit.Size == UnitSize.Little
+                   && (MyUnit.IsNeighbour(unit) || line != null);
         }
 
-        public bool IsAvailable2(TNode target2)
+        public bool IsAvailable(TUnit target1, TNode target2)
         {
-            return true;
+            return IsAvailable(target1)
+                   && target2 != MyUnit.Node
+                   && target2 != target1.Node;
         }
 
         public void Execute(TUnit takenUnit, TNode node)
@@ -40,10 +43,10 @@ namespace LineWars.Model
                 takenUnit.Node.LeftUnit = null;
             if (takenUnit.Node.RightUnit == takenUnit)
                 takenUnit.Node.RightUnit = null;
-            
+
             if (node.AllIsFree)
             {
-                takenUnit.Node = node;
+                AssignNode(takenUnit, node);
             }
             else
             {
@@ -53,11 +56,24 @@ namespace LineWars.Model
                 foreach (var enemy in enemies)
                     enemy.DealDamageThroughArmor(myDamage);
                 takenUnit.DealDamageThroughArmor(enemyDamage);
+                if (!takenUnit.IsDied)
+                {
+                    AssignNode(takenUnit, node);
+                }
             }
-            
-            
+
+
             CompleteAndAutoModify();
         }
+
+        private static void AssignNode(TUnit takenUnit, TNode node)
+        {
+            takenUnit.Node = node;
+            node.LeftUnit = takenUnit;
+            node.ConnectTo(takenUnit.OwnerId);
+        }
+
+
         public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit> visitor) => visitor.Visit(this);
 
         public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit> visitor) =>

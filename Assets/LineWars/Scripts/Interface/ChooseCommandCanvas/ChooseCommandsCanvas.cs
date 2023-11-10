@@ -20,7 +20,7 @@ namespace LineWars
         {
             gameObject.SetActive(true);
             transform.position = message.SelectedNode.Position;
-            var amount = message.AllActions.Count();
+            var amount = message.Data.Count();
             switch (amount)
             {
                 case 2:

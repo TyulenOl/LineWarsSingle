@@ -6,9 +6,9 @@ namespace LineWars.Model
         MonoUnitAction<ShotUnitAction<Node, Edge, Unit>>,
         IShotUnitAction<Node, Edge, Unit>
     {
-        public bool IsAvailable1(Unit target1) => Action.IsAvailable1(target1);
+        public bool IsAvailable(Unit target1) => Action.IsAvailable(target1);
 
-        public bool IsAvailable2(Node target2) => Action.IsAvailable2(target2);
+        public bool IsAvailable(Unit target1, Node target2) => Action.IsAvailable(target1, target2);
 
         public void Execute(Unit target1, Node target2)
         {
@@ -22,6 +22,7 @@ namespace LineWars.Model
 
         public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
 
-        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit> visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit> visitor) =>
+            visitor.Visit(this);
     }
 }
