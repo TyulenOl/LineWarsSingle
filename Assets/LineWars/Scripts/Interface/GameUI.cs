@@ -37,6 +37,7 @@ namespace LineWars.Interface
         private void Start()
         {
             CommandsManager.Instance.ExecutorChanged.AddListener(OnExecutorChanged);
+            CommandsManager.Instance.NeedRedraw.AddListener(ReDrawCurrentTargets);
 
             SubscribeEventForGameReferee();
         }
@@ -59,14 +60,8 @@ namespace LineWars.Interface
 
         private void OnExecutorChanged(IExecutor before, IExecutor after)
         {
-            if (before != null)
-                before.AnyActionCompleted -= ReDrawCurrentTargets;
-
             currentExecutor = after;
-            ReDrawCurrentTargets();
             ReDrawAllAvailability(before, after);
-            if (currentExecutor == null) return;
-            currentExecutor.AnyActionCompleted += ReDrawCurrentTargets;
         }
 
         private void ReDrawAllAvailability(IExecutor before, IExecutor after)
@@ -74,7 +69,7 @@ namespace LineWars.Interface
             var unitsToReDraw = Player.LocalPlayer.GetAllUnitsByPhase(PhaseManager.Instance.CurrentPhase);
             if (after is null)
             {
-                if (before is {CanDoAnyAction: true})
+                if (before is { CanDoAnyAction: true })
                     ReDrawAllAvailability(unitsToReDraw, true);
             }
             else
@@ -103,7 +98,7 @@ namespace LineWars.Interface
             }
         }
 
-        private void ReDrawCurrentTargets()
+        private void ReDrawCurrentTargets(ExecutorRedrawMessage message)
         {
             foreach (var currentDrawer in currentDrawers)
             {
@@ -111,23 +106,64 @@ namespace LineWars.Interface
                 currentDrawer.ReDraw(CommandType.None);
             }
 
+            if(message == null)
+                return;
+
             currentDrawers = new List<TargetDrawer>();
+
+            var dictionary = message.Data.GroupBy(info =>
+                {
+                    switch (info.Target)
+                    {
+                        case Node node:
+                            return node;
+                        case Unit unit:
+                            return unit.Node;
+                        default:
+                            return null;
+                    }
+                }, targetInfo => targetInfo.CommandType,
+                Tuple.Create);
             if (currentExecutor != null)
             {
-                ReDrawTargetsIcons(currentExecutor.GetAllAvailableTargets().ToList());
+                ReDrawTargetsIcons(dictionary);
             }
         }
 
-        private void ReDrawTargetsIcons(List<(ITarget, CommandType)> targets)
+        [Obsolete]
+        private void ReDrawTargetsIcons(IEnumerable<TargetActionInfo> targets)
         {
-            foreach (var valueTuple in targets)
+            foreach (var targetActionInfo in targets)
             {
-                var drawerScript = valueTuple.Item1 as MonoBehaviour;
+                var drawerScript = targetActionInfo.Target as MonoBehaviour;
                 if (drawerScript == null) continue;
                 var drawer = drawerScript.gameObject.GetComponent<TargetDrawer>();
                 if (drawer == null) continue;
                 currentDrawers.Add(drawer);
-                drawer.ReDraw(valueTuple.Item2);
+
+                if (drawer is NodeTargetDrawer nodeTargetDrawer)
+                {
+                    nodeTargetDrawer.ReDraw(targets.Select(x => x.CommandType));
+                }
+                else
+                {
+                    drawer.ReDraw(targetActionInfo.CommandType);
+                }
+            }
+        }
+
+        private void ReDrawTargetsIcons(IEnumerable<Tuple<Node, IEnumerable<CommandType>>> tuples)
+        {
+            foreach (var tuple in tuples)
+            {
+                var node = tuple.Item1;
+                var commands = tuple.Item2;
+                
+                if (node == null) continue;
+                var drawer = node.gameObject.GetComponent<NodeTargetDrawer>();
+                if (drawer == null) continue;
+                currentDrawers.Add(drawer);
+                drawer.ReDraw(commands);
             }
         }
 

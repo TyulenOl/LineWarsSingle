@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using LineWars;
@@ -39,7 +40,7 @@ public static class DrawHelper
             case CommandType.Build:
                 return Resources.Load<Sprite>("UI/Icons/Upgrade");
 
-            default: return Resources.Load<Sprite>("UI/Icons/Icon_Focus");
+            default: return Resources.Load<Sprite>("UI/Sorokin/Icons/DistanseAttackOrder");
         }
     }
 
@@ -62,6 +63,7 @@ public static class DrawHelper
     }
 
 
+    [Obsolete]
     public static Sprite GetSpriteByUnitType(UnitType characteristicType)
     {
         switch (characteristicType)

@@ -18,6 +18,7 @@ namespace LineWars.Controllers
     public class TargetActionInfo
     {
         public ITarget Target { get; }
+        
         public CommandType CommandType { get; }
 
         public TargetActionInfo(ITarget target, CommandType commandType)
