@@ -161,6 +161,11 @@ namespace LineWars.Controllers
 
         private void SendMessage(IEnumerable<ITarget> targets)
         {
+            if (targets == null)
+            {
+                NeedRedraw.Invoke(null);
+                return;
+            }
             var visitor = new GetAllAvailableTargetActionInfoForExecutorVisitor(
                 new GetAvailableTargetActionInfoForShotUnitAction(targets.ToArray()));
             var data = Executor.Accept(visitor);

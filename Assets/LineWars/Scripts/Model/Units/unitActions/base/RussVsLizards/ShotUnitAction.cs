@@ -27,7 +27,8 @@ namespace LineWars.Model
             var line = MyUnit.Node.GetLine(unit.Node);
             return ActionPointsCondition()
                    && unit.Size == UnitSize.Little
-                   && (MyUnit.IsNeighbour(unit) || line != null);
+                   && (MyUnit.IsNeighbour(unit) || line != null)
+                   && MyUnit != unit;
         }
 
         public bool IsAvailable(TUnit target1, TNode target2)

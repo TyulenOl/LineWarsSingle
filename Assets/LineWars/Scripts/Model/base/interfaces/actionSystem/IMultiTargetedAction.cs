@@ -46,8 +46,8 @@ namespace LineWars.Model
         {
             return target.Length switch
             {
-                0 => target[0] is TTarget1 target1 && IsAvailable(target1),
-                1 => target[0] is TTarget1 target1 && target[1] is TTarget2 target2 && IsAvailable(target1, target2),
+                1 => target[0] is TTarget1 target1 && IsAvailable(target1),
+                2 => target[0] is TTarget1 target1 && target[1] is TTarget2 target2 && IsAvailable(target1, target2),
                 _ => throw new ArgumentOutOfRangeException(nameof(target.Length))
             };
         }

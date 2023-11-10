@@ -88,8 +88,9 @@ namespace LineWars.Controllers
                 if (!isCancelable) return;
                 Manager.Executor = null;
                 Debug.Log("EXECUTOR CANCELED");
-
+                
                 Manager.stateMachine.SetState(Manager.executorState);
+                
             }
         }
     }
