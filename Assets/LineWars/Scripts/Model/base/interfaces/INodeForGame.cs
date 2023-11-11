@@ -16,6 +16,7 @@ namespace LineWars.Model
         public int Visibility { get; }
         public int ValueOfHidden { get; }
 
+        public bool IsSpawn { get; }
         public TUnit LeftUnit { get; set; }
         public TUnit RightUnit { get; set; }
         public IBuilding Building { get; set; }

@@ -14,6 +14,7 @@ namespace LineWars.Model
         {
             target1.MovementLogic.MoveTo(target2.transform);
             Action.Execute(target1, target2);
+            Player.LocalPlayer.RecalculateVisibility();
         }
 
         protected override ShotUnitAction<Node, Edge, Unit> GetAction()

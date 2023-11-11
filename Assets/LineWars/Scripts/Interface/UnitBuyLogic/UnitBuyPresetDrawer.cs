@@ -41,14 +41,14 @@ namespace LineWars.Interface
         private void OnPhaseChanged(PhaseType phaseTypeOld, PhaseType phaseTypeNew)
         {
             if (phaseTypeNew != PhaseType.Buy) return;
-            SetAvailable(Player.LocalPlayer.CanSpawnPreset(unitBuyPreset));
+            SetAvailable(Player.LocalPlayer.CanBuyPreset(unitBuyPreset));
         }
 
         private void Init()
         {
             image.sprite = unitBuyPreset.Image;
             cost.text = unitBuyPreset.Cost.ToString();
-            SetAvailable(Player.LocalPlayer.CanSpawnPreset(unitBuyPreset));
+            SetAvailable(Player.LocalPlayer.CanBuyPreset(unitBuyPreset));
         }
 
 
