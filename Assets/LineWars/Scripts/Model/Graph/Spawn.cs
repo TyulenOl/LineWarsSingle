@@ -19,6 +19,15 @@ namespace LineWars.Model
 
         private void OnValidate()
         {
+            if(GroupSprite == null && Nation != null)
+            {
+                GroupSprite = Nation.NodeSprite;
+            }
+            if ((GroupName == null || GroupName == "" || GroupName == string.Empty)
+                && Nation != null)
+            {
+                GroupName = Nation.Name;
+            }
             AssignFields();
             AssignComponents();
             Redraw();

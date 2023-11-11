@@ -111,21 +111,42 @@ namespace LineWars.Model
             SingleGame.Instance.AllPlayers.Remove(this);
         }
 
-        public bool CanSpawnPreset(UnitBuyPreset preset)
+        public bool CanBuyPreset(UnitBuyPreset preset)
         {
-            return NodeConditional() && MoneyConditional();
+            return CanBuyPreset(preset, Base);
+        }
 
-            bool NodeConditional()
-            {
-                if (Nation.GetUnit(preset.FirstUnitType).Size != UnitSize.Large && (preset.FirstUnitType == UnitType.None || preset.SecondUnitType == UnitType.None))
-                    return Base.AnyIsFree;
-                return Base.AllIsFree;
-            }
+        public bool CanBuyPreset(UnitBuyPreset preset, Node node)
+        {
+            if (preset.FirstUnitType != UnitType.None && preset.SecondUnitType == UnitType.None)
+                return CanBuyPresetOne(preset, node);
+            if(preset.FirstUnitType != UnitType.None && preset.SecondUnitType != UnitType.None)
+                return CanBuyPresetMultiple(preset, node);
+            Debug.Log("Invalid preset!");
+            return false;    
+        }
 
-            bool MoneyConditional()
-            {
-                return CurrentMoney - preset.Cost >= 0;
-            }
+        public bool CanBuyPresetOne(UnitBuyPreset preset, Node node)
+        {
+            if(GetUnitPrefab(preset.FirstUnitType).Size == UnitSize.Little)
+                return CanAffordPreset(preset)
+                    && (node.AnyIsFree);
+            return CanAffordPreset(preset)
+                 && (node.AllIsFree);
+        }
+
+        public bool CanBuyPresetMultiple(UnitBuyPreset preset, Node node)
+        {
+            if (GetUnitPrefab(preset.FirstUnitType).Size == UnitSize.Large
+                || GetUnitPrefab(preset.SecondUnitType).Size == UnitSize.Large)
+                Debug.LogError("Invalid Preset!");
+            return CanAffordPreset(preset)
+                && (node.AllIsFree);
+        }
+
+        public bool CanAffordPreset(UnitBuyPreset preset)
+        {
+            return CurrentMoney - preset.Cost >= 0;
         }
 
         public void SpawnUnit(Node node, UnitType unitType)
@@ -135,11 +156,16 @@ namespace LineWars.Model
             BasePlayerUtility.CreateUnitForPlayer(this, node, unitPrefab);
         }
 
-        public void SpawnPreset(UnitBuyPreset unitPreset)
+        public void BuyPreset(UnitBuyPreset unitPreset)
         {
-            SpawnUnit(Base, unitPreset.FirstUnitType);
-            SpawnUnit(Base, unitPreset.SecondUnitType);
-            CurrentMoney -= unitPreset.Cost;
+            BuyPreset(unitPreset, Base);
+        }
+
+        public void BuyPreset(UnitBuyPreset preset, Node node) //TODO: Закинуть в IBasePlayer???
+        {
+            SpawnUnit(node, preset.FirstUnitType);
+            SpawnUnit(node, preset.SecondUnitType);
+            CurrentMoney -= preset.Cost;
         }
 
         public void AddOwned([NotNull] Owned owned)

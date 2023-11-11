@@ -20,6 +20,7 @@ namespace LineWars.Model
         public int Id { get; set; }
         public int Visibility { get; set; }
         public int ValueOfHidden { get; set; }
+        public bool IsSpawn { get; set; }
 
         public UnitProjection LeftUnit 
         {

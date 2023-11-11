@@ -7,6 +7,8 @@ namespace LineWars.Model
     public class Nation: ScriptableObject
     {
         [SerializeField] private NationEconomicLogic nationEconomicLogic;
+        [field:SerializeField] public string Name { get; private set; }
+        [field: SerializeField] public Sprite NodeSprite { get; private set; }
         [field: SerializeField] public SerializedDictionary<UnitType, Unit> UnitTypeUnitPairs { get; private set; } = new();
         
         public NationEconomicLogic NationEconomicLogic => nationEconomicLogic;

@@ -18,12 +18,12 @@
 
         public void Execute()
         {
-            player.SpawnPreset(unitPreset);
+            player.BuyPreset(unitPreset);
         }
 
         public bool CanExecute()
         {
-            return player.CanSpawnPreset(unitPreset);
+            return player.CanBuyPreset(unitPreset);
         }
 
         public string GetLog()
