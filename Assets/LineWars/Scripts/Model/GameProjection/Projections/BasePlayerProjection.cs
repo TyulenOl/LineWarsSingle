@@ -86,7 +86,7 @@ namespace LineWars.Model
             }
         }
 
-        public bool CanSpawnPreset(UnitBuyPreset preset)
+        public bool CanBuyPreset(UnitBuyPreset preset)
         {
             return Base.LeftUnit == null && Base.RightUnit == null;
         }
@@ -99,7 +99,7 @@ namespace LineWars.Model
             OwnedObjects.Remove(owned);
         }
 
-        public void SpawnPreset(UnitBuyPreset preset)
+        public void BuyPreset(UnitBuyPreset preset)
         {
             var leftUnit = preset.FirstUnitType; // СПРОСИТЬ У ПАШИ
         }
