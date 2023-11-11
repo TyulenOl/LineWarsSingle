@@ -1,7 +1,8 @@
 ﻿namespace LineWars.Model
 {
     public interface IMonoExecutorAction<out TExecutor, out TAction> :
-        IExecutorAction<TExecutor>
+        IExecutorAction<TExecutor>,
+        IMonoBehaviorImplementation
         where TExecutor : class, IExecutor
         where TAction : ExecutorAction<TExecutor>
     {

@@ -3,7 +3,6 @@
 namespace LineWars.Model
 {
     public interface IEdgeForGame<TNode, TEdge, TUnit> :
-        ITarget,
         ITargetedAlive,
         IEdge<TNode, TEdge>
         where TNode : class, INodeForGame<TNode, TEdge, TUnit>

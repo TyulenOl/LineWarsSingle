@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    public class ConvertUnitActionToBlueprints<TNode, TEdge, TUnit> 
-        : IUnitActionVisitor<TNode, TEdge, TUnit>
+    public class ConvertBaseUnitActionToBlueprints<TNode, TEdge, TUnit> 
+        : IBaseUnitActionVisitor<TNode, TEdge, TUnit>
         where TNode : class, INodeForGame<TNode, TEdge, TUnit>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
         where TUnit : class, IUnit<TNode, TEdge, TUnit> 
@@ -14,7 +14,7 @@ namespace LineWars.Model
         public List<ICommandBlueprint> BlueprintList { get; private set; }
 
 
-        public ConvertUnitActionToBlueprints(IGraphForGame<TNode, TEdge, TUnit> graph,
+        public ConvertBaseUnitActionToBlueprints(IGraphForGame<TNode, TEdge, TUnit> graph,
             List<ICommandBlueprint> list)
         {
             Graph = graph;
@@ -166,14 +166,14 @@ namespace LineWars.Model
 
     public static class ConvertUnitActionToBlueprints
     {
-        public static ConvertUnitActionToBlueprints<TNode, TEdge, TUnit> Create<TNode, TEdge, TUnit>(
+        public static ConvertBaseUnitActionToBlueprints<TNode, TEdge, TUnit> Create<TNode, TEdge, TUnit>(
             IGraphForGame<TNode, TEdge, TUnit> graph,
             List<ICommandBlueprint> list)
             where TNode : class, INodeForGame<TNode, TEdge, TUnit>
             where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
             where TUnit : class, IUnit<TNode, TEdge, TUnit>
         {
-            return new ConvertUnitActionToBlueprints<TNode, TEdge, TUnit>(graph, list);
+            return new ConvertBaseUnitActionToBlueprints<TNode, TEdge, TUnit>(graph, list);
         }
     }
 }

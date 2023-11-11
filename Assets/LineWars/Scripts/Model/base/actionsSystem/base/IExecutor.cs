@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace LineWars.Model
 {
@@ -9,8 +10,6 @@ namespace LineWars.Model
         public event Action AnyActionCompleted;
 
         public bool CanDoAnyAction => CurrentActionPoints > 0;
-        
-        public T Accept<T>(IExecutorVisitor<T> visitor);
     }
 
     public interface IExecutor<TExecutor, in TAction> : IExecutor
@@ -19,5 +18,10 @@ namespace LineWars.Model
     {
         public bool TryGetUnitAction<T>(out T action) where T : TAction;
         public T GetUnitAction<T>() where T : TAction;
+    }
+
+    public interface IExecutorActionSource : IExecutor
+    {
+        public IEnumerable<IExecutorAction> Actions { get; }
     }
 }

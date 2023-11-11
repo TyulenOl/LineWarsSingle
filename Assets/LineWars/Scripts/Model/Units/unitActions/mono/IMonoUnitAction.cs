@@ -5,6 +5,6 @@
         IUnitAction<Node, Edge, Unit>
         where TAction : UnitAction<Node, Edge, Unit>
     {
-        public void Accept(IMonoUnitVisitor visitor);
+        public void Accept(IMonoUnitActionVisitor visitor);
     }
 }

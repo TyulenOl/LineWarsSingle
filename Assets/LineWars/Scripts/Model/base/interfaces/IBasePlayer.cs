@@ -9,7 +9,5 @@ namespace LineWars.Model
         
         public bool CanSpawnPreset(UnitBuyPreset preset);
         public void SpawnPreset(UnitBuyPreset preset);
-
-        public T Accept<T>(IBasePlayerVisitor<T> visitor);
     }
 }

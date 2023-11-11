@@ -1,6 +1,6 @@
 namespace LineWars.Model
 {
-    public interface IMonoUnitVisitor
+    public interface IMonoUnitActionVisitor
     {
         public void Visit(MonoBuildRoadAction action);
         public void Visit(MonoBlockAction action);
@@ -9,7 +9,7 @@ namespace LineWars.Model
         public void Visit(MonoDistanceAttackAction action);
         public void Visit(MonoArtilleryAttackAction action);
         public void Visit(MonoMeleeAttackAction action);
-        
+
         public void Visit(MonoRLBlockAction action);
         public void Visit(MonoSacrificeForPerunAction action);
         public void Visit(MonoRamAction action);

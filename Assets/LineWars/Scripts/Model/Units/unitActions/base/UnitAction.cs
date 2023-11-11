@@ -22,7 +22,7 @@ namespace LineWars.Model
         
         public virtual uint GetPossibleMaxRadius() => (uint) MyUnit.CurrentActionPoints;
 
-        public abstract void Accept(IUnitActionVisitor<TNode, TEdge, TUnit> visitor);
-        public abstract TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit> visitor);
+        public abstract void Accept(IBaseUnitActionVisitor<TNode, TEdge, TUnit> visitor);
+        public abstract TResult Accept<TResult>(IUnitActionVisitor<TResult, TNode, TEdge, TUnit> visitor);
     }
 }

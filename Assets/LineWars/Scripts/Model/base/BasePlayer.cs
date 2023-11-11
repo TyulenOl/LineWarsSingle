@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -117,7 +118,7 @@ namespace LineWars.Model
 
             bool NodeConditional()
             {
-                if (Nation.GetUnit(preset.FirstUnitType).Size != UnitSize.Large && (preset.FirstUnitType == UnitType.None || preset.SecondUnitType == UnitType.None))
+                if (Nation.GetUnitPrefab(preset.FirstUnitType).Size != UnitSize.Large && (preset.FirstUnitType == UnitType.None || preset.SecondUnitType == UnitType.None))
                     return Base.AnyIsFree;
                 return Base.AllIsFree;
             }
@@ -133,14 +134,20 @@ namespace LineWars.Model
             if (unitType == UnitType.None) return;
             var unitPrefab = GetUnitPrefab(unitType);
             BasePlayerUtility.CreateUnitForPlayer(this, node, unitPrefab);
+            OnSpawnUnit();
         }
+        
+        protected virtual void OnSpawnUnit(){}
 
         public void SpawnPreset(UnitBuyPreset unitPreset)
         {
             SpawnUnit(Base, unitPreset.FirstUnitType);
             SpawnUnit(Base, unitPreset.SecondUnitType);
             CurrentMoney -= unitPreset.Cost;
+            OnSpawnPreset();
         }
+        
+        public virtual void OnSpawnPreset() {}
 
         public void AddOwned([NotNull] Owned owned)
         {
@@ -240,7 +247,17 @@ namespace LineWars.Model
             Destroy(gameObject);
         }
         
-        public Unit GetUnitPrefab(UnitType unitType) => Nation.GetUnit(unitType);
+        public Unit GetUnitPrefab(UnitType unitType) => Nation.GetUnitPrefab(unitType);
+        
+        public void FinishTurn()
+        {
+            StartCoroutine(Coroutine());
+            IEnumerator Coroutine()
+            {
+                yield return null;
+                ExecuteTurn(PhaseType.Idle);
+            }
+        }
 
         public void ExecuteTurn(PhaseType phaseType)
         {
@@ -274,7 +291,6 @@ namespace LineWars.Model
             CurrentPhase = phaseType;
             TurnChanged?.Invoke(previousPhase, CurrentPhase);
         }
-
         public bool CanExecuteTurn(PhaseType phaseType)
         {
             switch (phaseType)
@@ -364,7 +380,5 @@ namespace LineWars.Model
         }
 
         #endregion
-
-        public T Accept<T>(IBasePlayerVisitor<T> visitor) => visitor.Visit(this);
     }
 }

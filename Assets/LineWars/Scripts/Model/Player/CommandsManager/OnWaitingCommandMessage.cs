@@ -21,12 +21,17 @@ namespace LineWars.Controllers
     public class CommandPreset
     {
         public IExecutorAction Action { get; }
-        public ITarget Target { get; }
+        public IMonoTarget Target { get; }
+        public IMonoExecutor Executor { get; }
 
-        public CommandPreset(ITarget target, IExecutorAction action)
+        public CommandPreset(
+            IMonoExecutor executor,
+            IMonoTarget target,
+            IExecutorAction action)
         {
             Target = target;
             Action = action;
+            Executor = executor;
         }
     }
 }

@@ -23,7 +23,6 @@ namespace LineWars
                 IEnumerator IdleCroroutine()
                 {
                     yield return null;
-                    player.IsTurnMade = true;
                     player.ExecuteTurn(PhaseType.Idle);
                 }
             }

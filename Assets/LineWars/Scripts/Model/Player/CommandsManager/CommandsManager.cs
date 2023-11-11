@@ -1,10 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using UnityEngine;
-using UnityEngine.Events;
 using LineWars.Model;
 
 namespace LineWars.Controllers
@@ -14,8 +11,9 @@ namespace LineWars.Controllers
     {
         public static CommandsManager Instance { get; private set; }
 
-        private ITarget target;
-        private IExecutor executor;
+        private IMonoTarget target;
+        private IMonoExecutor executor;
+        private bool canCancelExecutor = true;
 
         private StateMachine stateMachine;
         private CommandsManagerExecutorState executorState;
@@ -25,29 +23,28 @@ namespace LineWars.Controllers
         private CommandsManagerMultiTargetState multiTargetState;
 
         [SerializeField, ReadOnlyInspector] private CommandsManagerStateType state;
+        public event Action<IMonoTarget, IMonoTarget> TargetChanged;
+        public event Action<IMonoExecutor, IMonoExecutor> ExecutorChanged;
 
-        public UnityEvent<ITarget, ITarget> TargetChanged;
-        public UnityEvent<IExecutor, IExecutor> ExecutorChanged;
-        public UnityEvent<IExecutor, ITarget> CommandExecuted;
 
         private OnWaitingCommandMessage currentOnWaitingCommandMessage;
-        public UnityEvent<OnWaitingCommandMessage> InWaitingCommandState;
-
+        public event Action<OnWaitingCommandMessage> InWaitingCommandState;
+        
+        private Player Player => Player.LocalPlayer;
         private OnWaitingCommandMessage CurrentOnWaitingCommandMessage
         {
             get => currentOnWaitingCommandMessage;
             set
             {
-                InWaitingCommandState.Invoke(value);
+                InWaitingCommandState?.Invoke(value);
                 currentOnWaitingCommandMessage = value;
             }
         }
 
-        public UnityEvent<ExecutorRedrawMessage> NeedRedraw;
+        public event Action<ExecutorRedrawMessage> NeedRedraw;
 
-        #region Attributes
 
-        public ITarget Target
+        public IMonoTarget Target
         {
             get => target;
             private set
@@ -55,11 +52,11 @@ namespace LineWars.Controllers
                 var previousTarget = target;
                 target = value;
                 if (previousTarget != target)
-                    TargetChanged.Invoke(previousTarget, target);
+                    TargetChanged?.Invoke(previousTarget, target);
             }
         }
 
-        public IExecutor Executor
+        public IMonoExecutor Executor
         {
             get => executor;
             private set
@@ -67,13 +64,9 @@ namespace LineWars.Controllers
                 var previousExecutor = executor;
                 executor = value;
                 if (previousExecutor != executor)
-                    ExecutorChanged.Invoke(previousExecutor, executor);
+                    ExecutorChanged?.Invoke(previousExecutor, executor);
             }
         }
-
-        public StateMachine StateMachine => stateMachine;
-
-        #endregion
 
         private void Awake()
         {
@@ -93,28 +86,40 @@ namespace LineWars.Controllers
             waitingCommandState = new CommandsManagerWaitingCommandState(this);
             multiTargetState = new CommandsManagerMultiTargetState(this);
         }
-
+        
         private void Start()
         {
-            Player.LocalPlayer.TurnMade.AddListener(OnTurnMade);
+            stateMachine.SetState(executorState);
             Player.LocalPlayer.TurnChanged += OnTurnChanged;
         }
 
-        private void OnEnable()
-        {
-            stateMachine.SetState(executorState);
-        }
-
-        private void OnDisable()
+        private void OnDestroy()
         {
             stateMachine.SetState(idleState);
-            Player.LocalPlayer.TurnMade.RemoveListener(OnTurnMade);
             Player.LocalPlayer.TurnChanged -= OnTurnChanged;
         }
 
-        private void OnTurnMade()
+        public void ExecuteCommand(ICommand command)
         {
-            stateMachine.SetState(idleState);
+            UnitsController.ExecuteCommand(command);
+            if (!Executor.CanDoAnyAction)
+            {
+                FinishTurn();
+            }
+            else 
+            {
+                SendRedrawMessage(Array.Empty<IMonoTarget>());
+                stateMachine.SetState(targetState);
+            }
+        }
+        
+        public void SelectCommandsPreset(CommandPreset preset)
+        {
+            if (stateMachine.CurrentState != waitingCommandState)
+                throw new InvalidOperationException();
+            if (!currentOnWaitingCommandMessage.Data.Contains(preset))
+                throw new ArgumentException(nameof(preset));
+            ProcessCommandPreset(preset);
         }
 
         private void OnTurnChanged(PhaseType previousPhase, PhaseType currentPhase)
@@ -123,24 +128,17 @@ namespace LineWars.Controllers
                 || stateMachine.CurrentState == executorState) return;
             stateMachine.SetState(executorState);
         }
-
-        public void SelectAction(CommandPreset preset)
+        
+        private void ProcessCommandPreset(CommandPreset preset)
         {
-            if (stateMachine.CurrentState != waitingCommandState)
-                throw new InvalidOperationException();
-            if (!currentOnWaitingCommandMessage.Data.Contains(preset))
-                throw new ArgumentException(nameof(preset));
-            ProcessTargetedAction(preset);
-        }
-
-        private void ProcessTargetedAction(CommandPreset preset)
-        {
+            var presetExecutor = preset.Executor;
             var presetAction = preset.Action;
             var presetTarget = preset.Target;
             switch (presetAction)
             {
                 case IMultiTargetedAction targetedAction:
                 {
+                    Target = presetTarget;
                     multiTargetState.Prepare(targetedAction, presetTarget);
                     stateMachine.SetState(multiTargetState);
                     break;
@@ -149,28 +147,40 @@ namespace LineWars.Controllers
                 {
                     Target = presetTarget;
                     var command = generator.GenerateCommand(presetTarget);
-                    CommandExecuted.Invoke(executor, presetTarget);
-                    UnitsController.ExecuteCommand(command);
-                    if (stateMachine.CurrentState != targetState)
-                        stateMachine.SetState(targetState);
+                    ExecuteCommand(command);
                     break;
                 }
                 default: throw new Exception();
             }
         }
 
-        private void SendMessage(IEnumerable<ITarget> targets)
+        private void SendRedrawMessage(
+            IEnumerable<IMonoTarget> targets,
+            Func<IUnitAction<Node, Edge, Unit>, bool> actionSelector = null)
         {
-            if (targets == null)
-            {
-                NeedRedraw.Invoke(null);
-                return;
-            }
-            var visitor = new GetAllAvailableTargetActionInfoForExecutorVisitor(
-                new GetAvailableTargetActionInfoForShotUnitAction(targets.ToArray()));
-            var data = Executor.Accept(visitor);
+            var visitor = new GetAllAvailableTargetActionInfoForMonoExecutorVisitor(
+                new GetAvailableTargetActionInfoVisitor.ForShotUnitAction(targets.ToArray()),
+                actionSelector);
+            var data = Executor.Accept(visitor).ToArray();
             var message = new ExecutorRedrawMessage(data);
-            NeedRedraw.Invoke(message);
+            NeedRedraw?.Invoke(message);
+        }
+
+        private void SendClearMassage()
+        {
+            NeedRedraw?.Invoke(null);
+        }
+
+        private void GoToWaitingCommandState(OnWaitingCommandMessage commandMessage)
+        {
+            CurrentOnWaitingCommandMessage = commandMessage;
+            stateMachine.SetState(waitingCommandState);
+        }
+
+        private void FinishTurn()
+        {
+            stateMachine.SetState(idleState);
+            Player.FinishTurn();
         }
     }
 }

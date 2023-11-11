@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace LineWars.Scripts.Interface
+namespace LineWars.Interface
 {
     public class Map : MonoBehaviour
     {

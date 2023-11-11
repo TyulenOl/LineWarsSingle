@@ -28,7 +28,5 @@ namespace LineWars.Model
         public bool AllIsFree => LeftIsFree && RightIsFree;
         public bool AnyIsFree => LeftIsFree || RightIsFree;
         public bool IsBase { get; }
-
-        public T Accept<T>(INodeVisitor<T> visitor);
     }
 }
