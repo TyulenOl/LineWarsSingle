@@ -2,7 +2,7 @@ using System;
 
 namespace LineWars.Model
 {
-    public class ConvertMonoActionVisitor : IMonoUnitVisitor
+    public class ConvertMonoActionVisitor : IMonoUnitActionVisitor
     {
         public UnitProjection Unit { get; private set; }
         public IGraphForGame<NodeProjection, EdgeProjection, UnitProjection> Graph { get; private set; }

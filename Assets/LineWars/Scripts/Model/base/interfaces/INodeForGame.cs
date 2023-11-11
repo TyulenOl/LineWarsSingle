@@ -16,6 +16,7 @@ namespace LineWars.Model
         public int Visibility { get; }
         public int ValueOfHidden { get; }
 
+        public bool IsSpawn { get; }
         public TUnit LeftUnit { get; set; }
         public TUnit RightUnit { get; set; }
         public IBuilding Building { get; set; }
@@ -28,7 +29,5 @@ namespace LineWars.Model
         public bool AllIsFree => LeftIsFree && RightIsFree;
         public bool AnyIsFree => LeftIsFree || RightIsFree;
         public bool IsBase { get; }
-
-        public T Accept<T>(INodeVisitor<T> visitor);
     }
 }

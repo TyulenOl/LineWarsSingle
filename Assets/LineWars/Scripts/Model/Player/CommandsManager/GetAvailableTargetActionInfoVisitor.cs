@@ -1,20 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using LineWars.Model;
 
 namespace LineWars.Controllers
 {
     public class GetAvailableTargetActionInfoVisitor :
-        IIUnitActionVisitor<IEnumerable<TargetActionInfo>, Node, Edge, Unit>
+        IUnitActionVisitor<IEnumerable<TargetActionInfo>, Node, Edge, Unit>
     {
-        private readonly GetAvailableTargetActionInfoForShotUnitAction forShotUnitAction;
+        private readonly ForShotUnitAction forShotUnitAction;
 
         public GetAvailableTargetActionInfoVisitor(
-            GetAvailableTargetActionInfoForShotUnitAction forShotUnitAction)
+            ForShotUnitAction forShotUnitAction)
         {
             this.forShotUnitAction = forShotUnitAction;
         }
+
         public IEnumerable<TargetActionInfo> Visit(IBuildAction<Node, Edge, Unit> action)
         {
             return action.MyUnit.Node.Edges
@@ -109,31 +111,29 @@ namespace LineWars.Controllers
                 .Where(action.IsAvailable)
                 .Select(e => new TargetActionInfo(e, action.CommandType));
         }
-    }
 
-    public class GetAvailableTargetActionInfoForShotUnitAction
-    {
-        private ITarget[] targets;
 
-        public GetAvailableTargetActionInfoForShotUnitAction(ITarget[] targets)
+        public class ForShotUnitAction
         {
-            this.targets = targets;
-        }
+            private readonly ITarget[] targets;
 
-        public IEnumerable<TargetActionInfo> Visit(IShotUnitAction<Node, Edge, Unit> action)
-        {
-            if (targets.Length == 0)
-                return MonoGraph.Instance.GetUnitsInRange(action.MyUnit.Node, 1)
-                    .Where(action.IsAvailable)
-                    .Select(x => new TargetActionInfo(x, action.CommandType));
-            else if (targets.Length == 1)
+            public ForShotUnitAction([NotNull] ITarget[] targets)
             {
-                return MonoGraph.Instance.Nodes
-                    .Where(x => action.IsAvailable(targets.Concat(new[] {x}).ToArray()))
-                    .Select(x => new TargetActionInfo(x, action.CommandType));
+                this.targets = targets ?? throw new ArgumentNullException(nameof(targets));
             }
 
-            throw new Exception();
+            public IEnumerable<TargetActionInfo> Visit(IShotUnitAction<Node, Edge, Unit> action)
+            {
+                return targets.Length switch
+                {
+                    0 => MonoGraph.Instance.GetUnitsInRange(action.MyUnit.Node, 1)
+                        .Where(action.IsAvailable)
+                        .Select(x => new TargetActionInfo(x, action.CommandType)),
+                    1 => MonoGraph.Instance.Nodes.Where(x => action.IsAvailable(targets.Concat(new[] {x}).ToArray()))
+                        .Select(x => new TargetActionInfo(x, action.CommandType)),
+                    _ => throw new Exception()
+                };
+            }
         }
     }
 }

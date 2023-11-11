@@ -11,7 +11,8 @@ namespace LineWars.Model
         Owned,
         INodeForGame<Node, Edge, Unit>,
         IPointerClickHandler,
-        INumbered
+        INumbered,
+        IMonoTarget
     {
         [SerializeField] private int index;
         
@@ -28,7 +29,7 @@ namespace LineWars.Model
         
         [SerializeField] private RenderNodeV3 renderNodeV3;
         [SerializeField] private CommandPriorityData priorityData;
-
+        [field:SerializeField] public bool IsSpawn { get; set; }
         [field: Header("Sprite Info")] [SerializeField] private SpriteRenderer spriteRenderer;
 
         [field: Header("Initial Info")] [field: SerializeField] public Spawn ReferenceToSpawn { get; set; }
@@ -202,8 +203,6 @@ namespace LineWars.Model
             IsDirty = true;
             Redraw();
         }
-
-        public T Accept<T>(INodeVisitor<T> visitor) => visitor.Visit(this);
 
         #region Visualisation
 

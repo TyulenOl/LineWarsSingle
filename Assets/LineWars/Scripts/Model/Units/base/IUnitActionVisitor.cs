@@ -1,26 +1,22 @@
-namespace LineWars.Model
+﻿namespace LineWars.Model
 {
-    public interface IUnitActionVisitor<TNode, TEdge, TUnit>
-        
-        #region Constraints
+    public interface IUnitActionVisitor<out TResult, TNode, TEdge, TUnit>
         where TNode : class, INodeForGame<TNode, TEdge, TUnit>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
-        #endregion 
     {
-        public void Visit(BuildAction<TNode, TEdge, TUnit> action);
-        public void Visit(BlockAction<TNode, TEdge, TUnit> action);
-        public void Visit(MoveAction<TNode, TEdge, TUnit> action);
-        public void Visit(HealAction<TNode, TEdge, TUnit> action);
-        public void Visit(DistanceAttackAction<TNode, TEdge, TUnit> action);
-        public void Visit(ArtilleryAttackAction<TNode, TEdge, TUnit> action);
-        public void Visit(MeleeAttackAction<TNode, TEdge, TUnit> action);
-        public void Visit(RLBlockAction<TNode, TEdge, TUnit> action);
-        public void Visit(SacrificeForPerunAction<TNode, TEdge, TUnit> action);
-        public void Visit(RamAction<TNode, TEdge, TUnit> action);
-        public void Visit(BlowWithSwingAction<TNode, TEdge, TUnit> action);
-        public void Visit(ShotUnitAction<TNode, TEdge, TUnit> action);
-        public void Visit(RLBuildAction<TNode, TEdge, TUnit> action);
+        public TResult Visit(IBuildAction<TNode, TEdge, TUnit> action);
+        public TResult Visit(IBlockAction<TNode, TEdge, TUnit> action);
+        public TResult Visit(IMoveAction<TNode, TEdge, TUnit> action);
+        public TResult Visit(IHealAction<TNode, TEdge, TUnit> action);
+        public TResult Visit(IDistanceAttackAction<TNode, TEdge, TUnit> action);
+        public TResult Visit(IArtilleryAttackAction<TNode, TEdge, TUnit> action);
+        public TResult Visit(IMeleeAttackAction<TNode, TEdge, TUnit> action);
+        public TResult Visit(IRLBlockAction<TNode, TEdge, TUnit> action);
+        public TResult Visit(ISacrificeForPerunAction<TNode, TEdge, TUnit> action);
+        public TResult Visit(IRamAction<TNode, TEdge, TUnit> action);
+        public TResult Visit(IBlowWithSwingAction<TNode, TEdge, TUnit> action);
+        public TResult Visit(IShotUnitAction<TNode, TEdge, TUnit> action);
+        public TResult Visit(IRLBuildAction<TNode, TEdge, TUnit> action);
     }
 }
-

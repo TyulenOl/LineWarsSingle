@@ -66,12 +66,12 @@ namespace LineWars.Model
             return action;
         }
 
-        public override void Accept(IMonoUnitVisitor visitor)
+        public override void Accept(IMonoUnitActionVisitor visitor)
         {
             visitor.Visit(this);
         }
 
-        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit> visitor)
+        public override TResult Accept<TResult>(IUnitActionVisitor<TResult, Node, Edge, Unit> visitor)
         {
             return visitor.Visit(this);
         }

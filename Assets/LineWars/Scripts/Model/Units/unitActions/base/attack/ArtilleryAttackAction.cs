@@ -43,7 +43,7 @@
 
         public override CommandType CommandType => CommandType.Explosion;
 
-        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit> visitor)
+        public override void Accept(IBaseUnitActionVisitor<TNode, TEdge, TUnit> visitor)
         {
             visitor.Visit(this);
         }
