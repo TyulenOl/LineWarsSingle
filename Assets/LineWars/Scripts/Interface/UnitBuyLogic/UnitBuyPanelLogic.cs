@@ -10,7 +10,8 @@ namespace LineWars.Interface
         [SerializeField] private LayoutGroup presetsLayoutGroup;
         [SerializeField] private UnitBuyPresetDrawer presetDrawerPrefab;
         [SerializeField] private UnitBuyLayerLogic unitBuyLayerLogic;
-
+        [SerializeField] private UnitBuyPresetInfoDrawer chosenPresetInfoDrawer;
+        
         private List<UnitBuyPresetDrawer> unitBuyPresetDrawers;
         private Dictionary<UnitBuyPreset, UnitBuyPresetDrawer> unitBuyPresetDrawersDictionary;
 
@@ -35,6 +36,7 @@ namespace LineWars.Interface
                 {
                     unitBuyLayerLogic.CurrentPreset = presetDrawer.UnitBuyPreset;
                     unitBuyLayerLogic.ChosenUnitPresetDrawer = presetDrawer;
+                    chosenPresetInfoDrawer.Init(Player.LocalPlayer.Nation.GetUnit(presetDrawer.UnitBuyPreset.FirstUnitType));
                 });
             }
         }
