@@ -16,6 +16,7 @@ namespace LineWars.Controllers
             public override void OnEnter()
             {
                 Manager.state = CommandsManagerStateType.Executor;
+                Manager.SendClearMassage();
                 Selector.SelectedObjectChanged += OnSelectedObjectChanged;
             }
 
@@ -26,11 +27,11 @@ namespace LineWars.Controllers
 
             private void OnSelectedObjectChanged(GameObject previousObject, GameObject newObject)
             {
-                if (!newObject.TryGetComponent(out IExecutor executor)) return;
-                
+                if (!newObject.TryGetComponent(out IMonoExecutor executor)) return;
+
                 if (!newObject.TryGetComponent(out Owned owned)
                     || !Player.LocalPlayer.IsMyOwn(owned)) return;
-                
+
                 if (executor is Unit unit
                     && !Player.LocalPlayer.PotentialExecutors.Contains(unit.Type))
                     return;
@@ -38,7 +39,7 @@ namespace LineWars.Controllers
                     return;
 
                 Manager.Executor = executor;
-
+                Manager.SendRedrawMessage(Array.Empty<IMonoTarget>());
                 Manager.stateMachine.SetState(Manager.targetState);
             }
         }

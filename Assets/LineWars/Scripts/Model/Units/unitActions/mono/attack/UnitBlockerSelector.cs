@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using LineWars.Scripts;
 using UnityEngine;
 
 namespace LineWars.Model

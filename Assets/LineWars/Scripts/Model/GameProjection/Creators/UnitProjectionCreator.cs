@@ -1,60 +1,63 @@
-using Codice.Client.BaseCommands;
-using LineWars.Model;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+
 
 namespace LineWars.Model
 {
     public static class UnitProjectionCreator
     {
-        public static UnitProjection FromProjection(IReadOnlyUnitProjection oldUnit, NodeProjection node = null)
+        public static UnitProjection FromProjection(
+            IReadOnlyUnitProjection oldUnit,
+            NodeProjection node = null)
         {
-            var newUnit = new UnitProjection();
-            newUnit.UnitName = oldUnit.UnitName;
-            newUnit.CurrentHp = oldUnit.CurrentHp;
-            newUnit.MaxHp = oldUnit.MaxHp;
-            newUnit.MaxArmor = oldUnit.MaxArmor;
-            newUnit.CurrentArmor = oldUnit.CurrentArmor;
-            newUnit.CurrentActionPoints = oldUnit.CurrentActionPoints;
-            newUnit.MaxActionPoints = oldUnit.MaxActionPoints;
-            newUnit.Visibility = oldUnit.Visibility;
-            newUnit.Type = oldUnit.Type;
-            newUnit.Size = oldUnit.Size;
-            newUnit.MovementLineType = oldUnit.MovementLineType;
-            newUnit.CommandPriorityData = oldUnit.CommandPriorityData;
-            newUnit.UnitDirection = oldUnit.UnitDirection;
-            newUnit.Node = node;
-            newUnit.Original = oldUnit.Original;
-            newUnit.UnitActions = oldUnit.ActionsDictionary.Values;
-            newUnit.HasId = oldUnit.HasId;
-            newUnit.Id = oldUnit.Id;
+            var newUnit = new UnitProjection
+            {
+                UnitName = oldUnit.UnitName,
+                CurrentHp = oldUnit.CurrentHp,
+                MaxHp = oldUnit.MaxHp,
+                MaxArmor = oldUnit.MaxArmor,
+                CurrentArmor = oldUnit.CurrentArmor,
+                CurrentActionPoints = oldUnit.CurrentActionPoints,
+                MaxActionPoints = oldUnit.MaxActionPoints,
+                Visibility = oldUnit.Visibility,
+                Type = oldUnit.Type,
+                Size = oldUnit.Size,
+                MovementLineType = oldUnit.MovementLineType,
+                CommandPriorityData = oldUnit.CommandPriorityData,
+                UnitDirection = oldUnit.UnitDirection,
+                Node = node,
+                Original = oldUnit.Original,
+                UnitActions = oldUnit.ActionsDictionary.Values,
+                HasId = oldUnit.HasId,
+                Id = oldUnit.Id
+            };
 
             return newUnit;
         }
 
-        public static UnitProjection FromMono(Unit original, NodeProjection node = null)
+        public static UnitProjection FromMono(
+            Unit original,
+            NodeProjection node = null)
         {
-            var newUnit = new UnitProjection();
-
-            newUnit.UnitName = original.UnitName;
-            newUnit.CurrentHp = original.CurrentHp;
-            newUnit.MaxHp = original.MaxHp;
-            newUnit.MaxArmor = original.MaxArmor;
-            newUnit.CurrentArmor = original.CurrentArmor;
-            newUnit.CurrentActionPoints = original.CurrentActionPoints;
-            newUnit.MaxActionPoints = original.MaxActionPoints;
-            newUnit.Visibility = original.Visibility;
-            newUnit.Type = original.Type;
-            newUnit.Size = original.Size;
-            newUnit.MovementLineType = original.MovementLineType;
-            newUnit.CommandPriorityData = original.CommandPriorityData;
-            newUnit.UnitDirection = original.UnitDirection;
-            newUnit.Node = node;
-            newUnit.Original = original;
-            newUnit.MonoActions = original.MonoActions;
-            newUnit.HasId = true;
-            newUnit.Id = original.Id;
+            var newUnit = new UnitProjection
+            {
+                UnitName = original.UnitName,
+                CurrentHp = original.CurrentHp,
+                MaxHp = original.MaxHp,
+                MaxArmor = original.MaxArmor,
+                CurrentArmor = original.CurrentArmor,
+                CurrentActionPoints = original.CurrentActionPoints,
+                MaxActionPoints = original.MaxActionPoints,
+                Visibility = original.Visibility,
+                Type = original.Type,
+                Size = original.Size,
+                MovementLineType = original.MovementLineType,
+                CommandPriorityData = original.CommandPriorityData,
+                UnitDirection = original.UnitDirection,
+                Node = node,
+                Original = original,
+                MonoActions = original.MonoActions,
+                HasId = true,
+                Id = original.Id
+            };
 
             return newUnit;
         }

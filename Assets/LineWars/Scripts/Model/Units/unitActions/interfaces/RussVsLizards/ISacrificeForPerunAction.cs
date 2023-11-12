@@ -12,7 +12,7 @@
         public void Sacrifice(TNode node);
 
         
-        bool ITargetedAction<TNode>.CanExecute(TNode target) => CanSacrifice(target);
+        bool ITargetedAction<TNode>.IsAvailable(TNode target) => CanSacrifice(target);
         void ITargetedAction<TNode>.Execute(TNode target) => Sacrifice(target);
 
         IActionCommand ITargetedAction<TNode>.GenerateCommand(TNode target)

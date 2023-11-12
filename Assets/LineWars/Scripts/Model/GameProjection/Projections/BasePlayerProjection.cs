@@ -36,10 +36,6 @@ namespace LineWars.Model
         public int CurrentMoney { get; set; }
 
         IReadOnlyCollection<OwnedProjection> IReadOnlyBasePlayerProjection.OwnedObjects => OwnedObjects;
-        public BasePlayerProjection()
-        {
-
-        }
 
         public void SimulateReplenish()
         {
@@ -66,8 +62,7 @@ namespace LineWars.Model
             if(newProj is UnitProjection newUnit)
             {
                 foreach(var oldUnit in OwnedObjects
-                    .Where(owned => owned is UnitProjection)
-                    .Select(owned => (UnitProjection)owned))
+                            .OfType<UnitProjection>())
                 {
                     if (newUnit.Id == oldUnit.Id)
                         throw new InvalidOperationException();
@@ -77,8 +72,7 @@ namespace LineWars.Model
             if(newProj is NodeProjection newNode)
             {
                 foreach(var oldNode in OwnedObjects
-                    .Where (owned => owned is NodeProjection)
-                    .Select (owned => (NodeProjection)owned))
+                            .OfType<NodeProjection>())
                 {
                     if(newNode.Id == oldNode.Id)
                         throw new InvalidOperationException();
@@ -103,8 +97,6 @@ namespace LineWars.Model
         {
             var leftUnit = preset.FirstUnitType; // СПРОСИТЬ У ПАШИ
         }
-        
-        public T Accept<T>(IBasePlayerVisitor<T> visitor) => visitor.Visit(this);
     }
 
     public interface IReadOnlyBasePlayerProjection : INumbered

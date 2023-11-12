@@ -15,73 +15,70 @@ namespace LineWars.Model
         public override CommandType CommandType => CommandType.ShotUnit;
         public override ActionType ActionType => ActionType.MultiTargeted;
 
-        public TUnit TakenUnit { get; private set; }
 
         public ShotUnitAction(TUnit executor) : base(executor)
         {
         }
 
-        public bool CanTakeUnit([NotNull] TUnit unit)
+        public bool IsAvailable([NotNull] TUnit unit)
         {
             if (unit == null) throw new ArgumentNullException(nameof(unit));
 
             var line = MyUnit.Node.GetLine(unit.Node);
             return ActionPointsCondition()
-                   && line != null;
+                   && unit.Size == UnitSize.Little
+                   && (MyUnit.IsNeighbour(unit) || line != null)
+                   && MyUnit != unit;
         }
 
-        public void TakeUnit([NotNull] TUnit unit)
+        public bool IsAvailable(TUnit target1, TNode target2)
         {
-            TakenUnit = unit ?? throw new ArgumentNullException(nameof(unit));
+            return IsAvailable(target1)
+                   && target2 != MyUnit.Node
+                   && target2 != target1.Node;
         }
 
-        public bool CanShotUnitTo(TNode node)
+        public void Execute(TUnit takenUnit, TNode node)
         {
-            return TakenUnit != null;
-        }
+            if (takenUnit.Node.LeftUnit == takenUnit)
+                takenUnit.Node.LeftUnit = null;
+            if (takenUnit.Node.RightUnit == takenUnit)
+                takenUnit.Node.RightUnit = null;
 
-        public void ShotUnitTo(TNode node)
-        {
             if (node.AllIsFree)
             {
-                TakenUnit.Node = node;
+                AssignNode(takenUnit, node);
             }
             else
             {
                 var enemies = node.Units.ToArray();
-                var myDamage = (TakenUnit.CurrentHp + TakenUnit.CurrentArmor) / enemies.Length;
+                var myDamage = (takenUnit.CurrentHp + takenUnit.CurrentArmor) / enemies.Length;
                 var enemyDamage = enemies.Select(x => x.CurrentHp + x.CurrentArmor).Sum();
                 foreach (var enemy in enemies)
                     enemy.DealDamageThroughArmor(myDamage);
-                TakenUnit.DealDamageThroughArmor(enemyDamage);
+                takenUnit.DealDamageThroughArmor(enemyDamage);
+                if (!takenUnit.IsDied)
+                {
+                    AssignNode(takenUnit, node);
+                }
             }
 
-            TakenUnit = null;
+
             CompleteAndAutoModify();
         }
 
-        public Type TargetType { get; } = typeof(TUnit);
-        public Type[] AdditionalTargets { get; } = {typeof(TNode)};
-
-        public bool IsMyTarget(ITarget target)
+        private static void AssignNode(TUnit takenUnit, TNode node)
         {
-            return TakenUnit == null && target is TUnit || TakenUnit != null && target is TNode;
-        }
-
-        public IActionCommand GenerateCommand(ITarget target)
-        {
-            if (TakenUnit == null)
-            {
-                return new TakeUnitCommand<TNode, TEdge, TUnit>(this, (TUnit) target);
-            }
-
-            return new ShotUnitCommand<TNode, TEdge, TUnit>(this, (TNode) target);
+            takenUnit.Node = node;
+            takenUnit.UnitDirection = UnitDirection.Left;
+            node.LeftUnit = takenUnit;
+            node.ConnectTo(takenUnit.OwnerId);
         }
 
 
-        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit> visitor) => visitor.Visit(this);
+        public override void Accept(IBaseUnitActionVisitor<TNode, TEdge, TUnit> visitor) => visitor.Visit(this);
 
-        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit> visitor) =>
+        public override TResult Accept<TResult>(IUnitActionVisitor<TResult, TNode, TEdge, TUnit> visitor) =>
             visitor.Visit(this);
     }
 }

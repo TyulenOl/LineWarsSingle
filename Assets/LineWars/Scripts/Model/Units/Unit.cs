@@ -9,7 +9,10 @@ using UnityEngine.Events;
 namespace LineWars.Model
 {
     [RequireComponent(typeof(UnitMovementLogic))]
-    public sealed class Unit : Owned, IUnit<Node, Edge, Unit>
+    public sealed class Unit : Owned,
+        IUnit<Node, Edge, Unit>, 
+        IMonoExecutor,
+        IMonoTarget
     {
         [Header("Units Settings")] 
         [SerializeField, ReadOnlyInspector] private int index;
@@ -59,11 +62,6 @@ namespace LineWars.Model
         private Dictionary<CommandType, IMonoUnitAction<UnitAction<Node, Edge, Unit>>> monoActionsDictionary;
         public IEnumerable<IMonoUnitAction<UnitAction<Node, Edge, Unit>>> MonoActions => monoActionsDictionary.Values;
         public uint MaxPossibleActionRadius { get; private set; }
-        
-        
-        private static readonly ITargetActionGrouper grouper = new DefaultTargetActionGrouper();
-        public TargetTypeActionsDictionary TargetTypeActionsDictionary { get; private set; }
-        public IReadOnlyCollection<Type> PossibleTargetsTypes { get; private set; }
 
         #region Properties
         public int Id => index;
@@ -210,17 +208,6 @@ namespace LineWars.Model
                 }
 
                 MaxPossibleActionRadius = MonoActions.Max(x => x.GetPossibleMaxRadius());
-
-                var targetActions = MonoActions
-                    .OfType<ITargetedAction>()
-                    .ToArray();
-                
-                PossibleTargetsTypes = targetActions
-                    .Select(x => x.TargetType)
-                    .Distinct()
-                    .ToArray();
-
-                TargetTypeActionsDictionary = grouper.GroupByType(targetActions);
             }
         }
 
@@ -231,7 +218,7 @@ namespace LineWars.Model
         }
 
         public IEnumerable<IUnitAction<Node, Edge, Unit>> Actions => MonoActions;
-        IEnumerable<IExecutorAction<IExecutor>> IExecutorActionSource.Actions => Actions;
+        IEnumerable<IExecutorAction> IExecutorActionSource.Actions => Actions;
 
         public T GetUnitAction<T>() where T : IUnitAction<Node, Edge, Unit>
             => MonoActions.OfType<T>().FirstOrDefault();
@@ -241,22 +228,6 @@ namespace LineWars.Model
             action = GetUnitAction<T>();
             return action != null;
         }
-
-        public bool TryGetCommandForTarget(CommandType priorityType, ITarget target,
-            out IActionCommand command)
-        {
-            if (monoActionsDictionary.TryGetValue(priorityType, out var value)
-                && value is ITargetedAction targetedAction
-                && targetedAction.IsMyTarget(target))
-            {
-                command = targetedAction.GenerateCommand(target);
-                return true;
-            }
-
-            command = null;
-            return false;
-        }
-        
 
         private void OnDied()
         {
@@ -287,6 +258,9 @@ namespace LineWars.Model
                 unitAction.OnReplenish();
         }
 
-        public T Accept<T>(IExecutorVisitor<T> visitor) => visitor.Visit(this);
+        public T Accept<T>(IMonoExecutorVisitor<T> visitor)
+        {
+            return visitor.Visit(this);
+        }
     }
 }

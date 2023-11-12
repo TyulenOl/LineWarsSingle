@@ -10,8 +10,6 @@ namespace LineWars.Controllers
     {
         public class CommandsManagerTargetState : CommandsManagerState
         {
-            private bool isCancelable;
-
             public CommandsManagerTargetState(CommandsManager manager) : base(manager)
             {
             }
@@ -20,7 +18,6 @@ namespace LineWars.Controllers
             {
                 Manager.state = CommandsManagerStateType.Target;
                 Selector.SelectedObjectChanged += OnSelectedObjectChanged;
-                isCancelable = true;
             }
 
             public override void OnExit()
@@ -33,7 +30,7 @@ namespace LineWars.Controllers
                 if (newObject == null)
                     return;
                 if (Selector.SelectedObjects
-                    .Any(x => x.TryGetComponent(out IExecutor executor)
+                    .Any(x => x.TryGetComponent(out IMonoExecutor executor)
                               && executor == Manager.executor))
                 {
                     CancelExecutor();
@@ -41,52 +38,50 @@ namespace LineWars.Controllers
                 }
 
                 var targets = Selector.SelectedObjects
-                    .Select(x => x.GetComponent<ITarget>())
-                    .Where(x => x != null)
+                    .GetComponentMany<IMonoTarget>()
                     .ToArray();
 
-                var targetsAndCommands = targets
-                    .SelectMany(target => GetAllAvailableCommandsForPair(Manager.executor, target)
-                        .Select(command => (target, command)))
+                var presets = targets
+                    .SelectMany(target => GetAllActionsForPair(Manager.executor, target)
+                        .Select(action => new CommandPreset(Manager.Executor, target, action)))
                     .ToArray();
-                switch (targetsAndCommands.Length)
+
+                switch (presets.Length)
                 {
                     case 0:
                         break;
                     case 1:
-                        Manager.Target = targetsAndCommands[0].target;
-                        Manager.CommandExecuted.Invoke(Manager.executor, Manager.target);
-                        isCancelable = false;
-                        Manager.target = null;
-                        UnitsController.ExecuteCommand(targetsAndCommands[0].Item2);
+                        Manager.canCancelExecutor = false;
+                        Manager.ProcessCommandPreset(presets[0]);
                         break;
                     default:
-                        isCancelable = false;
-                        Manager.CurrentOnWaitingCommandMessage = new OnWaitingCommandMessage(targetsAndCommands, newObject.GetComponent<Node>());
-                        Manager.stateMachine.SetState(Manager.waitingCommandState);
+                        Manager.canCancelExecutor = false;
+                        Manager.GoToWaitingCommandState(
+                            new OnWaitingCommandMessage(
+                                presets,
+                                Selector.SelectedObjects.GetComponentMany<Node>().FirstOrDefault()
+                            ));
                         break;
                 }
             }
 
-            private IEnumerable<IActionCommand> GetAllAvailableCommandsForPair(
-                IExecutor executor,
-                ITarget target)
+            private IEnumerable<ITargetedAction> GetAllActionsForPair(
+                IMonoExecutor executor,
+                IMonoTarget target)
             {
                 if (executor is IExecutorActionSource source)
                 {
                     return source.Actions
                         .OfType<ITargetedAction>()
-                        .Where(x => x.IsMyTarget(target))
-                        .Select(x => x.GenerateCommand(target))
-                        .Where(x => x.CanExecute());
+                        .Where(x => x.IsAvailable(target));
                 }
 
-                return Enumerable.Empty<IActionCommand>();
+                return Enumerable.Empty<ITargetedAction>();
             }
 
             private void CancelExecutor()
             {
-                if (!isCancelable) return;
+                if (!Manager.canCancelExecutor) return;
                 Manager.Executor = null;
                 Debug.Log("EXECUTOR CANCELED");
 

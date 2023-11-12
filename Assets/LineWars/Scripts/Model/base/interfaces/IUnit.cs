@@ -8,8 +8,7 @@ namespace LineWars.Model
 {
     public interface IUnit<TNode, TEdge, TUnit> :
         IOwned,
-        ITarget,
-        IAlive,
+        ITargetedAlive,
         IExecutor<TUnit, IUnitAction<TNode, TEdge, TUnit>>,
         IExecutorActionSource
         where TNode : class, INodeForGame<TNode, TEdge, TUnit>

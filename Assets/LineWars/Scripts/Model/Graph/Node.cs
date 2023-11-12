@@ -11,7 +11,8 @@ namespace LineWars.Model
         Owned,
         INodeForGame<Node, Edge, Unit>,
         IPointerClickHandler,
-        INumbered
+        INumbered,
+        IMonoTarget
     {
         [SerializeField] private int index;
         
@@ -202,8 +203,6 @@ namespace LineWars.Model
             IsDirty = true;
             Redraw();
         }
-
-        public T Accept<T>(INodeVisitor<T> visitor) => visitor.Visit(this);
 
         #region Visualisation
 

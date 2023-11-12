@@ -10,7 +10,8 @@ namespace LineWars.Model
         IUnit<NodeProjection, EdgeProjection, UnitProjection>,
         IReadOnlyUnitProjection
     {
-        private Dictionary<CommandType, UnitAction<NodeProjection, EdgeProjection, UnitProjection>> actionsDictionary = new();
+        private Dictionary<CommandType, UnitAction<NodeProjection, EdgeProjection, UnitProjection>> actionsDictionary =
+            new();
 
         public IEnumerable<IMonoUnitAction<UnitAction<Node, Edge, Unit>>> MonoActions;
         public IEnumerable<UnitAction<NodeProjection, EdgeProjection, UnitProjection>> UnitActions { get; set; }
@@ -52,13 +53,10 @@ namespace LineWars.Model
         public event Action AnyActionCompleted;
         public event Action<UnitProjection> Died;
 
-        public IReadOnlyDictionary<CommandType, UnitAction<NodeProjection, EdgeProjection, UnitProjection>> ActionsDictionary => actionsDictionary;
+        public IReadOnlyDictionary<CommandType, UnitAction<NodeProjection, EdgeProjection, UnitProjection>>
+            ActionsDictionary => actionsDictionary;
 
         public bool HasOriginal => Original != null;
-
-        public UnitProjection()
-        {
-        }
 
         public void SetId(int id)
         {
@@ -117,8 +115,10 @@ namespace LineWars.Model
             Owner.RemoveOwned(this);
         }
 
-        public IEnumerable<IUnitAction<NodeProjection, EdgeProjection, UnitProjection>> Actions => actionsDictionary.Values;
-        IEnumerable<IExecutorAction<IExecutor>> IExecutorActionSource.Actions => actionsDictionary.Values;
+        public IEnumerable<IUnitAction<NodeProjection, EdgeProjection, UnitProjection>> Actions =>
+            actionsDictionary.Values;
+
+        IEnumerable<IExecutorAction> IExecutorActionSource.Actions => actionsDictionary.Values;
 
         public T GetUnitAction<T>()
             where T : IUnitAction<NodeProjection, EdgeProjection, UnitProjection>
@@ -133,21 +133,6 @@ namespace LineWars.Model
             return action != null;
         }
 
-        public bool TryGetCommandForTarget(CommandType priorityType, ITarget target,
-            out IActionCommand command)
-        {
-            if (actionsDictionary.TryGetValue(priorityType, out var value)
-                && value is ITargetedAction targetedAction
-                && targetedAction.IsMyTarget(target))
-            {
-                command = targetedAction.GenerateCommand(target);
-                return true;
-            }
-
-            command = null;
-            return false;
-        }
-
         public override void Replenish()
         {
             base.Replenish();
@@ -155,10 +140,9 @@ namespace LineWars.Model
             {
                 action.OnReplenish();
             }
+
             CurrentActionPoints = MaxActionPoints;
         }
-
-        public T Accept<T>(IExecutorVisitor<T> visitor) => visitor.Visit(this);
     }
 
     public interface IReadOnlyUnitProjection : INumbered
@@ -181,8 +165,10 @@ namespace LineWars.Model
         public NodeProjection Node { get; }
         public int CurrentActionPoints { get; }
         public int CurrentHp { get; }
-        
-        public IReadOnlyDictionary<CommandType, UnitAction<NodeProjection, EdgeProjection, UnitProjection>> ActionsDictionary { get; }
+
+        public IReadOnlyDictionary<CommandType, UnitAction<NodeProjection, EdgeProjection, UnitProjection>>
+            ActionsDictionary { get; }
+
         public bool HasOriginal => Original != null;
     }
 }

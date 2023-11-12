@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -151,7 +152,10 @@ namespace LineWars.Model
             if (unitType == UnitType.None) return;
             var unitPrefab = GetUnitPrefab(unitType);
             BasePlayerUtility.CreateUnitForPlayer(this, node, unitPrefab);
+            OnSpawnUnit();
         }
+        
+        protected virtual void OnSpawnUnit(){}
 
         public void SpawnUnit(Node node, Unit unit)
         {
@@ -173,6 +177,10 @@ namespace LineWars.Model
 
         public void BuyPreset(UnitBuyPreset unitPreset)
         {
+            SpawnUnit(Base, unitPreset.FirstUnitType);
+            SpawnUnit(Base, unitPreset.SecondUnitType);
+            CurrentMoney -= unitPreset.Cost;
+            OnSpawnPreset();
             BuyPreset(unitPreset, Base);
         }
 
@@ -182,6 +190,8 @@ namespace LineWars.Model
             SpawnUnit(node, preset.SecondUnitType);
             CurrentMoney -= preset.Cost;
         }
+        
+        public virtual void OnSpawnPreset() {}
 
         public void AddOwned([NotNull] Owned owned)
         {
@@ -281,7 +291,17 @@ namespace LineWars.Model
             Destroy(gameObject);
         }
         
-        public Unit GetUnitPrefab(UnitType unitType) => Nation.GetUnit(unitType);
+        public Unit GetUnitPrefab(UnitType unitType) => Nation.GetUnitPrefab(unitType);
+        
+        public void FinishTurn()
+        {
+            StartCoroutine(Coroutine());
+            IEnumerator Coroutine()
+            {
+                yield return null;
+                ExecuteTurn(PhaseType.Idle);
+            }
+        }
 
         public void ExecuteTurn(PhaseType phaseType)
         {
@@ -315,7 +335,6 @@ namespace LineWars.Model
             CurrentPhase = phaseType;
             TurnChanged?.Invoke(previousPhase, CurrentPhase);
         }
-
         public bool CanExecuteTurn(PhaseType phaseType)
         {
             switch (phaseType)
@@ -405,7 +424,5 @@ namespace LineWars.Model
         }
 
         #endregion
-
-        public T Accept<T>(IBasePlayerVisitor<T> visitor) => visitor.Visit(this);
     }
 }

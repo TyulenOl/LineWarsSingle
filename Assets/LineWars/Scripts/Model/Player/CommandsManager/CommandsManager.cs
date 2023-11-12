@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using UnityEngine;
-using UnityEngine.Events;
 using LineWars.Model;
 
 namespace LineWars.Controllers
@@ -13,8 +11,9 @@ namespace LineWars.Controllers
     {
         public static CommandsManager Instance { get; private set; }
 
-        private ITarget target;
-        private IExecutor executor;
+        private IMonoTarget target;
+        private IMonoExecutor executor;
+        private bool canCancelExecutor = true;
 
         private StateMachine stateMachine;
         private CommandsManagerExecutorState executorState;
@@ -24,26 +23,28 @@ namespace LineWars.Controllers
         private CommandsManagerMultiTargetState multiTargetState;
 
         [SerializeField, ReadOnlyInspector] private CommandsManagerStateType state;
+        public event Action<IMonoTarget, IMonoTarget> TargetChanged;
+        public event Action<IMonoExecutor, IMonoExecutor> ExecutorChanged;
 
-        public UnityEvent<ITarget, ITarget> TargetChanged;
-        public UnityEvent<IExecutor, IExecutor> ExecutorChanged;
-        public UnityEvent<IExecutor, ITarget> CommandExecuted;
 
         private OnWaitingCommandMessage currentOnWaitingCommandMessage;
-        public UnityEvent<OnWaitingCommandMessage> InWaitingCommandState;
-        public OnWaitingCommandMessage CurrentOnWaitingCommandMessage
+        public event Action<OnWaitingCommandMessage> InWaitingCommandState;
+        
+        private Player Player => Player.LocalPlayer;
+        private OnWaitingCommandMessage CurrentOnWaitingCommandMessage
         {
             get => currentOnWaitingCommandMessage;
             set
             {
-                InWaitingCommandState.Invoke(value);
+                InWaitingCommandState?.Invoke(value);
                 currentOnWaitingCommandMessage = value;
             }
         }
-        
-        #region Attributes
 
-        public ITarget Target
+        public event Action<ExecutorRedrawMessage> NeedRedraw;
+
+
+        public IMonoTarget Target
         {
             get => target;
             private set
@@ -51,11 +52,11 @@ namespace LineWars.Controllers
                 var previousTarget = target;
                 target = value;
                 if (previousTarget != target)
-                    TargetChanged.Invoke(previousTarget, target);
+                    TargetChanged?.Invoke(previousTarget, target);
             }
         }
 
-        public IExecutor Executor
+        public IMonoExecutor Executor
         {
             get => executor;
             private set
@@ -63,13 +64,9 @@ namespace LineWars.Controllers
                 var previousExecutor = executor;
                 executor = value;
                 if (previousExecutor != executor)
-                    ExecutorChanged.Invoke(previousExecutor, executor);
+                    ExecutorChanged?.Invoke(previousExecutor, executor);
             }
         }
-
-        public StateMachine StateMachine => stateMachine;
-
-        #endregion
 
         private void Awake()
         {
@@ -89,28 +86,40 @@ namespace LineWars.Controllers
             waitingCommandState = new CommandsManagerWaitingCommandState(this);
             multiTargetState = new CommandsManagerMultiTargetState(this);
         }
-
+        
         private void Start()
         {
-            Player.LocalPlayer.TurnMade.AddListener(OnTurnMade);
+            stateMachine.SetState(executorState);
             Player.LocalPlayer.TurnChanged += OnTurnChanged;
         }
 
-        private void OnEnable()
-        {
-            stateMachine.SetState(executorState);
-        }
-
-        private void OnDisable()
+        private void OnDestroy()
         {
             stateMachine.SetState(idleState);
-            Player.LocalPlayer.TurnMade.RemoveListener(OnTurnMade);
             Player.LocalPlayer.TurnChanged -= OnTurnChanged;
         }
 
-        private void OnTurnMade()
+        public void ExecuteCommand(ICommand command)
         {
-            stateMachine.SetState(idleState);
+            UnitsController.ExecuteCommand(command);
+            if (!Executor.CanDoAnyAction)
+            {
+                FinishTurn();
+            }
+            else 
+            {
+                SendRedrawMessage(Array.Empty<IMonoTarget>());
+                stateMachine.SetState(targetState);
+            }
+        }
+        
+        public void SelectCommandsPreset(CommandPreset preset)
+        {
+            if (stateMachine.CurrentState != waitingCommandState)
+                throw new InvalidOperationException();
+            if (!currentOnWaitingCommandMessage.Data.Contains(preset))
+                throw new ArgumentException(nameof(preset));
+            ProcessCommandPreset(preset);
         }
 
         private void OnTurnChanged(PhaseType previousPhase, PhaseType currentPhase)
@@ -120,15 +129,58 @@ namespace LineWars.Controllers
             stateMachine.SetState(executorState);
         }
         
-        public void SelectCommand([NotNull] IActionCommand command)
+        private void ProcessCommandPreset(CommandPreset preset)
         {
-            if (command == null)
-                throw new ArgumentNullException(nameof(command));
-            if (stateMachine.CurrentState != waitingCommandState)
-                throw new InvalidOperationException();
-            if (!currentOnWaitingCommandMessage.AllCommands.Contains(command))
-                throw new ArgumentException(nameof(command));
-            UnitsController.ExecuteCommand(command);
+            var presetExecutor = preset.Executor;
+            var presetAction = preset.Action;
+            var presetTarget = preset.Target;
+            switch (presetAction)
+            {
+                case IMultiTargetedAction targetedAction:
+                {
+                    Target = presetTarget;
+                    multiTargetState.Prepare(targetedAction, presetTarget);
+                    stateMachine.SetState(multiTargetState);
+                    break;
+                }
+                case ITargetedActionCommandGenerator generator:
+                {
+                    Target = presetTarget;
+                    var command = generator.GenerateCommand(presetTarget);
+                    ExecuteCommand(command);
+                    break;
+                }
+                default: throw new Exception();
+            }
+        }
+
+        private void SendRedrawMessage(
+            IEnumerable<IMonoTarget> targets,
+            Func<IUnitAction<Node, Edge, Unit>, bool> actionSelector = null)
+        {
+            var visitor = new GetAllAvailableTargetActionInfoForMonoExecutorVisitor(
+                new GetAvailableTargetActionInfoVisitor.ForShotUnitAction(targets.ToArray()),
+                actionSelector);
+            var data = Executor.Accept(visitor).ToArray();
+            var message = new ExecutorRedrawMessage(data);
+            NeedRedraw?.Invoke(message);
+        }
+
+        private void SendClearMassage()
+        {
+            NeedRedraw?.Invoke(null);
+        }
+
+        private void GoToWaitingCommandState(OnWaitingCommandMessage commandMessage)
+        {
+            CurrentOnWaitingCommandMessage = commandMessage;
+            stateMachine.SetState(waitingCommandState);
+        }
+
+        private void FinishTurn()
+        {
+            stateMachine.SetState(idleState);
+            Player.FinishTurn();
         }
     }
 }

@@ -21,7 +21,7 @@ namespace LineWars.Model
         public bool Onslaught => Action.Onslaught;
         public UnitBlockerSelector BlockerSelector => Action.BlockerSelector;
 
-        public override void Attack(IAlive enemy)
+        public override void Attack(ITargetedAlive enemy)
         {
             if (enemy is Unit unit)
             {
@@ -53,8 +53,8 @@ namespace LineWars.Model
         }
 
 
-        public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
+        public override void Accept(IMonoUnitActionVisitor visitor) => visitor.Visit(this);
 
-        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit> visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IUnitActionVisitor<TResult, Node, Edge, Unit> visitor) => visitor.Visit(this);
     }
 }

@@ -12,7 +12,7 @@ namespace LineWars.Model
         [SerializeField] private SimpleEffect explosionPrefab;
         public uint Distance => Action.Distance;
 
-        public override void Attack(IAlive enemy)
+        public override void Attack(ITargetedAlive enemy)
         {
             if (enemy is not MonoBehaviour mono) return;
             var explosion = Instantiate(explosionPrefab);
@@ -30,7 +30,7 @@ namespace LineWars.Model
                 MonoGraph.Instance);
         }
 
-        public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
-        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit> visitor) => visitor.Visit(this);
+        public override void Accept(IMonoUnitActionVisitor visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IUnitActionVisitor<TResult, Node, Edge, Unit> visitor) => visitor.Visit(this);
     }
 }

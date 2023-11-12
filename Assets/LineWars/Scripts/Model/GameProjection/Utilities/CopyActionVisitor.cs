@@ -2,7 +2,8 @@ using System;
 
 namespace LineWars.Model
 {
-    public class CopyActionVisitor<TNode, TEdge, TUnit> : IUnitActionVisitor<TNode, TEdge, TUnit>
+    public class CopyActionVisitor<TNode, TEdge, TUnit> : 
+        IBaseUnitActionVisitor<TNode, TEdge, TUnit>
         where TNode : class, INodeForGame<TNode, TEdge, TUnit>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
         where TUnit : class, IUnit<TNode, TEdge, TUnit> 

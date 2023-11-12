@@ -43,14 +43,14 @@ namespace LineWars.Model
             }
         }
 
-        public IEnumerator SlowRam(TNode node)
+        public IEnumerator SlowRam(TNode enemyNode)
         {
-            var enemies = node.Units
+            var enemies = enemyNode.Units
                 .ToArray();
             var damage = Damage / enemies.Length;
-            var possibleNodeForRetreat = node
+            var possibleNodeForRetreat = enemyNode
                 .GetNeighbors()
-                .Where(x => x.OwnerId != MyUnit.OwnerId)
+                .Where(node => node.OwnerId == enemyNode.OwnerId)
                 .ToArray();
 
             foreach (var enemy in enemies)
@@ -66,34 +66,34 @@ namespace LineWars.Model
                 if (enemyMoveAction == null)
                 {
                     enemy.CurrentHp = 0;
-                    yield return new DiedUnit() {Unit = enemy};
+                    yield return new DiedUnit {Unit = enemy};
                     continue;
                 }
 
                 var nodeForRetreat = possibleNodeForRetreat
-                    .FirstOrDefault(x => enemyMoveAction.CanMoveTo(x));
+                    .FirstOrDefault(x => enemyMoveAction.CanMoveTo(x, true));
                 if (nodeForRetreat == null)
                 {
                     enemy.CurrentHp = 0;
-                    yield return new DiedUnit() {Unit = enemy};
+                    yield return new DiedUnit {Unit = enemy};
                     continue;
                 }
 
                 enemy.DealDamageThroughArmor(damage);
                 enemyMoveAction.MoveTo(nodeForRetreat);
-                yield return new MovedUnit() {Unit = enemy};
+                yield return new MovedUnit {Unit = enemy};
             }
 
-            moveAction.MoveTo(node);
+            moveAction.MoveTo(enemyNode);
             CompleteAndAutoModify();
         }
 
-        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit> visitor)
+        public override void Accept(IBaseUnitActionVisitor<TNode, TEdge, TUnit> visitor)
         {
             visitor.Visit(this);
         }
 
-        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit> visitor)
+        public override TResult Accept<TResult>(IUnitActionVisitor<TResult, TNode, TEdge, TUnit> visitor)
         {
             return visitor.Visit(this);
         }

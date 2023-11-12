@@ -6,48 +6,25 @@ namespace LineWars.Model
         MonoUnitAction<ShotUnitAction<Node, Edge, Unit>>,
         IShotUnitAction<Node, Edge, Unit>
     {
+        public bool IsAvailable(Unit target1) => Action.IsAvailable(target1);
+
+        public bool IsAvailable(Unit target1, Node target2) => Action.IsAvailable(target1, target2);
+
+        public void Execute(Unit target1, Node target2)
+        {
+            target1.MovementLogic.MoveTo(target2.transform);
+            Action.Execute(target1, target2);
+            Player.LocalPlayer.RecalculateVisibility();
+        }
+
         protected override ShotUnitAction<Node, Edge, Unit> GetAction()
         {
             return new ShotUnitAction<Node, Edge, Unit>(Unit);
         }
-        
-        public Unit TakenUnit => Action.TakenUnit;
 
-        public bool CanTakeUnit(Unit unit)
-        {
-            return Action.CanTakeUnit(unit);
-        }
+        public override void Accept(IMonoUnitActionVisitor visitor) => visitor.Visit(this);
 
-        public void TakeUnit(Unit unit)
-        {
-            Action.TakeUnit(unit);
-        }
-
-        public bool CanShotUnitTo(Node node)
-        {
-            return Action.CanShotUnitTo(node);
-        }
-
-        public void ShotUnitTo(Node node)
-        {
-            Action.ShotUnitTo(node);
-        }
-
-        public Type TargetType => Action.TargetType;
-        public Type[] AdditionalTargets => Action.AdditionalTargets;
-        public bool IsMyTarget(ITarget target) => Action.IsMyTarget(target);
-
-        public IActionCommand GenerateCommand(ITarget target)
-        {
-            if (TakenUnit == null)
-            {
-                return new TakeUnitCommand<Node, Edge, Unit>(this, (Unit) target);
-            }
-
-            return new ShotUnitCommand<Node, Edge, Unit>(this, (Node) target);
-        }
-        
-        public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
-        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, Node, Edge, Unit> visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IUnitActionVisitor<TResult, Node, Edge, Unit> visitor) =>
+            visitor.Visit(this);
     }
 }
