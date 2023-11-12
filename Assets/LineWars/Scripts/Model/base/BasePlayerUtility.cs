@@ -1,5 +1,8 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 namespace LineWars.Model
@@ -23,7 +26,7 @@ namespace LineWars.Model
             Unit unitPrefab,
             UnitDirection unitDirection = UnitDirection.Any)
         {
-            var unit = Object.Instantiate(unitPrefab, player.transform);
+            var unit = UnityEngine.Object.Instantiate(unitPrefab, player.transform);
             unit.transform.position = node.transform.position;
 
             if (unit.Size == UnitSize.Large)
@@ -57,6 +60,18 @@ namespace LineWars.Model
             return player.OwnedObjects
                 .OfType<Unit>()
                 .Count(x => x.Type == type);
+        }
+
+        public static IEnumerable<Unit> GetAllUnits(BasePlayer player, Func<Unit, bool> predicate)
+        {
+            return player.OwnedObjects
+                .OfType<Unit>()
+                .Where(predicate);
+        }
+
+        public static IEnumerable<Unit> GetAllUnits(BasePlayer player)
+        {
+            return GetAllUnits(player, (_) => true);
         }
     }
 }
