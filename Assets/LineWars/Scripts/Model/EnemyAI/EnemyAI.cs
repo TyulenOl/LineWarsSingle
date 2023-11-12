@@ -12,18 +12,19 @@ namespace LineWars.Model
     {
         [SerializeField] private EnemyDifficulty difficulty;
         [SerializeField] private float actionCooldown;
-        [SerializeField] private EnemyAIPersonality personality;
+        //[SerializeField] private EnemyAIPersonality personality;
+        [SerializeField] private AIBuyLogicData buyLogicData;
         [SerializeField] private GameEvaluator gameEvaluator;
         [SerializeField] private int depth;
         [SerializeField] private float commandPause;
         [SerializeField] private float firstCommandPause;
 
-        private EnemyAIBuySelector buySelector;
+        private AIBuyLogic buyLogic;
 
-        protected override void Awake()
+        protected override void Start()
         {
-            base.Awake();
-            buySelector = new EnemyAIBuySelector();
+            base.Start();
+            buyLogic = buyLogicData.CreateAILogic(this);
         }
 
         #region Turns
@@ -33,8 +34,7 @@ namespace LineWars.Model
             StartCoroutine(BuyCoroutine());
             IEnumerator BuyCoroutine()
             {
-                if (buySelector.TryGetPreset(this, out var preset))
-                    BuyPreset(preset);
+                buyLogic.CalculateBuy();
                 yield return null;
                 ExecuteTurn(PhaseType.Idle);
             }
