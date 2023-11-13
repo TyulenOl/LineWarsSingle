@@ -12,7 +12,6 @@ namespace LineWars.Model
     {
         [SerializeField] private EnemyDifficulty difficulty;
         [SerializeField] private float actionCooldown;
-        //[SerializeField] private EnemyAIPersonality personality;
         [SerializeField] private AIBuyLogicData buyLogicData;
         [SerializeField] private GameEvaluator gameEvaluator;
         [SerializeField] private int depth;
