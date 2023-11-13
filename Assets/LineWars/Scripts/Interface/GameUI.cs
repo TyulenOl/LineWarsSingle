@@ -36,8 +36,8 @@ namespace LineWars.Interface
 
         private void Start()
         {
-            CommandsManager.Instance.ExecutorChanged.AddListener(OnExecutorChanged);
-            CommandsManager.Instance.NeedRedraw.AddListener(ReDrawCurrentTargets);
+            CommandsManager.Instance.ExecutorChanged += OnExecutorChanged;
+            CommandsManager.Instance.NeedRedraw += ReDrawCurrentTargets;
 
             SubscribeEventForGameReferee();
         }

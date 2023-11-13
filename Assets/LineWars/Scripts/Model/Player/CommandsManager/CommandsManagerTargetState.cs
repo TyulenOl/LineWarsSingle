@@ -10,8 +10,6 @@ namespace LineWars.Controllers
     {
         public class CommandsManagerTargetState : CommandsManagerState
         {
-            private bool isCancelable;
-
             public CommandsManagerTargetState(CommandsManager manager) : base(manager)
             {
             }
@@ -20,7 +18,6 @@ namespace LineWars.Controllers
             {
                 Manager.state = CommandsManagerStateType.Target;
                 Selector.SelectedObjectChanged += OnSelectedObjectChanged;
-                isCancelable = true;
             }
 
             public override void OnExit()
@@ -33,7 +30,7 @@ namespace LineWars.Controllers
                 if (newObject == null)
                     return;
                 if (Selector.SelectedObjects
-                    .Any(x => x.TryGetComponent(out IExecutor executor)
+                    .Any(x => x.TryGetComponent(out IMonoExecutor executor)
                               && executor == Manager.executor))
                 {
                     CancelExecutor();
@@ -41,12 +38,12 @@ namespace LineWars.Controllers
                 }
 
                 var targets = Selector.SelectedObjects
-                    .GetComponentMany<ITarget>()
+                    .GetComponentMany<IMonoTarget>()
                     .ToArray();
 
                 var presets = targets
                     .SelectMany(target => GetAllActionsForPair(Manager.executor, target)
-                        .Select(action => new CommandPreset(target, action)))
+                        .Select(action => new CommandPreset(Manager.Executor, target, action)))
                     .ToArray();
 
                 switch (presets.Length)
@@ -54,24 +51,23 @@ namespace LineWars.Controllers
                     case 0:
                         break;
                     case 1:
-                        isCancelable = false;
-                        Manager.ProcessTargetedAction(presets[0]);
+                        Manager.canCancelExecutor = false;
+                        Manager.ProcessCommandPreset(presets[0]);
                         break;
                     default:
-                        isCancelable = false;
-                        Manager.CurrentOnWaitingCommandMessage =
+                        Manager.canCancelExecutor = false;
+                        Manager.GoToWaitingCommandState(
                             new OnWaitingCommandMessage(
                                 presets,
                                 Selector.SelectedObjects.GetComponentMany<Node>().FirstOrDefault()
-                            );
-                        Manager.stateMachine.SetState(Manager.waitingCommandState);
+                            ));
                         break;
                 }
             }
 
             private IEnumerable<ITargetedAction> GetAllActionsForPair(
-                IExecutor executor,
-                ITarget target)
+                IMonoExecutor executor,
+                IMonoTarget target)
             {
                 if (executor is IExecutorActionSource source)
                 {
@@ -85,12 +81,11 @@ namespace LineWars.Controllers
 
             private void CancelExecutor()
             {
-                if (!isCancelable) return;
+                if (!Manager.canCancelExecutor) return;
                 Manager.Executor = null;
                 Debug.Log("EXECUTOR CANCELED");
-                
+
                 Manager.stateMachine.SetState(Manager.executorState);
-                
             }
         }
     }

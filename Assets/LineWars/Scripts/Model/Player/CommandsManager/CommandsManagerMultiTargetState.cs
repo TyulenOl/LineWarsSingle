@@ -12,7 +12,7 @@ namespace LineWars.Controllers
         public class CommandsManagerMultiTargetState : CommandsManagerState
         {
             private IMultiTargetedAction action;
-            private List<ITarget> targets;
+            private List<IMonoTarget> targets;
 
             public CommandsManagerMultiTargetState(CommandsManager manager) : base(manager)
             {
@@ -20,14 +20,14 @@ namespace LineWars.Controllers
 
             public void Prepare(
                 [NotNull] IMultiTargetedAction multiTargetedAction,
-                [NotNull] ITarget firstTarget)
+                [NotNull] IMonoTarget firstTarget)
             {
                 if (firstTarget == null) throw new ArgumentNullException(nameof(firstTarget));
                 if (multiTargetedAction == null) throw new ArgumentNullException(nameof(multiTargetedAction));
 
                 action = multiTargetedAction;
-                targets = new List<ITarget>() {firstTarget};
-                Manager.SendMessage(targets);
+                targets = new List<IMonoTarget>() {firstTarget};
+                Manager.SendRedrawMessage(targets, otherAction => otherAction.Equals(action));
             }
 
             public override void OnEnter()
@@ -44,7 +44,7 @@ namespace LineWars.Controllers
             private void OnSelectedObjectChanged(GameObject before, GameObject after)
             {
                 var allTargets = Selector.SelectedObjects
-                    .GetComponentMany<ITarget>()
+                    .GetComponentMany<IMonoTarget>()
                     .ToArray();
                 if (allTargets.Length == 0)
                     return;
@@ -54,14 +54,15 @@ namespace LineWars.Controllers
 
                 if (availableTarget == null)
                     return;
+                Manager.target = availableTarget;
                 targets.Add(availableTarget);
                 if (targets.Count == action.TargetsCount)
                 {
                     var command = (action as IMultiTargetedActionGenerator).GenerateCommand(targets.ToArray());
-                    UnitsController.ExecuteCommand(command);
+                    Manager.ExecuteCommand(command);
                 }
                 else
-                    Manager.SendMessage(targets);
+                    Manager.SendRedrawMessage(targets, otherAction => otherAction.Equals(action));
             }
         }
     }

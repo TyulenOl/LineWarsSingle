@@ -11,7 +11,8 @@ namespace LineWars.Model
         IEdgeForGame<Node, Edge, Unit>,
         ISerializationCallbackReceiver,
         IPointerClickHandler,
-        INumbered
+        INumbered,
+        IMonoTarget
     {
         [Header("Graph Settings")]
         [SerializeField] private int index;

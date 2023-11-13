@@ -9,7 +9,10 @@ using UnityEngine.Events;
 namespace LineWars.Model
 {
     [RequireComponent(typeof(UnitMovementLogic))]
-    public sealed class Unit : Owned, IUnit<Node, Edge, Unit>
+    public sealed class Unit : Owned,
+        IUnit<Node, Edge, Unit>, 
+        IMonoExecutor,
+        IMonoTarget
     {
         [Header("Units Settings")] 
         [SerializeField, ReadOnlyInspector] private int index;
@@ -215,7 +218,7 @@ namespace LineWars.Model
         }
 
         public IEnumerable<IUnitAction<Node, Edge, Unit>> Actions => MonoActions;
-        IEnumerable<IExecutorAction<IExecutor>> IExecutorActionSource.Actions => Actions;
+        IEnumerable<IExecutorAction> IExecutorActionSource.Actions => Actions;
 
         public T GetUnitAction<T>() where T : IUnitAction<Node, Edge, Unit>
             => MonoActions.OfType<T>().FirstOrDefault();
@@ -255,6 +258,9 @@ namespace LineWars.Model
                 unitAction.OnReplenish();
         }
 
-        public T Accept<T>(IExecutorVisitor<T> visitor) => visitor.Visit(this);
+        public T Accept<T>(IMonoExecutorVisitor<T> visitor)
+        {
+            return visitor.Visit(this);
+        }
     }
 }

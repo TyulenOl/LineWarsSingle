@@ -11,9 +11,10 @@ namespace LineWars
     {
         [SerializeField] private ChooseCommandsCanvasPreset forTwoPreset;
         [SerializeField] private ChooseCommandsCanvasPreset forThreePreset;
+
         private void Awake()
         {
-            CommandsManager.Instance.InWaitingCommandState.AddListener(OnWaitingState);
+            CommandsManager.Instance.InWaitingCommandState += OnWaitingState;
         }
 
         private void OnWaitingState(OnWaitingCommandMessage message)
@@ -27,10 +28,11 @@ namespace LineWars
                     forTwoPreset.ReDraw(message);
                     break;
                 case 3:
-                    forThreePreset.ReDraw(message); 
+                    forThreePreset.ReDraw(message);
                     break;
                 default:
-                    throw new NotImplementedException($"Окно выбра команд для количества аргументов {amount} не реализовано");
+                    throw new NotImplementedException(
+                        $"Окно выбра команд для количества аргументов {amount} не реализовано");
             }
         }
     }

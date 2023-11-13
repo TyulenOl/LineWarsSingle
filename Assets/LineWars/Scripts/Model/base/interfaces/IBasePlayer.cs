@@ -7,9 +7,7 @@ namespace LineWars.Model
     {
         public int Id { get; }
         
-        public bool CanSpawnPreset(UnitBuyPreset preset);
-        public void SpawnPreset(UnitBuyPreset preset);
-
-        public T Accept<T>(IBasePlayerVisitor<T> visitor);
+        public bool CanBuyPreset(UnitBuyPreset preset);
+        public void BuyPreset(UnitBuyPreset preset);
     }
 }

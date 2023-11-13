@@ -20,6 +20,7 @@ namespace LineWars.Model
         public int Id { get; set; }
         public int Visibility { get; set; }
         public int ValueOfHidden { get; set; }
+        public bool IsSpawn { get; set; }
 
         public UnitProjection LeftUnit 
         {
@@ -70,8 +71,6 @@ namespace LineWars.Model
 
             EdgesList.Add(edge);
         }
-        
-        public T Accept<T>(INodeVisitor<T> visitor) => visitor.Visit(this);
 
         public EdgeProjection GetLineOfNeighbour(NodeProjection otherNode) => 
             ((INode<NodeProjection, EdgeProjection>)this).GetLine(otherNode); 

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -111,21 +112,42 @@ namespace LineWars.Model
             SingleGame.Instance.AllPlayers.Remove(this);
         }
 
-        public bool CanSpawnPreset(UnitBuyPreset preset)
+        public bool CanBuyPreset(UnitBuyPreset preset)
         {
-            return NodeConditional() && MoneyConditional();
+            return CanBuyPreset(preset, Base);
+        }
 
-            bool NodeConditional()
-            {
-                if (Nation.GetUnit(preset.FirstUnitType).Size != UnitSize.Large && (preset.FirstUnitType == UnitType.None || preset.SecondUnitType == UnitType.None))
-                    return Base.AnyIsFree;
-                return Base.AllIsFree;
-            }
+        public bool CanBuyPreset(UnitBuyPreset preset, Node node)
+        {
+            if (preset.FirstUnitType != UnitType.None && preset.SecondUnitType == UnitType.None)
+                return CanBuyPresetOne(preset, node);
+            if(preset.FirstUnitType != UnitType.None && preset.SecondUnitType != UnitType.None)
+                return CanBuyPresetMultiple(preset, node);
+            Debug.Log("Invalid preset!");
+            return false;    
+        }
 
-            bool MoneyConditional()
-            {
-                return CurrentMoney - preset.Cost >= 0;
-            }
+        public bool CanBuyPresetOne(UnitBuyPreset preset, Node node)
+        {
+            if(GetUnitPrefab(preset.FirstUnitType).Size == UnitSize.Little)
+                return CanAffordPreset(preset)
+                    && (node.AnyIsFree);
+            return CanAffordPreset(preset)
+                 && (node.AllIsFree);
+        }
+
+        public bool CanBuyPresetMultiple(UnitBuyPreset preset, Node node)
+        {
+            if (GetUnitPrefab(preset.FirstUnitType).Size == UnitSize.Large
+                || GetUnitPrefab(preset.SecondUnitType).Size == UnitSize.Large)
+                Debug.LogError("Invalid Preset!");
+            return CanAffordPreset(preset)
+                && (node.AllIsFree);
+        }
+
+        public bool CanAffordPreset(UnitBuyPreset preset)
+        {
+            return CurrentMoney - preset.Cost >= 0;
         }
 
         public void SpawnUnit(Node node, UnitType unitType)
@@ -133,14 +155,28 @@ namespace LineWars.Model
             if (unitType == UnitType.None) return;
             var unitPrefab = GetUnitPrefab(unitType);
             BasePlayerUtility.CreateUnitForPlayer(this, node, unitPrefab);
+            OnSpawnUnit();
         }
+        
+        protected virtual void OnSpawnUnit(){}
 
-        public void SpawnPreset(UnitBuyPreset unitPreset)
+        public void BuyPreset(UnitBuyPreset unitPreset)
         {
             SpawnUnit(Base, unitPreset.FirstUnitType);
             SpawnUnit(Base, unitPreset.SecondUnitType);
             CurrentMoney -= unitPreset.Cost;
+            OnSpawnPreset();
+            BuyPreset(unitPreset, Base);
         }
+
+        public void BuyPreset(UnitBuyPreset preset, Node node) //TODO: Закинуть в IBasePlayer???
+        {
+            SpawnUnit(node, preset.FirstUnitType);
+            SpawnUnit(node, preset.SecondUnitType);
+            CurrentMoney -= preset.Cost;
+        }
+        
+        public virtual void OnSpawnPreset() {}
 
         public void AddOwned([NotNull] Owned owned)
         {
@@ -240,7 +276,17 @@ namespace LineWars.Model
             Destroy(gameObject);
         }
         
-        public Unit GetUnitPrefab(UnitType unitType) => Nation.GetUnit(unitType);
+        public Unit GetUnitPrefab(UnitType unitType) => Nation.GetUnitPrefab(unitType);
+        
+        public void FinishTurn()
+        {
+            StartCoroutine(Coroutine());
+            IEnumerator Coroutine()
+            {
+                yield return null;
+                ExecuteTurn(PhaseType.Idle);
+            }
+        }
 
         public void ExecuteTurn(PhaseType phaseType)
         {
@@ -274,7 +320,6 @@ namespace LineWars.Model
             CurrentPhase = phaseType;
             TurnChanged?.Invoke(previousPhase, CurrentPhase);
         }
-
         public bool CanExecuteTurn(PhaseType phaseType)
         {
             switch (phaseType)
@@ -364,7 +409,5 @@ namespace LineWars.Model
         }
 
         #endregion
-
-        public T Accept<T>(IBasePlayerVisitor<T> visitor) => visitor.Visit(this);
     }
 }

@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
-using LineWars.Scripts.Interface;
+using LineWars.Interface;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace LineWars.Scripts.Controllers
+namespace LineWars.Controllers
 {
     public class CameraController : MonoBehaviour
     {

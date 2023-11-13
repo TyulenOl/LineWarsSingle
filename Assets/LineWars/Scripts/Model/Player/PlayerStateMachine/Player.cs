@@ -27,20 +27,9 @@ namespace LineWars
         private PlayerBuyPhase buyPhase;
         private PlayerReplenishPhase replenishPhase;
         
-        [field: SerializeField] public UnityEvent TurnMade {get; private set;}
         public IReadOnlyCollection<UnitType> PotentialExecutors => potentialExecutors;
         public IReadOnlyDictionary<Node, bool> VisibilityMap;
         public IEnumerable<Node> AdditionalVisibleNodes => additionalVisibleNodes;
-        public bool IsTurnMade
-        {
-            get => isTurnMade;
-            private set
-            {
-                isTurnMade = value;
-                if(value)
-                    TurnMade.Invoke();
-            }
-        }
 
 
         protected override void Awake()
@@ -83,39 +72,29 @@ namespace LineWars
         private void OnOwnedAdded(Owned owned)
         {
             if(!(owned is Unit unit)) return;
-            unit.ActionPointsChanged.AddListener(ProcessActionPointsChange);
             unit.Died.AddListener(UnitOnDied);
         }
 
         private void OnOwnerRemoved(Owned owned)
         {
             if(!(owned is Unit unit)) return;
-            unit.ActionPointsChanged.RemoveListener(ProcessActionPointsChange);
             if (!unit.IsDied)
                 unit.Died.RemoveListener(UnitOnDied);
         }
 
-        private void ProcessActionPointsChange(int previousValue, int currentValue)
-        {
-            if (currentValue <= 0 && CurrentPhase != PhaseType.Idle)
-            {
-                IsTurnMade = true;
-                StartCoroutine(PauseCoroutine());
-            }
-
-            IEnumerator PauseCoroutine()
-            {
-                yield return new WaitForSeconds(pauseAfterTurn);
-                ExecuteTurn(PhaseType.Idle);
-            }
-        }
-        
-        public void FinishTurn()
-        {
-            if(!IsTurnMade) return;
-            ExecuteTurn(PhaseType.Idle);
-        }
-
+        // private void ProcessActionPointsChange(int previousValue, int currentValue)
+        // {
+        //     if (currentValue <= 0 && CurrentPhase != PhaseType.Idle)
+        //     {
+        //         StartCoroutine(PauseCoroutine());
+        //     }
+        //
+        //     IEnumerator PauseCoroutine()
+        //     {
+        //         yield return new WaitForSeconds(pauseAfterTurn);
+        //         ExecuteTurn(PhaseType.Idle);
+        //     }
+        // }
         public IEnumerable<Unit> GetAllUnitsByPhase(PhaseType phaseType)
         {
             if (PhaseExecutorsData.PhaseToUnits.TryGetValue(phaseType, out var value))
@@ -158,7 +137,7 @@ namespace LineWars
             GameUI.Instance.SetEnemyTurn(false);
         }
 
-        public override void ExecuteIdle()//Exit
+        public override void ExecuteIdle()
         {
             GameUI.Instance.ReDrawAllAvailability(MyUnits, false);
             GameUI.Instance.SetEnemyTurn(true);
@@ -211,7 +190,6 @@ namespace LineWars
                 return;
             additionalVisibleNodes.Add(node);
         }
-
         public bool RemoveVisibleNode(Node node) => additionalVisibleNodes.Remove(node);
         
         private void UnitOnDied(Unit diedUnit)
@@ -226,6 +204,11 @@ namespace LineWars
                     ExecuteTurn(PhaseType.Idle);
                 }
             }
+        }
+        public override void OnSpawnPreset()
+        {
+            base.OnSpawnPreset();
+            RecalculateVisibility();
         }
 
         public void RecalculateVisibility(bool useLerp = true)

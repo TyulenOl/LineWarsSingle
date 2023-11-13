@@ -22,6 +22,11 @@ public class NodeEditor : Editor
             Node.Redraw();
             foreach (var edge in Node.Edges)
             {
+                if(edge == null)
+                {
+                    Debug.LogWarning("В ноде присутствует пустое ребро! Перед началом игры убедитесь, что вы его убрали!", Node);
+                    continue;
+                }
                 edge.Redraw();
                 EditorUtility.SetDirty(edge);
             }

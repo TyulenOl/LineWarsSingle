@@ -19,8 +19,11 @@ namespace LineWars
         {
             var executor = CommandsManager.Instance.Executor;
             if (executor is Unit unit)
-                UnitsController.ExecuteCommand(new RLBlockCommand<Node, Edge, Unit>
-                    (unit), false);
+            {
+                var command = new RLBlockCommand<Node, Edge, Unit>(unit);
+                if (command.CanExecute())
+                    CommandsManager.Instance.ExecuteCommand(command);
+            }
         }
     }
 }

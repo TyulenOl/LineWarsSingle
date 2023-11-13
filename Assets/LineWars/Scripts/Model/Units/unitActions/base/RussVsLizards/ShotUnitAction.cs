@@ -70,14 +70,15 @@ namespace LineWars.Model
         private static void AssignNode(TUnit takenUnit, TNode node)
         {
             takenUnit.Node = node;
+            takenUnit.UnitDirection = UnitDirection.Left;
             node.LeftUnit = takenUnit;
             node.ConnectTo(takenUnit.OwnerId);
         }
 
 
-        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit> visitor) => visitor.Visit(this);
+        public override void Accept(IBaseUnitActionVisitor<TNode, TEdge, TUnit> visitor) => visitor.Visit(this);
 
-        public override TResult Accept<TResult>(IIUnitActionVisitor<TResult, TNode, TEdge, TUnit> visitor) =>
+        public override TResult Accept<TResult>(IUnitActionVisitor<TResult, TNode, TEdge, TUnit> visitor) =>
             visitor.Visit(this);
     }
 }

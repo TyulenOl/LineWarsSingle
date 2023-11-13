@@ -3,7 +3,7 @@ using LineWars.Model;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace LineWars.Scripts.Interface
+namespace LineWars.Interface
 {
     public class BaikalButtonLogic : MonoBehaviour
     {
