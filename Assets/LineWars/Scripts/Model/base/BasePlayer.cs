@@ -129,11 +129,8 @@ namespace LineWars.Model
 
         public bool CanBuyPresetOne(UnitBuyPreset preset, Node node)
         {
-            if(GetUnitPrefab(preset.FirstUnitType).Size == UnitSize.Little)
-                return CanAffordPreset(preset)
-                    && (node.AnyIsFree);
             return CanAffordPreset(preset)
-                 && (node.AllIsFree);
+                && CanSpawnUnit(node, preset.FirstUnitType);
         }
 
         public bool CanBuyPresetMultiple(UnitBuyPreset preset, Node node)
@@ -160,6 +157,24 @@ namespace LineWars.Model
         
         protected virtual void OnSpawnUnit(){}
 
+        public void SpawnUnit(Node node, Unit unit)
+        {
+            BasePlayerUtility.CreateUnitForPlayer(this, node, unit);
+        }
+
+        public bool CanSpawnUnit(Node node, UnitType type)
+        {
+            var unitPrefab = GetUnitPrefab(type);
+            return CanSpawnUnit(node, unitPrefab);
+        }
+
+        public bool CanSpawnUnit(Node node, Unit unit)
+        {
+            if (unit.Size == UnitSize.Large)
+                return node.AllIsFree;
+            return node.AnyIsFree;
+        }
+
         public void BuyPreset(UnitBuyPreset unitPreset)
         {
             SpawnUnit(Base, unitPreset.FirstUnitType);
@@ -169,7 +184,7 @@ namespace LineWars.Model
             BuyPreset(unitPreset, Base);
         }
 
-        public void BuyPreset(UnitBuyPreset preset, Node node) //TODO: Закинуть в IBasePlayer???
+        public void BuyPreset(UnitBuyPreset preset, Node node) 
         {
             SpawnUnit(node, preset.FirstUnitType);
             SpawnUnit(node, preset.SecondUnitType);
