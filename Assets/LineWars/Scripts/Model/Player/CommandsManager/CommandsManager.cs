@@ -133,6 +133,15 @@ namespace LineWars.Controllers
             ProcessTargetedAction(preset);
         }
 
+        public void CancelTarget()
+        {
+            if (stateMachine.CurrentState != waitingCommandState)
+            {
+                throw new InvalidOperationException("Is not targeted state to cancelAction");
+            }
+            stateMachine.SetState(targetState);
+        }
+
         private void ProcessTargetedAction(CommandPreset preset)
         {
             var presetAction = preset.Action;
