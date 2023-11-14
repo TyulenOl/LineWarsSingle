@@ -30,10 +30,12 @@ namespace LineWars.Model
         [SerializeField] private RenderNodeV3 renderNodeV3;
         [SerializeField] private CommandPriorityData priorityData;
         [field:SerializeField] public bool IsSpawn { get; set; }
-        [field: Header("Sprite Info")] [SerializeField] private SpriteRenderer spriteRenderer;
+        
+        [field: Header("Sprite Info")]
+        [SerializeField] private SpriteRenderer spriteRenderer;
 
-        [field: Header("Initial Info")] [field: SerializeField] public Spawn ReferenceToSpawn { get; set; }
-
+        [field: Header("Initial Info")] 
+        [field: SerializeField] public Spawn ReferenceToSpawn { get; set; }
         [field: SerializeField] public UnitType LeftUnitType { get; private set; }
         [field: SerializeField] public UnitType RightUnitType { get; private set; }
         
@@ -101,18 +103,6 @@ namespace LineWars.Model
             nodeInfoDrawer.ReDrawIncomeInfo(Player.LocalPlayer.GetMyIncomeFromNode(this));
         }
         
-        public IEnumerable<ITarget> Targets
-        {
-            get
-            {
-                yield return this;
-                foreach (var edge in edges)
-                    yield return edge;
-                foreach (var unit in Units)
-                    yield return unit;
-            }
-        }
-
         public IEnumerable<Unit> Units => new[] {LeftUnit, RightUnit}
             .Where(x => x != null)
             .Distinct();

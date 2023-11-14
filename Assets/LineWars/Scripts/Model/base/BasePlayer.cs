@@ -128,13 +128,15 @@ namespace LineWars.Model
             Debug.Log("Invalid preset!");
             return false;    
         }
-
+        
+        // почему публичный? что если сделать так None и TheRiffleMan?
         public bool CanBuyPresetOne(UnitBuyPreset preset, Node node)
         {
             return CanAffordPreset(preset)
                 && CanSpawnUnit(node, preset.FirstUnitType);
         }
 
+        // почему публичный?
         public bool CanBuyPresetMultiple(UnitBuyPreset preset, Node node)
         {
             if (GetUnitPrefab(preset.FirstUnitType).Size == UnitSize.Large
