@@ -25,6 +25,7 @@ namespace LineWars.Model
 
         private void SetOwner([MaybeNull] BasePlayer newBasePlayer)
         {
+            var sex = this as Node;
             var temp = basePlayer;
             basePlayer = newBasePlayer;
             OnSetOwner(temp, newBasePlayer);

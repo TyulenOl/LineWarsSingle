@@ -20,14 +20,12 @@ namespace LineWars.Model
 
         private AIBuyLogic buyLogic;
 
-        protected override void Start()
+        public override void Initialize(SpawnInfo spawnInfo)
         {
-            base.Start();
+            base.Initialize(spawnInfo);
             buyLogic = buyLogicData.CreateAILogic(this);
         }
-
         #region Turns
-
         public override void ExecuteBuy()
         {
             StartCoroutine(BuyCoroutine());
