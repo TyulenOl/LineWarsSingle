@@ -6,7 +6,6 @@ using LineWars.Model;
 
 namespace LineWars.Controllers
 {
-    // Client
     public partial class CommandsManager : MonoBehaviour
     {
         public static CommandsManager Instance { get; private set; }

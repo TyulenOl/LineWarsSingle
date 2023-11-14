@@ -27,7 +27,7 @@ namespace LineWars.Model
                     : new List<EdgeProjection>(edgeProjections)
             };
 
-            if (original.TryGetComponent(out NodeScore nodeScore))
+            if (original.TryGetComponent(out AINodeScore nodeScore))
                 newNode.Score = nodeScore.Score;
             else
                 newNode.Score = 1;

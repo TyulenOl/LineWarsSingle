@@ -27,6 +27,8 @@ namespace LineWars.Model
 
         public PhaseType CurrentPhase { get; private set; }
         public Nation Nation { get; private set; }
+
+        public HashSet<PhaseType> PhaseExceptions { get; set; }
         
 
         private HashSet<Owned> myOwned = new();
@@ -73,7 +75,7 @@ namespace LineWars.Model
 
         protected virtual void Awake()
         {
-            
+            PhaseExceptions = new HashSet<PhaseType>();
         }
 
         protected virtual void Start()
@@ -305,6 +307,8 @@ namespace LineWars.Model
 
         public void ExecuteTurn(PhaseType phaseType)
         {
+            if (PhaseExceptions.Contains(phaseType)) 
+                return;
             var previousPhase = CurrentPhase;
             switch (phaseType)
             {
