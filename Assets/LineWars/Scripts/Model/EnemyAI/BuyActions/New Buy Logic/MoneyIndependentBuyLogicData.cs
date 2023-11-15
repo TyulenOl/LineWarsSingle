@@ -55,7 +55,7 @@ namespace LineWars.Model
     { 
         private int currentRoundId = 0;
         private readonly EnemyAI player;
-        private readonly MoneyIndependentBuyLogicData data; 
+        private readonly MoneyIndependentBuyLogicData data;
         public MoneyIndependentLogic(EnemyAI player, MoneyIndependentBuyLogicData data)
         {
             this.player = player;
@@ -64,29 +64,30 @@ namespace LineWars.Model
 
         public override void CalculateBuy()
         {
-            var nodes = player.OwnedObjects
-                .OfType<Node>()
-                .Where(node => node.IsSpawn)
+            var eligbleNodes = MonoGraph.Instance.Nodes
+                .Where(node => node.IsQualifiedForSpawn(player))
                 .ToList();
-
             foreach (var purchase in data.UnitsPerRound[currentRoundId])
             {
                 var currentUnit = player.GetUnitPrefab(purchase.UnitType);
                 var quantity = purchase.Quantity;
 
                 var currentNodeId = 0;
-                while (quantity > 0 && AreNodesFree(nodes, currentUnit))
+                while (quantity > 0 && AreNodesFree(eligbleNodes, currentUnit))
                 {
                     if (data.UnitsLimit != 0 && BasePlayerUtility.GetAllUnits(player).Count() > data.UnitsLimit)
+                    {
+                        currentNodeId = (currentNodeId + 1) % eligbleNodes.Count;
                         return;
-                    var currentNode = nodes[currentNodeId];
+                    }
+                    var currentNode = eligbleNodes[currentNodeId];
                     if (BasePlayerUtility.CanSpawnUnit(currentNode, currentUnit))
                     {
                         player.SpawnUnit(currentNode, currentUnit);
                         quantity--;
                     }
 
-                    currentNodeId = (currentNodeId + 1) % nodes.Count;
+                    currentNodeId = (currentNodeId + 1) % eligbleNodes.Count;
                 }
             }
 

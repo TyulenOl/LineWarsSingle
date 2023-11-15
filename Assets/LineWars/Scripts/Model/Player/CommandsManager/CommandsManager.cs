@@ -20,6 +20,7 @@ namespace LineWars.Controllers
         private CommandsManagerIdleState idleState;
         private CommandsManagerWaitingCommandState waitingCommandState;
         private CommandsManagerMultiTargetState multiTargetState;
+        private CommandsManagerBuyState buyState;
 
         [SerializeField, ReadOnlyInspector] private CommandsManagerStateType state;
         public event Action<IMonoTarget, IMonoTarget> TargetChanged;
@@ -41,7 +42,7 @@ namespace LineWars.Controllers
         }
 
         public event Action<ExecutorRedrawMessage> NeedRedraw;
-
+        public event Action BuyEntered;
 
         public IMonoTarget Target
         {
@@ -120,6 +121,13 @@ namespace LineWars.Controllers
             }
             stateMachine.SetState(targetState);
         }
+
+        public void SetUnitPreset(UnitBuyPreset preset)
+        {
+            if (stateMachine.CurrentState != buyState)
+                Debug.LogError("Can't set unit preset while not in buy state!");
+            buyState.SetUnitPreset(preset);
+        }    
         
         public void SelectCommandsPreset(CommandPreset preset)
         {
@@ -132,6 +140,11 @@ namespace LineWars.Controllers
 
         private void OnTurnChanged(PhaseType previousPhase, PhaseType currentPhase)
         {
+            if(currentPhase == PhaseType.Buy && Player.CanExecuteTurn(currentPhase))
+            {
+                stateMachine.SetState(buyState);
+                return;
+            }
             if (currentPhase == PhaseType.Idle
                 || stateMachine.CurrentState == executorState) return;
             stateMachine.SetState(executorState);
@@ -185,7 +198,7 @@ namespace LineWars.Controllers
             stateMachine.SetState(waitingCommandState);
         }
 
-        private void FinishTurn()
+        public void FinishTurn()
         {
             stateMachine.SetState(idleState);
             Player.FinishTurn();
