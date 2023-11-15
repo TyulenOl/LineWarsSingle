@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace LineWars.Model
@@ -11,6 +12,7 @@ namespace LineWars.Model
         [field: Header("Logic")]
         [field: SerializeField] public PlayerRules Rules { get; private set; }
         [field: SerializeField] public Nation Nation { get; private set; }
+        [field: SerializeField] public List<Node> InitialSpawns { get; private set; }
 
         [field: Header("DEBUG")]
         [field: SerializeField] public string GroupName { get; set; } = DEFAULT_NAME;

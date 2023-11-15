@@ -20,6 +20,7 @@ namespace LineWars.Model
         /// </summary>
         [SerializeField, ReadOnlyInspector] private int income;
 
+        [field:SerializeField] public List<Node> InitialSpawns { get; private set; }
         [field:SerializeField] public PhaseExecutorsData PhaseExecutorsData { get; private set; }
         [field:SerializeField] public NationEconomicLogic EconomicLogic { get; private set; }
         [field: SerializeField, ReadOnlyInspector] public Node Base { get; private set; }
@@ -85,6 +86,7 @@ namespace LineWars.Model
                 PhaseManager.Instance.RegisterActor(this);
                 Debug.Log($"{name} registered");
             }
+
         }
 
         protected virtual void OnEnable()
@@ -107,6 +109,8 @@ namespace LineWars.Model
             
             SingleGame.Instance.AllPlayers.Add(spawnInfo.PlayerIndex, this);
             name = $"{GetType().Name}{spawnInfo.PlayerIndex} {spawnInfo.SpawnNode.name}";
+
+            InitialSpawns = spawnInfo.SpawnNode.InitialSpawns;
         }
 
         protected virtual void OnDestroy()
@@ -307,8 +311,11 @@ namespace LineWars.Model
 
         public void ExecuteTurn(PhaseType phaseType)
         {
-            if (PhaseExceptions.Contains(phaseType)) 
+            if (PhaseExceptions.Contains(phaseType))
+            {
+                StartCoroutine(SkipTurnCoroutine());
                 return;
+            }
             var previousPhase = CurrentPhase;
             switch (phaseType)
             {
@@ -338,6 +345,12 @@ namespace LineWars.Model
 
             CurrentPhase = phaseType;
             TurnChanged?.Invoke(previousPhase, CurrentPhase);
+
+            IEnumerator SkipTurnCoroutine()
+            {
+                yield return null;
+                TurnChanged?.Invoke(phaseType, PhaseType.Idle);
+            }
         }
         public bool CanExecuteTurn(PhaseType phaseType)
         {
