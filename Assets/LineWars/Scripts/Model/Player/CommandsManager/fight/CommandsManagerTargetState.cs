@@ -8,7 +8,7 @@ namespace LineWars.Controllers
 {
     public partial class CommandsManager
     {
-        public class CommandsManagerTargetState : CommandsManagerState
+        private class CommandsManagerTargetState : CommandsManagerState
         {
             public CommandsManagerTargetState(CommandsManager manager) : base(manager)
             {

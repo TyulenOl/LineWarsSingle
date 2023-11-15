@@ -13,6 +13,7 @@ namespace LineWars
         [SerializeField] private GameEvaluator gameEvaluator;
         [SerializeField] private AIBuyLogicData aiBuyLogicData;
 
+        // это очень сильный кастыль
         public GameEvaluator GameEvaluator => gameEvaluator;
         public AIBuyLogicData AIBuyLogicData => aiBuyLogicData;
         public T Initialize<T>(SpawnInfo spawnInfo) where T : BasePlayer

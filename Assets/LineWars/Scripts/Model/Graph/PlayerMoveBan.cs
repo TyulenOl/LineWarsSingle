@@ -7,6 +7,6 @@ namespace LineWars.Model
 {
     public class PlayerMoveBan : MonoBehaviour
     {
-        [field: SerializeField] public List<Spawn> bannedSpawns { get; private set; }
+        [field: SerializeField] public List<Spawn> BannedSpawns { get; private set; }
     }
 }

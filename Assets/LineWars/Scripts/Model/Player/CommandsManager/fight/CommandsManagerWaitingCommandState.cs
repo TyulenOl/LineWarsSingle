@@ -4,7 +4,7 @@ namespace LineWars.Controllers
 {
     public partial class CommandsManager
     {
-        public class CommandsManagerWaitingCommandState : CommandsManagerState
+        private class CommandsManagerWaitingCommandState : CommandsManagerState
         {
             public CommandsManagerWaitingCommandState(CommandsManager manager) : base(manager)
             {
@@ -13,7 +13,7 @@ namespace LineWars.Controllers
             public override void OnEnter()
             {
                 base.OnEnter();
-                Manager.state = CommandsManagerStateType.WaitingCommand;
+                Manager.state = CommandsManagerStateType.WaitingSelectCommand;
                 Debug.Log("Ождание выбора");
             }
         }
