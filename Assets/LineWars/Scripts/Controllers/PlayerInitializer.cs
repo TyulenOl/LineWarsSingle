@@ -8,6 +8,13 @@ namespace LineWars
     public class PlayerInitializer : MonoBehaviour
     {
         [SerializeField] private List<BasePlayer> playersPrefabs;
+
+        [Header("AI Options")]
+        [SerializeField] private GameEvaluator gameEvaluator;
+        [SerializeField] private AIBuyLogicData aiBuyLogicData;
+
+        public GameEvaluator GameEvaluator => gameEvaluator;
+        public AIBuyLogicData AIBuyLogicData => aiBuyLogicData;
         public T Initialize<T>(SpawnInfo spawnInfo) where T : BasePlayer
         {
             var player = Instantiate(playersPrefabs.OfType<T>().First());

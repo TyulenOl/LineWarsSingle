@@ -23,6 +23,15 @@ namespace LineWars.Model
         public override void Initialize(SpawnInfo spawnInfo)
         {
             base.Initialize(spawnInfo);
+            var playerInitializer = SingleGame.Instance.PlayerInitializer;
+            if(playerInitializer.AIBuyLogicData != null)
+            {
+                buyLogicData = playerInitializer.AIBuyLogicData;
+            }
+            if(playerInitializer.GameEvaluator != null)
+            {
+                gameEvaluator = playerInitializer.GameEvaluator;
+            }
             buyLogic = buyLogicData.CreateAILogic(this);
         }
         #region Turns

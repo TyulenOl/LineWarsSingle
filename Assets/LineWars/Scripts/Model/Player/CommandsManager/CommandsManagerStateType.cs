@@ -6,6 +6,7 @@
         Executor,
         Target,
         WaitingCommand,
-        MultiTarget
+        MultiTarget,
+        Buy
     }
 }

@@ -311,8 +311,11 @@ namespace LineWars.Model
 
         public void ExecuteTurn(PhaseType phaseType)
         {
-            if (PhaseExceptions.Contains(phaseType)) 
+            if (PhaseExceptions.Contains(phaseType))
+            {
+                StartCoroutine(SkipTurnCoroutine());
                 return;
+            }
             var previousPhase = CurrentPhase;
             switch (phaseType)
             {
@@ -342,6 +345,12 @@ namespace LineWars.Model
 
             CurrentPhase = phaseType;
             TurnChanged?.Invoke(previousPhase, CurrentPhase);
+
+            IEnumerator SkipTurnCoroutine()
+            {
+                yield return null;
+                TurnChanged?.Invoke(phaseType, PhaseType.Idle);
+            }
         }
         public bool CanExecuteTurn(PhaseType phaseType)
         {
