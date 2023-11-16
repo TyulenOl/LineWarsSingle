@@ -85,6 +85,7 @@ namespace LineWars.Controllers
             idleState = new CommandsManagerIdleState(this);
             waitingCommandState = new CommandsManagerWaitingCommandState(this);
             multiTargetState = new CommandsManagerMultiTargetState(this);
+            buyState = new CommandsManagerBuyState(this);
         }
         
         private void Start()

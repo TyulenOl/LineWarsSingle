@@ -24,6 +24,7 @@ namespace LineWars.Model
                    && OwnerCondition()
                    && SizeCondition()
                    && LineCondition()
+                   && CanOwnerMoveCondition()
                    && (ignoreActionPointsCondition || ActionPointsCondition());
 
             bool SizeCondition()
@@ -44,6 +45,11 @@ namespace LineWars.Model
                 return target.OwnerId == -1
                        || target.OwnerId == MyUnit.OwnerId
                        || target.OwnerId != MyUnit.OwnerId && target.AllIsFree;
+            }
+
+            bool CanOwnerMoveCondition()
+            {
+                return target.CanOwnerMove(MyUnit.OwnerId);
             }
         }
 

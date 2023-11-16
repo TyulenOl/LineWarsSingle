@@ -23,10 +23,11 @@ namespace LineWars
             if (current != PhaseType.Replenish)
                 return;
             currentRounds++;
-            if(currentRounds >= roundsToWin)
+            if(currentRounds >= roundsToWin + 1)
             {
                 Win(); 
                 PhaseManager.Instance.PhaseChanged.RemoveListener(OnPhaseChanged);
+                Me.OwnedRemoved -= OnRemoveOwned;
             }
         }
 
