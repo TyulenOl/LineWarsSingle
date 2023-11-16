@@ -79,7 +79,6 @@ namespace LineWars.Model
         {
             return !BannedOwnerId.Contains(ownerId);
         }
-
     }
 
     public interface IReadOnlyNodeProjection : INumbered
