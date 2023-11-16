@@ -51,6 +51,8 @@ namespace LineWars.Model
         }
 
         public event Action AnyActionCompleted;
+        IEnumerable<IExecutorAction> IExecutor.Actions => actionsDictionary.Values;
+
         public event Action<UnitProjection> Died;
 
         public IReadOnlyDictionary<CommandType, UnitAction<NodeProjection, EdgeProjection, UnitProjection>>
@@ -117,8 +119,6 @@ namespace LineWars.Model
 
         public IEnumerable<IUnitAction<NodeProjection, EdgeProjection, UnitProjection>> Actions =>
             actionsDictionary.Values;
-
-        IEnumerable<IExecutorAction> IExecutorActionSource.Actions => actionsDictionary.Values;
 
         public T GetUnitAction<T>()
             where T : IUnitAction<NodeProjection, EdgeProjection, UnitProjection>

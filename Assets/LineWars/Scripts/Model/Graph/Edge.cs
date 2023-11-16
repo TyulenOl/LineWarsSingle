@@ -33,8 +33,7 @@ namespace LineWars.Model
         [SerializeField] [ReadOnlyInspector] private int hp;
 
         [field: Header("Events")]
-        [field: SerializeField]
-        public UnityEvent<int, int> HpChanged { get; private set; }
+        [field: SerializeField] public UnityEvent<int, int> HpChanged { get; private set; }
 
         [field: SerializeField] public UnityEvent<LineType, LineType> LineTypeChanged { get; private set; }
 

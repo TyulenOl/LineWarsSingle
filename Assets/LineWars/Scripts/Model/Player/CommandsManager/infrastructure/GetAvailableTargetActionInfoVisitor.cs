@@ -76,7 +76,9 @@ namespace LineWars.Controllers
 
         public IEnumerable<TargetActionInfo> Visit(ISacrificeForPerunAction<Node, Edge, Unit> action)
         {
-            throw new System.NotImplementedException();
+            return MonoGraph.Instance.Nodes
+                .Where(action.IsAvailable)
+                .Select(x => new TargetActionInfo(x, action.CommandType));
         }
 
         public IEnumerable<TargetActionInfo> Visit(IRLBuildAction<Node, Edge, Unit> action)
@@ -117,9 +119,9 @@ namespace LineWars.Controllers
         {
             private readonly ITarget[] targets;
 
-            public ForShotUnitAction([NotNull] ITarget[] targets)
+            public ForShotUnitAction(IEnumerable<ITarget> targets)
             {
-                this.targets = targets ?? throw new ArgumentNullException(nameof(targets));
+                this.targets = targets.ToArray();
             }
 
             public IEnumerable<TargetActionInfo> Visit(IShotUnitAction<Node, Edge, Unit> action)

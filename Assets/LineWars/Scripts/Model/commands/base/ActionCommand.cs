@@ -3,6 +3,9 @@ using JetBrains.Annotations;
 
 namespace LineWars.Model
 {
+    /// <summary>
+    /// Класс команд, которые являются обертками над ExecutorAction
+    /// </summary>
     public abstract class ActionCommand<TExecutor, TAction> : 
         IActionCommand<TAction>
         where TExecutor : IExecutor<TExecutor, TAction>, IExecutor
@@ -23,9 +26,6 @@ namespace LineWars.Model
             Action = action ?? throw new ArgumentNullException(nameof(action));
             Executor = action.Executor;
         }
-
-        public CommandType CommandType => Action.CommandType;
-        public ActionType ActionType => Action.ActionType;
         
         public abstract void Execute();
         public abstract bool CanExecute();

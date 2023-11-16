@@ -8,15 +8,17 @@ namespace LineWars.Controllers
 {
     public partial class CommandsManager
     {
-        private class CommandsManagerTargetState : CommandsManagerState
+        private class CommandsManagerFindTargetState : CommandsManagerState
         {
-            public CommandsManagerTargetState(CommandsManager manager) : base(manager)
+
+            public CommandsManagerFindTargetState(CommandsManager manager) : base(manager)
             {
             }
 
             public override void OnEnter()
             {
                 Manager.state = CommandsManagerStateType.Target;
+                Manager.SendRedrawMessage(Array.Empty<IMonoTarget>(), CheckAction);
                 Selector.SelectedObjectChanged += OnSelectedObjectChanged;
             }
 
@@ -56,7 +58,7 @@ namespace LineWars.Controllers
                         break;
                     default:
                         Manager.canCancelExecutor = false;
-                        Manager.GoToWaitingCommandState(
+                        Manager.GoToWaitingSelectCommandState(
                             new OnWaitingCommandMessage(
                                 presets,
                                 Selector.SelectedObjects.GetComponentMany<Node>().FirstOrDefault()
@@ -65,18 +67,14 @@ namespace LineWars.Controllers
                 }
             }
 
-            private IEnumerable<ITargetedAction> GetAllActionsForPair(
+            protected virtual IEnumerable<ITargetedAction> GetAllActionsForPair(
                 IMonoExecutor executor,
                 IMonoTarget target)
             {
-                if (executor is IExecutorActionSource source)
-                {
-                    return source.Actions
-                        .OfType<ITargetedAction>()
-                        .Where(x => x.IsAvailable(target));
-                }
-
-                return Enumerable.Empty<ITargetedAction>();
+                return executor.Actions
+                    .OfType<ITargetedAction>()
+                    .Where(x => x.IsAvailable(target) 
+                                && CheckAction(x));
             }
 
             private void CancelExecutor()
@@ -85,7 +83,12 @@ namespace LineWars.Controllers
                 Manager.Executor = null;
                 Debug.Log("EXECUTOR CANCELED");
 
-                Manager.stateMachine.SetState(Manager.executorState);
+                Manager.stateMachine.SetState(Manager.findExecutorState);
+            }
+
+            protected virtual bool CheckAction(IExecutorAction action)
+            {
+                return !Manager.hiddenCommandsSet.Contains(action.CommandType);
             }
         }
     }

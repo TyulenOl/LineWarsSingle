@@ -7,6 +7,7 @@ namespace LineWars.Model
     {
         public int MaxActionPoints { get; set; }
         public int CurrentActionPoints { get; set; }
+        public IEnumerable<IExecutorAction> Actions { get; }
         public event Action AnyActionCompleted;
 
         public bool CanDoAnyAction => CurrentActionPoints > 0;
@@ -18,10 +19,5 @@ namespace LineWars.Model
     {
         public bool TryGetUnitAction<T>(out T action) where T : TAction;
         public T GetUnitAction<T>() where T : TAction;
-    }
-
-    public interface IExecutorActionSource : IExecutor
-    {
-        public IEnumerable<IExecutorAction> Actions { get; }
     }
 }
