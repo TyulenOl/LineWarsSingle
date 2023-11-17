@@ -218,7 +218,7 @@ namespace LineWars.Model
         }
 
         public IEnumerable<IUnitAction<Node, Edge, Unit>> Actions => MonoActions;
-        IEnumerable<IExecutorAction> IExecutorActionSource.Actions => Actions;
+        IEnumerable<IExecutorAction> IExecutor.Actions => Actions;
 
         public T GetUnitAction<T>() where T : IUnitAction<Node, Edge, Unit>
             => MonoActions.OfType<T>().FirstOrDefault();

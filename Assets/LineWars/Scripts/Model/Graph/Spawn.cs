@@ -25,7 +25,7 @@ namespace LineWars.Model
             {
                 GroupSprite = Nation.NodeSprite;
             }
-            if ((GroupName == null || GroupName == "" || GroupName == string.Empty)
+            if ((string.IsNullOrEmpty(GroupName) || GroupName == string.Empty)
                 && Nation != null)
             {
                 GroupName = Nation.Name;

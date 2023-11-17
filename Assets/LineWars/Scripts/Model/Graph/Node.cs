@@ -100,18 +100,6 @@ namespace LineWars.Model
             nodeInfoDrawer.ReDrawIncomeInfo(Player.LocalPlayer.GetMyIncomeFromNode(this));
         }
         
-        public IEnumerable<ITarget> Targets
-        {
-            get
-            {
-                yield return this;
-                foreach (var edge in edges)
-                    yield return edge;
-                foreach (var unit in Units)
-                    yield return unit;
-            }
-        }
-
         public IEnumerable<Unit> Units => new[] {LeftUnit, RightUnit}
             .Where(x => x != null)
             .Distinct();

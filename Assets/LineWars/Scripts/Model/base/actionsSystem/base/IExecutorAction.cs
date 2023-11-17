@@ -5,8 +5,6 @@ namespace LineWars.Model
     public interface IExecutorAction
     {
         public CommandType CommandType { get; }
-        public ActionType ActionType { get; }
-
         public event Action ActionCompleted;
         public void OnReplenish();
     }

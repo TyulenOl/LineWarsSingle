@@ -13,10 +13,10 @@ namespace LineWars.Controllers
         private readonly Func<IUnitAction<Node, Edge, Unit>, bool> actionSelector;
         public GetAllAvailableTargetActionInfoForMonoExecutorVisitor(
             GetAvailableTargetActionInfoVisitor.ForShotUnitAction forShotUnitAction, 
-            Func<IUnitAction<Node, Edge, Unit>, bool> actionSelector = null)
+            Func<IExecutorAction, bool> actionSelector)
         {
             this.forShotUnitAction = forShotUnitAction;
-            this.actionSelector = actionSelector ?? (_ => true);
+            this.actionSelector = actionSelector;
         }
 
         public IEnumerable<TargetActionInfo> Visit(Unit unit)

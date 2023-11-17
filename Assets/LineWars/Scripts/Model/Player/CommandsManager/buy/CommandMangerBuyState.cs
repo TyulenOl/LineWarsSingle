@@ -7,7 +7,7 @@ namespace LineWars.Controllers
 {
     public partial class CommandsManager
     {
-        public class CommandsManagerBuyState : CommandsManagerState
+        private class CommandsManagerBuyState : CommandsManagerState
         {
             private Node currentNode;
             private UnitBuyPreset currentBuyPreset;

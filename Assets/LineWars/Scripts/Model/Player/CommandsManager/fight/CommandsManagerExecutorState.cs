@@ -7,9 +7,9 @@ namespace LineWars.Controllers
 {
     public partial class CommandsManager
     {
-        public class CommandsManagerExecutorState : CommandsManagerState
+        private class CommandsManagerFindExecutorState : CommandsManagerState
         {
-            public CommandsManagerExecutorState(CommandsManager manager) : base(manager)
+            public CommandsManagerFindExecutorState(CommandsManager manager) : base(manager)
             {
             }
 
@@ -39,8 +39,7 @@ namespace LineWars.Controllers
                     return;
 
                 Manager.Executor = executor;
-                Manager.SendRedrawMessage(Array.Empty<IMonoTarget>());
-                Manager.stateMachine.SetState(Manager.targetState);
+                Manager.stateMachine.SetState(Manager.findTargetState);
             }
         }
     }

@@ -9,8 +9,7 @@ namespace LineWars.Model
     public interface IUnit<TNode, TEdge, TUnit> :
         IOwned,
         ITargetedAlive,
-        IExecutor<TUnit, IUnitAction<TNode, TEdge, TUnit>>,
-        IExecutorActionSource
+        IExecutor<TUnit, IUnitAction<TNode, TEdge, TUnit>>
         where TNode : class, INodeForGame<TNode, TEdge, TUnit>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
