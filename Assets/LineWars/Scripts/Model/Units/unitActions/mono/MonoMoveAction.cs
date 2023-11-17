@@ -28,13 +28,13 @@ namespace LineWars.Model
         public void MoveTo(Node target)
         {
             Action.MoveTo(target);
-            Unit.MovementLogic.MoveTo(target.transform);
+            Unit.MovementLogic.MoveTo(target.transform.position);
             SfxManager.Instance.Play(moveSfx);
             SfxManager.Instance.Play(dj.GetSound(reactionsSfx));
             Player.LocalPlayer.RecalculateVisibility();
         }
 
-        private void MovementLogicOnMovementIsOver(Transform obj) => MoveAnimationEnded?.Invoke();
+        private void MovementLogicOnMovementIsOver() => MoveAnimationEnded?.Invoke();
 
         private void OnDestroy()
         {

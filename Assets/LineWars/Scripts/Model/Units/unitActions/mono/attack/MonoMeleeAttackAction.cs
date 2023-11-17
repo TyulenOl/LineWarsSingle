@@ -13,8 +13,7 @@ namespace LineWars.Model
         /// <summary>
         /// указывет на то, нужно ли захватывать точку после атаки
         /// </summary>
-        [field: SerializeField]
-        public bool InitialOnslaught { get; private set; }
+        [field: SerializeField] public bool InitialOnslaught { get; private set; }
 
         [SerializeField] private SimpleEffect slashEffectPrefab;
 
