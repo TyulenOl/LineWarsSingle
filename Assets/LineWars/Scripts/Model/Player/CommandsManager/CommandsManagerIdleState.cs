@@ -14,7 +14,7 @@ namespace LineWars.Controllers
                 Manager.Executor = null;
                 Manager.Target = null;
                 Manager.canCancelExecutor = true;
-                Manager.SendClearMassage();
+                Manager.SendFightClearMassage();
             }
         }
     }

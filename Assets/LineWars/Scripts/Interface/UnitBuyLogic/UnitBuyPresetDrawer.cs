@@ -1,4 +1,5 @@
 using System;
+using LineWars.Controllers;
 using LineWars.Model;
 using TMPro;
 using UnityEngine;
@@ -33,22 +34,23 @@ namespace LineWars.Interface
             }
         }
 
-        private void Awake()
+        private void Start()
         {
             PhaseManager.Instance.PhaseChanged.AddListener(OnPhaseChanged);
+            CommandsManager.Instance.BuyNeedRedraw += (_) => SetAvailable();
         }
 
         private void OnPhaseChanged(PhaseType phaseTypeOld, PhaseType phaseTypeNew)
         {
             if (phaseTypeNew != PhaseType.Buy) return;
-            SetAvailable(Player.LocalPlayer.CanBuyPreset(unitBuyPreset));
+            SetAvailable();
         }
 
         private void Init()
         {
             image.sprite = unitBuyPreset.Image;
             cost.text = unitBuyPreset.Cost.ToString();
-            SetAvailable(Player.LocalPlayer.CanBuyPreset(unitBuyPreset));
+            SetAvailable();
         }
 
 
@@ -60,12 +62,14 @@ namespace LineWars.Interface
             }
         }
 
-        private void SetAvailable(bool isAvailable)
+        private void SetAvailable()
         {
+            var isAvailable = Player.LocalPlayer.CanBuyPreset(unitBuyPreset);
             button.interactable = isAvailable;
             var color = isAvailable ? Color.white : new Color(226 / 255f, 43 / 255f, 18 / 255f, 255 / 255f);
             cost.color = color;
             moneyImage.color = color;
+            ifChosenPanel.gameObject.SetActive(false);
             backgroundImage.color = !isAvailable ? Color.gray : new Color(226 / 255f, 43 / 255f, 18 / 255f, 255 / 255f);
             image.color = isAvailable ? Color.white : Color.gray;
             this.isAvailable = isAvailable;

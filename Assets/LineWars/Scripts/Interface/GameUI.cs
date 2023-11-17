@@ -37,9 +37,31 @@ namespace LineWars.Interface
         private void Start()
         {
             CommandsManager.Instance.ExecutorChanged += OnExecutorChanged;
-            CommandsManager.Instance.NeedRedraw += ReDrawCurrentTargets;
-
+            CommandsManager.Instance.FightNeedRedraw += ReDrawCurrentTargets;
+            CommandsManager.Instance.BuyNeedRedraw += ReDrawBuyNodes;
+            
             SubscribeEventForGameReferee();
+        }
+
+        public void ClearBuyNodes()
+        {
+            ReDrawBuyNodes(null);
+        }
+        
+        private void ReDrawBuyNodes(BuyStateMessage buyStateMessage)
+        {
+            foreach (var node in MonoGraph.Instance.Nodes)
+            {
+                node.GetComponent<NodeTargetDrawer>().ReDrawBuyInfo(false);
+            }
+            
+            if (buyStateMessage == null)
+                return;
+            
+            foreach (var node in buyStateMessage.NodesToSpawnPreset)
+            {
+                node.GetComponent<NodeTargetDrawer>().ReDrawBuyInfo(true);
+            }
         }
 
         private void SubscribeEventForGameReferee()
@@ -103,7 +125,7 @@ namespace LineWars.Interface
             foreach (var currentDrawer in currentDrawers)
             {
                 if (currentDrawer == null) continue;
-                currentDrawer.ReDraw(CommandType.None);
+                currentDrawer.ReDrawCommads(CommandType.None);
             }
 
             if(message == null)
@@ -143,11 +165,11 @@ namespace LineWars.Interface
 
                 if (drawer is NodeTargetDrawer nodeTargetDrawer)
                 {
-                    nodeTargetDrawer.ReDraw(targets.Select(x => x.CommandType));
+                    nodeTargetDrawer.ReDrawCommads(targets.Select(x => x.CommandType));
                 }
                 else
                 {
-                    drawer.ReDraw(targetActionInfo.CommandType);
+                    drawer.ReDrawCommads(targetActionInfo.CommandType);
                 }
             }
         }
@@ -163,7 +185,7 @@ namespace LineWars.Interface
                 var drawer = node.gameObject.GetComponent<NodeTargetDrawer>();
                 if (drawer == null) continue;
                 currentDrawers.Add(drawer);
-                drawer.ReDraw(commands);
+                drawer.ReDrawCommads(commands);
             }
         }
 

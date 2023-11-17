@@ -185,10 +185,6 @@ namespace LineWars.Model
 
         public void BuyPreset(UnitBuyPreset unitPreset)
         {
-            SpawnUnit(Base, unitPreset.FirstUnitType);
-            SpawnUnit(Base, unitPreset.SecondUnitType);
-            CurrentMoney -= unitPreset.Cost;
-            OnSpawnPreset();
             BuyPreset(unitPreset, Base);
         }
 
@@ -197,6 +193,7 @@ namespace LineWars.Model
             SpawnUnit(node, preset.FirstUnitType);
             SpawnUnit(node, preset.SecondUnitType);
             CurrentMoney -= preset.Cost;
+            OnSpawnPreset();
         }
         
         public virtual void OnSpawnPreset() {}
