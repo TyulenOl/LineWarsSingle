@@ -10,7 +10,7 @@ namespace LineWars.Interface
     {
         [field: SerializeField] public SpriteRenderer image { get; set; }
 
-        public virtual void ReDraw(CommandType commandType)
+        public virtual void ReDrawCommads(CommandType commandType)
         {
             image.enabled = commandType != CommandType.None;
             image.sprite = DrawHelper.GetSpriteByCommandType(commandType);

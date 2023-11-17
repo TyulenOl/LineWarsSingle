@@ -47,8 +47,8 @@ namespace LineWars.Controllers
             }
         }
 
-        public event Action<ExecutorRedrawMessage> NeedRedraw;
-        public event Action BuyEntered;
+        public event Action<ExecutorRedrawMessage> FightNeedRedraw;
+        public event Action<BuyStateMessage> BuyNeedRedraw;
 
         public IMonoTarget Target
         {
@@ -140,7 +140,7 @@ namespace LineWars.Controllers
                 }
                 else
                 {
-                    SendRedrawMessage();
+                    SendFightRedrawMessage();
                     stateMachine.SetState(findTargetState);
                 }
 
@@ -237,7 +237,7 @@ namespace LineWars.Controllers
             }
         }
 
-        private void SendRedrawMessage(
+        private void SendFightRedrawMessage(
             IEnumerable<IMonoTarget> targets = null,
             Func<IExecutorAction, bool> actionSelector = null)
         {
@@ -246,14 +246,24 @@ namespace LineWars.Controllers
                 actionSelector ?? (action => !hiddenCommandsSet.Contains(action.CommandType)));
             var data = Executor.Accept(visitor).ToArray();
             var message = new ExecutorRedrawMessage(data);
-            NeedRedraw?.Invoke(message);
+            FightNeedRedraw?.Invoke(message);
         }
-
-        private void SendClearMassage()
+        
+        private void SendFightClearMassage()
         {
-            NeedRedraw?.Invoke(null);
+            FightNeedRedraw?.Invoke(null);
         }
 
+        private void SendBuyReDrawMessage(IEnumerable<Node> nodes)
+        {
+            BuyNeedRedraw?.Invoke(new BuyStateMessage(nodes));
+        }
+        
+        private void ClearBuyReDrawMessage()
+        {
+            BuyNeedRedraw?.Invoke(null);
+        }
+        
         private void GoToWaitingSelectCommandState(OnWaitingCommandMessage commandMessage)
         {
             CurrentOnWaitingCommandMessage = commandMessage;

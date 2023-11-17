@@ -4,26 +4,29 @@ namespace LineWars.Model
 {
     public static class NodeSpawnQualifier
     {
-        public static bool IsQualifiedForSpawn(this Node node, BasePlayer player) 
+        public static bool IsQualifiedForSpawn(this Node node, BasePlayer player)
         {
-            return CzarCondition(node, player)
-                || InitialSpawnCondition(node, player);
-        }
-        private static bool InitialSpawnCondition(Node node, BasePlayer player)
-        {
-            return player.InitialSpawns.Contains(node) && node.Owner == player;
+            return (KnyazCondition(node, player)
+                   || InitialSpawnCondition(node, player)) && node.AnyIsFree;
         }
 
-        private static bool CzarCondition(Node node, BasePlayer player)
+        private static bool InitialSpawnCondition(Node node, BasePlayer player)
         {
-            var knyazes = player.MyUnits.
-                Where(unit => unit.Type == UnitType.Knyaz)
+            return player.InitialSpawns.Contains(node) && node.Owner == player ;
+        }
+
+        private static bool KnyazCondition(Node node, BasePlayer player)
+        {
+            if (node.Owner != player)
+                return false;
+            
+            var knyazes = player.MyUnits.Where(unit => unit.Type == UnitType.Knyaz)
                 .ToList();
             if (knyazes.Count == 0)
                 return false;
             var radius = knyazes
                 .Max(unit =>
-                unit.TryGetComponent(out KnyazRadius knyazRadius) ? knyazRadius.Radius : 1);
+                    unit.TryGetComponent(out KnyazRadius knyazRadius) ? knyazRadius.Radius : 1);
             var elligbleNodes = MonoGraph.Instance.GetNodesInRange(node, (uint)radius)
                 .Where(thisNode => HaveElligbleKnyaz(thisNode, node))
                 .ToList();
@@ -32,16 +35,12 @@ namespace LineWars.Model
 
         private static bool HaveElligbleKnyaz(Node node, Node startNode)
         {
-            var result = false;
-            if (!node.LeftIsFree 
+            var result = !node.LeftIsFree
                 && node.LeftUnit.Type == UnitType.Knyaz
-                && IsKnyazElligble(node, startNode, node.LeftUnit))
-                    result = true;
-
-            if (!node.RightIsFree
+                && IsKnyazElligble(node, startNode, node.LeftUnit) || !node.RightIsFree
                 && node.RightUnit.Type == UnitType.Knyaz
-                && IsKnyazElligble(node, startNode, node.RightUnit))
-                result = true;
+                && IsKnyazElligble(node, startNode, node.RightUnit);
+
             return result;
         }
 

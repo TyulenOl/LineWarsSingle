@@ -20,9 +20,14 @@ namespace LineWars.Controllers
                 base.OnEnter();
                 Manager.state = CommandsManagerStateType.Buy;
                 Selector.ManySelectedObjectsChanged += OnSelectedObjectsChanged;
-                Manager.BuyEntered?.Invoke();
+                Manager.SendBuyReDrawMessage(GetNodes());
             }
 
+            private IEnumerable<Node> GetNodes()
+            {
+                return MonoGraph.Instance.Nodes.Where(node => node.IsQualifiedForSpawn(Manager.Player));
+            }
+            
             public override void OnExit()
             {
                 base.OnExit();
@@ -31,7 +36,9 @@ namespace LineWars.Controllers
 
             private void OnSelectedObjectsChanged(IEnumerable<GameObject> _, IEnumerable<GameObject> gameObjects)
             {
-                var node = gameObjects.OfType<Node>().FirstOrDefault();
+                if(currentBuyPreset == null)
+                    return;
+                var node = gameObjects.GetComponentMany<Node>().FirstOrDefault();
                 if (node == null || currentNode == node)
                 {
                     currentNode = null;
@@ -43,8 +50,7 @@ namespace LineWars.Controllers
 
             public void SetUnitPreset(UnitBuyPreset newPreset)
             {
-                if(newPreset == null
-                    && newPreset == null)
+                if(newPreset == null)
                 {
                     currentBuyPreset = null;
                     return;
@@ -61,10 +67,11 @@ namespace LineWars.Controllers
                 {
                     var newCommand = new BuyPresetOnNodeCommand(Manager.Player, currentNode, currentBuyPreset);
                     UnitsController.ExecuteCommand(newCommand);
-                    currentBuyPreset = null;
+                    //currentBuyPreset = null;
+                    currentNode = null;
+                    Manager.SendBuyReDrawMessage(GetNodes());
                 }
             }
-
         }
     }
 }
