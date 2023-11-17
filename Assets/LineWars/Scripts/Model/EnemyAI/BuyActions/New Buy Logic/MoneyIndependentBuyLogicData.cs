@@ -54,6 +54,7 @@ namespace LineWars.Model
     public class MoneyIndependentLogic : AIBuyLogic
     { 
         private int currentRoundId = 0;
+        private int currentNodeId = 0;
         private readonly EnemyAI player;
         private readonly MoneyIndependentBuyLogicData data;
         public MoneyIndependentLogic(EnemyAI player, MoneyIndependentBuyLogicData data)
@@ -71,14 +72,11 @@ namespace LineWars.Model
             {
                 var currentUnit = player.GetUnitPrefab(purchase.UnitType);
                 var quantity = purchase.Quantity;
-
-                var currentNodeId = 0;
                 while (quantity > 0 && AreNodesFree(eligbleNodes, currentUnit))
                 {
                     if (data.UnitsLimit != 0 && BasePlayerUtility.GetAllUnits(player).Count() > data.UnitsLimit)
                     {
-                        currentNodeId = (currentNodeId + 1) % eligbleNodes.Count;
-                        return;
+                        break;
                     }
                     var currentNode = eligbleNodes[currentNodeId];
                     if (BasePlayerUtility.CanSpawnUnit(currentNode, currentUnit))

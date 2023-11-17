@@ -178,6 +178,15 @@ namespace LineWars.Model
             }
         }
 
+        public bool CanOwnerMove(int ownerId)
+        {
+            if (!TryGetComponent<PlayerMoveBan>(out var moveBan))
+                return true;
+
+            var banOwners = moveBan.BannedSpawns.Select(spawn => spawn.GetComponent<Node>().OwnerId).ToList();
+            return !banOwners.Contains(ownerId);
+        }
+
 
         protected override void OnSetOwner(BasePlayer oldPlayer, BasePlayer newPlayer)
         {

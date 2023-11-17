@@ -32,6 +32,13 @@ namespace LineWars.Model
             else
                 newNode.Score = 1;
 
+            newNode.BannedOwnerId = new List<int>();
+            foreach(var owner in SingleGame.Instance.AllPlayers)
+            {
+                var ownerId = owner.Value.Id;
+                if(!original.CanOwnerMove(ownerId)) 
+                    newNode.BannedOwnerId.Add(ownerId);
+            }
             return newNode;
         }
 
@@ -53,7 +60,8 @@ namespace LineWars.Model
                 Original = oldNode.Original,
                 EdgesList = edges == null ?
                     new List<EdgeProjection>() : new List<EdgeProjection>(edges),
-                Score = oldNode.Score
+                Score = oldNode.Score,
+                BannedOwnerId = new List<int>(oldNode.BannedOwnerId)
             };
 
             return newNode;

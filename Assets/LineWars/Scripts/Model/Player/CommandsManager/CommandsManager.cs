@@ -92,6 +92,7 @@ namespace LineWars.Controllers
             waitingSelectCommandState = new CommandsManagerWaitingSelectCommandState(this);
             waitingExecuteCommandState = new CommandsManagerWaitingExecuteCommandState(this);
             multiTargetState = new CommandsManagerMultiTargetState(this);
+
             currentCommandState = new CommandsManagerCurrentCommandState(this);
 
             buyState = new CommandsManagerBuyState(this);
