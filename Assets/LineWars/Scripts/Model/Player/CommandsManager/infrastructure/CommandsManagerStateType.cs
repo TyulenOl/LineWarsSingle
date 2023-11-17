@@ -5,7 +5,9 @@
         Idle,
         Executor,
         Target,
-        WaitingCommand,
-        MultiTarget
+        WaitingSelectCommand,
+        WaitingExecuteCommand,
+        MultiTarget,
+        Buy
     }
 }

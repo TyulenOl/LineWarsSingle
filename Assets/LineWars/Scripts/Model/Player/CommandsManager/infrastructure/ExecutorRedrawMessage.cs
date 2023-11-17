@@ -17,11 +17,11 @@ namespace LineWars.Controllers
 
     public class TargetActionInfo
     {
-        public ITarget Target { get; }
+        public IMonoTarget Target { get; }
         
         public CommandType CommandType { get; }
 
-        public TargetActionInfo(ITarget target, CommandType commandType)
+        public TargetActionInfo(IMonoTarget target, CommandType commandType)
         {
             Target = target;
             CommandType = commandType;

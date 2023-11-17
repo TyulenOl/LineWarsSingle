@@ -9,7 +9,7 @@ namespace LineWars.Controllers
 {
     public partial class CommandsManager
     {
-        public class CommandsManagerMultiTargetState : CommandsManagerState
+        private class CommandsManagerMultiTargetState : CommandsManagerState
         {
             private IMultiTargetedAction action;
             private List<IMonoTarget> targets;
@@ -59,7 +59,7 @@ namespace LineWars.Controllers
                 if (targets.Count == action.TargetsCount)
                 {
                     var command = (action as IMultiTargetedActionGenerator).GenerateCommand(targets.ToArray());
-                    Manager.ExecuteCommand(command);
+                    Manager.ExecuteCommandButIgnoreConstrains(command);
                 }
                 else
                     Manager.SendRedrawMessage(targets, otherAction => otherAction.Equals(action));

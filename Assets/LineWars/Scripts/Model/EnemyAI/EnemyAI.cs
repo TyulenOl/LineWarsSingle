@@ -12,7 +12,6 @@ namespace LineWars.Model
     {
         [SerializeField] private EnemyDifficulty difficulty;
         [SerializeField] private float actionCooldown;
-        //[SerializeField] private EnemyAIPersonality personality;
         [SerializeField] private AIBuyLogicData buyLogicData;
         [SerializeField] private GameEvaluator gameEvaluator;
         [SerializeField] private int depth;
@@ -21,14 +20,21 @@ namespace LineWars.Model
 
         private AIBuyLogic buyLogic;
 
-        protected override void Start()
+        public override void Initialize(SpawnInfo spawnInfo)
         {
-            base.Start();
+            base.Initialize(spawnInfo);
+            var playerInitializer = SingleGame.Instance.PlayerInitializer;
+            if(playerInitializer.AIBuyLogicData != null)
+            {
+                buyLogicData = playerInitializer.AIBuyLogicData;
+            }
+            if(playerInitializer.GameEvaluator != null)
+            {
+                gameEvaluator = playerInitializer.GameEvaluator;
+            }
             buyLogic = buyLogicData.CreateAILogic(this);
         }
-
         #region Turns
-
         public override void ExecuteBuy()
         {
             StartCoroutine(BuyCoroutine());
