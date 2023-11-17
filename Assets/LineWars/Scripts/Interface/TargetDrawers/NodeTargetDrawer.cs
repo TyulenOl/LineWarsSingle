@@ -11,12 +11,18 @@ namespace LineWars.Interface
     {
         [field: SerializeField] public LayoutGroup ImagesLayout { get; set; }
         [field: SerializeField] public SpriteRenderer imagePrefab;
+        [field: SerializeField] public SpriteRenderer buyOnNodeInfo;
 
-        public void ReDraw(IEnumerable<CommandType> commandTypes)
+        public void ReDrawBuyInfo(bool isActive)
+        {
+            buyOnNodeInfo.gameObject.SetActive(isActive);
+        }
+        
+        public void ReDrawCommads(IEnumerable<CommandType> commandTypes)
         {
             Clean();
             
-            var types = commandTypes.ToList();
+            var types = commandTypes.Distinct().ToList();
             if(types.Count == 1 && types[0] == CommandType.None)
                 return;
             
@@ -27,9 +33,9 @@ namespace LineWars.Interface
             }
         }
 
-        public override void ReDraw(CommandType commandType)
+        public override void ReDrawCommads(CommandType commandType)
         {
-             ReDraw(new []{commandType});
+             ReDrawCommads(new []{commandType});
         }
 
         private void Clean()

@@ -27,7 +27,7 @@ namespace LineWars.Controllers
 
                 action = multiTargetedAction;
                 targets = new List<IMonoTarget>() {firstTarget};
-                Manager.SendRedrawMessage(targets, otherAction => otherAction.Equals(action));
+                Manager.SendFightRedrawMessage(targets, otherAction => otherAction.Equals(action));
             }
 
             public override void OnEnter()
@@ -62,7 +62,7 @@ namespace LineWars.Controllers
                     Manager.ExecuteCommandButIgnoreConstrains(command);
                 }
                 else
-                    Manager.SendRedrawMessage(targets, otherAction => otherAction.Equals(action));
+                    Manager.SendFightRedrawMessage(targets, otherAction => otherAction.Equals(action));
             }
         }
     }
