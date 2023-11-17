@@ -15,6 +15,7 @@ namespace LineWars.Model
         Mechnik,
         Luchnik,
         BogatyrForZBT,
+        Knyaz
     }
     
 }

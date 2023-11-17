@@ -20,6 +20,7 @@ namespace LineWars.Model
         public int Id { get; set; }
         public int Visibility { get; set; }
         public int ValueOfHidden { get; set; }
+        public List<int> BannedOwnerId { get; set; }
 
         public UnitProjection LeftUnit 
         {
@@ -72,24 +73,12 @@ namespace LineWars.Model
         }
 
         public EdgeProjection GetLineOfNeighbour(NodeProjection otherNode) => 
-            ((INode<NodeProjection, EdgeProjection>)this).GetLine(otherNode); 
+            ((INode<NodeProjection, EdgeProjection>)this).GetLine(otherNode);
 
-        private void OnUnitDied(UnitDirection placement, UnitProjection unit)
+        public bool CanOwnerMove(int ownerId)
         {
-            switch(placement)
-            {
-                case UnitDirection.Left:
-                    leftUnit = null;
-                    break;
-                case UnitDirection.Right:
-                    rightUnit = null;
-                    break;
-                default:
-                    throw new ArgumentException();
-                   
-            }
+            return !BannedOwnerId.Contains(ownerId);
         }
- 
     }
 
     public interface IReadOnlyNodeProjection : INumbered
@@ -102,6 +91,7 @@ namespace LineWars.Model
         public bool IsBase { get; }
         public int Visibility { get; }
         public int ValueOfHidden { get; }
+        public List<int> BannedOwnerId { get; }
 
         public UnitProjection LeftUnit { get; }
         public UnitProjection RightUnit { get; }
