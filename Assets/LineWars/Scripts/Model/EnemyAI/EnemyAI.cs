@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
+using JetBrains.Annotations;
 
 namespace LineWars.Model
 {
@@ -23,17 +24,24 @@ namespace LineWars.Model
         public override void Initialize(SpawnInfo spawnInfo)
         {
             base.Initialize(spawnInfo);
-            var playerInitializer = SingleGame.Instance.PlayerInitializer;
-            if(playerInitializer.AIBuyLogicData != null)
-            {
-                buyLogicData = playerInitializer.AIBuyLogicData;
-            }
-            if(playerInitializer.GameEvaluator != null)
-            {
-                gameEvaluator = playerInitializer.GameEvaluator;
-            }
             buyLogic = buyLogicData.CreateAILogic(this);
         }
+
+        public void SetNewBuyLogic([NotNull] AIBuyLogicData buyData)
+        {
+            if (buyLogicData == null)
+                Debug.LogError("Buy Logic Data cannot be null!");
+            buyLogicData = buyData;
+            buyLogic = buyData.CreateAILogic(this);
+        }
+
+        public void SetNewGameEvaluator([NotNull] GameEvaluator evaluator)
+        {
+            if (evaluator == null)
+                Debug.LogError("Evaluator cannot be null!");
+            gameEvaluator = evaluator;
+        }
+
         #region Turns
         public override void ExecuteBuy()
         {

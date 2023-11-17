@@ -126,22 +126,22 @@ namespace LineWars.Model
         public bool CanBuyPreset(UnitBuyPreset preset, Node node)
         {
             if (preset.FirstUnitType != UnitType.None && preset.SecondUnitType == UnitType.None)
-                return CanBuyPresetOne(preset, node);
-            if(preset.FirstUnitType != UnitType.None && preset.SecondUnitType != UnitType.None)
+            {
+                return CanAffordPreset(preset)
+                    && CanSpawnUnit(node, preset.FirstUnitType);
+            }
+            if (preset.FirstUnitType == UnitType.None && preset.SecondUnitType != UnitType.None)
+            {
+                return CanAffordPreset(preset)
+                    && CanSpawnUnit(node, preset.SecondUnitType);
+            }
+            if (preset.FirstUnitType != UnitType.None && preset.SecondUnitType != UnitType.None)
                 return CanBuyPresetMultiple(preset, node);
             Debug.Log("Invalid preset!");
             return false;    
         }
         
-        // почему публичный? что если сделать так None и TheRiffleMan?
-        public bool CanBuyPresetOne(UnitBuyPreset preset, Node node)
-        {
-            return CanAffordPreset(preset)
-                && CanSpawnUnit(node, preset.FirstUnitType);
-        }
-
-        // почему публичный?
-        public bool CanBuyPresetMultiple(UnitBuyPreset preset, Node node)
+        private bool CanBuyPresetMultiple(UnitBuyPreset preset, Node node)
         {
             if (GetUnitPrefab(preset.FirstUnitType).Size == UnitSize.Large
                 || GetUnitPrefab(preset.SecondUnitType).Size == UnitSize.Large)
@@ -270,9 +270,7 @@ namespace LineWars.Model
             Income -= Mathf.RoundToInt(Rules.IncomeModifier.Modify(node.BaseIncome));
 
             if (node == Base)
-            {
                 Defeat();
-            }
         }
 
         protected virtual void BeforeRemoveOwned(Unit unit)

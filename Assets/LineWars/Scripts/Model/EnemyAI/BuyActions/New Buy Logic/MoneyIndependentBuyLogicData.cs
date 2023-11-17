@@ -65,13 +65,14 @@ namespace LineWars.Model
 
         public override void CalculateBuy()
         {
-            var eligbleNodes = MonoGraph.Instance.Nodes
-                .Where(node => node.IsQualifiedForSpawn(player))
-                .ToList();
+            
             foreach (var purchase in data.UnitsPerRound[currentRoundId])
             {
                 var currentUnit = player.GetUnitPrefab(purchase.UnitType);
                 var quantity = purchase.Quantity;
+                var eligbleNodes = MonoGraph.Instance.Nodes
+                .Where(node => node.IsQualifiedForSpawn(player))
+                .ToList();
                 while (quantity > 0 && AreNodesFree(eligbleNodes, currentUnit))
                 {
                     if (data.UnitsLimit != 0 && BasePlayerUtility.GetAllUnits(player).Count() > data.UnitsLimit)
@@ -83,6 +84,11 @@ namespace LineWars.Model
                     {
                         player.SpawnUnit(currentNode, currentUnit);
                         quantity--;
+                        eligbleNodes = MonoGraph.Instance.Nodes
+                            .Where(node => node.IsQualifiedForSpawn(player))
+                            .ToList();
+                        if (eligbleNodes.Count <= 0)
+                            break;
                     }
 
                     currentNodeId = (currentNodeId + 1) % eligbleNodes.Count;

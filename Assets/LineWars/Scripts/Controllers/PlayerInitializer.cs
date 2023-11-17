@@ -13,9 +13,6 @@ namespace LineWars
         [SerializeField] private GameEvaluator gameEvaluator;
         [SerializeField] private AIBuyLogicData aiBuyLogicData;
 
-        // это очень сильный кастыль
-        public GameEvaluator GameEvaluator => gameEvaluator;
-        public AIBuyLogicData AIBuyLogicData => aiBuyLogicData;
         public T Initialize<T>(SpawnInfo spawnInfo) where T : BasePlayer
         {
             var player = Instantiate(playersPrefabs.OfType<T>().First());
@@ -39,7 +36,19 @@ namespace LineWars
                 }
             }
 
+            //слабейший костыль
+            if(player is EnemyAI enemyAI)
+                InitializeAISettings(enemyAI);
+            
             return player;
+        }
+
+        private void InitializeAISettings(EnemyAI enemyAI)
+        {
+            if(gameEvaluator != null)
+                enemyAI.SetNewGameEvaluator(gameEvaluator);
+            if(aiBuyLogicData != null)
+                enemyAI.SetNewBuyLogic(aiBuyLogicData);
         }
     }
 }

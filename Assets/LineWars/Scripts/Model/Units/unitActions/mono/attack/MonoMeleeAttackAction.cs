@@ -16,30 +16,48 @@ namespace LineWars.Model
         [field: SerializeField]
         public bool InitialOnslaught { get; private set; }
 
-        [SerializeField] private SimpleEffect slashEffectPrefab;
+        [SerializeField] private UnitMeleeAttackAnimation attackAnimation;
 
         public bool Onslaught => Action.Onslaught;
         public UnitBlockerSelector BlockerSelector => Action.BlockerSelector;
 
+        public override void Initialize()
+        {
+            base.Initialize();
+            TryInitializeAttackAnimation();
+        }
+
         public override void Attack(ITargetedAlive enemy)
         {
-            if (enemy is Unit unit)
-            {
-                if (slashEffectPrefab == null)
-                {
-                    Debug.LogWarning($"Slash effect is null on {name}");
-                }
-                else
-                {
-                    var helper = unit.GetComponent<UnitAnimationHelper>();
-                    var slash = Instantiate(slashEffectPrefab);
-                    slash.transform.position = unit.UnitDirection == UnitDirection.Left
-                        ? helper.LeftCenter.transform.position
-                        : helper.RightCenter.transform.position;
-                }
-            }
+            if (enemy is Unit unit && attackAnimation != null)
+                AttackWithAnimation(unit);
+            else
+                base.Attack(enemy);
+        }
 
-            base.Attack(enemy);
+        private void TryInitializeAttackAnimation()
+        {
+            if (attackAnimation == null)
+                return;
+            if (Executor is Unit unit)
+                attackAnimation.Initialize(unit);
+            else
+            {
+                Debug.LogWarning("Attempt to add animation on not unit!");
+                attackAnimation = null;
+            }
+        }
+
+        private void AttackWithAnimation(Unit targetUnit)
+        {
+            attackAnimation.Attacked.AddListener(AttackOnEvent);
+            attackAnimation.Execute(targetUnit);
+
+            void AttackOnEvent(UnitMeleeAttackAnimation _)
+            {
+                base.Attack(targetUnit);
+                attackAnimation.Attacked.RemoveListener(AttackOnEvent);
+            }
         }
 
         protected override MeleeAttackAction<Node, Edge, Unit> GetAction()
