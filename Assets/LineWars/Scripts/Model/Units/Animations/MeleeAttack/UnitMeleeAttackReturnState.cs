@@ -23,7 +23,8 @@ namespace LineWars.Model
                 returnFromPosition = animation.ownerUnit.transform.position;
                 movementProgress = 0f;
                 if (animation.action.Onslaught
-                   && animation.targetNode.AllIsFree)
+                   && (animation.ownerUnit == animation.targetNode.LeftUnit ||
+                   animation.ownerUnit == animation.targetNode.RightUnit)) //Плохой код :(
                 {
                     animation.Ended.Invoke(animation);
                     animation.stateMachine.SetState(animation.idleState);
