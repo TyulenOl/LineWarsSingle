@@ -63,7 +63,7 @@ namespace LineWars.Model
         }
 
 
-        public Dictionary<Node, bool> GetVisibilityInfo(BasePlayer player) 
+        public Dictionary<Node, bool> GetVisibilityInfo(BasePlayer player)
             => modelGraph.GetVisibilityInfo(player.MyNodes);
 
         public IEnumerable<Node> GetVisibilityNodes(IEnumerable<Node> ownedNodes)
@@ -73,12 +73,23 @@ namespace LineWars.Model
             [NotNull] Node start,
             [NotNull] Node end,
             Func<Node, Node, bool> condition = null)
-            => modelGraph.FindShortestPath(start, end, condition);
+        {
+            return modelGraph.FindShortestPath(start, end, condition);
+        }
 
         public IEnumerable<Node> GetNodesInRange(
             Node startNode,
             uint range,
             Func<Node, Node, bool> condition = null)
-            => modelGraph.GetNodesInRange(startNode, range, condition);
+        {
+            return modelGraph.GetNodesInRange(startNode, range, condition);
+        }
+
+        public IEnumerable<Node> MultiStartsLimitedBfs(
+            IReadOnlyDictionary<Node, int> startNodes,
+            IReadOnlyDictionary<Node, int> interferingNodes)
+        {
+            return modelGraph.MultiStartsLimitedBfs(startNodes, interferingNodes);
+        }
     }
 }

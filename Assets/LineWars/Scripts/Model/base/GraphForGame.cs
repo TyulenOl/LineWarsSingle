@@ -29,31 +29,38 @@ namespace LineWars.Model
 
         public IEnumerable<TNode> GetVisibilityNodes(IEnumerable<TNode> ownedNodes)
         {
-            var startNodes = ownedNodes.ToArray();
-            if (startNodes.Length == 0) throw new ArgumentException();
-            if (startNodes.Any(x => !Nodes.Contains(x))) throw new InvalidOperationException();
+            var startNodes = ownedNodes.ToDictionary(x => x, x => x.Visibility);
+            var hiddenNodes = Nodes
+                .Where(x => !startNodes.ContainsKey(x))
+                .ToDictionary(x => x, x => x.ValueOfHidden);
+            return MultiStartsLimitedBfs(startNodes, hiddenNodes);
 
-            var closedNodes = new HashSet<TNode>();
-            var priorityQueue = new PriorityQueue<TNode, int>(0);
-            foreach (var ownedNode in startNodes)
-                priorityQueue.Enqueue(ownedNode, -ownedNode.Visibility);
 
-            while (priorityQueue.Count != 0)
-            {
-                var (node, currentVisibility) = priorityQueue.Dequeue();
-                if (closedNodes.Contains(node)) continue;
-
-                closedNodes.Add(node);
-                yield return node;
-                if (currentVisibility == 0) continue;
-                foreach (var neighbor in node.GetNeighbors())
-                {
-                    if (closedNodes.Contains(neighbor)) continue;
-                    var nextVisibility = currentVisibility + 1 + neighbor.ValueOfHidden;
-                    if (nextVisibility > 0) continue;
-                    priorityQueue.Enqueue(neighbor, nextVisibility);
-                }
-            }
+            // var startNodes = ownedNodes.ToArray();
+            // if (startNodes.Length == 0) throw new ArgumentException();
+            // if (startNodes.Any(x => !Nodes.Contains(x))) throw new InvalidOperationException();
+            //
+            // var closedNodes = new HashSet<TNode>();
+            // var priorityQueue = new PriorityQueue<TNode, int>(0);
+            // foreach (var ownedNode in startNodes)
+            //     priorityQueue.Enqueue(ownedNode, -ownedNode.Visibility);
+            //
+            // while (priorityQueue.Count != 0)
+            // {
+            //     var (node, currentVisibility) = priorityQueue.Dequeue();
+            //     if (closedNodes.Contains(node)) continue;
+            //
+            //     closedNodes.Add(node);
+            //     yield return node;
+            //     if (currentVisibility == 0) continue;
+            //     foreach (var neighbor in node.GetNeighbors())
+            //     {
+            //         if (closedNodes.Contains(neighbor)) continue;
+            //         var nextVisibility = currentVisibility + 1 + neighbor.ValueOfHidden;
+            //         if (nextVisibility > 0) continue;
+            //         priorityQueue.Enqueue(neighbor, nextVisibility);
+            //     }
+            // }
         }
     }
 }

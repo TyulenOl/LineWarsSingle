@@ -8,7 +8,17 @@ namespace LineWars.Model
         where TNode : INode<TNode, TEdge>
     {
         IEnumerable<TEdge> Edges { get; }
-        IEnumerable<TNode> GetNeighbors();
+
+        IEnumerable<TNode> GetNeighbors()
+        {
+            foreach (var edge in Edges)
+            {
+                if (edge.FirstNode.Equals(this))
+                    yield return edge.SecondNode;
+                else
+                    yield return edge.FirstNode;
+            }
+        }
         
         public TEdge GetLine(TNode node) => Edges.Intersect(node.Edges).FirstOrDefault();
     }

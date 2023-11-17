@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using DataStructures.PriorityQueue;
 
 namespace LineWars.Model
 {
@@ -9,8 +10,8 @@ namespace LineWars.Model
         where TNode : class, INode<TNode, TEdge>
         where TEdge : class, IEdge<TNode, TEdge>
     {
-        private TNode[] nodes;
-        private TEdge[] edges;
+        private readonly TNode[] nodes;
+        private readonly TEdge[] edges;
         public IReadOnlyList<TNode> Nodes => nodes;
         public IReadOnlyList<TEdge> Edges => edges;
 
@@ -19,7 +20,7 @@ namespace LineWars.Model
             this.nodes = nodes.ToArray();
             this.edges = edges.ToArray();
         }
-        
+
         public List<TNode> FindShortestPath(
             [NotNull] TNode start,
             [NotNull] TNode end,
@@ -61,7 +62,7 @@ namespace LineWars.Model
             result.Reverse();
             return result;
         }
-        
+
         /// <summary>
         /// Действует как волновой алгоритм
         /// </summary>
@@ -72,12 +73,13 @@ namespace LineWars.Model
         /// <exception cref="ArgumentException">Стартовая нода не содержится в графе</exception>
         /// <exception cref="InvalidOperationException">Выход за пределы графа</exception>
         public IEnumerable<TNode> GetNodesInRange(
-            [NotNull]TNode startNode,
+            [NotNull] TNode startNode,
             uint range,
             Func<TNode, TNode, bool> condition = null)
         {
-            if (startNode == null || !Nodes.Contains(startNode)) throw new ArgumentException(nameof(startNode));
-                
+            if (startNode == null || !Nodes.Contains(startNode))
+                throw new ArgumentException(nameof(startNode));
+
             var queue = new Queue<TNode>();
             var distanceMemory = new Dictionary<TNode, uint>();
 
@@ -98,6 +100,53 @@ namespace LineWars.Model
                     distanceMemory[neighborhood] = distanceForNextNode;
                     queue.Enqueue(neighborhood);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Алгоритм обхода графа в ширину из нескольких точек,
+        /// которые передаются в словаре startNodes, где по ключу ноды передается ее "сила".
+        /// Сила - расстояние, на которое пройдет волновой алгоритм из данной точки.
+        ///
+        /// interferingNodes - ноды, которые мешают проходу, или могут ему помогать
+        /// </summary>
+        public IEnumerable<TNode> MultiStartsLimitedBfs(
+            IReadOnlyDictionary<TNode, int> startNodes,
+            IReadOnlyDictionary<TNode, int> interferingNodes)
+        {
+            if (startNodes.Count == 0)
+                throw new ArgumentException("Нет стартовых нод!");
+            if (startNodes.Keys.Any(x => !Nodes.Contains(x))
+                || interferingNodes.Keys.Any(x => !Nodes.Contains(x)))
+                throw new InvalidOperationException("Есть ноды не содержащиеся в графе!");
+
+            var closedNodes = new HashSet<TNode>();
+            var priorityQueue = new PriorityQueue<TNode, int>(0);
+            foreach (var (node, value) in startNodes)
+                priorityQueue.Enqueue(node, -value + FindValue(node));
+
+            while (priorityQueue.Count != 0)
+            {
+                var (node, currentVisibility) = priorityQueue.Dequeue();
+                if (closedNodes.Contains(node)) continue;
+
+                closedNodes.Add(node);
+                yield return node;
+                if (currentVisibility == 0) continue;
+                foreach (var neighbor in node.GetNeighbors())
+                {
+                    if (closedNodes.Contains(neighbor)) continue;
+                    var nextVisibility = currentVisibility + 1 + FindValue(neighbor);
+                    if (nextVisibility > 0) continue;
+                    priorityQueue.Enqueue(neighbor, nextVisibility);
+                }
+            }
+
+            int FindValue(TNode node)
+            {
+                return interferingNodes.TryGetValue(node, out var negativeValue)
+                    ? negativeValue
+                    : 0;
             }
         }
     }

@@ -20,5 +20,9 @@ namespace LineWars.Model
             [NotNull] TNode startNode,
             uint range,
             Func<TNode, TNode, bool> condition = null);
+
+        public IEnumerable<TNode> MultiStartsLimitedBfs(
+            IReadOnlyDictionary<TNode, int> startNodes,
+            IReadOnlyDictionary<TNode, int> interferingNodes);
     }
 }
