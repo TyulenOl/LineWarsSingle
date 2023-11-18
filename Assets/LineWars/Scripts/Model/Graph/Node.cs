@@ -4,6 +4,8 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+// ReSharper disable Unity.NoNullPropagation
+
 namespace LineWars.Model
 {
     [RequireComponent(typeof(RenderNodeV3))]
@@ -15,7 +17,7 @@ namespace LineWars.Model
         IMonoTarget
     {
         [SerializeField] private int index;
-        
+
         [SerializeField] private Sprite defaultSprite;
         [SerializeField] private List<Edge> edges;
 
@@ -26,17 +28,21 @@ namespace LineWars.Model
 
         [SerializeField, ReadOnlyInspector] private Unit leftUnit;
         [SerializeField, ReadOnlyInspector] private Unit rightUnit;
-        
+
         [SerializeField] private RenderNodeV3 renderNodeV3;
         [SerializeField] private CommandPriorityData priorityData;
-        [field: Header("Sprite Info")] [SerializeField] private SpriteRenderer spriteRenderer;
 
-        [field: Header("Initial Info")] [field: SerializeField] public Spawn ReferenceToSpawn { get; set; }
+        [field: Header("Sprite Info")] [SerializeField]
+        private SpriteRenderer spriteRenderer;
+
+        [field: Header("Initial Info")]
+        [field: SerializeField]
+        public Spawn ReferenceToSpawn { get; set; }
 
         [field: SerializeField] public UnitType LeftUnitType { get; private set; }
         [field: SerializeField] public UnitType RightUnitType { get; private set; }
-        
-        
+
+
         private Camera mainCamera;
 
         /// <summary>
@@ -99,7 +105,7 @@ namespace LineWars.Model
             nodeInfoDrawer.ReDrawCapturingInfo(Player.LocalPlayer.GetMyCapturingMoneyFromNode(this));
             nodeInfoDrawer.ReDrawIncomeInfo(Player.LocalPlayer.GetMyIncomeFromNode(this));
         }
-        
+
         public IEnumerable<Unit> Units => new[] {LeftUnit, RightUnit}
             .Where(x => x != null)
             .Distinct();
@@ -109,17 +115,17 @@ namespace LineWars.Model
             var absolutePosition = mainCamera.ScreenToWorldPoint(eventData.position);
             var relativePosition = absolutePosition - transform.position;
 
-            if (relativePosition.x > 0 && rightUnit != null)
+            if (relativePosition.x > 0)
             {
-                Selector.SelectedObjects = new []{rightUnit.gameObject, gameObject};
-            }
-            else if (leftUnit != null)
-            {
-                Selector.SelectedObjects = new []{leftUnit.gameObject, gameObject};
+                Selector.SelectedObjects = new[] {rightUnit?.gameObject, gameObject, leftUnit?.gameObject}
+                    .Where(x => x != null)
+                    .ToArray();
             }
             else
             {
-                Selector.SelectedObject = gameObject;
+                Selector.SelectedObjects = new[] {leftUnit?.gameObject, gameObject, rightUnit?.gameObject}
+                    .Where(x => x != null)
+                    .ToArray();
             }
         }
 

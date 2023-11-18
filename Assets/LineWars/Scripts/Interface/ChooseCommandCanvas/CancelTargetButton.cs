@@ -15,7 +15,7 @@ namespace LineWars
             button = GetComponent<Button>();
             button.onClick.AddListener((() =>
             {
-                CommandsManager.Instance.CancelTarget();
+                CommandsManager.Instance.CancelCommandPreset();
                 commandsCanvasPreset.gameObject.SetActive(false);
             }));
         }

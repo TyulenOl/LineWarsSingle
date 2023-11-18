@@ -15,7 +15,7 @@ namespace LineWars.Model
         public TExecutor Executor { get; }
 
         protected ActionCommand([NotNull] TExecutor executor) :
-            this(executor.TryGetUnitAction<TAction>(out var action)
+            this(executor.TryGetAction<TAction>(out var action)
                 ? action
                 : throw new ArgumentException($"{nameof(TExecutor)} does not contain {nameof(TAction)}"))
         {

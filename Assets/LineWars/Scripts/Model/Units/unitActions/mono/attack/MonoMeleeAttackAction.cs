@@ -13,12 +13,22 @@ namespace LineWars.Model
         /// <summary>
         /// указывет на то, нужно ли захватывать точку после атаки
         /// </summary>
-        [field: SerializeField] public bool InitialOnslaught { get; private set; }
+        [field: SerializeField]
+        public bool InitialOnslaught { get; private set; }
 
         [SerializeField] private SimpleEffect slashEffectPrefab;
 
         public bool Onslaught => Action.Onslaught;
         public UnitBlockerSelector BlockerSelector => Action.BlockerSelector;
+
+        public override void Initialize()
+        {
+            base.Initialize();
+            Action.Moved += (node =>
+            {
+                MyUnit.MovementLogic.MoveTo(node.transform.position);
+            });
+        }
 
         public override void Attack(ITargetedAlive enemy)
         {
@@ -54,6 +64,7 @@ namespace LineWars.Model
 
         public override void Accept(IMonoUnitActionVisitor visitor) => visitor.Visit(this);
 
-        public override TResult Accept<TResult>(IUnitActionVisitor<TResult, Node, Edge, Unit> visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IUnitActionVisitor<TResult, Node, Edge, Unit> visitor) =>
+            visitor.Visit(this);
     }
 }

@@ -110,41 +110,42 @@ namespace LineWars
         }
         
         #region Turns
-        public override void ExecuteBuy()
+
+        protected override void ExecuteBuy()
         {
             stateMachine.SetState(buyPhase);
             GameUI.Instance.SetEnemyTurn(false);
         }
 
-        public override void ExecuteArtillery()
+        protected override void ExecuteArtillery()
         {
             stateMachine.SetState(artilleryPhase);
             GameUI.Instance.ReDrawAllAvailability(GetAllUnitsByPhase(PhaseType.Artillery), true);
             GameUI.Instance.SetEnemyTurn(false);
         }
 
-        public override void ExecuteFight()
+        protected override void ExecuteFight()
         {
             stateMachine.SetState(fightPhase);
             GameUI.Instance.ReDrawAllAvailability(GetAllUnitsByPhase(PhaseType.Fight), true);
             GameUI.Instance.SetEnemyTurn(false);
         }
 
-        public override void ExecuteScout()
+        protected override void ExecuteScout()
         {
             stateMachine.SetState(scoutPhase);
             GameUI.Instance.ReDrawAllAvailability(GetAllUnitsByPhase(PhaseType.Scout), true);
             GameUI.Instance.SetEnemyTurn(false);
         }
 
-        public override void ExecuteIdle()
+        protected override void ExecuteIdle()
         {
             GameUI.Instance.ReDrawAllAvailability(MyUnits, false);
             GameUI.Instance.SetEnemyTurn(true);
             stateMachine.SetState(idlePhase);
         }
 
-        public override void ExecuteReplenish()
+        protected override void ExecuteReplenish()
         {
             base.ExecuteReplenish();
             stateMachine.SetState(replenishPhase);
@@ -154,15 +155,15 @@ namespace LineWars
 
         #region Check Turns
 
-        public override bool CanExecuteBuy() => true;
+        protected override bool CanExecuteBuy() => true;
 
-        public override bool CanExecuteArtillery() => CanExecutePhase(PhaseType.Artillery);
+        protected override bool CanExecuteArtillery() => CanExecutePhase(PhaseType.Artillery);
 
-        public override bool CanExecuteFight() => CanExecutePhase(PhaseType.Fight);
+        protected override bool CanExecuteFight() => CanExecutePhase(PhaseType.Fight);
 
-        public override bool CanExecuteScout() => CanExecutePhase(PhaseType.Scout);
+        protected override bool CanExecuteScout() => CanExecutePhase(PhaseType.Scout);
 
-        public override bool CanExecuteReplenish() => true;
+        protected override bool CanExecuteReplenish() => true;
 
         private bool CanExecutePhase(PhaseType phaseType)
         {
@@ -205,9 +206,10 @@ namespace LineWars
                 }
             }
         }
-        public override void OnSpawnPreset()
+
+        protected override void OnBuyPreset()
         {
-            base.OnSpawnPreset();
+            base.OnBuyPreset();
             RecalculateVisibility();
         }
 

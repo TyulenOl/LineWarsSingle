@@ -39,7 +39,7 @@ namespace LineWars.Model
 
         public void EnableBlock()
         {
-            MyUnit.CurrentArmor = MyUnit.CurrentActionPoints - ModifyActionPoints();
+            MyUnit.CurrentArmor = MyUnit.CurrentActionPoints - GetActionPointsAfterModify();
             CompleteAndAutoModify();
         }
 

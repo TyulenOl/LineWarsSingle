@@ -15,8 +15,8 @@ namespace LineWars.Model
         public event Action MoveAnimationEnded;
 
 
-        public bool CanMoveTo(Node target, bool ignoreActionPointsCondition = false) =>
-            Action.CanMoveTo(target, ignoreActionPointsCondition);
+        public bool CanMoveTo(Node target) =>
+            Action.CanMoveTo(target);
 
         public override void Initialize()
         {
