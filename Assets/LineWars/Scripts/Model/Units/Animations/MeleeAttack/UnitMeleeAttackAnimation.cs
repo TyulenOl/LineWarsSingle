@@ -1,14 +1,13 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace LineWars.Model
 {
     [RequireComponent(typeof(MonoMeleeAttackAction))]
-    public partial class UnitMeleeAttackAnimation : UnitOnUnitBasedAnimation
+    public partial class UnitMeleeAttackAnimation : UnitAnimation
     {
         private MonoMeleeAttackAction action;
+        private Unit currentTarget;
 
         private StateMachine stateMachine;
         private MeleeMoveToUnitState moveToState;
@@ -47,9 +46,11 @@ namespace LineWars.Model
             idleState = new();
         }
 
-        public override void Execute(Unit targetUnit)
+        public override void Execute(AnimationContext context)
         {
-            currentTarget = targetUnit;
+            currentTarget = context.TargetUnit;
+            targetNode = context.TargetNode;
+
             stateMachine.SetState(moveToState);
         }
     }

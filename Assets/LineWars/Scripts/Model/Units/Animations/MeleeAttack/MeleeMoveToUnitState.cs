@@ -33,7 +33,6 @@ namespace LineWars.Model
             public override void OnEnter()
             {
                 base.OnEnter();
-                animation.targetNode = animation.currentTarget.Node;
                 isPlayed = false;
                 animation.startPosition = animation.ownerUnit.transform.position;
                 movementProgress = 0f;

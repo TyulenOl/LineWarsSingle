@@ -51,12 +51,27 @@ namespace LineWars.Model
         private void AttackWithAnimation(Unit targetUnit)
         {
             attackAnimation.Attacked.AddListener(AttackOnEvent);
-            attackAnimation.Execute(targetUnit);
+            var animContext = new AnimationContext()
+            {
+                TargetUnit = targetUnit,
+                TargetNode = targetUnit.Node,
+            };
+            attackAnimation.Execute(animContext);
 
             void AttackOnEvent(UnitMeleeAttackAnimation _)
             {
                 base.Attack(targetUnit);
                 attackAnimation.Attacked.RemoveListener(AttackOnEvent);
+                if(targetUnit.TryGetComponent(out AnimationResponses responses))
+                {
+                    var animContext = new AnimationContext()
+                    {
+                        TargetNode = Unit.Node,
+                        TargetUnit = Unit
+                    };
+
+                    responses.Respond(AnimationResponseType.MeleeDamaged, animContext);
+                }
             }
         }
 

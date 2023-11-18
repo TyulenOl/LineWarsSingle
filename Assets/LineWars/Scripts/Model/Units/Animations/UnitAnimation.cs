@@ -13,5 +13,7 @@ namespace LineWars.Model
         {
             this.ownerUnit = ownerUnit;
         }
+
+        public abstract void Execute(AnimationContext context);
     }
 }
