@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
+    [DisallowMultipleComponent]
     public class MonoMoveAction : MonoUnitAction<MoveAction<Node, Edge, Unit>>,
         IMoveAction<Node, Edge, Unit>
     {

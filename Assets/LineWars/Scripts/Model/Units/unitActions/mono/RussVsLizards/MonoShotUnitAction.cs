@@ -1,7 +1,9 @@
 ﻿using System;
+using UnityEngine;
 
 namespace LineWars.Model
 {
+    [DisallowMultipleComponent]
     public class MonoShotUnitAction :
         MonoUnitAction<ShotUnitAction<Node, Edge, Unit>>,
         IShotUnitAction<Node, Edge, Unit>

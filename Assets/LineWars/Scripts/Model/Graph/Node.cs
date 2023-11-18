@@ -238,6 +238,7 @@ namespace LineWars.Model
         {
             if (renderNodeV3 == null)
                 renderNodeV3 = GetComponent<RenderNodeV3>();
+            Redraw();
         }
 
         #endregion

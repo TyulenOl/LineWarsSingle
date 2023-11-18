@@ -8,8 +8,8 @@ namespace LineWars.Model
     [CreateAssetMenu(menuName = "UnitCostFunctions/Advanced", order = 80)]
     public class AdvancedUnitCostFunction : UnitCostFunction
     {
-        [SerializeField, ReadOnlyInspector] private string baseCostParameterName = "x";
-        [SerializeField, ReadOnlyInspector] private string unitCountParameterName = "y";
+        [SerializeField] private string baseCostParameterName = "x";
+        [SerializeField] private string unitCountParameterName = "y";
 
         [SerializeField, SerializedDictionary("Тип юнита", "Функция стоимости")]
         private SerializedDictionary<UnitType, string> functions;

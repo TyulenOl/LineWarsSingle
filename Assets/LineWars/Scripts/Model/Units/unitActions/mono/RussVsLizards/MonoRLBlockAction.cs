@@ -1,7 +1,9 @@
 ﻿using System;
+using UnityEngine;
 
 namespace LineWars.Model
 {
+    [DisallowMultipleComponent]
     public class MonoRLBlockAction :
         MonoUnitAction<RLBlockAction<Node, Edge, Unit>>,
         IRLBlockAction<Node, Edge, Unit>

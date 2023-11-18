@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
+    [DisallowMultipleComponent]
     public class MonoBlockAction :
         MonoUnitAction<BlockAction<Node, Edge, Unit>>,
         IBlockAction<Node, Edge, Unit>

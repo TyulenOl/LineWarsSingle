@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
+    [DisallowMultipleComponent]
     public class MonoHealAction : MonoUnitAction<HealAction<Node, Edge, Unit>>,
         IHealAction<Node, Edge, Unit>
     {

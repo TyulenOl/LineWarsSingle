@@ -1,7 +1,9 @@
 ﻿using System;
+using UnityEngine;
 
 namespace LineWars.Model
 {
+    [DisallowMultipleComponent]
     public class MonoSacrificeForPerunAction :
         MonoUnitAction<SacrificeForPerunAction<Node, Edge, Unit>>,
         ISacrificeForPerunAction<Node, Edge, Unit>

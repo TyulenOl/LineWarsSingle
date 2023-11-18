@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
+    [DisallowMultipleComponent]
     public class MonoRamAction :
         MonoUnitAction<RamAction<Node, Edge, Unit>>,
         IRamAction<Node, Edge, Unit>

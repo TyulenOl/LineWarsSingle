@@ -16,7 +16,9 @@ namespace LineWars.Model
         Tank,
         Mechnik,
         Luchnik,
-        BogatyrForZBT,
-        Knyaz
+        DobrynyaNikitich,
+        Knyaz,
+        AlyoshaPopovich,
+        IlyaMuromec
     }
 }

@@ -2,6 +2,7 @@
 
 namespace LineWars.Model
 {
+    [DisallowMultipleComponent]
     public class MonoBlowWithSwingAction: 
         MonoUnitAction<BlowWithSwingAction<Node, Edge, Unit>>,
         IBlowWithSwingAction<Node, Edge, Unit>

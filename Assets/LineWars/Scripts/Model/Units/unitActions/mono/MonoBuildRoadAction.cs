@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
+    [DisallowMultipleComponent]
     public class MonoBuildRoadAction :
         MonoUnitAction<BuildAction<Node, Edge, Unit>>,
         IBuildAction<Node, Edge, Unit>
