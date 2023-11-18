@@ -50,6 +50,8 @@ namespace LineWars.Controllers
         public event Action<ExecutorRedrawMessage> FightNeedRedraw;
         public event Action<BuyStateMessage> BuyNeedRedraw;
 
+        public bool CommandIsExecuted => stateMachine.CurrentState == waitingExecuteCommandState;
+
         public IMonoTarget Target
         {
             get => target;
@@ -112,16 +114,16 @@ namespace LineWars.Controllers
             Player.LocalPlayer.TurnChanged -= OnTurnChanged;
         }
 
-        public void FinishTurn()
+        public bool CanExecuteAnyCommand()
         {
-            stateMachine.SetState(idleState);
-            Player.FinishTurn();
+            return stateMachine.CurrentState == findTargetState && Executor.CanDoAnyAction;
         }
 
         public void ExecuteCommand(IActionCommand command)
         {
-            if (stateMachine.CurrentState != findTargetState)
-                throw new InvalidOperationException();
+            if (!CanExecuteAnyCommand())
+                throw new InvalidOperationException($"В текущем состоянии командс менеджера {state}" +
+                                                    $" нельзя исполнить команду");
             ExecuteCommandButIgnoreConstrains(command);
         }
 
@@ -136,7 +138,7 @@ namespace LineWars.Controllers
             {
                 if (!Executor.CanDoAnyAction)
                 {
-                    FinishTurn();
+                    Player.FinishTurn();
                 }
                 else
                 {
@@ -148,16 +150,6 @@ namespace LineWars.Controllers
             }
         }
 
-
-        public void CancelTarget()
-        {
-            if (stateMachine.CurrentState != waitingSelectCommandState)
-            {
-                throw new InvalidOperationException("Is not targeted state to cancelAction");
-            }
-
-            stateMachine.SetState(findTargetState);
-        }
 
         public void SetUnitPreset(UnitBuyPreset preset)
         {
@@ -173,6 +165,16 @@ namespace LineWars.Controllers
             if (!currentOnWaitingCommandMessage.Data.Contains(preset))
                 throw new ArgumentException(nameof(preset));
             ProcessCommandPreset(preset);
+        }
+
+        public void CancelCommandPreset()
+        {
+            if (stateMachine.CurrentState != waitingSelectCommandState)
+            {
+                throw new InvalidOperationException("Is not targeted state to cancelAction");
+            }
+
+            stateMachine.SetState(findTargetState);
         }
 
         public void SelectCurrentCommand(CommandType commandType)
@@ -201,15 +203,29 @@ namespace LineWars.Controllers
 
         private void OnTurnChanged(PhaseType previousPhase, PhaseType currentPhase)
         {
-            if (currentPhase == PhaseType.Buy && Player.CanExecuteTurn(currentPhase))
+            switch (currentPhase)
             {
-                stateMachine.SetState(buyState);
-                return;
-            }
+                case PhaseType.Idle:
+                {
+                    if (Executor is {CanDoAnyAction: true})
+                    {
+                        Debug.LogError("Вы как-то завершили ход, хотя у текущего executora остались очки действия");
+                    }
 
-            if (currentPhase == PhaseType.Idle
-                || stateMachine.CurrentState == findExecutorState) return;
-            stateMachine.SetState(findExecutorState);
+                    stateMachine.SetState(idleState);
+                    break;
+                }
+                case PhaseType.Buy when Player.CanExecuteTurn(currentPhase):
+                {
+                    stateMachine.SetState(buyState);
+                    break;
+                }
+                default:
+                {
+                    stateMachine.SetState(findExecutorState);
+                    break;
+                }
+            }
         }
 
         private void ProcessCommandPreset(CommandPreset preset)
@@ -248,7 +264,7 @@ namespace LineWars.Controllers
             var message = new ExecutorRedrawMessage(data);
             FightNeedRedraw?.Invoke(message);
         }
-        
+
         private void SendFightClearMassage()
         {
             FightNeedRedraw?.Invoke(null);
@@ -258,12 +274,12 @@ namespace LineWars.Controllers
         {
             BuyNeedRedraw?.Invoke(new BuyStateMessage(nodes));
         }
-        
+
         private void ClearBuyReDrawMessage()
         {
             BuyNeedRedraw?.Invoke(null);
         }
-        
+
         private void GoToWaitingSelectCommandState(OnWaitingCommandMessage commandMessage)
         {
             CurrentOnWaitingCommandMessage = commandMessage;

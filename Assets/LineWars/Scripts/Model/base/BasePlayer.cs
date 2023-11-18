@@ -13,40 +13,47 @@ namespace LineWars.Model
     /// </summary>
     public abstract class BasePlayer : MonoBehaviour, IActor, IBasePlayer
     {
-        [field: SerializeField, ReadOnlyInspector] public int Id { get;  private set; }
+        [field: SerializeField, ReadOnlyInspector]
+        public int Id { get; private set; }
+
         [SerializeField, ReadOnlyInspector] private int money;
+
         /// <summary>
         /// Для оптимизации income всегда хешируется
         /// </summary>
         [SerializeField, ReadOnlyInspector] private int income;
 
-        [field:SerializeField] public List<Node> InitialSpawns { get; private set; }
-        [field:SerializeField] public PhaseExecutorsData PhaseExecutorsData { get; private set; }
-        [field:SerializeField] public NationEconomicLogic EconomicLogic { get; private set; }
-        [field: SerializeField, ReadOnlyInspector] public Node Base { get; private set; }
-        [field: SerializeField, ReadOnlyInspector] public PlayerRules Rules { get; set; }
+        [field: SerializeField] public List<Node> InitialSpawns { get; private set; }
+        [field: SerializeField] public PhaseExecutorsData PhaseExecutorsData { get; private set; }
+        [field: SerializeField] public NationEconomicLogic EconomicLogic { get; private set; }
+
+        [field: SerializeField, ReadOnlyInspector]
+        public Node Base { get; private set; }
+
+        [field: SerializeField, ReadOnlyInspector]
+        public PlayerRules Rules { get; private set; }
 
         public PhaseType CurrentPhase { get; private set; }
         public Nation Nation { get; private set; }
 
         public HashSet<PhaseType> PhaseExceptions { get; set; }
-        
+
 
         private HashSet<Owned> myOwned = new();
-        private readonly List<Node> nodes = new ();
-        private readonly List<Unit> units = new ();
-        
+        private readonly List<Node> nodes = new();
+        private readonly List<Unit> units = new();
+
         private bool isFirstReplenish = true;
 
         public IEnumerable<Node> MyNodes => nodes;
         public IEnumerable<Unit> MyUnits => units;
-        
+
         public event Action<PhaseType, PhaseType> TurnChanged;
         public event Action<Owned> OwnedAdded;
         public event Action<Owned> OwnedRemoved;
         public event Action<int, int> CurrentMoneyChanged;
         public event Action<int, int> IncomeChanged;
-        public event Action Defeated; 
+        public event Action Defeated;
         public IReadOnlyCollection<Owned> OwnedObjects => myOwned;
         public bool IsMyOwn(Owned owned) => myOwned.Contains(owned);
 
@@ -86,7 +93,6 @@ namespace LineWars.Model
                 PhaseManager.Instance.RegisterActor(this);
                 Debug.Log($"{name} registered");
             }
-
         }
 
         protected virtual void OnEnable()
@@ -106,7 +112,7 @@ namespace LineWars.Model
             CurrentMoney = Rules.StartMoney;
             Income = Rules.DefaultIncome;
             Nation = spawnInfo.SpawnNode.Nation;
-            
+
             SingleGame.Instance.AllPlayers.Add(spawnInfo.PlayerIndex, this);
             name = $"{GetType().Name}{spawnInfo.PlayerIndex} {spawnInfo.SpawnNode.name}";
 
@@ -117,6 +123,42 @@ namespace LineWars.Model
         {
             SingleGame.Instance.AllPlayers.Remove(this);
         }
+
+        #region SpawnUnit
+
+        public bool CanSpawnUnit(Node node, UnitType type)
+        {
+            var unitPrefab = GetUnitPrefab(type);
+            return CanSpawnUnit(node, unitPrefab);
+        }
+
+        public bool CanSpawnUnit(Node node, Unit unit)
+        {
+            if (unit.Size == UnitSize.Large)
+                return node.AllIsFree;
+            return node.AnyIsFree;
+        }
+
+        public void SpawnUnit(Node node, UnitType unitType)
+        {
+            if (unitType == UnitType.None) return;
+            var unitPrefab = GetUnitPrefab(unitType);
+            SpawnUnit(node, unitPrefab);
+        }
+
+        public void SpawnUnit(Node node, Unit unit)
+        {
+            BasePlayerUtility.CreateUnitForPlayer(this, node, unit);
+            OnSpawnUnit();
+        }
+
+        protected virtual void OnSpawnUnit()
+        {
+        }
+
+        #endregion
+
+        #region BuyPreset
 
         public bool CanBuyPreset(UnitBuyPreset preset)
         {
@@ -135,10 +177,11 @@ namespace LineWars.Model
                 return CanAffordPreset(preset)
                     && CanSpawnUnit(node, preset.SecondUnitType);
             }
+
             if (preset.FirstUnitType != UnitType.None && preset.SecondUnitType != UnitType.None)
                 return CanBuyPresetMultiple(preset, node);
             Debug.Log("Invalid preset!");
-            return false;    
+            return false;
         }
         
         private bool CanBuyPresetMultiple(UnitBuyPreset preset, Node node)
@@ -147,40 +190,13 @@ namespace LineWars.Model
                 || GetUnitPrefab(preset.SecondUnitType).Size == UnitSize.Large)
                 Debug.LogError("Invalid Preset!");
             return CanAffordPreset(preset)
-                && (node.AllIsFree);
+                   && (node.AllIsFree);
         }
 
-        public bool CanAffordPreset(UnitBuyPreset preset)
+        private bool CanAffordPreset(UnitBuyPreset preset)
         {
-            return CurrentMoney - preset.Cost >= 0;
-        }
-
-        public void SpawnUnit(Node node, UnitType unitType)
-        {
-            if (unitType == UnitType.None) return;
-            var unitPrefab = GetUnitPrefab(unitType);
-            BasePlayerUtility.CreateUnitForPlayer(this, node, unitPrefab);
-            OnSpawnUnit();
-        }
-        
-        protected virtual void OnSpawnUnit(){}
-
-        public void SpawnUnit(Node node, Unit unit)
-        {
-            BasePlayerUtility.CreateUnitForPlayer(this, node, unit);
-        }
-
-        public bool CanSpawnUnit(Node node, UnitType type)
-        {
-            var unitPrefab = GetUnitPrefab(type);
-            return CanSpawnUnit(node, unitPrefab);
-        }
-
-        public bool CanSpawnUnit(Node node, Unit unit)
-        {
-            if (unit.Size == UnitSize.Large)
-                return node.AllIsFree;
-            return node.AnyIsFree;
+            var purchaseInfo = this.GetPresetPurchaseInfo(preset);
+            return purchaseInfo.CanBuy && CurrentMoney - purchaseInfo.Cost >= 0;
         }
 
         public void BuyPreset(UnitBuyPreset unitPreset)
@@ -188,20 +204,24 @@ namespace LineWars.Model
             BuyPreset(unitPreset, Base);
         }
 
-        public void BuyPreset(UnitBuyPreset preset, Node node) 
+        public void BuyPreset(UnitBuyPreset preset, Node node)
         {
             SpawnUnit(node, preset.FirstUnitType);
             SpawnUnit(node, preset.SecondUnitType);
-            CurrentMoney -= preset.Cost;
-            OnSpawnPreset();
+            CurrentMoney -= this.GetPresetPurchaseInfo(preset).Cost;
+            OnBuyPreset();
         }
-        
-        public virtual void OnSpawnPreset() {}
+
+        protected virtual void OnBuyPreset()
+        {
+        }
+
+        #endregion
 
         public void AddOwned([NotNull] Owned owned)
         {
             if (owned == null) throw new ArgumentNullException(nameof(owned));
-            
+
             if (owned.Owner != null)
             {
                 throw new InvalidOperationException();
@@ -233,7 +253,7 @@ namespace LineWars.Model
         {
             return Mathf.RoundToInt(Rules.IncomeModifier.Modify(node.BaseIncome));
         }
-        
+
         public int GetMyCapturingMoneyFromNode(Node node)
         {
             return Rules.MoneyForFirstCapturingNode + GetMyIncomeFromNode(node);
@@ -259,7 +279,7 @@ namespace LineWars.Model
                     BeforeRemoveOwned(unit);
                     break;
             }
-            
+
             myOwned.Remove(owned);
             OwnedRemoved?.Invoke(owned);
         }
@@ -283,22 +303,24 @@ namespace LineWars.Model
             OnDefeat();
             Defeated?.Invoke();
         }
+
         protected virtual void OnDefeat()
         {
             foreach (var unit in MyUnits.ToList())
                 Destroy(unit.gameObject);
-            foreach (var node in MyNodes.ToList()) 
+            foreach (var node in MyNodes.ToList())
                 node.Owner = null;
 
             myOwned = new HashSet<Owned>();
             Destroy(gameObject);
         }
-        
+
         public Unit GetUnitPrefab(UnitType unitType) => Nation.GetUnitPrefab(unitType);
-        
+
         public void FinishTurn()
         {
             StartCoroutine(Coroutine());
+
             IEnumerator Coroutine()
             {
                 yield return null;
@@ -313,6 +335,7 @@ namespace LineWars.Model
                 StartCoroutine(SkipTurnCoroutine());
                 return;
             }
+
             var previousPhase = CurrentPhase;
             switch (phaseType)
             {
@@ -349,6 +372,7 @@ namespace LineWars.Model
                 TurnChanged?.Invoke(phaseType, PhaseType.Idle);
             }
         }
+
         public bool CanExecuteTurn(PhaseType phaseType)
         {
             switch (phaseType)
@@ -375,34 +399,35 @@ namespace LineWars.Model
 
         #region Turns
 
-        public virtual void ExecuteBuy()
+        protected virtual void ExecuteBuy()
         {
         }
 
-        public virtual void ExecuteArtillery()
+        protected virtual void ExecuteArtillery()
         {
         }
 
-        public virtual void ExecuteFight()
+        protected virtual void ExecuteFight()
         {
         }
 
-        public virtual void ExecuteScout()
+        protected virtual void ExecuteScout()
         {
         }
 
 
-        public virtual void ExecuteIdle()
+        protected virtual void ExecuteIdle()
         {
         }
 
-        public virtual void ExecuteReplenish()
+        protected virtual void ExecuteReplenish()
         {
             if (isFirstReplenish)
             {
                 isFirstReplenish = false;
                 return;
             }
+
             CurrentMoney += Income;
             foreach (var owned in OwnedObjects)
                 owned.Replenish();
@@ -412,27 +437,27 @@ namespace LineWars.Model
 
         #region Check Turns
 
-        public virtual bool CanExecuteBuy()
+        protected virtual bool CanExecuteBuy()
         {
             return false;
         }
 
-        public virtual bool CanExecuteArtillery()
+        protected virtual bool CanExecuteArtillery()
         {
             return false;
         }
 
-        public virtual bool CanExecuteFight()
+        protected virtual bool CanExecuteFight()
         {
             return false;
         }
 
-        public virtual bool CanExecuteScout()
+        protected virtual bool CanExecuteScout()
         {
             return false;
         }
 
-        public virtual bool CanExecuteReplenish()
+        protected virtual bool CanExecuteReplenish()
         {
             return false;
         }

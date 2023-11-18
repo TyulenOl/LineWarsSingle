@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
 
 namespace LineWars.Model
@@ -12,7 +10,7 @@ namespace LineWars.Model
         public static bool CanSpawnUnit(Node node, Unit unit, UnitDirection unitDirection = UnitDirection.Any)
         {
             return node != null && unit != null &&
-                   (unit.Size == UnitSize.Large && node.LeftIsFree && node.RightIsFree 
+                   (unit.Size == UnitSize.Large && node.LeftIsFree && node.RightIsFree
                     || unit.Size == UnitSize.Little && (
                         unitDirection is UnitDirection.Left or UnitDirection.Any && node.LeftIsFree
                         || unitDirection is UnitDirection.Right or UnitDirection.Any && node.RightIsFree
@@ -54,18 +52,31 @@ namespace LineWars.Model
             Owned.Connect(player, unit);
             return unit;
         }
-        
+
+        public static PurchaseInfo GetPresetPurchaseInfo(this BasePlayer player, UnitBuyPreset preset)
+        {
+            var result = player.Rules.CostFunction.Calculate(
+                preset.FirstUnitType,
+                preset.Cost,
+                player.GetCountUnitByType(preset.FirstUnitType)
+            );
+            return result;
+        }
+
+        public static UnitSize GetUnitSizeByTypeForPlayer(this UnitType type, BasePlayer player)
+        {
+            return player.GetUnitPrefab(type).Size;
+        }
+
         public static int GetCountUnitByType(this BasePlayer player, UnitType type)
         {
-            return player.OwnedObjects
-                .OfType<Unit>()
+            return player.MyUnits
                 .Count(x => x.Type == type);
         }
 
         public static IEnumerable<Unit> GetAllUnits(BasePlayer player, Func<Unit, bool> predicate)
         {
-            return player.OwnedObjects
-                .OfType<Unit>()
+            return player.MyUnits
                 .Where(predicate);
         }
 

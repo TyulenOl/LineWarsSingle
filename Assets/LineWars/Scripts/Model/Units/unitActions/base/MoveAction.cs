@@ -18,54 +18,16 @@ namespace LineWars.Model
         {
         }
 
-        public bool CanMoveTo([NotNull] TNode target, bool ignoreActionPointsCondition = false)
+        public bool CanMoveTo([NotNull] TNode target)
         {
-            return MyUnit.Node != target
-                   && OwnerCondition()
-                   && SizeCondition()
-                   && LineCondition()
-                   && CanOwnerMoveCondition()
-                   && (ignoreActionPointsCondition || ActionPointsCondition());
-
-            bool SizeCondition()
-            {
-                return MyUnit.Size == UnitSize.Little && target.AnyIsFree
-                       || MyUnit.Size == UnitSize.Large && target.AllIsFree;
-            }
-
-            bool LineCondition()
-            {
-                var line = MyUnit.Node.GetLine(target);
-                return line != null
-                       && MyUnit.CanMoveOnLineWithType(line.LineType);
-            }
-
-            bool OwnerCondition()
-            {
-                return target.OwnerId == -1
-                       || target.OwnerId == MyUnit.OwnerId
-                       || target.OwnerId != MyUnit.OwnerId && target.AllIsFree;
-            }
-
-            bool CanOwnerMoveCondition()
-            {
-                return target.CanOwnerMove(MyUnit.OwnerId);
-            }
+            return ActionPointsCondition()
+                   && UnitUtilities<TNode, TEdge, TUnit>.CanMoveTo(MyUnit, target);
         }
 
         public void MoveTo([NotNull] TNode target)
         {
-            var startNode = MyUnit.Node;
-
-            if (startNode.LeftUnit == MyUnit)
-                startNode.LeftUnit = null;
-            if (startNode.RightUnit == MyUnit)
-                startNode.RightUnit = null;
-
             InspectNodeForCallback();
-            AssignNewNode();
-
-
+            UnitUtilities<TNode, TEdge, TUnit>.MoveTo(MyUnit, target);
             CompleteAndAutoModify();
 
             void InspectNodeForCallback()
@@ -82,30 +44,6 @@ namespace LineWars.Model
                     if (target.IsBase)
                         OnCapturingEnemyBase();
                 }
-            }
-
-            void AssignNewNode()
-            {
-                MyUnit.Node = target;
-                if (MyUnit.Size == UnitSize.Large)
-                {
-                    target.LeftUnit = MyUnit;
-                    target.RightUnit = MyUnit;
-                }
-                else if (target.LeftIsFree && (MyUnit.UnitDirection == UnitDirection.Left ||
-                                               MyUnit.UnitDirection == UnitDirection.Right && !target.RightIsFree))
-                {
-                    target.LeftUnit = MyUnit;
-                    MyUnit.UnitDirection = UnitDirection.Left;
-                }
-                else
-                {
-                    target.RightUnit = MyUnit;
-                    MyUnit.UnitDirection = UnitDirection.Right;
-                }
-
-                if (MyUnit.OwnerId != target.OwnerId)
-                    target.ConnectTo(MyUnit.OwnerId);
             }
         }
 

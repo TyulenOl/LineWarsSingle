@@ -220,12 +220,12 @@ namespace LineWars.Model
         public IEnumerable<IUnitAction<Node, Edge, Unit>> Actions => MonoActions;
         IEnumerable<IExecutorAction> IExecutor.Actions => Actions;
 
-        public T GetUnitAction<T>() where T : IUnitAction<Node, Edge, Unit>
+        public T GetAction<T>() where T : IUnitAction<Node, Edge, Unit>
             => MonoActions.OfType<T>().FirstOrDefault();
 
-        public bool TryGetUnitAction<T>(out T action) where T : IUnitAction<Node, Edge, Unit>
+        public bool TryGetAction<T>(out T action) where T : IUnitAction<Node, Edge, Unit>
         {
-            action = GetUnitAction<T>();
+            action = GetAction<T>();
             return action != null;
         }
 

@@ -2,6 +2,13 @@
 {
     public class MovedUnit
     {
-        public object Unit;
+        public object Unit { get; }
+        public object DestinationNode { get; }
+
+        public MovedUnit(object unit, object destinationNode)
+        {
+            Unit = unit;
+            DestinationNode = destinationNode;
+        }
     }
 }

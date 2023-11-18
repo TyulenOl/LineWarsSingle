@@ -13,7 +13,7 @@ namespace LineWars.Model
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
         #endregion 
     {
-        bool CanMoveTo([NotNull] TNode target, bool ignoreActionPointsCondition = false);
+        bool CanMoveTo([NotNull] TNode target);
         void MoveTo([NotNull] TNode target);
         
         

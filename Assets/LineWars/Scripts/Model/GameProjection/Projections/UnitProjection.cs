@@ -120,16 +120,16 @@ namespace LineWars.Model
         public IEnumerable<IUnitAction<NodeProjection, EdgeProjection, UnitProjection>> Actions =>
             actionsDictionary.Values;
 
-        public T GetUnitAction<T>()
+        public T GetAction<T>()
             where T : IUnitAction<NodeProjection, EdgeProjection, UnitProjection>
         {
             return actionsDictionary.Values.OfType<T>().FirstOrDefault();
         }
 
-        public bool TryGetUnitAction<T>(out T action)
+        public bool TryGetAction<T>(out T action)
             where T : IUnitAction<NodeProjection, EdgeProjection, UnitProjection>
         {
-            action = GetUnitAction<T>();
+            action = GetAction<T>();
             return action != null;
         }
 

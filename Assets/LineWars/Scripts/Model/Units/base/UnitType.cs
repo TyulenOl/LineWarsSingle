@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace LineWars.Model
 {
     public enum UnitType
@@ -17,5 +19,4 @@ namespace LineWars.Model
         BogatyrForZBT,
         Knyaz
     }
-    
 }
