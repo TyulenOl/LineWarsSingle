@@ -26,7 +26,7 @@ namespace LineWars.Model
         protected override RLBuildAction<Node, Edge, Unit> GetAction()
         {
             return new RLBuildAction<Node, Edge, Unit>(
-                Unit,
+                Executor,
                 initialPossibleBuildingTypes,
                 new MonoBuildingFactory());
         }

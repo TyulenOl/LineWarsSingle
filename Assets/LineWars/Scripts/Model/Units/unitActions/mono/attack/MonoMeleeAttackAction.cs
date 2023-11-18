@@ -25,7 +25,9 @@ namespace LineWars.Model
         {
             base.Initialize();
             TryInitializeAttackAnimation();
+            Action.Moved += node => Executor.MovementLogic.MoveTo(node.transform.position);
         }
+
 
         public override void Attack(ITargetedAlive enemy)
         {
@@ -39,13 +41,7 @@ namespace LineWars.Model
         {
             if (attackAnimation == null)
                 return;
-            if (Executor is Unit unit)
-                attackAnimation.Initialize(unit);
-            else
-            {
-                Debug.LogWarning("Attempt to add animation on not unit!");
-                attackAnimation = null;
-            }
+            attackAnimation.Initialize(Executor);
         }
 
         private void AttackWithAnimation(Unit targetUnit)
@@ -62,12 +58,12 @@ namespace LineWars.Model
             {
                 base.Attack(targetUnit);
                 attackAnimation.Attacked.RemoveListener(AttackOnEvent);
-                if(targetUnit.TryGetComponent(out AnimationResponses responses))
+                if (targetUnit.TryGetComponent(out AnimationResponses responses))
                 {
                     var animContext = new AnimationContext()
                     {
-                        TargetNode = Unit.Node,
-                        TargetUnit = Unit
+                        TargetNode = Executor.Node,
+                        TargetUnit = Executor
                     };
 
                     responses.Respond(AnimationResponseType.MeleeDamaged, animContext);
@@ -78,7 +74,7 @@ namespace LineWars.Model
         protected override MeleeAttackAction<Node, Edge, Unit> GetAction()
         {
             return new MeleeAttackAction<Node, Edge, Unit>(
-                Unit,
+                Executor,
                 InitialDamage,
                 InitialIsPenetratingDamage,
                 InitialOnslaught,

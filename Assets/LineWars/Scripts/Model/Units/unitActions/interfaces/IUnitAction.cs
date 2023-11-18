@@ -7,7 +7,6 @@
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
 
     {
-        public TUnit MyUnit => Executor;
         public uint GetPossibleMaxRadius();
 
         public TResult Accept<TResult>(IUnitActionVisitor<TResult, TNode, TEdge, TUnit> visitor);

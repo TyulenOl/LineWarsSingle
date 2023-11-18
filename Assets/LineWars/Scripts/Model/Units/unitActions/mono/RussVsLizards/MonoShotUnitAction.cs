@@ -19,7 +19,7 @@ namespace LineWars.Model
 
         protected override ShotUnitAction<Node, Edge, Unit> GetAction()
         {
-            return new ShotUnitAction<Node, Edge, Unit>(Unit);
+            return new ShotUnitAction<Node, Edge, Unit>(Executor);
         }
 
         public override void Accept(IMonoUnitActionVisitor visitor) => visitor.Visit(this);

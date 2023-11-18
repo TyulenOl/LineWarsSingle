@@ -16,7 +16,7 @@ namespace LineWars.Model
         protected override DistanceAttackAction<Node, Edge, Unit> GetAction()
         {
             return new DistanceAttackAction<Node, Edge, Unit>(
-                Unit,
+                Executor,
                 InitialDamage,
                 InitialIsPenetratingDamage,
                 (uint)InitialDistance,
@@ -30,8 +30,8 @@ namespace LineWars.Model
             {
                 var animContext = new AnimationContext()
                 {
-                    TargetNode = Unit.Node,
-                    TargetUnit = Unit
+                    TargetNode = Executor.Node,
+                    TargetUnit = Executor
                 };
                 responses.Respond(AnimationResponseType.DistanceDamaged, animContext);
             }

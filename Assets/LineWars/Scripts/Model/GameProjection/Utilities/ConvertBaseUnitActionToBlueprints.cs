@@ -23,11 +23,11 @@ namespace LineWars.Model
 
         public void Visit(BuildAction<TNode, TEdge, TUnit> action)
         {
-            foreach(var edge in action.MyUnit.Node.Edges)
+            foreach(var edge in action.Executor.Node.Edges)
             {
                 if(action.CanUpRoad(edge))
                 {
-                    var command = new BuildCommandBlueprint(action.MyUnit.Id, edge.Id);
+                    var command = new BuildCommandBlueprint(action.Executor.Id, edge.Id);
                     BlueprintList.Add(command);
                 }
             }
@@ -37,7 +37,7 @@ namespace LineWars.Model
         {
             if(action.CanBlock())
             {
-                var command = new BlockCommandBlueprint(action.MyUnit.Id);
+                var command = new BlockCommandBlueprint(action.Executor.Id);
 
                 BlueprintList.Add(command);
             }
@@ -45,13 +45,13 @@ namespace LineWars.Model
 
         public void Visit(MoveAction<TNode, TEdge, TUnit> action)
         {
-            foreach (var node in Graph.GetNodesInRange(action.MyUnit.Node, 1))
+            foreach (var node in Graph.GetNodesInRange(action.Executor.Node, 1))
             {
                 
-                if(action.CanMoveTo(node) && (!node.IsBase || action.MyUnit.OwnerId == node.OwnerId))
+                if(action.CanMoveTo(node) && (!node.IsBase || action.Executor.OwnerId == node.OwnerId))
                 {
 
-                    var command = new MoveCommandBlueprint(action.MyUnit.Id, node.Id);
+                    var command = new MoveCommandBlueprint(action.Executor.Id, node.Id);
 
                     BlueprintList.Add(command);
                 }
@@ -60,7 +60,7 @@ namespace LineWars.Model
 
         public void Visit(HealAction<TNode, TEdge, TUnit> action)
         {
-            foreach (var node in Graph.GetNodesInRange(action.MyUnit.Node, 1))
+            foreach (var node in Graph.GetNodesInRange(action.Executor.Node, 1))
             {
                 if (!node.LeftIsFree)
                     ProcessUnit(node.LeftUnit);
@@ -72,7 +72,7 @@ namespace LineWars.Model
             {
                 if (action.CanHeal(unit))
                 {
-                    var unitId = action.MyUnit.Id;
+                    var unitId = action.Executor.Id;
                     var command = new HealCommandBlueprint(unitId, unit.Id);
 
                     BlueprintList.Add(command);
@@ -82,12 +82,12 @@ namespace LineWars.Model
 
         public void Visit(DistanceAttackAction<TNode, TEdge, TUnit> action)
         {
-            ProcessAttackAction(action, (uint)action.MyUnit.MaxActionPoints);
+            ProcessAttackAction(action, (uint)action.Executor.MaxActionPoints);
         }
 
         public void Visit(ArtilleryAttackAction<TNode, TEdge, TUnit> action)
         {
-            ProcessAttackAction(action, (uint)action.MyUnit.MaxActionPoints);
+            ProcessAttackAction(action, (uint)action.Executor.MaxActionPoints);
         }
 
         public void Visit(MeleeAttackAction<TNode, TEdge, TUnit> action)
@@ -99,7 +99,7 @@ namespace LineWars.Model
         {
             if(action.CanBlock())
             {
-                var unitId = action.MyUnit.Id;
+                var unitId = action.Executor.Id;
                 var command = new RlBlockCommandBlueprint(unitId);
                 BlueprintList.Add(command);
             }
@@ -112,11 +112,11 @@ namespace LineWars.Model
 
         public void Visit(RamAction<TNode, TEdge, TUnit> action)
         {
-            foreach (var node in Graph.GetNodesInRange(action.MyUnit.Node, 1))
+            foreach (var node in Graph.GetNodesInRange(action.Executor.Node, 1))
             {
                 if(action.CanRam(node))
                 {
-                    var unitId = action.MyUnit.Id;
+                    var unitId = action.Executor.Id;
                     var nodeId = node.Id;
                     var command = new RamCommandBlueprint(unitId, nodeId);
 
@@ -143,7 +143,7 @@ namespace LineWars.Model
 
         private void ProcessAttackAction(AttackAction<TNode, TEdge, TUnit> action, uint range)
         {
-            foreach (var node in Graph.GetNodesInRange(action.MyUnit.Node, range))
+            foreach (var node in Graph.GetNodesInRange(action.Executor.Node, range))
             {
                 if (!node.LeftIsFree)
                     ProcessUnit(node.LeftUnit);
@@ -153,9 +153,9 @@ namespace LineWars.Model
 
             void ProcessUnit(TUnit unit)
             {
-                if (action.CanAttackFrom(action.MyUnit.Node, unit))
+                if (action.CanAttackFrom(action.Executor.Node, unit))
                 {
-                    var unitId = action.MyUnit.Id;
+                    var unitId = action.Executor.Id;
                     var command = new AttackCommandBlueprint(unitId, unit.Id, AttackCommandBlueprint.Target.Unit);
 
                     BlueprintList.Add(command);

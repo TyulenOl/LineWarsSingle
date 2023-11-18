@@ -20,13 +20,13 @@ namespace LineWars.Model
         public void Heal(Unit target)
         {
             Action.Heal(target);
-            SfxManager.Instance.Play(healSfx);
+            Executor.PlaySfx(healSfx);
         }
         
         protected override HealAction<Node, Edge, Unit> GetAction()
         {
             var action = new HealAction<Node, Edge, Unit>(
-                Unit,
+                Executor,
                 InitialIsMassHeal,
                 InitialHealingAmount);
             return action;

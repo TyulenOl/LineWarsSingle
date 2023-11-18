@@ -19,7 +19,7 @@ namespace LineWars.Model
 
         protected override SacrificeForPerunAction<Node, Edge, Unit> GetAction()
         {
-            return new SacrificeForPerunAction<Node, Edge, Unit>(Unit);
+            return new SacrificeForPerunAction<Node, Edge, Unit>(Executor);
         }
         
         public override void Accept(IMonoUnitActionVisitor visitor) => visitor.Visit(this);

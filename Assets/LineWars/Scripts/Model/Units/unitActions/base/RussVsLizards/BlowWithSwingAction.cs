@@ -18,11 +18,11 @@
 
         public void ExecuteBlowWithSwing()
         {
-            foreach (var neighbor in MyUnit.Node.GetNeighbors())
+            foreach (var neighbor in Executor.Node.GetNeighbors())
             {
                 if (neighbor.AllIsFree)
                     continue;
-                if (neighbor.OwnerId == MyUnit.OwnerId)
+                if (neighbor.OwnerId == Executor.OwnerId)
                     continue;
                 foreach (var unit in neighbor.Units)
                 {

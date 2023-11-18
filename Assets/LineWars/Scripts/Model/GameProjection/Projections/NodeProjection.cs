@@ -49,21 +49,7 @@ namespace LineWars.Model
             .Distinct();
 
         public Action<UnitProjection> UnitAdded;
-
-        public NodeProjection()
-        {
-
-        }
-
-        public IEnumerable<NodeProjection> GetNeighbors()
-        {
-            foreach (var edge in EdgesList)
-            {
-                if (edge.SecondNode == this) yield return edge.FirstNode;
-                else yield return edge.SecondNode;
-            }
-        }
-
+        
         public void AddEdge(EdgeProjection edge)
         {
             if (edge.FirstNode != this && edge.SecondNode != this)

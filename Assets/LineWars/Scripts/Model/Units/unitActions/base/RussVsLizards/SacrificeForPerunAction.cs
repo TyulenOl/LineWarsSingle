@@ -31,13 +31,13 @@ namespace LineWars.Model
                 .Distinct()
                 .ToArray();
 
-            var damage = MyUnit.CurrentHp / units.Length;
+            var damage = Executor.CurrentHp / units.Length;
 
             foreach (var unit in units)
                 unit.DealDamageThroughArmor(damage);
 
 
-            MyUnit.CurrentHp = 0;
+            Executor.CurrentHp = 0;
             CompleteAndAutoModify();
         }
         public override void Accept(IBaseUnitActionVisitor<TNode, TEdge, TUnit> visitor)

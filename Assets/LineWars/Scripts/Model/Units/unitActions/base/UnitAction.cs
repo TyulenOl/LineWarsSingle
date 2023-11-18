@@ -14,13 +14,13 @@ namespace LineWars.Model
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
         #endregion
     {
-        public TUnit MyUnit => Executor;
+        public TUnit Executor => base.Executor;
         
         protected UnitAction(TUnit executor) : base(executor)
         {
         }
         
-        public virtual uint GetPossibleMaxRadius() => (uint) MyUnit.CurrentActionPoints;
+        public virtual uint GetPossibleMaxRadius() => (uint) Executor.CurrentActionPoints;
 
         public abstract void Accept(IBaseUnitActionVisitor<TNode, TEdge, TUnit> visitor);
         public abstract TResult Accept<TResult>(IUnitActionVisitor<TResult, TNode, TEdge, TUnit> visitor);

@@ -24,11 +24,11 @@ namespace LineWars.Model
 
         public bool CanRam(TNode node)
         {
-            var line = MyUnit.Node.GetLine(node);
+            var line = Executor.Node.GetLine(node);
             return ActionPointsCondition()
                    && line != null
-                   && MyUnit.CanMoveOnLineWithType(line.LineType)
-                   && node.OwnerId != MyUnit.OwnerId
+                   && Executor.CanMoveOnLineWithType(line.LineType)
+                   && node.OwnerId != Executor.OwnerId
                    && !node.AllIsFree;
         }
 
@@ -73,8 +73,8 @@ namespace LineWars.Model
                 yield return new MovedUnit(enemy, nodeForRetreat);
             }
 
-            UnitUtilities<TNode, TEdge, TUnit>.MoveTo(MyUnit, enemyNode);
-            yield return new MovedUnit(MyUnit, enemyNode);
+            UnitUtilities<TNode, TEdge, TUnit>.MoveTo(Executor, enemyNode);
+            yield return new MovedUnit(Executor, enemyNode);
             CompleteAndAutoModify();
         }
 

@@ -26,7 +26,7 @@ namespace LineWars.Model
 
         protected override BlockAction<Node, Edge, Unit> GetAction()
         {
-            var action = new BlockAction<Node, Edge, Unit>(Unit,
+            var action = new BlockAction<Node, Edge, Unit>(Executor,
                 InitialContrAttackDamageModifier,
                 InitialProtection);
             action.CanBlockChanged += (before, after) => CanBlockChanged?.Invoke(before, after);

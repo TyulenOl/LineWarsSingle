@@ -29,9 +29,9 @@ namespace LineWars.Model
             var line = node.GetLine(enemy.Node);
             return !AttackLocked
                    && Damage > 0
-                   && enemy.OwnerId != MyUnit.OwnerId
+                   && enemy.OwnerId != Executor.OwnerId
                    && line != null
-                   && MyUnit.CanMoveOnLineWithType(line.LineType)
+                   && Executor.CanMoveOnLineWithType(line.LineType)
                    && (ignoreActionPointsCondition || ActionPointsCondition());
         }
 
@@ -63,10 +63,10 @@ namespace LineWars.Model
             if (enemy.IsDied
                 && enemyNode.AllIsFree
                 && Onslaught
-                && UnitUtilities<TNode, TEdge, TUnit>.CanMoveTo(MyUnit, enemyNode)
+                && UnitUtilities<TNode, TEdge, TUnit>.CanMoveTo(Executor, enemyNode)
                )
             {
-                UnitUtilities<TNode, TEdge, TUnit>.MoveTo(MyUnit, enemyNode);
+                UnitUtilities<TNode, TEdge, TUnit>.MoveTo(Executor, enemyNode);
                 Moved?.Invoke(enemyNode);
             }
         }
@@ -76,7 +76,7 @@ namespace LineWars.Model
             var enemyDamage = UnitUtilities<TNode, TEdge, TUnit>.GetMaxDamage(target);
             target.DealDamageThroughArmor(Damage);
             if (!target.IsDied)
-                MyUnit.DealDamageThroughArmor(enemyDamage / 2);
+                Executor.DealDamageThroughArmor(enemyDamage / 2);
             CompleteAndAutoModify();
         }
 

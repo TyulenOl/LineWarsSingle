@@ -14,5 +14,10 @@ namespace LineWars.Model
         {
             return UnitUtilities<Node, Edge, Unit>.GetDamages(unit);
         }
+
+        public static bool IsVisible(this Unit unit)
+        {
+            return unit.Node.IsVisible;
+        }
     }
 }

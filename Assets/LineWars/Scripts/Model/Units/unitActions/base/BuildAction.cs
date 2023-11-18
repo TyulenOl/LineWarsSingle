@@ -19,7 +19,7 @@ namespace LineWars.Model
         }
 
         public bool CanUpRoad([NotNull] TEdge edge, bool ignoreActionPointsCondition = false)
-            => CanUpRoad(edge, MyUnit.Node, ignoreActionPointsCondition);
+            => CanUpRoad(edge, Executor.Node, ignoreActionPointsCondition);
 
         public bool CanUpRoad([NotNull] TEdge edge, [NotNull] TNode node, bool ignoreActionPointsCondition = false)
         {

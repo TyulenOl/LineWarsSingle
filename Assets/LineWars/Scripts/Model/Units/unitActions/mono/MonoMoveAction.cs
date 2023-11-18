@@ -21,16 +21,16 @@ namespace LineWars.Model
         public override void Initialize()
         {
             base.Initialize();
-            Unit.MovementLogic.MovementIsOver += MovementLogicOnMovementIsOver;
+            Executor.MovementLogic.MovementIsOver += MovementLogicOnMovementIsOver;
             dj = new RandomDJ(0.5f);
         }
 
         public void MoveTo(Node target)
         {
             Action.MoveTo(target);
-            Unit.MovementLogic.MoveTo(target.transform.position);
-            SfxManager.Instance.Play(moveSfx);
-            SfxManager.Instance.Play(dj.GetSound(reactionsSfx));
+            Executor.MovementLogic.MoveTo(target.transform.position);
+            Executor.PlaySfx(moveSfx);
+            Executor.PlaySfx(dj.GetSound(reactionsSfx));
             Player.LocalPlayer.RecalculateVisibility();
         }
 
@@ -38,12 +38,12 @@ namespace LineWars.Model
 
         private void OnDestroy()
         {
-            Unit.MovementLogic.MovementIsOver -= MovementLogicOnMovementIsOver;
+            Executor.MovementLogic.MovementIsOver -= MovementLogicOnMovementIsOver;
         }
 
         protected override MoveAction<Node, Edge, Unit> GetAction()
         {
-            var action = new MoveAction<Node, Edge, Unit>(Unit);
+            var action = new MoveAction<Node, Edge, Unit>(Executor);
             return action;
         }
 

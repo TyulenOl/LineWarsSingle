@@ -21,13 +21,13 @@ namespace LineWars.Model
         public bool CanMoveTo([NotNull] TNode target)
         {
             return ActionPointsCondition()
-                   && UnitUtilities<TNode, TEdge, TUnit>.CanMoveTo(MyUnit, target);
+                   && UnitUtilities<TNode, TEdge, TUnit>.CanMoveTo(Executor, target);
         }
 
         public void MoveTo([NotNull] TNode target)
         {
             InspectNodeForCallback();
-            UnitUtilities<TNode, TEdge, TUnit>.MoveTo(MyUnit, target);
+            UnitUtilities<TNode, TEdge, TUnit>.MoveTo(Executor, target);
             CompleteAndAutoModify();
 
             void InspectNodeForCallback()
@@ -38,7 +38,7 @@ namespace LineWars.Model
                     return;
                 }
 
-                if (target.OwnerId != MyUnit.OwnerId)
+                if (target.OwnerId != Executor.OwnerId)
                 {
                     OnCapturingEnemyNode();
                     if (target.IsBase)

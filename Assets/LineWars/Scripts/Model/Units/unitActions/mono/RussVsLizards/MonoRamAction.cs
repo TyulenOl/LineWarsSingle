@@ -14,7 +14,7 @@ namespace LineWars.Model
         public override void Initialize()
         {
             base.Initialize();
-            moveAction = Unit.GetAction<MonoMoveAction>();
+            moveAction = Executor.GetAction<MonoMoveAction>();
         }
 
         public int Damage => Action.Damage;
@@ -63,7 +63,7 @@ namespace LineWars.Model
 
         protected override RamAction<Node, Edge, Unit> GetAction()
         {
-            var action = new RamAction<Node, Edge, Unit>(Unit, InitialDamage);
+            var action = new RamAction<Node, Edge, Unit>(Executor, InitialDamage);
             return action;
         }
 

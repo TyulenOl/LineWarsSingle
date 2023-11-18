@@ -73,6 +73,8 @@ namespace LineWars.Model
 
         public int ValueOfHidden => valueOfHidden;
 
+        public bool IsVisible => RenderNodeV3.Visibility > 0;
+
         public int BaseIncome => baseIncome;
 
         public Unit LeftUnit

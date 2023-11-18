@@ -43,9 +43,9 @@ namespace LineWars.Model
         private IEnumerator AttackCoroutine(ITargetedAlive enemy)
         {
             Action.Attack(enemy);
-            SfxManager.Instance.Play(attackSfx);
+            Executor.PlaySfx(attackSfx);
             yield return new WaitForSeconds(attackSfx.LengthInSeconds / 2);
-            SfxManager.Instance.Play(DJ.GetSound(sfxList));
+            Executor.PlaySfx(DJ.GetSound(sfxList));
         }
     }
 }
