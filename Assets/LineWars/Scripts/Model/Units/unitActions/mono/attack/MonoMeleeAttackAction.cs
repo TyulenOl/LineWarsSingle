@@ -16,7 +16,7 @@ namespace LineWars.Model
         [field: SerializeField]
         public bool InitialOnslaught { get; private set; }
 
-        [SerializeField] private SimpleEffect slashEffectPrefab;
+        [SerializeField] private UnitMeleeAttackAnimation attackAnimation;
 
         public bool Onslaught => Action.Onslaught;
         public UnitBlockerSelector BlockerSelector => Action.BlockerSelector;
@@ -24,31 +24,55 @@ namespace LineWars.Model
         public override void Initialize()
         {
             base.Initialize();
-            Action.Moved += (node =>
-            {
-                MyUnit.MovementLogic.MoveTo(node.transform.position);
-            });
+            TryInitializeAttackAnimation();
         }
 
         public override void Attack(ITargetedAlive enemy)
         {
-            if (enemy is Unit unit)
+            if (enemy is Unit unit && attackAnimation != null)
+                AttackWithAnimation(unit);
+            else
+                base.Attack(enemy);
+        }
+
+        private void TryInitializeAttackAnimation()
+        {
+            if (attackAnimation == null)
+                return;
+            if (Executor is Unit unit)
+                attackAnimation.Initialize(unit);
+            else
             {
-                if (slashEffectPrefab == null)
+                Debug.LogWarning("Attempt to add animation on not unit!");
+                attackAnimation = null;
+            }
+        }
+
+        private void AttackWithAnimation(Unit targetUnit)
+        {
+            attackAnimation.Attacked.AddListener(AttackOnEvent);
+            var animContext = new AnimationContext()
+            {
+                TargetUnit = targetUnit,
+                TargetNode = targetUnit.Node,
+            };
+            attackAnimation.Execute(animContext);
+
+            void AttackOnEvent(UnitMeleeAttackAnimation _)
+            {
+                base.Attack(targetUnit);
+                attackAnimation.Attacked.RemoveListener(AttackOnEvent);
+                if(targetUnit.TryGetComponent(out AnimationResponses responses))
                 {
-                    Debug.LogWarning($"Slash effect is null on {name}");
-                }
-                else
-                {
-                    var helper = unit.GetComponent<UnitAnimationHelper>();
-                    var slash = Instantiate(slashEffectPrefab);
-                    slash.transform.position = unit.UnitDirection == UnitDirection.Left
-                        ? helper.LeftCenter.transform.position
-                        : helper.RightCenter.transform.position;
+                    var animContext = new AnimationContext()
+                    {
+                        TargetNode = Unit.Node,
+                        TargetUnit = Unit
+                    };
+
+                    responses.Respond(AnimationResponseType.MeleeDamaged, animContext);
                 }
             }
-
-            base.Attack(enemy);
         }
 
         protected override MeleeAttackAction<Node, Edge, Unit> GetAction()
