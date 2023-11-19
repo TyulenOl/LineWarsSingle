@@ -1,4 +1,5 @@
 ﻿using System;
+using LineWars.Controllers;
 using UnityEngine;
 
 namespace LineWars.Model
@@ -8,10 +9,22 @@ namespace LineWars.Model
         MonoUnitAction<ShotUnitAction<Node, Edge, Unit>>,
         IShotUnitAction<Node, Edge, Unit>
     {
+
+        [SerializeField] private SFXList ThrowRusSounds;
+        [SerializeField] private SFXList ThrowLizardSounds;
+        [SerializeField] private SFXList FallSoundsList;
+
+        private IDJ dj;
+        
         protected override bool NeedAutoComplete => false;
         public bool IsAvailable(Unit target1) => Action.IsAvailable(target1);
 
         public bool IsAvailable(Unit target1, Node target2) => Action.IsAvailable(target1, target2);
+
+        private void Awake()
+        {
+            dj = new RandomDJ(1);
+        }
 
         public void Execute(Unit unitTarget, Node nodeTarget)
         {
@@ -37,8 +50,18 @@ namespace LineWars.Model
                 TargetUnit = Executor
             };
 
+            if (unitTarget.Owner == Executor.Owner)
+            {
+                Executor.PlaySfx(dj.GetSound(ThrowRusSounds));
+            }
+            else
+            {
+                Executor.PlaySfx(dj.GetSound(ThrowLizardSounds));
+            }
+            
             var walkAnimation = responses.Respond(AnimationResponseType.ComeTo, animContext);
             walkAnimation.Ended.AddListener(OnWalkEnded);
+            
             void OnWalkEnded(UnitAnimation animation)
             {
                 animation.Ended.RemoveListener(OnWalkEnded);
@@ -51,12 +74,14 @@ namespace LineWars.Model
                 var throwAnimation = responses.Respond(AnimationResponseType.Throw, throwContext);
                 throwAnimation.Ended.AddListener(OnThrowEnded);
             }
+            
             void OnThrowEnded(UnitAnimation animation)
             {
                 animation.Ended.RemoveListener(OnThrowEnded);
                 Action.Execute(unitTarget, nodeTarget);
-                Player.LocalPlayer.RecalculateVisibility();
                 Complete();
+                Player.LocalPlayer.RecalculateVisibility();
+                Executor.PlaySfx(dj.GetSound(FallSoundsList));
             }
         }
 

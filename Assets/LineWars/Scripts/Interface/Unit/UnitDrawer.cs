@@ -78,7 +78,7 @@ namespace LineWars.Interface
 
         private void LocalPlayerOnVisibilityRecalculated()
         {
-            gameObject.SetActive(unit.Node.IsVisible);
+            //gameObject.SetActive(unit.Node.IsVisible);
         }
 
         private void OnDisable()

@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using LineWars.Controllers;
+using UnityEngine;
 
 namespace LineWars.Model
 {
@@ -8,7 +10,18 @@ namespace LineWars.Model
         IBlowWithSwingAction<Node, Edge, Unit>
     {
         [field: SerializeField] public int InitialDamage { get; private set; }
+
+        [SerializeField] private SFXList attackReactionSounds;
+        [SerializeField] private SFXData attackSound;
+
+        private IDJ dj;
+        
         public int Damage => Action.Damage;
+
+        private void Awake()
+        {
+            dj = new RandomDJ(1);
+        }
 
         public bool IsAvailable(Unit target)
         {
@@ -18,7 +31,9 @@ namespace LineWars.Model
         public void Execute(Unit target)
         {
             //TODO: анимации и звуки
+            Executor.PlaySfx(attackSound);
             Action.Execute(target);
+            Executor.PlaySfx(dj.GetSound(attackReactionSounds));
         }
 
         protected override BlowWithSwingAction<Node, Edge, Unit> GetAction()
