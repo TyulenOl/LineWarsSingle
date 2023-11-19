@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 8ff8dc30ed419974ea384df7b0270d91
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - leftSprite: {instanceID: 0}
+  - rightSprite: {instanceID: 0}
+  - lightningPrefab: {fileID: 1098743853089467233, guid: 9080148e2d445e14dac4e4f32292702f, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

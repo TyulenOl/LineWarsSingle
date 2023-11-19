@@ -62,6 +62,11 @@ namespace LineWars.Model
             {
                 base.Attack(targetUnit);
                 attackAnimation.Attacked.RemoveListener(AttackOnEvent);
+                if(targetUnit == null || targetUnit.CurrentHp <= 0)
+                {
+                    Complete();
+                    return;
+                }    
                 if (targetUnit.TryGetComponent(out AnimationResponses responses))
                 {
                     var animContext = new AnimationContext()
