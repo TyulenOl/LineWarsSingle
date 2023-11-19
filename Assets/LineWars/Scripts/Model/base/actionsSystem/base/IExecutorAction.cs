@@ -7,6 +7,10 @@ namespace LineWars.Model
         public CommandType CommandType { get; }
         public event Action ActionCompleted;
         public void OnReplenish();
+
+        public int GetActionPointsAfterModify();
+        
+        public int GetActionPointsCost();
     }
 
 

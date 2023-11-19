@@ -11,7 +11,6 @@ namespace LineWars.Model
         public IntModifier ActionModifier { get; set; }
         public event Action ActionCompleted;
         public abstract CommandType CommandType { get; }
-        public abstract ActionType ActionType { get; }
 
         protected ExecutorAction(T executor)
         {
@@ -30,9 +29,14 @@ namespace LineWars.Model
             Complete();
         }
 
-        protected int GetActionPointsAfterModify()
+        public int GetActionPointsAfterModify()
         {
             return ActionModifier.Modify(Executor.CurrentActionPoints);
+        }
+
+        public int GetActionPointsCost()
+        {
+            return Executor.CurrentActionPoints - GetActionPointsAfterModify();
         }
 
         public bool ActionPointsCondition()

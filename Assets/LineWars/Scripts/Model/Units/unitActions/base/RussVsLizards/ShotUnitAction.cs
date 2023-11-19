@@ -13,7 +13,6 @@ namespace LineWars.Model
 
     {
         public override CommandType CommandType => CommandType.ShotUnit;
-        public override ActionType ActionType => ActionType.MultiTargeted;
 
 
         public ShotUnitAction(TUnit executor) : base(executor)

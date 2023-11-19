@@ -15,7 +15,6 @@ namespace LineWars.Model
         public IEnumerable<BuildingType> PossibleBuildings { get; }
         
         public override CommandType CommandType => CommandType.Build;
-        public override ActionType ActionType => ActionType.NeedAdditionalParameters;
 
         public bool CanBuild(TNode node, BuildingType buildingType)
         {

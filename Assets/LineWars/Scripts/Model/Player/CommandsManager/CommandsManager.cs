@@ -129,6 +129,7 @@ namespace LineWars.Controllers
 
         private void ExecuteCommandButIgnoreConstrains(IActionCommand command)
         {
+            canCancelExecutor = false;
             stateMachine.SetState(waitingExecuteCommandState);
             var action = command.Action;
             action.ActionCompleted += OnActionCompleted;
@@ -173,7 +174,6 @@ namespace LineWars.Controllers
             {
                 throw new InvalidOperationException("Is not targeted state to cancelAction");
             }
-
             stateMachine.SetState(findTargetState);
         }
 
@@ -183,6 +183,8 @@ namespace LineWars.Controllers
                 throw new InvalidOperationException();
             if (CheckContainsActions(commandType))
                 throw new InvalidOperationException();
+            if (Executor.Actions.First(x => x.CommandType == commandType) is not ITargetedAction)
+                throw new NotImplementedException();
             currentCommandState.Prepare(commandType);
             stateMachine.SetState(currentCommandState);
 
