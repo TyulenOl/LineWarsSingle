@@ -26,9 +26,11 @@ namespace LineWars
         private PlayerPhase scoutPhase;
         private PlayerBuyPhase buyPhase;
         private PlayerReplenishPhase replenishPhase;
+
+        private event Action VisibilityRecalculated;
         
         public IReadOnlyCollection<UnitType> PotentialExecutors => potentialExecutors;
-        public IReadOnlyDictionary<Node, bool> VisibilityMap;
+        public IReadOnlyDictionary<Node, bool> VisibilityMap { get; private set; }
         public IEnumerable<Node> AdditionalVisibleNodes => additionalVisibleNodes;
 
 
@@ -81,20 +83,6 @@ namespace LineWars
             if (!unit.IsDied)
                 unit.Died.RemoveListener(UnitOnDied);
         }
-
-        // private void ProcessActionPointsChange(int previousValue, int currentValue)
-        // {
-        //     if (currentValue <= 0 && CurrentPhase != PhaseType.Idle)
-        //     {
-        //         StartCoroutine(PauseCoroutine());
-        //     }
-        //
-        //     IEnumerator PauseCoroutine()
-        //     {
-        //         yield return new WaitForSeconds(pauseAfterTurn);
-        //         ExecuteTurn(PhaseType.Idle);
-        //     }
-        // }
         public IEnumerable<Unit> GetAllUnitsByPhase(PhaseType phaseType)
         {
             if (PhaseExecutorsData.PhaseToUnits.TryGetValue(phaseType, out var value))
@@ -149,7 +137,11 @@ namespace LineWars
         {
             base.ExecuteReplenish();
             stateMachine.SetState(replenishPhase);
-            additionalVisibleNodes.Clear();
+            if (additionalVisibleNodes.Count > 0)
+            {
+                additionalVisibleNodes.Clear();
+                RecalculateVisibility();
+            }
         }
 
         #endregion
@@ -182,7 +174,8 @@ namespace LineWars
 
         #endregion
 
-        public void AddVisibleNode(Node node)
+        
+        public void AddAdditionalVisibleNode(Node node)
         {
             if (!MonoGraph.Instance.Nodes.Contains(node))
                 throw new ArgumentException();
@@ -229,6 +222,7 @@ namespace LineWars
             }
 
             VisibilityMap = visibilityMap;
+            VisibilityRecalculated?.Invoke();
         }
     }
 }

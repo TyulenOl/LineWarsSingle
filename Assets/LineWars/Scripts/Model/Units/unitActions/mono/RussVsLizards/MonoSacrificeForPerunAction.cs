@@ -15,7 +15,7 @@ namespace LineWars.Model
         {
             //TODO: анимации и звуки
             Action.Sacrifice(node);
-            Player.LocalPlayer.AddVisibleNode(node);
+            Player.LocalPlayer.AddAdditionalVisibleNode(node);
             Player.LocalPlayer.RecalculateVisibility();
         }
 
