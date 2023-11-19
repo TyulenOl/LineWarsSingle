@@ -15,6 +15,7 @@ namespace LineWars.Model
 
         public event Action MoveAnimationEnded;
 
+        protected override bool NeedAutoComplete => false;
 
         public bool CanMoveTo(Node target) =>
             Action.CanMoveTo(target);
@@ -30,9 +31,16 @@ namespace LineWars.Model
         {
             Action.MoveTo(target);
             Executor.MovementLogic.MoveTo(target.transform.position);
+            Executor.MovementLogic.MovementIsOver += OnMoveEnd;
             Executor.PlaySfx(moveSfx);
             Executor.PlaySfx(dj.GetSound(reactionsSfx));
             Player.LocalPlayer.RecalculateVisibility();
+        }
+
+        private void OnMoveEnd()
+        {
+            Executor.MovementLogic.MovementIsOver -= OnMoveEnd;
+            Complete();
         }
 
         private void MovementLogicOnMovementIsOver() => MoveAnimationEnded?.Invoke();

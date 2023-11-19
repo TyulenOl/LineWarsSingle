@@ -20,6 +20,7 @@ namespace LineWars.Model
 
         public bool Onslaught => Action.Onslaught;
         public UnitBlockerSelector BlockerSelector => Action.BlockerSelector;
+        protected override bool NeedAutoComplete => false;
 
         public override void Initialize()
         {
@@ -34,7 +35,10 @@ namespace LineWars.Model
             if (enemy is Unit unit && attackAnimation != null)
                 AttackWithAnimation(unit);
             else
+            {
                 base.Attack(enemy);
+                Complete();
+            }    
         }
 
         private void TryInitializeAttackAnimation()
@@ -66,8 +70,18 @@ namespace LineWars.Model
                         TargetUnit = Executor
                     };
 
-                    responses.Respond(AnimationResponseType.MeleeDamaged, animContext);
+                    var response = responses.Respond(AnimationResponseType.MeleeDamaged, animContext);
+                    if (response != null)
+                        response.Ended.AddListener(OnRespondEnd);
+                    else
+                        Complete();
                 }
+            }
+
+            void OnRespondEnd(UnitAnimation animation)
+            {
+                animation.Ended.RemoveListener(OnRespondEnd);
+                Complete();
             }
         }
 

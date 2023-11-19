@@ -19,12 +19,20 @@ namespace LineWars.Model
         public TAction Action { get; private set; }
         public event Action ActionCompleted;
 
+        protected virtual bool NeedAutoComplete => true;
+
         public virtual void Initialize()
         {
             Executor = GetComponent<TExecutor>();
             Action = GetAction();
             Action.ActionModifier = actionModifier;
-            Action.ActionCompleted += () => ActionCompleted?.Invoke();
+            if(NeedAutoComplete)
+                Action.ActionCompleted += () => ActionCompleted?.Invoke();
+        }
+
+        protected void Complete()
+        {
+            ActionCompleted?.Invoke();
         }
 
         public void OnReplenish() => Action.OnReplenish();

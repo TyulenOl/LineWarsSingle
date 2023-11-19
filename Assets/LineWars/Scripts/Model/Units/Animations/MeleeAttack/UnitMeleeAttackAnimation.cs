@@ -23,8 +23,9 @@ namespace LineWars.Model
             InitializeStateMachine();
         }
 
-        private void Start()
+        protected override void Start()
         {
+            base.Start();
             action = GetComponent<MonoMeleeAttackAction>();
         }
 
@@ -50,7 +51,6 @@ namespace LineWars.Model
         {
             currentTarget = context.TargetUnit;
             targetNode = context.TargetNode;
-
             stateMachine.SetState(moveToState);
         }
     }
