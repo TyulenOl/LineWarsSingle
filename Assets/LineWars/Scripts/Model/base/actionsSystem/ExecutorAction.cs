@@ -30,9 +30,14 @@ namespace LineWars.Model
             Complete();
         }
 
-        protected int GetActionPointsAfterModify()
+        public int GetActionPointsAfterModify()
         {
             return ActionModifier.Modify(Executor.CurrentActionPoints);
+        }
+
+        public int GetActionPointsCost()
+        {
+            return Executor.CurrentActionPoints - GetActionPointsAfterModify();
         }
 
         public bool ActionPointsCondition()

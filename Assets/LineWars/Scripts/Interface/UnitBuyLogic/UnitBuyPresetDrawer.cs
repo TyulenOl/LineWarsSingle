@@ -64,7 +64,8 @@ namespace LineWars.Interface
 
         private void SetAvailable()
         {
-            var isAvailable = Player.LocalPlayer.CanBuyPreset(unitBuyPreset);
+            var purchaseInfo = Player.LocalPlayer.GetPresetPurchaseInfo(unitBuyPreset);
+            isAvailable = purchaseInfo.CanBuy && Player.LocalPlayer.CanBuyPreset(unitBuyPreset);
             button.interactable = isAvailable;
             var color = isAvailable ? Color.white : new Color(226 / 255f, 43 / 255f, 18 / 255f, 255 / 255f);
             cost.color = color;
@@ -72,7 +73,8 @@ namespace LineWars.Interface
             ifChosenPanel.gameObject.SetActive(false);
             backgroundImage.color = !isAvailable ? Color.gray : new Color(226 / 255f, 43 / 255f, 18 / 255f, 255 / 255f);
             image.color = isAvailable ? Color.white : Color.gray;
-            this.isAvailable = isAvailable;
+            cost.text = purchaseInfo.Cost.ToString();
+
         }
     }
 }
