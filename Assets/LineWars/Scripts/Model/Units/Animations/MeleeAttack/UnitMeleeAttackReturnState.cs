@@ -22,11 +22,12 @@ namespace LineWars.Model
                 base.OnEnter();
                 returnFromPosition = animation.ownerUnit.transform.position;
                 movementProgress = 0f;
+
                 if (animation.action.Onslaught
                    && (animation.ownerUnit == animation.targetNode.LeftUnit ||
-                   animation.ownerUnit == animation.targetNode.RightUnit)) //Плохой код :(
+                   animation.ownerUnit == animation.targetNode.RightUnit)) 
                 {
-                    animation.Ended.Invoke(animation);
+                    animation.IsPlaying = true;
                     animation.stateMachine.SetState(animation.idleState);
                 }
             }
