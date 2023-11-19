@@ -5,9 +5,9 @@ namespace LineWars.Model
 {
     public class ShakeAnimation : UnitAnimation
     {
-        [SerializeField, Min(0)] private float timeInSeconds;
-        [SerializeField, Min(0)] private float shakePauseInSeconds;
-        [SerializeField, Min(0)] private float shakeMagnitude;
+        [SerializeField, Min(0)] private float timeInSeconds = 0.6f;
+        [SerializeField, Min(0)] private float shakePauseInSeconds = 0.04f;
+        [SerializeField, Min(0)] private float shakeMagnitude = 0.3f;
 
         private Vector2 startPosition;
         private Coroutine shakesCoroutine;
@@ -15,6 +15,7 @@ namespace LineWars.Model
         public override void Execute(AnimationContext context)
         {
             StartCoroutine(StartStopCoroutine());
+            IsPlaying = true;
         }
 
         private IEnumerator StartStopCoroutine()
@@ -24,6 +25,7 @@ namespace LineWars.Model
             yield return new WaitForSeconds(timeInSeconds);
             StopCoroutine(shakesCoroutine);
             transform.position = startPosition;
+            IsPlaying = false;
         }
 
         private IEnumerator ShakesCoroutine()

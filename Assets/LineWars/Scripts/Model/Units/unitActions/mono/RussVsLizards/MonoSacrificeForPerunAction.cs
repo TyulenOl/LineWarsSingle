@@ -8,12 +8,34 @@ namespace LineWars.Model
         MonoUnitAction<SacrificeForPerunAction<Node, Edge, Unit>>,
         ISacrificeForPerunAction<Node, Edge, Unit>
     {
-
+        [SerializeField] private PerunAnimation perunAnimation;
         public bool CanSacrifice(Node node) => Action.CanSacrifice(node);
 
         public void Sacrifice(Node node)
         {
-            //TODO: анимации и звуки
+            if(perunAnimation == null)
+            {
+                SacrificeInstant(node);
+                return;
+            }
+
+            var animContext = new AnimationContext()
+            {
+                TargetNode = node
+            };
+
+            perunAnimation.Ended.AddListener(SacrificeAfterAnim);
+            perunAnimation.Execute(animContext);
+
+            void SacrificeAfterAnim(UnitAnimation _)
+            {
+                perunAnimation.Ended.RemoveListener(SacrificeAfterAnim);
+                SacrificeInstant(node);
+            }
+        }
+
+        private void SacrificeInstant(Node node)
+        {
             Action.Sacrifice(node);
             Player.LocalPlayer.AddAdditionalVisibleNode(node);
             Player.LocalPlayer.RecalculateVisibility();
