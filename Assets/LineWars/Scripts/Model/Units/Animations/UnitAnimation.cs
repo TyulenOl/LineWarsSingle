@@ -32,6 +32,7 @@ namespace LineWars.Model
             var unit = GetComponent<Unit>();
             Initialize(unit);
         }
+
         public virtual void Initialize(Unit ownerUnit)
         {
             this.ownerUnit = ownerUnit;

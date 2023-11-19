@@ -66,6 +66,11 @@ namespace LineWars.Model
         private void ExecuteAttack(ITargetedAlive enemy)
         {
             base.Attack(enemy);
+            if (enemy == null || enemy.CurrentHp <= 0)
+            {
+                Complete();
+                return;
+            }
             if (enemy is Unit unit && unit.TryGetComponent(out AnimationResponses responses))
             {
                 var animContext = new AnimationContext()
