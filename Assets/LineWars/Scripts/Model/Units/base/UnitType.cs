@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace LineWars.Model
 {
     public enum UnitType
@@ -14,8 +16,9 @@ namespace LineWars.Model
         Tank,
         Mechnik,
         Luchnik,
-        BogatyrForZBT,
-        Knyaz
+        DobrynyaNikitich,
+        Knyaz,
+        AlyoshaPopovich,
+        IlyaMuromec
     }
-    
 }

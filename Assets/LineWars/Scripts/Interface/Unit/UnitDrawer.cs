@@ -38,7 +38,7 @@ namespace LineWars.Interface
                 drawer.ReDrawActivity(newValue != 0);
                 ReDrawCharacteristics();
             }));
-            if (unit.TryGetUnitAction<MonoBlockAction>(out var action))
+            if (unit.TryGetAction<MonoBlockAction>(out var action))
                 action.CanBlockChanged +=
                     (_, newBool) => ExecuteForAllDrawers(drawer => drawer.ReDrawCanBlock(newBool));
 

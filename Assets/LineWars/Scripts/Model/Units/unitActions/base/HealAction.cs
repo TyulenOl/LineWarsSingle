@@ -30,25 +30,25 @@ namespace LineWars.Model
                    && OwnerCondition()
                    && SpaceCondition()
                    && (ignoreActionPointsCondition || ActionPointsCondition())
-                   && target != MyUnit
+                   && target != Executor
                    && target.CurrentHp != target.MaxHp;
 
             bool SpaceCondition()
             {
-                var line = MyUnit.Node.GetLine(target.Node);
-                return line != null || MyUnit.IsNeighbour(target);
+                var line = Executor.Node.GetLine(target.Node);
+                return line != null || Executor.IsNeighbour(target);
             }
 
             bool OwnerCondition()
             {
-                return target.OwnerId == MyUnit.OwnerId;
+                return target.OwnerId == Executor.OwnerId;
             }
         }
 
         public void Heal([NotNull] TUnit target)
         {
             target.CurrentHp += HealingAmount;
-            if (IsMassHeal && MyUnit.TryGetNeighbour(out var neighbour))
+            if (IsMassHeal && Executor.TryGetNeighbour(out var neighbour))
                 neighbour.CurrentHp += HealingAmount;
 
 

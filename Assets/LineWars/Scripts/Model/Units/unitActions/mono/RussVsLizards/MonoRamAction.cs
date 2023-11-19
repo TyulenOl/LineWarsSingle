@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
+    [DisallowMultipleComponent]
     public class MonoRamAction :
         MonoUnitAction<RamAction<Node, Edge, Unit>>,
         IRamAction<Node, Edge, Unit>
@@ -14,7 +15,7 @@ namespace LineWars.Model
         public override void Initialize()
         {
             base.Initialize();
-            moveAction = Unit.GetUnitAction<MonoMoveAction>();
+            moveAction = Executor.GetAction<MonoMoveAction>();
         }
 
         public int Damage => Action.Damage;
@@ -42,8 +43,9 @@ namespace LineWars.Model
                 if (current is MovedUnit movedUnit)
                 {
                     var unit = (Unit) movedUnit.Unit;
-                    var monoMoveAction = unit.GetUnitAction<MonoMoveAction>();
-                    monoMoveAction.MoveAnimationEnded += OnAnimationEnded;
+                    var movementLogic = unit.MovementLogic;
+                    movementLogic.MoveTo(((Node) movedUnit.DestinationNode).transform.position);
+                    movementLogic.MovementIsOver += OnAnimationEnded;
                     moved = true;
 
                     while (moved)
@@ -52,7 +54,7 @@ namespace LineWars.Model
                     void OnAnimationEnded()
                     {
                         moved = false;
-                        monoMoveAction.MoveAnimationEnded -= OnAnimationEnded;
+                        movementLogic.MovementIsOver -= OnAnimationEnded;
                     }
                 }
             }
@@ -62,7 +64,7 @@ namespace LineWars.Model
 
         protected override RamAction<Node, Edge, Unit> GetAction()
         {
-            var action = new RamAction<Node, Edge, Unit>(Unit, InitialDamage);
+            var action = new RamAction<Node, Edge, Unit>(Executor, InitialDamage);
             return action;
         }
 

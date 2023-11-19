@@ -32,7 +32,7 @@ namespace LineWars.Model
         {
             ContrAttackDamageModifier = contrAttackDamageModifier;
             Protection = protection;
-            attackAction = MyUnit.GetUnitAction<IAttackAction<TNode, TEdge, TUnit>>();
+            attackAction = Executor.GetAction<IAttackAction<TNode, TEdge, TUnit>>();
         }
         
         public bool CanBlock()

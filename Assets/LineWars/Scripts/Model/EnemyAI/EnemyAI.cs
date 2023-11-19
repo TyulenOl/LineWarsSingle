@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
+using JetBrains.Annotations;
 
 namespace LineWars.Model
 {
@@ -23,19 +24,27 @@ namespace LineWars.Model
         public override void Initialize(SpawnInfo spawnInfo)
         {
             base.Initialize(spawnInfo);
-            var playerInitializer = SingleGame.Instance.PlayerInitializer;
-            if(playerInitializer.AIBuyLogicData != null)
-            {
-                buyLogicData = playerInitializer.AIBuyLogicData;
-            }
-            if(playerInitializer.GameEvaluator != null)
-            {
-                gameEvaluator = playerInitializer.GameEvaluator;
-            }
             buyLogic = buyLogicData.CreateAILogic(this);
         }
+
+        public void SetNewBuyLogic([NotNull] AIBuyLogicData buyData)
+        {
+            if (buyLogicData == null)
+                Debug.LogError("Buy Logic Data cannot be null!");
+            buyLogicData = buyData;
+            buyLogic = buyData.CreateAILogic(this);
+        }
+
+        public void SetNewGameEvaluator([NotNull] GameEvaluator evaluator)
+        {
+            if (evaluator == null)
+                Debug.LogError("Evaluator cannot be null!");
+            gameEvaluator = evaluator;
+        }
+
         #region Turns
-        public override void ExecuteBuy()
+
+        protected override void ExecuteBuy()
         {
             StartCoroutine(BuyCoroutine());
             IEnumerator BuyCoroutine()
@@ -45,11 +54,12 @@ namespace LineWars.Model
                 ExecuteTurn(PhaseType.Idle);
             }
         }
-        public override void ExecuteArtillery() => ExecuteAITurn(PhaseType.Artillery);
-        public override void ExecuteFight() => ExecuteAITurn(PhaseType.Fight);
-        public override void ExecuteScout() => ExecuteAITurn(PhaseType.Scout);
 
-        public override void ExecuteReplenish()
+        protected override void ExecuteArtillery() => ExecuteAITurn(PhaseType.Artillery);
+        protected override void ExecuteFight() => ExecuteAITurn(PhaseType.Fight);
+        protected override void ExecuteScout() => ExecuteAITurn(PhaseType.Scout);
+
+        protected override void ExecuteReplenish()
         {
             base.ExecuteReplenish();
             StartCoroutine(ReplenishCoroutine());
@@ -168,11 +178,12 @@ namespace LineWars.Model
         #endregion
 
         #region Check Turns
-        public override bool CanExecuteBuy() => true;
-        public override bool CanExecuteArtillery() => CanExecutePhase(PhaseType.Artillery);
-        public override bool CanExecuteFight() => CanExecutePhase(PhaseType.Fight);
-        public override bool CanExecuteScout() => CanExecutePhase(PhaseType.Scout);
-        public override bool CanExecuteReplenish() => true;
+
+        protected override bool CanExecuteBuy() => true;
+        protected override bool CanExecuteArtillery() => CanExecutePhase(PhaseType.Artillery);
+        protected override bool CanExecuteFight() => CanExecutePhase(PhaseType.Fight);
+        protected override bool CanExecuteScout() => CanExecutePhase(PhaseType.Scout);
+        protected override bool CanExecuteReplenish() => true;
 
         private bool CanExecutePhase(PhaseType phase)
         {

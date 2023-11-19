@@ -18,7 +18,7 @@ namespace LineWars.Model
             this.attacker = attacker ?? throw new ArgumentNullException(nameof(attacker));
             this.blocker = blocker ?? throw new ArgumentNullException(nameof(blocker));
 
-            blockAction = attacker.TryGetUnitAction<IBlockAction<TNode, TEdge, TUnit>>(out var action)
+            blockAction = attacker.TryGetAction<IBlockAction<TNode, TEdge, TUnit>>(out var action)
                 ? action
                 : throw new ArgumentException(
                     $"{nameof(TUnit)} does not contain {nameof(IBlockAction<TNode, TEdge, TUnit>)}");

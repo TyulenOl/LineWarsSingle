@@ -32,7 +32,7 @@ namespace LineWars.Model
         {
             return !AttackLocked
                    && Damage > 0
-                   && enemy.OwnerId != MyUnit.OwnerId
+                   && enemy.OwnerId != Executor.OwnerId
                    && Graph.FindShortestPath(node, enemy.Node).Count - 1 <= Distance
                    && (ignoreActionPointsCondition || ActionPointsCondition());
         }

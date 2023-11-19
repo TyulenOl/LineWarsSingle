@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
+    [DisallowMultipleComponent]
     public class MonoRLBuildAction :
         MonoUnitAction<RLBuildAction<Node, Edge, Unit>>,
         IRLBuildAction<Node, Edge, Unit>
@@ -26,7 +27,7 @@ namespace LineWars.Model
         protected override RLBuildAction<Node, Edge, Unit> GetAction()
         {
             return new RLBuildAction<Node, Edge, Unit>(
-                Unit,
+                Executor,
                 initialPossibleBuildingTypes,
                 new MonoBuildingFactory());
         }

@@ -12,8 +12,6 @@ namespace LineWars.Model
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
 
     {
-        private readonly IMoveAction<TNode, TEdge, TUnit> moveAction;
-
         public int Damage { get; }
 
         public override CommandType CommandType => CommandType.Ram;
@@ -22,16 +20,15 @@ namespace LineWars.Model
         public RamAction(TUnit executor, int damage) : base(executor)
         {
             Damage = damage;
-            moveAction = MyUnit.GetUnitAction<IMoveAction<TNode, TEdge, TUnit>>();
         }
 
         public bool CanRam(TNode node)
         {
-            var line = MyUnit.Node.GetLine(node);
+            var line = Executor.Node.GetLine(node);
             return ActionPointsCondition()
                    && line != null
-                   && MyUnit.CanMoveOnLineWithType(line.LineType)
-                   && node.OwnerId != MyUnit.OwnerId
+                   && Executor.CanMoveOnLineWithType(line.LineType)
+                   && node.OwnerId != Executor.OwnerId
                    && !node.AllIsFree;
         }
 
@@ -58,33 +55,26 @@ namespace LineWars.Model
                 if (enemy.CurrentHp + enemy.CurrentArmor <= damage)
                 {
                     enemy.CurrentHp = 0;
-                    yield return new DiedUnit() {Unit = enemy};
-                    continue;
-                }
-
-                var enemyMoveAction = enemy.GetUnitAction<IMoveAction<TNode, TEdge, TUnit>>();
-                if (enemyMoveAction == null)
-                {
-                    enemy.CurrentHp = 0;
-                    yield return new DiedUnit {Unit = enemy};
+                    yield return new DiedUnit(enemy);
                     continue;
                 }
 
                 var nodeForRetreat = possibleNodeForRetreat
-                    .FirstOrDefault(x => enemyMoveAction.CanMoveTo(x, true));
+                    .FirstOrDefault(x => UnitUtilities<TNode, TEdge, TUnit>.CanMoveTo(enemy, x));
                 if (nodeForRetreat == null)
                 {
                     enemy.CurrentHp = 0;
-                    yield return new DiedUnit {Unit = enemy};
+                    yield return new DiedUnit(enemy);
                     continue;
                 }
 
                 enemy.DealDamageThroughArmor(damage);
-                enemyMoveAction.MoveTo(nodeForRetreat);
-                yield return new MovedUnit {Unit = enemy};
+                UnitUtilities<TNode, TEdge, TUnit>.MoveTo(enemy, nodeForRetreat);
+                yield return new MovedUnit(enemy, nodeForRetreat);
             }
 
-            moveAction.MoveTo(enemyNode);
+            UnitUtilities<TNode, TEdge, TUnit>.MoveTo(Executor, enemyNode);
+            yield return new MovedUnit(Executor, enemyNode);
             CompleteAndAutoModify();
         }
 

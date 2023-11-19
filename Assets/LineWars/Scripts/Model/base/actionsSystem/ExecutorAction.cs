@@ -4,8 +4,8 @@ using LineWars.Controllers;
 
 namespace LineWars.Model
 {
-    public abstract class ExecutorAction<T>: IExecutorAction<T>
-        where T: class, IExecutor 
+    public abstract class ExecutorAction<T> : IExecutorAction<T>
+        where T : class, IExecutor
     {
         public T Executor { get; }
         public IntModifier ActionModifier { get; set; }
@@ -18,23 +18,34 @@ namespace LineWars.Model
             Executor = executor;
         }
 
-        public virtual void OnReplenish() {}
-        
+        public virtual void OnReplenish()
+        {
+        }
+
         protected void Complete() => ActionCompleted?.Invoke();
-        
+
         protected void CompleteAndAutoModify()
         {
-            Executor.CurrentActionPoints = ModifyActionPoints();
+            Executor.CurrentActionPoints = GetActionPointsAfterModify();
             Complete();
         }
 
-        protected int ModifyActionPoints(int actionPoints) => ActionModifier.Modify(actionPoints);
-        protected int ModifyActionPoints() => ModifyActionPoints(Executor.CurrentActionPoints);
-        
-        protected bool ActionPointsCondition(int actionPoints) => ActionPointsCondition(ActionModifier, actionPoints);
-        protected bool ActionPointsCondition() => ActionPointsCondition(ActionModifier, Executor.CurrentActionPoints);
-        
-        protected static bool ActionPointsCondition(IntModifier modifier, int actionPoints) =>
-            actionPoints > 0 && modifier != null && modifier.Modify(actionPoints) >= 0;
+        protected int GetActionPointsAfterModify()
+        {
+            return ActionModifier.Modify(Executor.CurrentActionPoints);
+        }
+
+        public bool ActionPointsCondition()
+        {
+            return ExecutorAction.ActionPointsCondition(ActionModifier, Executor.CurrentActionPoints);
+        }
+    }
+
+    public static class ExecutorAction
+    {
+        public static bool ActionPointsCondition(IntModifier modifier, int actionPoints)
+        {
+            return actionPoints > 0 && modifier != null && modifier.Modify(actionPoints) >= 0;
+        }
     }
 }

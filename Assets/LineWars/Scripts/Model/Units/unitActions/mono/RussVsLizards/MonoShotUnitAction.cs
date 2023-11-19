@@ -1,7 +1,9 @@
 ﻿using System;
+using UnityEngine;
 
 namespace LineWars.Model
 {
+    [DisallowMultipleComponent]
     public class MonoShotUnitAction :
         MonoUnitAction<ShotUnitAction<Node, Edge, Unit>>,
         IShotUnitAction<Node, Edge, Unit>
@@ -12,14 +14,14 @@ namespace LineWars.Model
 
         public void Execute(Unit target1, Node target2)
         {
-            target1.MovementLogic.MoveTo(target2.transform);
+            target1.MovementLogic.MoveTo(target2.transform.position);
             Action.Execute(target1, target2);
             Player.LocalPlayer.RecalculateVisibility();
         }
 
         protected override ShotUnitAction<Node, Edge, Unit> GetAction()
         {
-            return new ShotUnitAction<Node, Edge, Unit>(Unit);
+            return new ShotUnitAction<Node, Edge, Unit>(Executor);
         }
 
         public override void Accept(IMonoUnitActionVisitor visitor) => visitor.Visit(this);

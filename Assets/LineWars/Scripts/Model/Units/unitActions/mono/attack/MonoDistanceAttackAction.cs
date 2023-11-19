@@ -16,11 +16,25 @@ namespace LineWars.Model
         protected override DistanceAttackAction<Node, Edge, Unit> GetAction()
         {
             return new DistanceAttackAction<Node, Edge, Unit>(
-                Unit,
+                Executor,
                 InitialDamage,
                 InitialIsPenetratingDamage,
                 (uint)InitialDistance,
                 MonoGraph.Instance);
+        }
+
+        public override void Attack(ITargetedAlive enemy)
+        {
+            base.Attack(enemy);
+            if(enemy is Unit unit && unit.TryGetComponent(out AnimationResponses responses))
+            {
+                var animContext = new AnimationContext()
+                {
+                    TargetNode = Executor.Node,
+                    TargetUnit = Executor
+                };
+                responses.Respond(AnimationResponseType.DistanceDamaged, animContext);
+            }
         }
 
         public override void Accept(IMonoUnitActionVisitor visitor) => visitor.Visit(this);

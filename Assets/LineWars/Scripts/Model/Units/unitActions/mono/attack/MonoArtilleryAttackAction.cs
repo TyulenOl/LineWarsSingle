@@ -17,13 +17,13 @@ namespace LineWars.Model
             if (enemy is not MonoBehaviour mono) return;
             var explosion = Instantiate(explosionPrefab);
             explosion.transform.position = mono.transform.position;
-            SfxManager.Instance.Play(attackSfx);
+            Executor.PlaySfx(attackSfx);
             explosion.Ended += () => { Action.Attack(enemy); };
         }
 
         protected override ArtilleryAttackAction<Node, Edge, Unit> GetAction()
         {
-            return new ArtilleryAttackAction<Node, Edge, Unit>(Unit,
+            return new ArtilleryAttackAction<Node, Edge, Unit>(Executor,
                 InitialDamage,
                 InitialIsPenetratingDamage,
                 (uint) InitialDistance,

@@ -17,7 +17,7 @@ namespace LineWars.Model
         where TExecutor : IExecutor<TExecutor, TAction>
         where TAction : IExecutorAction<TExecutor>
     {
-        public bool TryGetUnitAction<T>(out T action) where T : TAction;
-        public T GetUnitAction<T>() where T : TAction;
+        public bool TryGetAction<T>(out T action) where T : TAction;
+        public T GetAction<T>() where T : TAction;
     }
 }

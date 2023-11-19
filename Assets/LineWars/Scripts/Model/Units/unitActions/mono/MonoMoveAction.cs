@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
+    [DisallowMultipleComponent]
     public class MonoMoveAction : MonoUnitAction<MoveAction<Node, Edge, Unit>>,
         IMoveAction<Node, Edge, Unit>
     {
@@ -15,35 +16,35 @@ namespace LineWars.Model
         public event Action MoveAnimationEnded;
 
 
-        public bool CanMoveTo(Node target, bool ignoreActionPointsCondition = false) =>
-            Action.CanMoveTo(target, ignoreActionPointsCondition);
+        public bool CanMoveTo(Node target) =>
+            Action.CanMoveTo(target);
 
         public override void Initialize()
         {
             base.Initialize();
-            Unit.MovementLogic.MovementIsOver += MovementLogicOnMovementIsOver;
+            Executor.MovementLogic.MovementIsOver += MovementLogicOnMovementIsOver;
             dj = new RandomDJ(0.5f);
         }
 
         public void MoveTo(Node target)
         {
             Action.MoveTo(target);
-            Unit.MovementLogic.MoveTo(target.transform);
-            SfxManager.Instance.Play(moveSfx);
-            SfxManager.Instance.Play(dj.GetSound(reactionsSfx));
+            Executor.MovementLogic.MoveTo(target.transform.position);
+            Executor.PlaySfx(moveSfx);
+            Executor.PlaySfx(dj.GetSound(reactionsSfx));
             Player.LocalPlayer.RecalculateVisibility();
         }
 
-        private void MovementLogicOnMovementIsOver(Transform obj) => MoveAnimationEnded?.Invoke();
+        private void MovementLogicOnMovementIsOver() => MoveAnimationEnded?.Invoke();
 
         private void OnDestroy()
         {
-            Unit.MovementLogic.MovementIsOver -= MovementLogicOnMovementIsOver;
+            Executor.MovementLogic.MovementIsOver -= MovementLogicOnMovementIsOver;
         }
 
         protected override MoveAction<Node, Edge, Unit> GetAction()
         {
-            var action = new MoveAction<Node, Edge, Unit>(Unit);
+            var action = new MoveAction<Node, Edge, Unit>(Executor);
             return action;
         }
 

@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
+    [DisallowMultipleComponent]
     public class MonoBuildRoadAction :
         MonoUnitAction<BuildAction<Node, Edge, Unit>>,
         IBuildAction<Node, Edge, Unit>
@@ -16,12 +17,12 @@ namespace LineWars.Model
         public void UpRoad(Edge edge)
         {
             Action.UpRoad(edge);
-            SfxManager.Instance.Play(buildSfx);
+            Executor.PlaySfx(buildSfx);
         }
         
         protected override BuildAction<Node, Edge, Unit> GetAction()
         {
-            return new BuildAction<Node, Edge, Unit>(Unit);
+            return new BuildAction<Node, Edge, Unit>(Executor);
         }
 
         public override void Accept(IMonoUnitActionVisitor visitor) => visitor.Visit(this);

@@ -19,7 +19,7 @@ namespace LineWars.Controllers
 
         public IEnumerable<TargetActionInfo> Visit(IBuildAction<Node, Edge, Unit> action)
         {
-            return action.MyUnit.Node.Edges
+            return action.Executor.Node.Edges
                 .Where(action.IsAvailable)
                 .Select(x => new TargetActionInfo(x, action.CommandType));
         }
@@ -101,7 +101,7 @@ namespace LineWars.Controllers
         private static IEnumerable<TargetActionInfo> ForNode<TAction>(TAction action, uint distance)
             where TAction : ITargetedAction<Node>, IUnitAction<Node, Edge, Unit>
         {
-            return MonoGraph.Instance.GetNodesInRange(action.MyUnit.Node, distance)
+            return MonoGraph.Instance.GetNodesInRange(action.Executor.Node, distance)
                 .Where(action.IsAvailable)
                 .Select(e => new TargetActionInfo(e, action.CommandType));
         }
@@ -109,7 +109,7 @@ namespace LineWars.Controllers
         private static IEnumerable<TargetActionInfo> ForUnit<TAction>(TAction action, uint distance)
             where TAction : ITargetedAction<Unit>, IUnitAction<Node, Edge, Unit>
         {
-            return MonoGraph.Instance.GetUnitsInRange(action.MyUnit.Node, distance)
+            return MonoGraph.Instance.GetUnitsInRange(action.Executor.Node, distance)
                 .Where(action.IsAvailable)
                 .Select(e => new TargetActionInfo(e, action.CommandType));
         }
@@ -128,7 +128,7 @@ namespace LineWars.Controllers
             {
                 return targets.Length switch
                 {
-                    0 => MonoGraph.Instance.GetUnitsInRange(action.MyUnit.Node, 1)
+                    0 => MonoGraph.Instance.GetUnitsInRange(action.Executor.Node, 1)
                         .Where(action.IsAvailable)
                         .Select(x => new TargetActionInfo(x, action.CommandType)),
                     1 => MonoGraph.Instance.Nodes.Where(x => action.IsAvailable(targets.Concat(new[] {x}).ToArray()))

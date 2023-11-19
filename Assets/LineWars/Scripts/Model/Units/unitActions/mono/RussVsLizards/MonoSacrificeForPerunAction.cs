@@ -1,7 +1,9 @@
 ﻿using System;
+using UnityEngine;
 
 namespace LineWars.Model
 {
+    [DisallowMultipleComponent]
     public class MonoSacrificeForPerunAction :
         MonoUnitAction<SacrificeForPerunAction<Node, Edge, Unit>>,
         ISacrificeForPerunAction<Node, Edge, Unit>
@@ -19,7 +21,7 @@ namespace LineWars.Model
 
         protected override SacrificeForPerunAction<Node, Edge, Unit> GetAction()
         {
-            return new SacrificeForPerunAction<Node, Edge, Unit>(Unit);
+            return new SacrificeForPerunAction<Node, Edge, Unit>(Executor);
         }
         
         public override void Accept(IMonoUnitActionVisitor visitor) => visitor.Visit(this);

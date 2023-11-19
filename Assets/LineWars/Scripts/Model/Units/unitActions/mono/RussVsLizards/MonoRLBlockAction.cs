@@ -1,7 +1,9 @@
 ﻿using System;
+using UnityEngine;
 
 namespace LineWars.Model
 {
+    [DisallowMultipleComponent]
     public class MonoRLBlockAction :
         MonoUnitAction<RLBlockAction<Node, Edge, Unit>>,
         IRLBlockAction<Node, Edge, Unit>
@@ -23,7 +25,7 @@ namespace LineWars.Model
 
         protected override RLBlockAction<Node, Edge, Unit> GetAction()
         {
-            var action = new RLBlockAction<Node, Edge, Unit>(Unit);
+            var action = new RLBlockAction<Node, Edge, Unit>(Executor);
             action.CanBlockChanged += (before, after) => CanBlockChanged?.Invoke(before, after);
             return action;
         }

@@ -24,17 +24,17 @@ namespace LineWars.Model
         {
             if (unit == null) throw new ArgumentNullException(nameof(unit));
 
-            var line = MyUnit.Node.GetLine(unit.Node);
+            var line = Executor.Node.GetLine(unit.Node);
             return ActionPointsCondition()
                    && unit.Size == UnitSize.Little
-                   && (MyUnit.IsNeighbour(unit) || line != null)
-                   && MyUnit != unit;
+                   && (Executor.IsNeighbour(unit) || line != null)
+                   && Executor != unit;
         }
 
         public bool IsAvailable(TUnit target1, TNode target2)
         {
             return IsAvailable(target1)
-                   && target2 != MyUnit.Node
+                   && target2 != Executor.Node
                    && target2 != target1.Node;
         }
 

@@ -19,7 +19,7 @@ namespace LineWars.Model
         public bool IsPenetratingDamage { get; protected set; }
         
         public bool CanAttack(ITargetedAlive enemy, bool ignoreActionPointsCondition = false) =>
-            CanAttackFrom(MyUnit.Node, enemy, ignoreActionPointsCondition);
+            CanAttackFrom(Executor.Node, enemy, ignoreActionPointsCondition);
 
         public bool CanAttackFrom(TNode node, ITargetedAlive enemy, bool ignoreActionPointsCondition = false)
         {

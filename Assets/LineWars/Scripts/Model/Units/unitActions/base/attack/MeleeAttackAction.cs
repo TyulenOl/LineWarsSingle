@@ -6,9 +6,8 @@ using UnityEngine;
 namespace LineWars.Model
 {
     public sealed class MeleeAttackAction<TNode, TEdge, TUnit> :
-            AttackAction<TNode, TEdge, TUnit>,
-            IMeleeAttackAction<TNode, TEdge, TUnit>
-
+        AttackAction<TNode, TEdge, TUnit>,
+        IMeleeAttackAction<TNode, TEdge, TUnit>
         where TNode : class, INodeForGame<TNode, TEdge, TUnit>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
@@ -16,9 +15,9 @@ namespace LineWars.Model
     {
         public UnitBlockerSelector BlockerSelector { get; }
         public bool Onslaught { get; }
-        
-        private readonly IMoveAction<TNode, TEdge, TUnit> moveAction;
-        
+
+        public event Action<TNode> Moved; 
+
         public override CommandType CommandType => CommandType.MeleeAttack;
 
         public override bool CanAttackFrom([NotNull] TNode node, [NotNull] TUnit enemy,
@@ -30,9 +29,9 @@ namespace LineWars.Model
             var line = node.GetLine(enemy.Node);
             return !AttackLocked
                    && Damage > 0
-                   && enemy.OwnerId != MyUnit.OwnerId
+                   && enemy.OwnerId != Executor.OwnerId
                    && line != null
-                   && MyUnit.CanMoveOnLineWithType(line.LineType)
+                   && Executor.CanMoveOnLineWithType(line.LineType)
                    && (ignoreActionPointsCondition || ActionPointsCondition());
         }
 
@@ -64,22 +63,23 @@ namespace LineWars.Model
             if (enemy.IsDied
                 && enemyNode.AllIsFree
                 && Onslaught
-                && moveAction.CanMoveTo(enemyNode, true)
+                && UnitUtilities<TNode, TEdge, TUnit>.CanMoveTo(Executor, enemyNode)
                )
             {
-                moveAction.MoveTo(enemyNode);
+                UnitUtilities<TNode, TEdge, TUnit>.MoveTo(Executor, enemyNode);
+                Moved?.Invoke(enemyNode);
             }
         }
 
         private void MeleeAttack(TUnit target)
         {
-            var enemyDamage = target.GetMaxDamage<TNode, TEdge, TUnit>();
+            var enemyDamage = UnitUtilities<TNode, TEdge, TUnit>.GetMaxDamage(target);
             target.DealDamageThroughArmor(Damage);
-            if(!target.IsDied)
-                MyUnit.DealDamageThroughArmor(enemyDamage/2);
+            if (!target.IsDied)
+                Executor.DealDamageThroughArmor(enemyDamage / 2);
             CompleteAndAutoModify();
         }
-        
+
         public MeleeAttackAction(
             TUnit executor,
             int damage,
@@ -87,15 +87,16 @@ namespace LineWars.Model
             bool onslaught,
             [NotNull] UnitBlockerSelector blockerSelector) : base(executor, damage, isPenetrating)
         {
-            if(blockerSelector == null) throw new ArgumentException();
+            if (blockerSelector == null) throw new ArgumentException();
             Onslaught = onslaught;
             if (blockerSelector == null)
                 throw new ArgumentException($"blocker selector is null");
             BlockerSelector = blockerSelector;
-            moveAction = executor.GetUnitAction<IMoveAction<TNode, TEdge, TUnit>>();
         }
-        
+
         public override void Accept(IBaseUnitActionVisitor<TNode, TEdge, TUnit> visitor) => visitor.Visit(this);
-        public override TResult Accept<TResult>(IUnitActionVisitor<TResult, TNode, TEdge, TUnit> visitor) => visitor.Visit(this);
+
+        public override TResult Accept<TResult>(IUnitActionVisitor<TResult, TNode, TEdge, TUnit> visitor) =>
+            visitor.Visit(this);
     }
 }

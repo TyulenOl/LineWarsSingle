@@ -2,6 +2,7 @@
 
 namespace LineWars.Model
 {
+    [DisallowMultipleComponent]
     public class MonoBlowWithSwingAction: 
         MonoUnitAction<BlowWithSwingAction<Node, Edge, Unit>>,
         IBlowWithSwingAction<Node, Edge, Unit>
@@ -18,7 +19,7 @@ namespace LineWars.Model
         
         protected override BlowWithSwingAction<Node, Edge, Unit> GetAction()
         {
-            return new BlowWithSwingAction<Node, Edge, Unit>(Unit, InitialDamage);
+            return new BlowWithSwingAction<Node, Edge, Unit>(Executor, InitialDamage);
         }
         
         public override void Accept(IMonoUnitActionVisitor visitor) => visitor.Visit(this);

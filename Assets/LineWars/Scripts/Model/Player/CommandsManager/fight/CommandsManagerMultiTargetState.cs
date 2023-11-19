@@ -54,7 +54,7 @@ namespace LineWars.Controllers
 
                 if (availableTarget == null)
                     return;
-                Manager.target = availableTarget;
+                Manager.Target = availableTarget;
                 targets.Add(availableTarget);
                 if (targets.Count == action.TargetsCount)
                 {
