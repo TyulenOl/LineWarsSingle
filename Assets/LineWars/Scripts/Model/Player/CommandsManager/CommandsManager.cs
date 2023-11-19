@@ -25,16 +25,37 @@ namespace LineWars.Controllers
 
         private CommandsManagerBuyState buyState;
 
-        [SerializeField, ReadOnlyInspector] private CommandsManagerStateType state;
+        
         [SerializeField] private List<CommandType> hiddenCommands;
+
         private HashSet<CommandType> hiddenCommandsSet;
         public event Action<IMonoTarget, IMonoTarget> TargetChanged;
         public event Action<IMonoExecutor, IMonoExecutor> ExecutorChanged;
-
-
+        
         private OnWaitingCommandMessage currentOnWaitingCommandMessage;
         public event Action<OnWaitingCommandMessage> InWaitingCommandState;
+        
+        
 
+        [SerializeField, ReadOnlyInspector] private CommandsManagerStateType state;
+        private CommandsManagerStateType State
+        {
+            get => state;
+            set
+            {
+                var previousValue = state;
+                state = value;
+                StateExited?.Invoke(previousValue);
+                StateEntered?.Invoke(state);
+            }
+        }
+
+        public event Action<CommandsManagerStateType> StateEntered;
+        public event Action<CommandsManagerStateType> StateExited; 
+
+        
+        
+        
         private Player Player => Player.LocalPlayer;
 
         private OnWaitingCommandMessage CurrentOnWaitingCommandMessage
@@ -122,7 +143,7 @@ namespace LineWars.Controllers
         public void ExecuteCommand(IActionCommand command)
         {
             if (!CanExecuteAnyCommand())
-                throw new InvalidOperationException($"В текущем состоянии командс менеджера {state}" +
+                throw new InvalidOperationException($"В текущем состоянии командс менеджера {State}" +
                                                     $" нельзя исполнить команду");
             ExecuteCommandButIgnoreConstrains(command);
         }
