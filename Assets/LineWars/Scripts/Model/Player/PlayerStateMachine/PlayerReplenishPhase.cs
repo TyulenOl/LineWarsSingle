@@ -19,8 +19,8 @@ namespace LineWars
             public override void OnEnter()
             {
                 base.OnEnter();
-                player.StartCoroutine(IdleCroroutine());
-                IEnumerator IdleCroroutine()
+                player.StartCoroutine(IdleCoroutine());
+                IEnumerator IdleCoroutine()
                 {
                     yield return null;
                     player.ExecuteTurn(PhaseType.Idle);
