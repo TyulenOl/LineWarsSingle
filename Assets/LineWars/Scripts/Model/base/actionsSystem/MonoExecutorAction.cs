@@ -28,6 +28,8 @@ namespace LineWars.Model
         }
 
         public void OnReplenish() => Action.OnReplenish();
+        public int GetActionPointsAfterModify() => Action.GetActionPointsAfterModify();
+        public int GetActionPointsCost() => Action.GetActionPointsCost();
 
         public CommandType CommandType => Action.CommandType;
 

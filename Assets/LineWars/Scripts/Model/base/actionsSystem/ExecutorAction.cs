@@ -34,6 +34,11 @@ namespace LineWars.Model
             return ActionModifier.Modify(Executor.CurrentActionPoints);
         }
 
+        public int GetActionPointsCost()
+        {
+            return Executor.CurrentActionPoints - GetActionPointsAfterModify();
+        }
+
         public bool ActionPointsCondition()
         {
             return ExecutorAction.ActionPointsCondition(ActionModifier, Executor.CurrentActionPoints);

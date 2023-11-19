@@ -31,12 +31,13 @@ namespace LineWars.Model
                 .Distinct()
                 .ToArray();
 
-            var damage = Executor.CurrentHp / units.Length;
+            if (units.Length != 0)
+            {
+                var damage = Executor.CurrentHp / units.Length;
 
-            foreach (var unit in units)
-                unit.DealDamageThroughArmor(damage);
-
-
+                foreach (var unit in units)
+                    unit.DealDamageThroughArmor(damage);
+            }
             Executor.CurrentHp = 0;
             CompleteAndAutoModify();
         }
