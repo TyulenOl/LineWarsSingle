@@ -17,7 +17,7 @@ namespace LineWars.Controllers
 
             public override void OnEnter()
             {
-                Manager.state = CommandsManagerStateType.Target;
+                Manager.State = CommandsManagerStateType.Target;
                 Manager.SendFightRedrawMessage(Array.Empty<IMonoTarget>(), CheckAction);
                 Selector.SelectedObjectChanged += OnSelectedObjectChanged;
             }

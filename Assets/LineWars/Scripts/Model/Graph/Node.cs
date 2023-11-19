@@ -121,12 +121,14 @@ namespace LineWars.Model
             {
                 Selector.SelectedObjects = new[] {rightUnit?.gameObject, gameObject, leftUnit?.gameObject}
                     .Where(x => x != null)
+                    .Distinct()
                     .ToArray();
             }
             else
             {
                 Selector.SelectedObjects = new[] {leftUnit?.gameObject, gameObject, rightUnit?.gameObject}
                     .Where(x => x != null)
+                    .Distinct()
                     .ToArray();
             }
         }

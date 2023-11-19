@@ -2,22 +2,16 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using LineWars.Controllers;
+using LineWars.LineWars.Scripts.Interface;
 using LineWars.Model;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace LineWars
 {
-    public class SacryficeForPerunButton : MonoBehaviour
+    public class SacryficeForPerunButton : ActionButtonLogic
     {
-        [SerializeField] private Button button;
-
-        private void Awake()
-        {
-            button.onClick.AddListener(OnClick);
-        }
-
-        private void OnClick()
+        protected override void OnClick()
         {
             CommandsManager.Instance.SelectCurrentCommand(CommandType.SacrificePerun);
         }

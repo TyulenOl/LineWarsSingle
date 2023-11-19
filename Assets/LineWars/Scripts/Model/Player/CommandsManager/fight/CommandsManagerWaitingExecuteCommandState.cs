@@ -12,7 +12,7 @@
             public override void OnEnter()
             {
                 base.OnEnter();
-                Manager.state = CommandsManagerStateType.WaitingExecuteCommand;
+                Manager.State = CommandsManagerStateType.WaitingExecuteCommand;
             }
         }
     }
