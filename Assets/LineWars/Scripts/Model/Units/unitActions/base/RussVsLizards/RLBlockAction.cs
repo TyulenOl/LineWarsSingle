@@ -29,8 +29,7 @@ namespace LineWars.Model
         public event Action<bool, bool> CanBlockChanged;
 
         public override CommandType CommandType => CommandType.Block;
-        public override ActionType ActionType => ActionType.Simple;
-        
+
         public RLBlockAction(TUnit executor) : base(executor)
         {
         }

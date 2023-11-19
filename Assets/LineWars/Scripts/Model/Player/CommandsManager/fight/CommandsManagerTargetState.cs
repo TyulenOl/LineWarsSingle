@@ -53,11 +53,9 @@ namespace LineWars.Controllers
                     case 0:
                         break;
                     case 1:
-                        Manager.canCancelExecutor = false;
                         Manager.ProcessCommandPreset(presets[0]);
                         break;
                     default:
-                        Manager.canCancelExecutor = false;
                         Manager.GoToWaitingSelectCommandState(
                             new OnWaitingCommandMessage(
                                 presets,

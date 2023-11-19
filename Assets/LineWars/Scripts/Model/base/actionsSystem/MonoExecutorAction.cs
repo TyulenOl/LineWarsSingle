@@ -32,7 +32,6 @@ namespace LineWars.Model
         public int GetActionPointsCost() => Action.GetActionPointsCost();
 
         public CommandType CommandType => Action.CommandType;
-        public ActionType ActionType => Action.ActionType;
 
         protected abstract TAction GetAction();
     }

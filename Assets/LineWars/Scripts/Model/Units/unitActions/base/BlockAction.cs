@@ -23,8 +23,7 @@ namespace LineWars.Model
         public bool IsBlocked => isBlocked || Protection;
         
         public override CommandType CommandType => CommandType.Block;
-        public override ActionType ActionType => ActionType.Simple;
-        
+
         public BlockAction(
             TUnit executor,
             IntModifier contrAttackDamageModifier,
