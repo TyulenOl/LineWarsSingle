@@ -12,7 +12,7 @@ namespace LineWars.Model
 
     {
         public override CommandType CommandType => CommandType.SacrificePerun;
-        public override ActionType ActionType => ActionType.Targeted;
+
         public SacrificeForPerunAction(TUnit executor) : base(executor)
         {
         }

@@ -12,7 +12,6 @@ namespace LineWars.Model
 
     {
         public override CommandType CommandType => CommandType.Move;
-        public override ActionType ActionType => ActionType.Targeted;
 
         public MoveAction(TUnit executor) : base(executor)
         {

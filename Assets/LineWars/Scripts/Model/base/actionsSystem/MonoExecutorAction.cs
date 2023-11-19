@@ -30,7 +30,6 @@ namespace LineWars.Model
         public void OnReplenish() => Action.OnReplenish();
 
         public CommandType CommandType => Action.CommandType;
-        public ActionType ActionType => Action.ActionType;
 
         protected abstract TAction GetAction();
     }

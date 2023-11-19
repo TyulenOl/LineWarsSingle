@@ -9,14 +9,16 @@
     {
         public int Damage { get; }
         public override CommandType CommandType => CommandType.BlowWithSwing;
-        public override ActionType ActionType => ActionType.Simple;
 
-        public bool CanBlowWithSwing()
+
+        public bool IsAvailable(TUnit target)
         {
-            return ActionPointsCondition();
+            return ActionPointsCondition()
+                   && target.Node.GetLine(Executor.Node) != null
+                   && target.OwnerId != Executor.OwnerId;
         }
 
-        public void ExecuteBlowWithSwing()
+        public void Execute(TUnit target)
         {
             foreach (var neighbor in Executor.Node.GetNeighbors())
             {

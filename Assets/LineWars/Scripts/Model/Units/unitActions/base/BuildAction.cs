@@ -12,7 +12,6 @@ namespace LineWars.Model
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
         public override CommandType CommandType => CommandType.Build;
-        public override ActionType ActionType => ActionType.Targeted;
 
         public BuildAction(TUnit executor) : base(executor)
         {

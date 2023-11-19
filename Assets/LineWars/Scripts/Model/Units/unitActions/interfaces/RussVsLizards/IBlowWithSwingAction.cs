@@ -2,22 +2,15 @@
 {
     public interface IBlowWithSwingAction<TNode, TEdge, TUnit> :
         IUnitAction<TNode, TEdge, TUnit>,
-        ISimpleAction,
+        ITargetedAction<TUnit>,
         IActionWithDamage
         where TNode : class, INodeForGame<TNode, TEdge, TUnit>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
-
     {
-        public bool CanBlowWithSwing();
-        public void ExecuteBlowWithSwing();
-
-        
-        bool ISimpleAction.CanExecute() => CanBlowWithSwing();
-        void ISimpleAction.Execute() => ExecuteBlowWithSwing();
-        IActionCommand ISimpleAction.GenerateCommand()
+        IActionCommand ITargetedAction<TUnit>.GenerateCommand(TUnit target)
         {
-            return new BlowWithSwingCommand<TNode, TEdge, TUnit>(this);
+            return new BlowWithSwingCommand<TNode, TEdge, TUnit>(this, target);
         }
     }
 }

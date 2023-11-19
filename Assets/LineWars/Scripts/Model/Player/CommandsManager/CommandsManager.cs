@@ -183,6 +183,8 @@ namespace LineWars.Controllers
                 throw new InvalidOperationException();
             if (CheckContainsActions(commandType))
                 throw new InvalidOperationException();
+            if (Executor.Actions.First(x => x.CommandType == commandType) is not ITargetedAction)
+                throw new NotImplementedException();
             currentCommandState.Prepare(commandType);
             stateMachine.SetState(currentCommandState);
 

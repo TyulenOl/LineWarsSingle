@@ -15,7 +15,6 @@ namespace LineWars.Model
         public int Damage { get; }
 
         public override CommandType CommandType => CommandType.Ram;
-        public override ActionType ActionType => ActionType.Targeted;
 
         public RamAction(TUnit executor, int damage) : base(executor)
         {
