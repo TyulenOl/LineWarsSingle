@@ -13,7 +13,6 @@ namespace LineWars.Model
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
-        public override ActionType ActionType => ActionType.Targeted;
         public bool AttackLocked { get; protected set; }
         public int Damage { get; protected set; }
         public bool IsPenetratingDamage { get; protected set; }

@@ -32,7 +32,8 @@ namespace LineWars.Controllers
 
             public override void OnEnter()
             {
-                Manager.State = CommandsManagerStateType.MultiTarget;
+                Manager.state = CommandsManagerStateType.MultiTarget;
+                Manager.canCancelExecutor = false;
                 Selector.SelectedObjectChanged += OnSelectedObjectChanged;
             }
 

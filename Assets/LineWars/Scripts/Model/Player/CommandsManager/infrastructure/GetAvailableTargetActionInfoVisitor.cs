@@ -66,7 +66,7 @@ namespace LineWars.Controllers
 
         public IEnumerable<TargetActionInfo> Visit(IBlowWithSwingAction<Node, Edge, Unit> action)
         {
-            return ForSimple(action);
+            return ForUnit(action, 1);
         }
 
         public IEnumerable<TargetActionInfo> Visit(IShotUnitAction<Node, Edge, Unit> action)
