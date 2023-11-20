@@ -22,10 +22,6 @@ namespace LineWars.Model
                 {
                     var nodeOwnerProjection = players[oldNode.Owner];
                     nodeProjection.ConnectTo(nodeOwnerProjection);
-                    if (oldNode.IsBase)
-                    {
-                        nodeOwnerProjection.Base = nodeProjection;
-                    }
                 }
 
                 if (!oldNode.LeftIsFree)
@@ -87,10 +83,6 @@ namespace LineWars.Model
                 {
                     var ownerProjection = oldPlayersToNew[oldNode.Owner];
                     newNode.ConnectTo(ownerProjection);
-                    if (oldNode.IsBase)
-                    {
-                        ownerProjection.Base = newNode;
-                    }
                 }
 
                 if (oldNode.LeftUnit != null)

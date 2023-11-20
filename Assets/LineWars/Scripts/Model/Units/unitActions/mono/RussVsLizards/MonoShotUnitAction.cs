@@ -41,6 +41,7 @@ namespace LineWars.Model
             if(!responses.CanRespond(AnimationResponseType.ComeTo)
                 || !responses.CanRespond(AnimationResponseType.Throw))
             {
+                Debug.Log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
                 ExecuteInstant(unitTarget, nodeTarget);
                 return;
             }
