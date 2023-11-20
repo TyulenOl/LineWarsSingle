@@ -83,7 +83,7 @@ namespace LineWars.Model
             set
             {
                 var previousValue = currentActionPoints;
-                currentActionPoints = Mathf.Max(0, value);
+                currentActionPoints = Mathf.Clamp(value, 0, MaxActionPoints);
                 ActionPointsChanged.Invoke(previousValue, currentActionPoints);
             }
         }
@@ -253,7 +253,8 @@ namespace LineWars.Model
         protected override void OnReplenish()
         {
             CurrentActionPoints = maxActionPoints;
-
+            CurrentArmor = 0;
+            
             foreach (var unitAction in MonoActions)
                 unitAction.OnReplenish();
         }

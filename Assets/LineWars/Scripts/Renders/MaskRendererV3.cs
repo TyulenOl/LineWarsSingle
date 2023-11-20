@@ -192,7 +192,7 @@ public class MaskRendererV3 : MonoBehaviour
         availableNodes = new List<RenderNodeV3>();
         foreach (var node in nodes)
         {
-            var pixelCoord = node.transform.position
+            var pixelCoord = (node.transform.position - startPosition.position)
                     .To2D()
                     .GetPixelCoord(texSizeInWorldCoord, visibilityMap.GetTextureSize());
             if (pixelCoord.CheckPixelCoord(visibilityMap.GetTextureSize()))
@@ -204,6 +204,10 @@ public class MaskRendererV3 : MonoBehaviour
                 };
                 nodeBuffers.Add(nodeBuffer);
                 availableNodes.Add(node);
+            }
+            else
+            {
+                Debug.LogWarning($"Нода {node.name} не имеет цвета");
             }
         }
 

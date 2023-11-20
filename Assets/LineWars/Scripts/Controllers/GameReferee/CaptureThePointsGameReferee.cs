@@ -24,10 +24,15 @@ namespace LineWars
                 {
                     if (node.Owner != null)
                     {
+                        var score = 1;
+                        if(TryGetComponent(out NodeScore scoreComponent))
+                        {
+                            score = scoreComponent.Score;
+                        }
                         SetScoreForPlayer(
                             node.Owner,
                             GetScoreForPlayer(node.Owner)
-                            + node.GetComponent<NodeScore>().Score);
+                            + score);
                     }
                 };
             }

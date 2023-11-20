@@ -295,7 +295,7 @@ namespace LineWars.Model
             nodes.Remove(node);
             Income -= Mathf.RoundToInt(Rules.IncomeModifier.Modify(node.BaseIncome));
 
-            if (node == Base)
+            if (nodes.Count == 0)
                 Defeat();
         }
 
