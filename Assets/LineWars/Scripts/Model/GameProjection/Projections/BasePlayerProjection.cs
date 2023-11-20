@@ -12,23 +12,6 @@ namespace LineWars.Model
         public int Id { get; set; }
         public BasePlayer Original { get; set; }
         public GameProjection Game { get; set; }
-        public NodeProjection Base
-        {
-            get => baseProjection;
-
-            set
-            {
-                if (value == null)
-                {
-                    baseProjection = null;
-                    return;
-                }
-
-                if (value.Owner != this) throw new ArgumentException();
-
-                baseProjection = value;
-            }
-        }
         public PlayerRules Rules { get; set; }
         public PhaseExecutorsData PhaseExecutorsData { get; set; }
         public NationEconomicLogic EconomicLogic { get; set; } 
@@ -82,7 +65,7 @@ namespace LineWars.Model
 
         public bool CanBuyPreset(UnitBuyPreset preset)
         {
-            return Base.LeftUnit == null && Base.RightUnit == null;
+            return false; //TODO: Сделать шота
         }
 
         public void RemoveOwned([NotNull] OwnedProjection owned)
@@ -102,7 +85,6 @@ namespace LineWars.Model
     public interface IReadOnlyBasePlayerProjection : INumbered
     {
         public BasePlayer Original { get; }
-        public NodeProjection Base { get; }
         public PlayerRules Rules { get; }
         public PhaseExecutorsData PhaseExecutorsData { get; }  
         public NationEconomicLogic EconomicLogic { get; }

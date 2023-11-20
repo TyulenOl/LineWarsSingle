@@ -54,13 +54,6 @@ namespace LineWars.Model
 
             var newGraphProjection = GraphProjectionCreator.FromProjection(oldProjection.Graph, oldPlayersToNew, newGame);
 
-            foreach (var oldNewPlayerPair in oldPlayersToNew)
-            {
-                var baseId = oldNewPlayerPair.Key.Base.Id;
-                var newBase = newGraphProjection.NodesIndexList[baseId];
-                oldNewPlayerPair.Value.Base = newBase;
-            }
-
             newGame.SetPlayers(newPlayerList);
             newGame.Graph = newGraphProjection;
             newGame.CurrentPhase = oldProjection.CurrentPhase;
