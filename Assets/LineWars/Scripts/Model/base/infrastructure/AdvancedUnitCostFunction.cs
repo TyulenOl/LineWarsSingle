@@ -16,6 +16,7 @@ namespace LineWars.Model
 
         public override PurchaseInfo Calculate(UnitType unitType, int baseCost, int unitCount)
         {
+            return new PurchaseInfo(baseCost);
             if (functions.TryGetValue(unitType, out var stringExpression))
             {
                 var x = new Argument($"{baseCostParameterName} = {baseCost}");

@@ -207,12 +207,12 @@ namespace LineWars.Model
 
         public void BuyPreset(UnitBuyPreset preset, Node node)
         {
+            CurrentMoney -= this.GetPresetPurchaseInfo(preset).Cost;
             var unitsList = new List<Unit>
             {
                 SpawnUnit(node, preset.FirstUnitType),
                 SpawnUnit(node, preset.SecondUnitType)
             }.Where(x => x != null);
-            CurrentMoney -= this.GetPresetPurchaseInfo(preset).Cost;
             OnBuyPreset(node, unitsList);
         }
 
