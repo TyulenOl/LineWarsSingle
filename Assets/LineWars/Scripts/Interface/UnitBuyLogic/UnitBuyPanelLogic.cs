@@ -37,7 +37,6 @@ namespace LineWars.Interface
                     unitBuyLayerLogic.CurrentPreset = presetDrawer.UnitBuyPreset;
                     unitBuyLayerLogic.ChosenUnitPresetDrawer = presetDrawer;
                     chosenPresetInfoDrawer.Init(Player.LocalPlayer.Nation.GetUnitPrefab(presetDrawer.UnitBuyPreset.FirstUnitType));
-                    
                 });
             }
         }
