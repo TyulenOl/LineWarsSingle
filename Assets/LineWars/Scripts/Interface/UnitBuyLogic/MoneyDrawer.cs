@@ -14,6 +14,7 @@ public class MoneyDrawer : MonoBehaviour
     private void Start()
     {
         Player.LocalPlayer.CurrentMoneyChanged += CurrentMoneyChanged;
+        Player.LocalPlayer.IncomeChanged += CurrentMoneyChanged;
         ReDrawText();
     }
 

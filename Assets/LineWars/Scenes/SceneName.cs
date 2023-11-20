@@ -5,5 +5,8 @@
     Map_2,
     WinOrLoseScene,
     Oboz,
-    Oboz1
+    Oboz1,
+    DominationLarge = 6,
+    CaptureThePoints = 7,
+    SiegeLarge = 8
 }

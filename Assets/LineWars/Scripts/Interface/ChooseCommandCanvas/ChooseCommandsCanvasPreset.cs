@@ -13,14 +13,13 @@ namespace LineWars
         public void ReDraw(OnWaitingCommandMessage message)
         {
             gameObject.SetActive(true);
-            if (message.Data.Count() != buttons.Count)
-                throw new InvalidOperationException(
-                    $"Количество кнопок в окне канваса ({message.Data.Count()}) не совпадает с количеством команд ({buttons.Count})");
-            var data = message.Data.ToArray();
-            
+            var presets = message.Data.GroupBy(x => x.Action.CommandType).ToArray();
+            // if (message.Data.Count() != buttons.Count)
+            //     throw new InvalidOperationException(
+            //         $"Количество кнопок в окне канваса ({message.Data.Count()}) не совпадает с количеством команд ({buttons.Count})");
             for (int i = 0; i < buttons.Count; i++)
             {
-                buttons[i].ReDraw(data[i]);
+                buttons[i].ReDraw(presets[i].First());
             }
         }
     }

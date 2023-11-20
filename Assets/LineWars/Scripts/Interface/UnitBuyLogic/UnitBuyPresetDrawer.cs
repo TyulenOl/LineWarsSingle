@@ -15,6 +15,7 @@ namespace LineWars.Interface
         [SerializeField] private Image backgroundImage;
         [SerializeField] private Button button;
         [SerializeField] private Image ifChosenPanel;
+        [SerializeField] private Image ifCannotBuyImage;
 
         private bool isAvailable;
 
@@ -65,6 +66,7 @@ namespace LineWars.Interface
         private void SetAvailable()
         {
             var purchaseInfo = Player.LocalPlayer.GetPresetPurchaseInfo(unitBuyPreset);
+            ifCannotBuyImage.gameObject.SetActive(!purchaseInfo.CanBuy);
             isAvailable = purchaseInfo.CanBuy && Player.LocalPlayer.CanBuyPreset(unitBuyPreset);
             button.interactable = isAvailable;
             var color = isAvailable ? Color.white : new Color(226 / 255f, 43 / 255f, 18 / 255f, 255 / 255f);
@@ -74,7 +76,6 @@ namespace LineWars.Interface
             backgroundImage.color = !isAvailable ? Color.gray : new Color(226 / 255f, 43 / 255f, 18 / 255f, 255 / 255f);
             image.color = isAvailable ? Color.white : Color.gray;
             cost.text = purchaseInfo.Cost.ToString();
-
         }
     }
 }

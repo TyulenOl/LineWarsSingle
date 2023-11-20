@@ -1,3 +1,4 @@
+using System;
 using JetBrains.Annotations;
 using LineWars.Model;
 using System.Collections.Generic;
@@ -11,6 +12,21 @@ namespace LineWars
         [SerializeField] private int rounds;
 
         private int pastRounds = -1;
+        
+        private int PastRounds
+        {
+            get => pastRounds;
+            set
+            {
+                pastRounds = value;
+                RoundsAmountChanged?.Invoke();
+            }
+        }
+        
+        public int RoundsToWin => rounds - PastRounds;
+
+        public event Action RoundsAmountChanged;
+        
         public override void Initialize([NotNull] Player me, IEnumerable<BasePlayer> enemies)
         {
             base.Initialize(me, enemies);
@@ -21,8 +37,8 @@ namespace LineWars
         {
             if (currentType != PhaseType.Replenish)
                 return;
-            pastRounds++;
-            if (pastRounds >= rounds)
+            PastRounds++;
+            if (PastRounds >= rounds)
             {
                 CalculateVictory();
                 PhaseManager.Instance.PhaseChanged.RemoveListener(OnPhaseChanged);

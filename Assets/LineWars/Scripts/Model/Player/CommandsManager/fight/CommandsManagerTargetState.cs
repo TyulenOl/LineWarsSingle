@@ -48,6 +48,8 @@ namespace LineWars.Controllers
                         .Select(action => new CommandPreset(Manager.Executor, target, action)))
                     .ToArray();
 
+                presets = presets.GroupBy(x=> x.Action.CommandType).Select(x => x.First()).ToArray();
+                
                 switch (presets.Length)
                 {
                     case 0:

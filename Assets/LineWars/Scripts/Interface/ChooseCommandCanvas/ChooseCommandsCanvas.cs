@@ -21,18 +21,23 @@ namespace LineWars
         {
             gameObject.SetActive(true);
             transform.position = message.SelectedNode.Position;
-            var amount = message.Data.Count();
-            switch (amount)
+            var amount = message.Data.Select(x=> x.Action.CommandType).Distinct().Count();
+            
+            var presets = message.Data.GroupBy(x => x.Action.CommandType).ToArray();
+
+            var message2 = new OnWaitingCommandMessage(presets.Select(x => x.ToArray().First()), message.SelectedNode);
+            
+            switch (message2.Data.Count())
             {
                 case 2:
-                    forTwoPreset.ReDraw(message);
+                    forTwoPreset.ReDraw(message2);
                     break;
                 case 3:
-                    forThreePreset.ReDraw(message);
+                    forThreePreset.ReDraw(message2);
                     break;
                 default:
                     throw new NotImplementedException(
-                        $"Окно выбра команд для количества аргументов {amount} не реализовано");
+                        $"Окно выбра команд для количества аргументов {message2.Data.Count()} не реализовано");
             }
         }
     }
