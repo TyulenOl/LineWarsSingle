@@ -38,7 +38,7 @@ public class UnitBuyLayerLogic : MonoBehaviour
 
     private void Start()
     {
-        PhaseManager.Instance.PhaseChanged.AddListener(OnPhaseChanged);
+        Player.LocalPlayer.TurnChanged += OnPhaseChanged;
     }
 
     private void OnPhaseChanged(PhaseType phaseTypeOld, PhaseType phaseTypeNew)

@@ -106,6 +106,8 @@ namespace LineWars.Model
             var nodeInfoDrawer = GetComponent<NodeInfoDrawer>();
             nodeInfoDrawer.ReDrawCapturingInfo(Player.LocalPlayer.GetMyCapturingMoneyFromNode(this));
             nodeInfoDrawer.ReDrawIncomeInfo(Player.LocalPlayer.GetMyIncomeFromNode(this));
+            if(Owner != null)
+                nodeInfoDrawer.Capture();
         }
 
         public IEnumerable<Unit> Units => new[] {LeftUnit, RightUnit}
