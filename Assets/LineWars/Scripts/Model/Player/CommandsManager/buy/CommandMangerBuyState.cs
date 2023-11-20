@@ -44,7 +44,8 @@ namespace LineWars.Controllers
                     currentNode = null;
                     return;
                 }
-                currentNode = node;
+                if (node.IsQualifiedForSpawn(Player.LocalPlayer))
+                    currentNode = node;
                 CheckForCompleteness();
             }
 
