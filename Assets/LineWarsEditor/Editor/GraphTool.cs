@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Codice.Client.Common.WebApi;
 using LineWars.Extensions;
 using LineWars.Model;
 using UnityEditor;
@@ -31,14 +32,13 @@ public class GraphTool : EditorTool
         foreach (var gameObject in FindObjectsOfType<GameObject>())
             SceneVisibilityManager.instance.DisablePicking(gameObject, false);
 
-        foreach (var node in FindObjectsOfType<Node>())
-            SceneVisibilityManager.instance.EnablePicking(node.gameObject, false);
-
         SceneVisibilityManager.instance.EnablePicking(graph.gameObject, false);
+        SceneVisibilityManager.instance.EnablePicking(graph.NodesParent.gameObject, true);
+
         EditorApplication.RepaintHierarchyWindow();
 
         nodeListener = new SelectionListener<Node>();
-        
+
         //Debug.Log("CreateGraph is Activated!");
     }
 
@@ -66,6 +66,10 @@ public class GraphTool : EditorTool
         if (Event.current.Equals(Event.KeyboardEvent("k")))
         {
             PutNodeInMousePosition();
+        }
+        else if (Event.current.Equals(Event.KeyboardEvent("delete")))
+        {
+            DeleteSelectedNodes();
         }
     }
 
@@ -101,6 +105,60 @@ public class GraphTool : EditorTool
         }
     }
 
+    private void DeleteSelectedNodes()
+    {
+        Debug.Log("DELETE");
+        var allDeletedEdges = new List<Edge>();
+        var allDeletedNodes = new List<Node>();
+        var allNeighboringNodes = new List<Node>();
+
+        foreach (var node in nodeListener.GetActive().ToArray())
+        {
+            allDeletedNodes.Add(node);
+            allNeighboringNodes.AddRange(node.GetNeighbors());
+            allDeletedEdges.AddRange(node.Edges);
+        }
+
+        allDeletedEdges = allDeletedEdges.Distinct().ToList();
+        allNeighboringNodes = allNeighboringNodes.Distinct().ToList();
+        
+        Undo.IncrementCurrentGroup();
+        foreach (var node in allNeighboringNodes)
+        {
+            Undo.RecordObject(node, "Delete Node");
+            var myDeleteEdges = node.Edges.Intersect(allDeletedEdges).ToArray();
+            foreach (var deleteEdge in myDeleteEdges)
+                node.RemoveEdge(deleteEdge);
+            EditorUtility.SetDirty(node);
+        }
+
+        foreach (var node in allDeletedNodes)
+        {
+            Undo.RecordObject(node, "Delete Node");
+            var myDeleteEdges = node.Edges.Intersect(allDeletedEdges).ToArray();
+            foreach (var deleteEdge in myDeleteEdges)
+                node.RemoveEdge(deleteEdge);
+        }
+
+        foreach (var deletedEdge in allDeletedEdges)
+        {
+            Undo.RecordObject(deletedEdge, "Delete Node");
+            deletedEdge.FirstNode = null;
+            deletedEdge.SecondNode = null;
+        }
+
+        foreach (var node in allDeletedNodes)
+        { 
+            Undo.DestroyObjectImmediate(node.gameObject);
+        }
+        
+        foreach (var deletedEdge in allDeletedEdges)
+        {
+            Undo.DestroyObjectImmediate(deletedEdge.gameObject);
+        }
+
+    }
+
     private void PutNodeInMousePosition()
     {
         var activeNodes = nodeListener.GetActive().ToArray();
@@ -117,9 +175,15 @@ public class GraphTool : EditorTool
                 ConnectOrDisconnectNodes(activeNodes[0], activeNodes[1]);
                 break;
             case > 2:
-                Debug.Log("Too many nodes");
+                Debug.LogError("Too many nodes");
                 break;
         }
+    }
+
+    private void ConnectManyNode(Node[] nodes)
+    {
+        var allPairs = nodes.Zip(nodes, (node1, node2) => (node1, node2))
+            .Where(x => x.node1.GetLine(x.node2));
     }
 
 
@@ -160,12 +224,6 @@ public class GraphTool : EditorTool
         return edge;
     }
 
-    private void DisconnectNodes(Node firstNode, Node secondNode)
-    {
-        var intersect = GetIntersectEdges(firstNode, secondNode);
-        DisconnectNodes(firstNode, secondNode, intersect);
-    }
-
     private void DisconnectNodes(Node firstNode, Node secondNode, List<Edge> intersect)
     {
         Undo.IncrementCurrentGroup();
@@ -198,16 +256,6 @@ public class GraphTool : EditorTool
         return node;
     }
 
-    public void DeleteNode(Node node)
-    {
-        node.BeforeDestroy(out var deletedEdges, out var neighbors);
-        DestroyImmediate(node.gameObject);
-        foreach (var edge in deletedEdges)
-            DestroyImmediate(edge.gameObject);
-        foreach (var neighbor in neighbors)
-            EditorUtility.SetDirty(neighbor);
-    }
-
     private void UsePositionHandle()
     {
         if (target is GameObject activeObj)
@@ -221,9 +269,8 @@ public class GraphTool : EditorTool
             if (EditorGUI.EndChangeCheck())
             {
                 foreach (var node in targets
-                             .Select(o => (GameObject) o)
-                             .Select(o => o.GetComponent<Node>())
-                             .Where(o => o != null)
+                             .OfType<GameObject>()
+                             .GetComponentMany<Node>()
                         )
                 {
                     Undo.RecordObject(node.transform, "Move Node");
@@ -238,9 +285,10 @@ public class GraphTool : EditorTool
     {
         foreach (var edge in node.Edges)
         {
-            Undo.RecordObject(edge.transform, "ReDrawEdge");
-            Undo.RecordObject(edge.SpriteRenderer, "ReDrawEdge");
-            Undo.RecordObject(edge.BoxCollider2D, "ReDrawEdge");
+            Undo.RecordObject(edge.gameObject, "Move Node");
+            Undo.RecordObject(edge.transform, "Move Node");
+            Undo.RecordObject(edge.SpriteRenderer, "Move Node");
+            Undo.RecordObject(edge.BoxCollider2D, "Move Node");
             edge.Redraw();
         }
     }
@@ -275,6 +323,43 @@ public class GraphTool : EditorTool
             else
                 return nextIndex;
         }
+
         return nextIndex;
+    }
+}
+
+
+public static class EdgeEditorExtension
+{
+    public static void Redraw(this Edge edge)
+    {
+        Undo.RecordObject(edge.gameObject, "Redraw Edge");
+        edge.name = $"Edge{edge.Id}";
+        RedrawLine();
+        AlineCollider();
+        
+        void RedrawLine()
+        {
+            var v1 = edge.FirstNode ? edge.FirstNode.Position : Vector2.zero;
+            var v2 = edge.SecondNode ? edge.SecondNode.Position : Vector2.right;
+            var distance = Vector2.Distance(v1, v2);
+            var center = v1;
+            var newSecondNodePosition = v2 - center;
+            var radian = Mathf.Atan2(newSecondNodePosition.y, newSecondNodePosition.x) * 180 / Mathf.PI;
+            
+            Undo.RecordObject(edge.SpriteRenderer.transform, "Redraw Edge");
+            edge.SpriteRenderer.transform.rotation = Quaternion.Euler(0, 0, radian);
+            edge.SpriteRenderer.transform.position = (v1 + v2) / 2;
+
+            Undo.RecordObject(edge.SpriteRenderer, "Redraw Edge");
+            edge.SpriteRenderer.size = new Vector2(distance, edge.GetCurrentWidth());
+            edge.SpriteRenderer.sprite = edge.GetCurrentSprite();
+        }
+
+        void AlineCollider()
+        {
+            Undo.RecordObject(edge.BoxCollider2D, "Redraw Edge");
+            edge.BoxCollider2D.size = edge.SpriteRenderer.size;
+        }
     }
 }

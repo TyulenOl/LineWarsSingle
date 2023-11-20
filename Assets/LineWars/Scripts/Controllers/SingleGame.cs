@@ -15,7 +15,7 @@ namespace LineWars
     {
         public static SingleGame Instance { get; private set; }
         [Header("Logic")]
-        [SerializeField] private Spawn playerSpawn;
+        [SerializeField] private PlayerBuilder playerSpawn;
         
         [Header("References")]
         [SerializeField] private PlayerInitializer playerInitializer;
@@ -86,9 +86,21 @@ namespace LineWars
                 return;
             }
 
-            playerSpawnInfo = playerSpawn
-                ? MonoGraph.Instance.Spawns.First(info => info.SpawnNode == playerSpawn)
-                : MonoGraph.Instance.Spawns.First();
+            if (playerSpawn != null)
+            {
+                playerSpawnInfo = MonoGraph.Instance.Spawns
+                    .FirstOrDefault(info => info.SpawnNode == playerSpawn);
+            }
+            else
+            {
+                Debug.LogWarning("Ой ей вы не настроили спавн игрока");
+                playerSpawnInfo = MonoGraph.Instance.Spawns.FirstOrDefault();
+            }
+
+            if (playerSpawnInfo == null)
+            {
+                throw new InvalidOperationException("Игра не может быть продолжена, так нет свавна для игрока");
+            }
             
             spawnInfosStack = MonoGraph.Instance.Spawns
                 .Where(x => x != playerSpawnInfo)

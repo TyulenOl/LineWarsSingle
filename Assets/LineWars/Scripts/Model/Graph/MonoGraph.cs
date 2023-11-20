@@ -44,7 +44,7 @@ namespace LineWars.Model
 
         private void GenerateSpawnInfo()
         {
-            var spawns = FindObjectsOfType<Spawn>();
+            var spawns = FindObjectsOfType<PlayerBuilder>();
 
             var initialInfos = FindObjectsOfType<Node>();
 
