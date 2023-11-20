@@ -163,7 +163,7 @@ namespace LineWars.Model
 
         public bool CanBuyPreset(UnitBuyPreset preset)
         {
-            return CanBuyPreset(preset, Base);
+            return MonoGraph.Instance.Nodes.Where(x => x.Owner == this).Select(x => CanBuyPreset(preset, x)).Any(x => x);
         }
 
         public bool CanBuyPreset(UnitBuyPreset preset, Node node)
