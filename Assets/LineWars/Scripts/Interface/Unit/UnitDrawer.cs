@@ -63,14 +63,22 @@ namespace LineWars.Interface
                 rightDrawer.CurrentUnit = unit;
 
             targetDrawer = GetComponent<TargetDrawer>();
-        }
 
+            Player.LocalPlayer.VisibilityRecalculated += LocalPlayerOnVisibilityRecalculated;
+        }
+        
+        
         private void OnEnable()
         {
             unit.UnitDirectionChange.AddListener(OnUnitDirectionChange);
             unit.ArmorChanged.AddListener(OnUnitArmorChange);
             unit.HpChanged.AddListener(OnUnitHpChange);
             ReDrawCharacteristics();
+        }
+
+        private void LocalPlayerOnVisibilityRecalculated()
+        {
+            //gameObject.SetActive(unit.Node.IsVisible);
         }
 
         private void OnDisable()
@@ -164,6 +172,11 @@ namespace LineWars.Interface
             {
                 action.Invoke(drawer);
             }
+        }
+
+        private void OnDestroy()
+        {
+            Player.LocalPlayer.VisibilityRecalculated -= LocalPlayerOnVisibilityRecalculated;
         }
     }
 }

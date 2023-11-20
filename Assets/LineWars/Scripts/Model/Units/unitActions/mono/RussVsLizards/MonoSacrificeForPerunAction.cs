@@ -1,4 +1,5 @@
 ﻿using System;
+using LineWars.Controllers;
 using UnityEngine;
 
 namespace LineWars.Model
@@ -9,10 +10,24 @@ namespace LineWars.Model
         ISacrificeForPerunAction<Node, Edge, Unit>
     {
         [SerializeField] private PerunAnimation perunAnimation;
+        
+        [SerializeField] protected SFXData sacrSfx;
+
+        [SerializeField] protected SFXList sfxList;
+
+        private IDJ DJ;
+
+        private void Awake()
+        {
+            DJ = new RandomDJ(1);
+        }
+
         public bool CanSacrifice(Node node) => Action.CanSacrifice(node);
 
         public void Sacrifice(Node node)
         {
+            Executor.PlaySfx(DJ.GetSound(sfxList));
+            
             if(perunAnimation == null)
             {
                 SacrificeInstant(node);
@@ -31,6 +46,7 @@ namespace LineWars.Model
             {
                 perunAnimation.Ended.RemoveListener(SacrificeAfterAnim);
                 SacrificeInstant(node);
+                
             }
         }
 
@@ -39,6 +55,7 @@ namespace LineWars.Model
             Action.Sacrifice(node);
             Player.LocalPlayer.AddAdditionalVisibleNode(node);
             Player.LocalPlayer.RecalculateVisibility();
+            Executor.PlaySfx(sacrSfx);
         }
 
         protected override SacrificeForPerunAction<Node, Edge, Unit> GetAction()

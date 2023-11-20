@@ -11,6 +11,12 @@ namespace LineWars.Controllers
             {
             }
 
+            public override void OnEnter()
+            {
+                base.OnEnter();
+                Manager.State = CommandsManagerStateType.CurrentCommand;
+            }
+
             public void Prepare(CommandType commandType)
             {
                 CommandType = commandType;

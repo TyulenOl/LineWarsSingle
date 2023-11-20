@@ -1,29 +1,24 @@
 using LineWars.Controllers;
+using LineWars.LineWars.Scripts.Interface;
 using LineWars.Model;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace LineWars.Interface
 {
-    public class BaikalButtonLogic : MonoBehaviour
+    public class BaikalButtonLogic : ActionButtonLogic
     {
-        private Button button;
-
-        private void Awake()
-        {
-            button = GetComponent<Button>();
-            button.onClick.AddListener(OnClick);
-        }
-
-        private void OnClick()
+        protected override void OnClick()
         {
             var executor = CommandsManager.Instance.Executor;
             if (executor is Unit unit)
             {
                 unit.CurrentHp += 1;
                 unit.CurrentActionPoints = 0;
+                Player.LocalPlayer.FinishTurn();
             }
+            
             //TODO переписать на команду
         }
     }
-}
+}   

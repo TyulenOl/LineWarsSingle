@@ -1,4 +1,5 @@
 ﻿using System;
+using LineWars.Controllers;
 using UnityEngine;
 
 namespace LineWars.Model
@@ -8,6 +9,10 @@ namespace LineWars.Model
         MonoUnitAction<RLBlockAction<Node, Edge, Unit>>,
         IRLBlockAction<Node, Edge, Unit>
     {
+        [SerializeField] protected SFXList sfxList;
+
+        private IDJ DJ;
+        
         private void OnDestroy()
         {
             CanBlockChanged = null;
@@ -17,10 +22,18 @@ namespace LineWars.Model
         public event Action<bool, bool> CanBlockChanged;
 
         public bool CanBlock() => Action.CanBlock();
+
+        private void Awake()
+        {
+            DJ = new RandomDJ(0.75f);
+        }
+
         public void EnableBlock()
         {
             //TODO: анимации и звуки
             Action.EnableBlock();
+            if(sfxList != null)
+                Executor.PlaySfx(DJ.GetSound(sfxList));
         }
 
         protected override RLBlockAction<Node, Edge, Unit> GetAction()

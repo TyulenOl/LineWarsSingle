@@ -13,7 +13,7 @@ namespace LineWars.Controllers
             public override void OnEnter()
             {
                 base.OnEnter();
-                Manager.state = CommandsManagerStateType.WaitingSelectCommand;
+                Manager.State = CommandsManagerStateType.WaitingSelectCommand;
             }
         }
     }

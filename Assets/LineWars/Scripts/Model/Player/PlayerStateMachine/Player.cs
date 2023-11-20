@@ -27,7 +27,7 @@ namespace LineWars
         private PlayerBuyPhase buyPhase;
         private PlayerReplenishPhase replenishPhase;
 
-        private event Action VisibilityRecalculated;
+        public event Action VisibilityRecalculated;
         
         public IReadOnlyCollection<UnitType> PotentialExecutors => potentialExecutors;
         public IReadOnlyDictionary<Node, bool> VisibilityMap { get; private set; }
@@ -201,9 +201,9 @@ namespace LineWars
             }
         }
 
-        protected override void OnBuyPreset()
+        protected override void OnBuyPreset(Node node, IEnumerable<Unit> units)
         {
-            base.OnBuyPreset();
+            base.OnBuyPreset(node, units);
             RecalculateVisibility();
         }
 

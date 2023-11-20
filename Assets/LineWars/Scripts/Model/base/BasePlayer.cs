@@ -139,17 +139,18 @@ namespace LineWars.Model
             return node.AnyIsFree;
         }
 
-        public void SpawnUnit(Node node, UnitType unitType)
+        public Unit SpawnUnit(Node node, UnitType unitType)
         {
-            if (unitType == UnitType.None) return;
+            if (unitType == UnitType.None) return null;
             var unitPrefab = GetUnitPrefab(unitType);
-            SpawnUnit(node, unitPrefab);
+            return SpawnUnit(node, unitPrefab);
         }
 
-        public void SpawnUnit(Node node, Unit unit)
+        public Unit SpawnUnit(Node node, Unit unitPrefab)
         {
-            BasePlayerUtility.CreateUnitForPlayer(this, node, unit);
+            var unitInstance =BasePlayerUtility.CreateUnitForPlayer(this, node, unitPrefab);
             OnSpawnUnit();
+            return unitInstance;
         }
 
         protected virtual void OnSpawnUnit()
@@ -206,15 +207,16 @@ namespace LineWars.Model
 
         public void BuyPreset(UnitBuyPreset preset, Node node)
         {
-            SpawnUnit(node, preset.FirstUnitType);
-            SpawnUnit(node, preset.SecondUnitType);
+            var unitsList = new List<Unit>
+            {
+                SpawnUnit(node, preset.FirstUnitType),
+                SpawnUnit(node, preset.SecondUnitType)
+            }.Where(x => x != null);
             CurrentMoney -= this.GetPresetPurchaseInfo(preset).Cost;
-            OnBuyPreset();
+            OnBuyPreset(node, unitsList);
         }
 
-        protected virtual void OnBuyPreset()
-        {
-        }
+        protected virtual void OnBuyPreset(Node node, IEnumerable<Unit> units) { }
 
         #endregion
 
