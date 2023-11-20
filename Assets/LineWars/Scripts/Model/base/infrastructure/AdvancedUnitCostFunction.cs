@@ -15,7 +15,7 @@ namespace LineWars.Model
         [SerializeField, SerializedDictionary("Тип юнита", "Функция стоимости")]
         private SerializedDictionary<UnitType, string> functions;
 
-        private Dictionary<UnitType, (int, int, PurchaseInfo)> hash = new();
+        private readonly Dictionary<UnitType, (int, int, PurchaseInfo)> hash = new();
 
         public override PurchaseInfo Calculate(UnitType unitType, int baseCost, int unitCount)
         {
