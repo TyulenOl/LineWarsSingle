@@ -12,6 +12,7 @@ namespace LineWars
         [Header("AI Options")]
         [SerializeField] private GameEvaluator gameEvaluator;
         [SerializeField] private AIBuyLogicData aiBuyLogicData;
+        [SerializeField] private int aiDepth;
 
         public T Initialize<T>(SpawnInfo spawnInfo) where T : BasePlayer
         {
@@ -49,6 +50,8 @@ namespace LineWars
                 enemyAI.SetNewGameEvaluator(gameEvaluator);
             if(aiBuyLogicData != null)
                 enemyAI.SetNewBuyLogic(aiBuyLogicData);
+            if (aiDepth > 0)
+                enemyAI.Depth = aiDepth;
         }
     }
 }

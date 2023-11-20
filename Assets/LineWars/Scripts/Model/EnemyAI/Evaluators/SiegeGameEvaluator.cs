@@ -2,20 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace LineWars
+namespace LineWars.Model
 {
-    public class SiegeGameEvaluator : MonoBehaviour
+    [CreateAssetMenu]
+    public class SiegeGameEvaluator : GameEvaluator
     {
-        // Start is called before the first frame update
-        void Start()
+        //[SerializeField] private float Hp
+        public override int Evaluate(GameProjection projection, BasePlayerProjection player)
         {
-        
+            throw new System.NotImplementedException();
         }
 
-        // Update is called once per frame
-        void Update()
-        {
-        
-        }
+
     }
 }

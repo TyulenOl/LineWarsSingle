@@ -73,8 +73,10 @@ namespace LineWars.Model
                 var eligbleNodes = MonoGraph.Instance.Nodes
                 .Where(node => node.IsQualifiedForSpawn(player))
                 .ToList();
+
                 while (quantity > 0 && AreNodesFree(eligbleNodes, currentUnit))
                 {
+                    currentNodeId = currentNodeId % eligbleNodes.Count;
                     if (data.UnitsLimit != 0 && BasePlayerUtility.GetAllUnits(player).Count() > data.UnitsLimit)
                     {
                         break;

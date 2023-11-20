@@ -160,7 +160,7 @@ namespace LineWars.Controllers
 
             void OnActionCompleted()
             {
-                if (!Executor.CanDoAnyAction)
+                if (Executor as MonoBehaviour == null || !Executor.CanDoAnyAction)
                 {
                     Player.FinishTurn();
                 }
