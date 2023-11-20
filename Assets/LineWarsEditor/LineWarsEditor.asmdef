@@ -1,0 +1,17 @@
+{
+    "name": "LineWarsEditor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:e3a0c8f5ca8677340ad3caa84b0dbab6",
+        "GUID:626070ea3273cb844a310aa4f53b31fa"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
