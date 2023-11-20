@@ -15,7 +15,7 @@ namespace LineWars.Model
         [SerializeField] private float actionCooldown;
         [SerializeField] private AIBuyLogicData buyLogicData;
         [SerializeField] private GameEvaluator gameEvaluator;
-        [SerializeField] private int depth;
+        [field: SerializeField] public int Depth { get; set; }
         [SerializeField] private float commandPause;
         [SerializeField] private float firstCommandPause;
 
@@ -51,6 +51,7 @@ namespace LineWars.Model
                 Debug.LogError("Evaluator cannot be null!");
             gameEvaluator = evaluator;
         }
+
 
         #region Turns
 
@@ -89,7 +90,7 @@ namespace LineWars.Model
             foreach ( var command in possibleCommands )
             {
                 var commandChain = new List<ICommandBlueprint>();
-                tasksList.Add(ExploreOutcomes(gameProjection, command, depth, -1, commandChain, true));
+                tasksList.Add(ExploreOutcomes(gameProjection, command, Depth, -1, commandChain, true));
             }
 
             var commandEvalList = await Task.WhenAll(tasksList.ToArray());
