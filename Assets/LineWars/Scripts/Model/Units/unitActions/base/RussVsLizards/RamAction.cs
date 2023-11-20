@@ -72,8 +72,11 @@ namespace LineWars.Model
                 yield return new MovedUnit(enemy, nodeForRetreat);
             }
 
-            UnitUtilities<TNode, TEdge, TUnit>.MoveTo(Executor, enemyNode);
-            yield return new MovedUnit(Executor, enemyNode);
+            if (UnitUtilities<TNode, TEdge, TUnit>.CanMoveTo(Executor, enemyNode))
+            {
+                UnitUtilities<TNode, TEdge, TUnit>.MoveTo(Executor, enemyNode);
+                yield return new MovedUnit(Executor, enemyNode);
+            }
             CompleteAndAutoModify();
         }
 

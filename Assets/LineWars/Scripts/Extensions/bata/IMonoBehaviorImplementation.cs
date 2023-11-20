@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 
 public interface IMonoBehaviorImplementation : IBehaviorImplementation
