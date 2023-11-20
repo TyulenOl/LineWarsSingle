@@ -25,7 +25,7 @@ namespace LineWars.Model
 
         [field: SerializeField] public List<Node> InitialSpawns { get; private set; }
         [field: SerializeField] public PhaseExecutorsData PhaseExecutorsData { get; private set; }
-        [field: SerializeField] public NationEconomicLogic EconomicLogic { get; private set; }
+        public NationEconomicLogic EconomicLogic => Nation.NationEconomicLogic;
 
         [field: SerializeField, ReadOnlyInspector]
         public Node Base { get; private set; }
@@ -258,7 +258,7 @@ namespace LineWars.Model
 
         public int GetMyCapturingMoneyFromNode(Node node)
         {
-            return Rules.MoneyForFirstCapturingNode + GetMyIncomeFromNode(node);
+            return Rules.MoneyForFirstCapturingNode;
         }
 
         protected virtual void BeforeAddOwned(Unit unit)
