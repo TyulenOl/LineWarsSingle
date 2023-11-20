@@ -78,6 +78,25 @@ namespace LineWars.Interface
 
                 scoreText.text = $"{scoreReferee.GetScoreForPlayer(Player.LocalPlayer)}/{scoreReferee.ScoreForWin}";
             }
+            if (GameReferee.Instance is SiegeGameReferee siegeGameReferee)
+            {
+                siegeGameReferee.CurrentRoundsChanged += (currentRounds) =>
+                {
+                    scoreText.text = $"{currentRounds}/{siegeGameReferee.RoundsToWin}";
+                };
+
+                scoreText.text = $"{siegeGameReferee.CurrentRounds}/{siegeGameReferee.RoundsToWin}";
+            }
+            
+            if (GameReferee.Instance is NewDominationGameReferee dominationGameReferee)
+            {
+                dominationGameReferee.RoundsAmountChanged += () =>
+                {
+                    scoreText.text = $"{dominationGameReferee.RoundsToWin}";
+                };
+
+                scoreText.text = $"{dominationGameReferee.RoundsToWin}";
+            }
         }
 
         private void OnExecutorChanged(IExecutor before, IExecutor after)

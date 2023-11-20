@@ -30,7 +30,6 @@ namespace LineWars.Model
 
         public void Execute(Unit target)
         {
-            //TODO: анимации и звуки
             Executor.PlaySfx(attackSound);
             Action.Execute(target);
             Executor.PlaySfx(dj.GetSound(attackReactionSounds));

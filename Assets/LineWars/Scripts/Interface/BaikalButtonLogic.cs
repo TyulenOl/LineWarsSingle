@@ -13,7 +13,7 @@ namespace LineWars.Interface
             var executor = CommandsManager.Instance.Executor;
             if (executor is Unit unit)
             {
-                unit.CurrentHp += 1;
+                unit.CurrentHp += 2;
                 unit.CurrentActionPoints = 0;
                 Player.LocalPlayer.FinishTurn();
             }
