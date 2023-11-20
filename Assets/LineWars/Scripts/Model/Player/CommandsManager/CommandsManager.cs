@@ -150,6 +150,8 @@ namespace LineWars.Controllers
 
         private void ExecuteCommandButIgnoreConstrains(IActionCommand command)
         {
+            if (Executor as MonoBehaviour == null)
+                Debug.LogError("EXECUTOR is missing");
             canCancelExecutor = false;
             stateMachine.SetState(waitingExecuteCommandState);
             var action = command.Action;

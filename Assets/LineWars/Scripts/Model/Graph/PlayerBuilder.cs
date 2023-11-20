@@ -1,37 +1,33 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+// ReSharper disable Unity.NoNullPropagation
 
 namespace LineWars.Model
 {
+    /// <summary>
+    /// класс для создания плеера
+    /// </summary>
     [RequireComponent(typeof(Node))]
-    public class Spawn : MonoBehaviour
+    public class PlayerBuilder : MonoBehaviour
     {
-        public const string DEFAULT_NAME = "";
-
         [field: Header("Logic")]
         [field: SerializeField] public PlayerRules Rules { get; private set; }
+
         [field: SerializeField] public Nation Nation { get; private set; }
         [field: SerializeField] public List<Node> InitialSpawns { get; private set; }
 
         [field: Header("DEBUG")]
-        [field: SerializeField] public string GroupName { get; set; } = DEFAULT_NAME;
-        [field: SerializeField] public Sprite GroupSprite { get; set; }
         [field: SerializeField, HideInInspector] public Node Node { get; private set; }
+
+        public string GroupName => Nation?.Name ?? "Default";
+        public Sprite GroupSprite => Nation?.NodeSprite;
 
         private void OnValidate()
         {
-            if(GroupSprite == null && Nation != null)
-            {
-                GroupSprite = Nation.NodeSprite;
-            }
-            if ((string.IsNullOrEmpty(GroupName) || GroupName == string.Empty)
-                && Nation != null)
-            {
-                GroupName = Nation.Name;
-            }
             AssignFields();
             AssignComponents();
+            Validate();
             Redraw();
         }
 
@@ -46,10 +42,24 @@ namespace LineWars.Model
                 Node = GetComponent<Node>();
         }
 
+        private void Validate()
+        {
+            if (Rules == null)
+                Debug.LogWarning($"У {nameof(PlayerBuilder)}({name}) нет {nameof(Rules)}");
+            if (Nation == null)
+                Debug.LogWarning($"У {nameof(PlayerBuilder)}({name}) нет {nameof(Nation)}");
+        }
+
         private void Redraw()
         {
-            foreach (var info in FindObjectsOfType<Node>().Where(x => x.ReferenceToSpawn == this))
-                info.Redraw();
+            foreach (var node in GetMyNodes())
+                node.Redraw();
+        }
+
+        private IEnumerable<Node> GetMyNodes()
+        {
+            return FindObjectsOfType<Node>()
+                .Where(x => x.ReferenceToSpawn == this);
         }
     }
 }

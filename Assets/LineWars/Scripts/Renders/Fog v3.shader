@@ -2,7 +2,7 @@
 {
     Properties
     {
-        [NoScaleOffset] _MainTex ("Main Texture", 2D) = "white"{}
+        [NoScaleOffset] [HideInInspector] _MainTex ("Main Texture", 2D) = "white"{}
         [NoScaleOffset] _FogTex ("FogTexture", 2D) = "white" {}
         [NoScaleOffset] _FogEff ("FogEffects", 2D) = "white"{}
         [NoScaleOffset] _Noise ("Noise", 2D) = "black"{}

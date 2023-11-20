@@ -18,6 +18,7 @@ namespace LineWars.Model
     {
         [SerializeField] private int index;
 
+        // задается в префабе
         [SerializeField] private Sprite defaultSprite;
         [SerializeField] private List<Edge> edges;
 
@@ -37,7 +38,7 @@ namespace LineWars.Model
 
         [field: Header("Initial Info")]
         [field: SerializeField]
-        public Spawn ReferenceToSpawn { get; set; }
+        public PlayerBuilder ReferenceToSpawn { get; set; }
 
         [field: SerializeField] public UnitType LeftUnitType { get; private set; }
         [field: SerializeField] public UnitType RightUnitType { get; private set; }
@@ -106,9 +107,11 @@ namespace LineWars.Model
             var nodeInfoDrawer = GetComponent<NodeInfoDrawer>();
             nodeInfoDrawer.ReDrawCapturingInfo(Player.LocalPlayer.GetMyCapturingMoneyFromNode(this));
             nodeInfoDrawer.ReDrawIncomeInfo(Player.LocalPlayer.GetMyIncomeFromNode(this));
-            if(Owner != null)
+            if (Owner != null)
                 nodeInfoDrawer.Capture();
         }
+
+        public Edge GetLine(Node node) => Edges.Intersect(node.Edges).FirstOrDefault();
 
         public IEnumerable<Unit> Units => new[] {LeftUnit, RightUnit}
             .Where(x => x != null)
@@ -141,29 +144,6 @@ namespace LineWars.Model
             edges = new List<Edge>();
         }
 
-        public void BeforeDestroy(out List<Edge> deletedEdges, out List<Node> neighbors)
-        {
-            neighbors = new List<Node>();
-            deletedEdges = edges.ToList();
-
-            foreach (var edge in edges)
-            {
-                var first = edge.FirstNode;
-                var second = edge.SecondNode;
-                if (first.Equals(this))
-                {
-                    second.RemoveEdge(edge);
-                    neighbors.Add(second);
-                }
-                else
-                {
-                    first.RemoveEdge(edge);
-                    neighbors.Add(first);
-                }
-            }
-
-            edges = null;
-        }
 
         public void AddEdge(Edge edge)
         {
@@ -207,7 +187,7 @@ namespace LineWars.Model
                 GetComponent<NodeInfoDrawer>().Capture();
             }
 
-            ReferenceToSpawn = newPlayer != null ? basePlayer.Base.GetComponent<Spawn>() : null;
+            ReferenceToSpawn = newPlayer != null ? basePlayer.Base.GetComponent<PlayerBuilder>() : null;
             IsDirty = true;
             Redraw();
         }
@@ -222,12 +202,12 @@ namespace LineWars.Model
             }
             else if (IsBase)
             {
-                gameObject.name = $"Spawn {ReferenceToSpawn.GroupName}";
+                gameObject.name = $"Spawn{Id} {ReferenceToSpawn.GroupName}";
                 spriteRenderer.sprite = ReferenceToSpawn.GroupSprite;
             }
             else
             {
-                gameObject.name = $"Node{Id} Group with {ReferenceToSpawn.GroupName}";
+                gameObject.name = $"Node{Id} group with {ReferenceToSpawn.GroupName}";
                 spriteRenderer.sprite = ReferenceToSpawn.GroupSprite;
             }
         }
@@ -242,6 +222,8 @@ namespace LineWars.Model
         {
             if (renderNodeV3 == null)
                 renderNodeV3 = GetComponent<RenderNodeV3>();
+            if (defaultSprite == null)
+                Debug.LogError("Нет дефолтного спрайта у ноды", gameObject);
             Redraw();
         }
 
