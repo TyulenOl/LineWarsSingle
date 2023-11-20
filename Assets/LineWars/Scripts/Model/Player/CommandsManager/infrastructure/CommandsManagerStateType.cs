@@ -8,6 +8,7 @@
         WaitingSelectCommand,
         WaitingExecuteCommand,
         MultiTarget,
-        Buy
+        Buy,
+        CurrentCommand
     }
 }

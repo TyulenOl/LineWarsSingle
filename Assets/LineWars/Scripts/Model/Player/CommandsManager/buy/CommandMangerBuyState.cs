@@ -18,7 +18,7 @@ namespace LineWars.Controllers
             public override void OnEnter()
             {
                 base.OnEnter();
-                Manager.state = CommandsManagerStateType.Buy;
+                Manager.State = CommandsManagerStateType.Buy;
                 Selector.ManySelectedObjectsChanged += OnSelectedObjectsChanged;
                 Manager.SendBuyReDrawMessage(GetNodes());
             }

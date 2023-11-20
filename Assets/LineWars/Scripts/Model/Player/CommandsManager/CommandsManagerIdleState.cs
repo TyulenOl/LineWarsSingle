@@ -10,7 +10,7 @@ namespace LineWars.Controllers
             public override void OnEnter()
             {
                 base.OnEnter();
-                Manager.state = CommandsManagerStateType.Idle;
+                Manager.State = CommandsManagerStateType.Idle;
                 Manager.Executor = null;
                 Manager.Target = null;
                 Manager.canCancelExecutor = true;

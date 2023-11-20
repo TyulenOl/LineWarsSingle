@@ -1,21 +1,14 @@
 using LineWars.Controllers;
+using LineWars.LineWars.Scripts.Interface;
 using LineWars.Model;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace LineWars
 {
-    public class DefenceButtonLogic : MonoBehaviour
+    public class DefenceButtonLogic : ActionButtonLogic
     {
-        private Button button;
-
-        private void Awake()
-        {
-            button = GetComponent<Button>();
-            button.onClick.AddListener(OnClick);
-        }
-
-        private void OnClick()
+        protected override void OnClick()
         {
             var executor = CommandsManager.Instance.Executor;
             if (executor is Unit unit)

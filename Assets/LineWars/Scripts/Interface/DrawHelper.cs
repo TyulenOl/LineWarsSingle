@@ -31,8 +31,14 @@ public static class DrawHelper
                 return Resources.Load<Sprite>("UI/Sorokin/Icons/AttackOrder");
             case CommandType.Ram:
                 return Resources.Load<Sprite>("UI/Sorokin/Icons/RamOrder");
+            case CommandType.ShotUnit:
+                return Resources.Load<Sprite>("UI/Sorokin/Icons/ThrowOrder");
+            case CommandType.BlowWithSwing:
+                return Resources.Load<Sprite>("UI/Sorokin/Icons/BlowOrder");
             case CommandType.Heal:
                 return Resources.Load<Sprite>("UI/Sorokin/Icons/Heal");
+            case CommandType.SacrificePerun:
+                return Resources.Load<Sprite>("UI/Sorokin/Icons/SacryficeOrder");
             case CommandType.Fire:
                 return Resources.Load<Sprite>("UI/Sorokin/Icons/DistanseAttackOrder");
             case CommandType.Move:

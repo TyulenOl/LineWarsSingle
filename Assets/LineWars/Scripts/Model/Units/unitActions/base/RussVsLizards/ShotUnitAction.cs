@@ -30,11 +30,17 @@ namespace LineWars.Model
                    && Executor != unit;
         }
 
-        public bool IsAvailable(TUnit target1, TNode target2)
+        public bool IsAvailable(TUnit unitTarget, TNode nodeTarget)
         {
-            return IsAvailable(target1)
-                   && target2 != Executor.Node
-                   && target2 != target1.Node;
+            return IsAvailable(unitTarget)
+                   && BanCondition(unitTarget, nodeTarget)
+                   && nodeTarget != Executor.Node
+                   && nodeTarget != unitTarget.Node;
+        }
+
+        private bool BanCondition(TUnit unit, TNode node)
+        {
+            return node.CanOwnerMove(unit.OwnerId);
         }
 
         public void Execute(TUnit takenUnit, TNode node)
