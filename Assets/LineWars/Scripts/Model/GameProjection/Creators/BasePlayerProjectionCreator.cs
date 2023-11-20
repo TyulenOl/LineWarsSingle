@@ -14,7 +14,6 @@ namespace LineWars.Model
             {
                 Id = original.Id,
                 Original = original,
-                Base = playerBase,
                 Rules = original.Rules,
                 Income = original.Income,
                 CurrentMoney = original.CurrentMoney,
@@ -41,7 +40,6 @@ namespace LineWars.Model
             {
                 Id = playerProjection.Id,
                 Original = playerProjection.Original,
-                Base = playerBase,
                 Rules = playerProjection.Rules,
                 Income = playerProjection.Income,
                 CurrentMoney = playerProjection.CurrentMoney,
