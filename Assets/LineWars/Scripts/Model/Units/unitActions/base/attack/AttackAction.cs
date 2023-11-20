@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-
+﻿
 namespace LineWars.Model
 {
     public abstract class AttackAction<TNode, TEdge, TUnit> :
         UnitAction<TNode, TEdge, TUnit>,
         IAttackAction<TNode, TEdge, TUnit>
-
         where TNode : class, INodeForGame<TNode, TEdge, TUnit>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
@@ -16,7 +11,7 @@ namespace LineWars.Model
         public bool AttackLocked { get; protected set; }
         public int Damage { get; protected set; }
         public bool IsPenetratingDamage { get; protected set; }
-        
+
         public bool CanAttack(ITargetedAlive enemy, bool ignoreActionPointsCondition = false) =>
             CanAttackFrom(Executor.Node, enemy, ignoreActionPointsCondition);
 
@@ -48,17 +43,20 @@ namespace LineWars.Model
         {
             return false;
         }
+
         public virtual bool CanAttackFrom(TNode node, TEdge edge, bool ignoreActionPointsCondition = false)
         {
             return false;
         }
+
         public virtual void Attack(TUnit unit)
         {
         }
+
         public virtual void Attack(TEdge edge)
         {
         }
-        
+
         protected AttackAction(TUnit executor, int damage, bool isPenetratingDamage) : base(executor)
         {
             Damage = damage;

@@ -13,11 +13,10 @@ namespace LineWars.Model
         /// <summary>
         /// указывет на то, нужно ли захватывать точку после атаки
         /// </summary>
-        [field: SerializeField]
-        public bool InitialOnslaught { get; private set; }
+        [field: SerializeField] public bool InitialOnslaught { get; private set; }
 
         [SerializeField] private UnitMeleeAttackAnimation attackAnimation;
-
+        
         public bool Onslaught => Action.Onslaught;
         public UnitBlockerSelector BlockerSelector => Action.BlockerSelector;
         protected override bool NeedAutoComplete => false;
@@ -26,7 +25,11 @@ namespace LineWars.Model
         {
             base.Initialize();
             TryInitializeAttackAnimation();
-            Action.Moved += node => Executor.MovementLogic.MoveTo(node.transform.position);
+            Action.Moved += node =>
+            {
+                Player.LocalPlayer.RecalculateVisibility();
+                Executor.MovementLogic.MoveTo(node.transform.position);
+            };
         }
 
 

@@ -1,6 +1,4 @@
-﻿using System;
-using JetBrains.Annotations;
-
+﻿
 namespace LineWars.Model
 {
     public class DistanceAttackAction<TNode, TEdge, TUnit> :
