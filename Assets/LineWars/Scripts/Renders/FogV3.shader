@@ -27,8 +27,7 @@
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
-
-            #include "UnityCG.cginc"
+            
 
             struct appdata
             {
