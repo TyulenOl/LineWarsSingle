@@ -21,10 +21,9 @@ namespace LineWars.Model
         private float initialXScale;
         private float initialYScale;
 
-        public override void Initialize(Unit ownerUnit)
+        protected void Start()
         {
-            base.Initialize(ownerUnit);
-            if(ownerUnit.UnitDirection == UnitDirection.Left)
+            if (ownerUnit.UnitDirection == UnitDirection.Left)
                 mainSprite = leftPartSprite;
             else
                 mainSprite = rightPartSprite;

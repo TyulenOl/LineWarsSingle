@@ -3,7 +3,6 @@ using UnityEngine.Events;
 
 namespace LineWars.Model
 {
-    [RequireComponent(typeof(MonoMeleeAttackAction))]
     public partial class UnitMeleeAttackAnimation : UnitAnimation
     {
         private MonoMeleeAttackAction action;
@@ -23,10 +22,11 @@ namespace LineWars.Model
             InitializeStateMachine();
         }
 
-        protected override void Start()
+        protected void Start()
         {
-            base.Start();
-            action = GetComponent<MonoMeleeAttackAction>();
+            action = ownerUnit.GetComponent<MonoMeleeAttackAction>();
+            if (action == null)
+                Debug.LogWarning("Melee Attack Animation without Melee Attack Action!");
         }
 
         private void Update()

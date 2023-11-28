@@ -29,9 +29,8 @@ namespace LineWars.Model
         private float shakeMagnitude;
         private float passedTime;
 
-        protected override void Start()
+        protected void Start()
         {
-            base.Start();
             shakeMagnitude = initialShakeMagnitude;
             if (ownerUnit.UnitDirection == UnitDirection.Left)
                 mainSprite = leftSprite;
