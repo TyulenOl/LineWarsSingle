@@ -26,13 +26,27 @@ namespace LineWars
             return CanExecuteTurnProgrammedAITurn(PhaseType.Fight);
         }
 
+        protected override bool CanExecuteBuy()
+        {
+            return CanExecuteTurnProgrammedAITurn(PhaseType.Buy);
+        }
+
         private bool CanExecuteTurnProgrammedAITurn(PhaseType phaseType)
         {
             return turns.TryGetValue(phaseType, out var phaseTurns);
         }
 
-        private void ExecuteEnemyProgrammedAITurn(PhaseType phaseType)
+        protected override void ExecuteFight()
         {
+            base.ExecuteFight();
+            turns[PhaseType.Fight].GetNextTurn().Execute();
+            FinishTurn();
+        }
+
+        protected override void ExecuteReplenish()
+        {
+            base.ExecuteReplenish();
+            FinishTurn();
         }
     }
 }

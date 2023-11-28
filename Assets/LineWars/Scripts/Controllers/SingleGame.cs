@@ -15,16 +15,14 @@ namespace LineWars
     {
         public static SingleGame Instance { get; private set; }
 
-        [Header("Logic")] 
-        [SerializeField] private PlayerBuilder playerSpawn;
+        [Header("Logic")] [SerializeField] private PlayerBuilder playerSpawn;
 
-        [Header("Players")] 
-        [SerializeField] private Player playerPrefab;
+        [Header("Players")] [SerializeField] private Player playerPrefab;
         [SerializeField] private List<BasePlayer> enemiesPrefabs;
         [SerializeField] private AIType aiType;
 
-        [Header("AI Options")]
-        [SerializeField] private GameEvaluator gameEvaluator;
+        [Header("AI Options")] [SerializeField]
+        private GameEvaluator gameEvaluator;
 
         [SerializeField] private AIBuyLogicData aiBuyLogicData;
         [SerializeField, Min(1)] private int aiDepth;
@@ -62,6 +60,8 @@ namespace LineWars
             InitializeAIs();
 
             InitializeGameReferee();
+            
+            RegisterAllPlayers();
 
 
             StartCoroutine(StartGameCoroutine());
@@ -70,6 +70,15 @@ namespace LineWars
             {
                 yield return null;
                 PhaseManager.Instance.StartGame();
+            }
+        }
+
+        private void RegisterAllPlayers()
+        {
+            foreach (var (key, value) in AllPlayers)
+            {
+                PhaseManager.Instance.RegisterActor(value);
+                Debug.Log($"{value.name} registered");
             }
         }
 

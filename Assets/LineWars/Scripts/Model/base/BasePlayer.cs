@@ -13,8 +13,7 @@ namespace LineWars.Model
     /// </summary>
     public abstract class BasePlayer : MonoBehaviour, IActor, IBasePlayer
     {
-        [field: SerializeField, ReadOnlyInspector]
-        public int Id { get; private set; }
+        [field: SerializeField, ReadOnlyInspector] public int Id { get; private set; }
 
         [SerializeField, ReadOnlyInspector] private int money;
 
@@ -23,15 +22,13 @@ namespace LineWars.Model
         /// </summary>
         [SerializeField, ReadOnlyInspector] private int income;
 
-        [field: SerializeField] public List<Node> InitialSpawns { get; private set; }
         [field: SerializeField] public PhaseExecutorsData PhaseExecutorsData { get; private set; }
         public NationEconomicLogic EconomicLogic => Nation.NationEconomicLogic;
+        public List<Node> InitialSpawns { get; private set; }
 
-        [field: SerializeField, ReadOnlyInspector]
-        public Node Base { get; private set; }
+        [field: SerializeField, ReadOnlyInspector] public Node Base { get; private set; }
 
-        [field: SerializeField, ReadOnlyInspector]
-        public PlayerRules Rules { get; private set; }
+        [field: SerializeField, ReadOnlyInspector] public PlayerRules Rules { get; private set; }
 
         public PhaseType CurrentPhase { get; private set; }
         public Nation Nation { get; private set; }
@@ -39,7 +36,7 @@ namespace LineWars.Model
         public HashSet<PhaseType> PhaseExceptions { get; set; }
 
 
-        private HashSet<Owned> myOwned = new();
+        private readonly HashSet<Owned> myOwned = new();
         private readonly List<Node> nodes = new();
         private readonly List<Unit> units = new();
 
@@ -87,11 +84,6 @@ namespace LineWars.Model
 
         protected virtual void Start()
         {
-            if (PhaseManager.Instance != null)
-            {
-                PhaseManager.Instance.RegisterActor(this);
-                Debug.Log($"{name} registered");
-            }
         }
 
         protected virtual void OnEnable()
@@ -111,8 +103,7 @@ namespace LineWars.Model
             CurrentMoney = Rules.StartMoney;
             Income = Rules.DefaultIncome;
             Nation = spawnInfo.SpawnNode.Nation;
-
-            //SingleGame.Instance.AllPlayers.Add(spawnInfo.PlayerIndex, this);
+            
             name = $"{GetType().Name}{spawnInfo.PlayerIndex} {spawnInfo.SpawnNode.name}";
 
             InitialSpawns = spawnInfo.SpawnNode.InitialSpawns;

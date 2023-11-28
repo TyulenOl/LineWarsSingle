@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace LineWars
 {
-    public class Move : AITurn
+    public class MoveAITurn : AITurn
     {
         [SerializeField] private PointerToUnit unit;
         [SerializeField] private Node toNode;

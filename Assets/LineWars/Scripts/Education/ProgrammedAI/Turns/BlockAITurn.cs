@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace LineWars
 {
-    public class Block: AITurn
+    public class BlockAITurn: AITurn
     {
         [SerializeField] private PointerToUnit unit;
         public override void Execute()

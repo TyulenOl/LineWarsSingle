@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace LineWars
 {
-    public class MeleeAttack : AITurn
+    public class MeleeAttackAITurn : AITurn
     {
         [SerializeField] private PointerToUnit myUnit;
         [SerializeField] private PointerToUnit enemyUnit;

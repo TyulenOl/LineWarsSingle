@@ -9,7 +9,7 @@ namespace LineWars
     {
         [SerializeField, ReadOnlyInspector] private int currentIndex;
 
-        public AITurn GetGetNextTurn()
+        public AITurn GetNextTurn()
         {
             var turns = GetComponents<AITurn>();
             if (currentIndex < turns.Length)
