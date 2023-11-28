@@ -24,16 +24,6 @@ namespace LineWars
                 .Concat(new[] {me})
                 .Select(x => new KeyValuePair<BasePlayer, int>(x, 0))
             );
-
-            foreach (var (player, score) in playersScore)
-                player.Defeated += () =>
-                {
-                    playersScore.Remove(player);
-                    if (player == me)
-                        Lose();
-                    if (playersScore.Count == 1) // остался только игрок
-                        Win();
-                };
         }
 
         public int GetScoreForPlayer(BasePlayer basePlayer)

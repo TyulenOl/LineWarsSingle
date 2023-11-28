@@ -10,6 +10,9 @@ namespace LineWars.Controllers
     {
         public static CommandsManager Instance { get; private set; }
 
+        public bool ActiveSelf => isActive;
+        private bool isActive = true;
+
         private IMonoTarget target;
         private IMonoExecutor executor;
         private bool canCancelExecutor = true;
@@ -25,19 +28,20 @@ namespace LineWars.Controllers
 
         private CommandsManagerBuyState buyState;
 
-        
+
         [SerializeField] private List<CommandType> hiddenCommands;
 
         private HashSet<CommandType> hiddenCommandsSet;
         public event Action<IMonoTarget, IMonoTarget> TargetChanged;
         public event Action<IMonoExecutor, IMonoExecutor> ExecutorChanged;
-        
+
         private OnWaitingCommandMessage currentOnWaitingCommandMessage;
         public event Action<OnWaitingCommandMessage> InWaitingCommandState;
-        
-        
+
+        private List<PhaseType> skippedPhases = new();
 
         [SerializeField, ReadOnlyInspector] private CommandsManagerStateType state;
+
         private CommandsManagerStateType State
         {
             get => state;
@@ -51,11 +55,9 @@ namespace LineWars.Controllers
         }
 
         public event Action<CommandsManagerStateType> StateEntered;
-        public event Action<CommandsManagerStateType> StateExited; 
+        public event Action<CommandsManagerStateType> StateExited;
 
-        
-        
-        
+
         private Player Player => Player.LocalPlayer;
 
         private OnWaitingCommandMessage CurrentOnWaitingCommandMessage
@@ -142,9 +144,10 @@ namespace LineWars.Controllers
 
         public void ExecuteCommand(IActionCommand command)
         {
+            ValidateActiveSelf();
             if (!CanExecuteAnyCommand())
-                throw new InvalidOperationException($"В текущем состоянии командс менеджера {State}" +
-                                                    $" нельзя исполнить команду");
+                throw new InvalidOperationException(
+                    $"В текущем состоянии командс менеджера {State} нельзя исполнить команду");
             ExecuteCommandButIgnoreConstrains(command);
         }
 
@@ -177,13 +180,15 @@ namespace LineWars.Controllers
 
         public void SetUnitPreset(UnitBuyPreset preset)
         {
+            ValidateActiveSelf();
             if (stateMachine.CurrentState != buyState)
-                Debug.LogError("Can't set unit preset while not in buy state!");
+                throw new InvalidOperationException("Can't set unit preset while not in buy state!");
             buyState.SetUnitPreset(preset);
         }
 
         public void SelectCommandsPreset(CommandPreset preset)
         {
+            ValidateActiveSelf();
             if (stateMachine.CurrentState != waitingSelectCommandState)
                 throw new InvalidOperationException();
             if (!currentOnWaitingCommandMessage.Data.Contains(preset))
@@ -193,15 +198,18 @@ namespace LineWars.Controllers
 
         public void CancelCommandPreset()
         {
+            ValidateActiveSelf();
             if (stateMachine.CurrentState != waitingSelectCommandState)
             {
                 throw new InvalidOperationException("Is not targeted state to cancelAction");
             }
+
             stateMachine.SetState(findTargetState);
         }
 
         public void SelectCurrentCommand(CommandType commandType)
         {
+            ValidateActiveSelf();
             if (stateMachine.CurrentState != findTargetState)
                 throw new InvalidOperationException();
             if (CheckContainsActions(commandType))
@@ -221,6 +229,7 @@ namespace LineWars.Controllers
 
         public void CancelCurrentCommand()
         {
+            ValidateActiveSelf();
             if (stateMachine.CurrentState != currentCommandState)
                 throw new InvalidOperationException();
             stateMachine.SetState(findTargetState);
@@ -228,7 +237,19 @@ namespace LineWars.Controllers
 
         private void OnTurnChanged(PhaseType previousPhase, PhaseType currentPhase)
         {
-            switch (currentPhase)
+            if (!isActive)
+            {
+                skippedPhases.Add(currentPhase);
+                Debug.Log(currentPhase);
+                return;
+            }
+
+            ToPhase(currentPhase);
+        }
+
+        private void ToPhase(PhaseType phaseType)
+        {
+            switch (phaseType)
             {
                 case PhaseType.Idle:
                 {
@@ -240,7 +261,7 @@ namespace LineWars.Controllers
                     stateMachine.SetState(idleState);
                     break;
                 }
-                case PhaseType.Buy when Player.CanExecuteTurn(currentPhase):
+                case PhaseType.Buy when Player.CanExecuteTurn(phaseType):
                 {
                     stateMachine.SetState(buyState);
                     break;
@@ -309,6 +330,29 @@ namespace LineWars.Controllers
         {
             CurrentOnWaitingCommandMessage = commandMessage;
             stateMachine.SetState(waitingSelectCommandState);
+        }
+
+        public void Activate()
+        {
+            if (isActive) return;
+            isActive = true;
+            if (skippedPhases.Count == 0)
+                ToPhase(PhaseManager.Instance.CurrentPhase);
+            foreach (var skippedPhase in skippedPhases)
+                ToPhase(skippedPhase);
+        }
+
+        public void Deactivate()
+        {
+            if (!isActive) return;
+            isActive = false;
+            ToPhase(PhaseType.Idle);
+        }
+
+        public void ValidateActiveSelf()
+        {
+            if (!isActive)
+                throw new InvalidOperationException("Коммандс манеджер не активен!");
         }
     }
 }

@@ -53,7 +53,6 @@ namespace LineWars.Model
         public event Action<Owned> OwnedRemoved;
         public event Action<int, int> CurrentMoneyChanged;
         public event Action<int, int> IncomeChanged;
-        public event Action Defeated;
         public IReadOnlyCollection<Owned> OwnedObjects => myOwned;
         public bool IsMyOwn(Owned owned) => myOwned.Contains(owned);
 
@@ -113,17 +112,12 @@ namespace LineWars.Model
             Income = Rules.DefaultIncome;
             Nation = spawnInfo.SpawnNode.Nation;
 
-            SingleGame.Instance.AllPlayers.Add(spawnInfo.PlayerIndex, this);
+            //SingleGame.Instance.AllPlayers.Add(spawnInfo.PlayerIndex, this);
             name = $"{GetType().Name}{spawnInfo.PlayerIndex} {spawnInfo.SpawnNode.name}";
 
             InitialSpawns = spawnInfo.SpawnNode.InitialSpawns;
         }
-
-        protected virtual void OnDestroy()
-        {
-            SingleGame.Instance.AllPlayers.Remove(this);
-        }
-
+        
         #region SpawnUnit
 
         public bool CanSpawnUnit(Node node, UnitType type)
@@ -294,33 +288,13 @@ namespace LineWars.Model
         {
             nodes.Remove(node);
             Income -= Mathf.RoundToInt(Rules.IncomeModifier.Modify(node.BaseIncome));
-
-            if (nodes.Count == 0)
-                Defeat();
         }
 
         protected virtual void BeforeRemoveOwned(Unit unit)
         {
             units.Remove(unit);
         }
-
-        public void Defeat()
-        {
-            OnDefeat();
-            Defeated?.Invoke();
-        }
-
-        protected virtual void OnDefeat()
-        {
-            foreach (var unit in MyUnits.ToList())
-                Destroy(unit.gameObject);
-            foreach (var node in MyNodes.ToList())
-                node.Owner = null;
-
-            myOwned = new HashSet<Owned>();
-            Destroy(gameObject);
-        }
-
+        
         public Unit GetUnitPrefab(UnitType unitType) => Nation.GetUnitPrefab(unitType);
 
         public void FinishTurn()

@@ -42,5 +42,10 @@ namespace LineWars
             var newIndex = (index + 1) % orderData.Count;
             return orderData[newIndex];
         }
+
+        public static bool IsAnyFightPhase(this PhaseType phaseType)
+        {
+            return phaseType is PhaseType.Artillery or PhaseType.Scout or PhaseType.Fight;
+        }
     }
 }
