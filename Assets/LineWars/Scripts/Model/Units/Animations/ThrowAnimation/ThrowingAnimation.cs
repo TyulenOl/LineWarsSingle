@@ -4,8 +4,12 @@ namespace LineWars.Model
 {
     public class ThrowingAnimation : UnitAnimation
     {
-        [SerializeField] private float speed = 10f;
-        [SerializeField] private float rotationSpeedInDegrees = 3f;
+        [SerializeField] private float minSpeed = 10f;
+        [SerializeField] private float maxSpeed = 10f;
+
+        [SerializeField] private float minRotationInDegrees = 3f;
+        [SerializeField] private float maxRotationInDegrees = 3f;
+
         [SerializeField] private float maxAddititveScale = 0.5f;
 
         [SerializeField] private AnimationCurve scaleCurve;
@@ -14,27 +18,31 @@ namespace LineWars.Model
         [SerializeField] private SpriteRenderer leftPartSprite;
         [SerializeField] private SpriteRenderer rightPartSprite;
 
-        private Vector2 Destination;
+        private Vector2 destination;
         private float totalDistance;
+        private float currentSpeed;
+        private float currentRotationInDegrees;
 
         private SpriteRenderer mainSprite;
-        private float initialXScale;
-        private float initialYScale;
 
-        public override void Initialize(Unit ownerUnit)
+        private Vector3 initialLocalScale;
+        private Quaternion initialRotation;
+
+        public override void Execute(AnimationContext context)
         {
-            base.Initialize(ownerUnit);
-            if(ownerUnit.UnitDirection == UnitDirection.Left)
+            if (ownerUnit.UnitDirection == UnitDirection.Left)
                 mainSprite = leftPartSprite;
             else
                 mainSprite = rightPartSprite;
-            initialXScale = mainSprite.transform.localScale.x;
-            initialYScale = mainSprite.transform.localScale.y;
-        }
-        public override void Execute(AnimationContext context)
-        {
-            Destination = context.TargetNode.transform.position;
-            totalDistance = Vector2.Distance(Destination, ownerUnit.transform.position);
+
+            initialLocalScale = mainSprite.transform.localScale;
+            initialRotation = mainSprite.transform.rotation;
+
+            destination = context.TargetNode.transform.position;
+            totalDistance = Vector2.Distance(destination, ownerUnit.transform.position);
+            currentSpeed = Random.Range(minSpeed, maxSpeed);
+            currentRotationInDegrees = Random.Range(minRotationInDegrees, maxRotationInDegrees);
+
             IsPlaying = true;
         }
 
@@ -52,31 +60,30 @@ namespace LineWars.Model
         private void Move()
         {
             ownerUnit.transform.position = 
-                Vector2.MoveTowards(ownerUnit.transform.position, Destination, speed * Time.deltaTime);
+                Vector2.MoveTowards(ownerUnit.transform.position, destination, currentSpeed * Time.deltaTime);
         }
        
         private void ChangeSize()
         {
-            var completionRate = Vector2.Distance(ownerUnit.transform.position, Destination) / totalDistance;
+            var completionRate = Vector2.Distance(ownerUnit.transform.position, destination) / totalDistance;
             var scaleAdditiveAmount = scaleCurve.Evaluate(completionRate);
             mainSprite.transform.localScale = 
-                new Vector3(initialXScale + scaleAdditiveAmount * maxAddititveScale,
-                initialXScale + scaleAdditiveAmount * maxAddititveScale,
+                new Vector3(initialLocalScale.x + scaleAdditiveAmount * maxAddititveScale,
+                initialLocalScale.x + scaleAdditiveAmount * maxAddititveScale,
                 1);
         }
 
         private void Rotate()
         {
-            var oldZ = ownerUnit.transform.rotation.z;
-            mainSprite.transform.Rotate(0f, 0f, oldZ + rotationSpeedInDegrees);
+            mainSprite.transform.Rotate(0f, 0f, currentRotationInDegrees);
         }
 
         private void CheckIsAtDestination()
         {
-            if(Destination == (Vector2)ownerUnit.transform.position)
+            if(destination == (Vector2)ownerUnit.transform.position)
             {
-                mainSprite.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
-                mainSprite.transform.localScale = new Vector2(initialXScale, initialYScale);
+                mainSprite.transform.rotation = initialRotation;
+                mainSprite.transform.localScale = initialLocalScale;
                 IsPlaying = false;
             }
         }

@@ -7,15 +7,19 @@ namespace LineWars.Model
     public class PerunAnimation : UnitAnimation
     {
         [SerializeField] private float deathTimeInSeconds = 0.6f;
+        [SerializeField] private UnitAnimation standardDeathAnimation;
+
         [Header("Shake Settings")]
         [SerializeField] private float initialShakeMagnitude = 0.3f;
         [SerializeField] private float additiveShakeMagnitude = 0.3f;
         [SerializeField] private float shakePauseInSeconds = 0.04f;
         [SerializeField] private AnimationCurve additiveShakeCurve;
+
         [Header("Transparent Settings")]
         [SerializeField] private AnimationCurve transparencyCurve;
         [SerializeField] private SpriteRenderer leftSprite;
         [SerializeField] private SpriteRenderer rightSprite;
+
         [Header("Lightning Settings")]
         [SerializeField] private float pauseBeforeLightningInSeconds = 0.1f;
         [SerializeField] private float lightningTimeInSeconds = 0.5f;
@@ -29,23 +33,19 @@ namespace LineWars.Model
         private float shakeMagnitude;
         private float passedTime;
 
-        protected override void Start()
+        public override void Execute(AnimationContext context)
         {
-            base.Start();
-            shakeMagnitude = initialShakeMagnitude;
             if (ownerUnit.UnitDirection == UnitDirection.Left)
                 mainSprite = leftSprite;
             else
                 mainSprite = rightSprite;
-        }
 
-        public override void Execute(AnimationContext context)
-        {
             targetNode = context.TargetNode;
             IsPlaying = true;
             shakeMagnitude = initialShakeMagnitude;
             startPosition = mainSprite.transform.position;
             StartCoroutine(ShakesCoroutine());
+            Destroy(standardDeathAnimation);
         }
 
         private IEnumerator ShakesCoroutine()

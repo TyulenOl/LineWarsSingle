@@ -20,11 +20,11 @@ namespace LineWars.Model
 
         private IEnumerator StartStopCoroutine()
         {
-            startPosition = transform.position;
+            startPosition = ownerUnit.transform.position;
             shakesCoroutine = StartCoroutine(ShakesCoroutine());
             yield return new WaitForSeconds(timeInSeconds);
             StopCoroutine(shakesCoroutine);
-            transform.position = startPosition;
+            ownerUnit.transform.position = startPosition;
             IsPlaying = false;
         }
 
@@ -33,7 +33,7 @@ namespace LineWars.Model
             while (true)
             {
                 var randomDirection = Random.insideUnitCircle * shakeMagnitude;
-                transform.position = startPosition + randomDirection;
+                ownerUnit.transform.position = startPosition + randomDirection;
                 yield return new WaitForSeconds(shakePauseInSeconds);
             }   
         }
