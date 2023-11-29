@@ -10,9 +10,6 @@ public class EnemyTurnPanel : MonoBehaviour
     [SerializeField] private Image lizardsImage;
     [SerializeField] private Image rusImage;
 
-    private const float MIN_ALPHA = 130f;
-    private const float ALPHA_DECREASE_MODIFIER = -3f;
-
     private bool isCoroutinActive;
 
     public bool IsCoroutinActive
@@ -28,40 +25,10 @@ public class EnemyTurnPanel : MonoBehaviour
         }
     }
 
-    private void Awake()
-    {
-        alphaDecreaseModifier = ALPHA_DECREASE_MODIFIER;
-    }
-
-    private void FixedUpdate()
-    {
-        if (IsCoroutinActive)
-        {
-            ChangeAlpha();
-        }
-    }
-
     private void Hide()
     {
         lizardsImage.gameObject.SetActive(false);
         StartCoroutine(HideCoroutine());
-    }
-
-    private void ChangeAlpha()
-    {
-        var currentAlpha = lizardsImage.color.a * 255;
-        if (currentAlpha >= 255)
-        {
-            alphaDecreaseModifier = -Math.Abs(alphaDecreaseModifier);
-        }
-        else if (currentAlpha <= MIN_ALPHA)
-        {
-            alphaDecreaseModifier = Math.Abs(alphaDecreaseModifier);
-        }
-
-        var resultAlpha = currentAlpha + alphaDecreaseModifier;
-        lizardsImage.color = new Color(lizardsImage.color.r, lizardsImage.color.g, lizardsImage.color.b,
-            resultAlpha / 255f);
     }
 
     IEnumerator HideCoroutine()

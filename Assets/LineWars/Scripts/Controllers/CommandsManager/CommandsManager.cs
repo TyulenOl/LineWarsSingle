@@ -139,7 +139,8 @@ namespace LineWars.Controllers
 
         private void Start()
         {
-            stateMachine.SetState(findExecutorState);
+            if(isActive)
+                stateMachine.SetState(findExecutorState);
             Player.LocalPlayer.TurnChanged += OnTurnChanged;
         }
 
@@ -272,7 +273,6 @@ namespace LineWars.Controllers
             if (!isActive)
             {
                 skippedPhases.Add(currentPhase);
-                Debug.Log(currentPhase);
                 return;
             }
 
@@ -371,6 +371,7 @@ namespace LineWars.Controllers
                 ToPhase(PhaseManager.Instance.CurrentPhase);
             foreach (var skippedPhase in skippedPhases)
                 ToPhase(skippedPhase);
+            skippedPhases.Clear();
         }
 
         public void Deactivate()
