@@ -8,7 +8,6 @@ namespace LineWars.Education
     {
         private void OnEnable()
         {
-            CommandsManager.Instance.Activate();
             CommandsManager.Instance.ExecutorChanged += OnExecutorChanged;
         }
 

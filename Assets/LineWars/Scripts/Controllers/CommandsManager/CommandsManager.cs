@@ -9,11 +9,7 @@ namespace LineWars.Controllers
     public partial class CommandsManager : MonoBehaviour
     {
         public static CommandsManager Instance { get; private set; }
-
-        [SerializeField, ReadOnlyInspector] private bool isActive = true;
-        public bool ActiveSelf => isActive;
-
-
+        
         [field: SerializeField] private CommandsManagerConstrainsBase Constrains { get; set; }
         public bool HaveConstrains => Constrains != null;
         public bool NotHaveConstraints => Constrains == null;
@@ -36,11 +32,10 @@ namespace LineWars.Controllers
 
         [SerializeField] private List<CommandType> hiddenCommands;
         private HashSet<CommandType> hiddenCommandsSet;
-
-        private readonly List<PhaseType> skippedPhases = new();
-
+        
         public event Action<ICommand> CommandIsExecuted;
 
+        
         [SerializeField, ReadOnlyInspector] private CommandsManagerStateType state;
 
         private CommandsManagerStateType State
@@ -139,8 +134,7 @@ namespace LineWars.Controllers
 
         private void Start()
         {
-            if(isActive)
-                stateMachine.SetState(findExecutorState);
+            stateMachine.SetState(findExecutorState);
             Player.LocalPlayer.TurnChanged += OnTurnChanged;
         }
 
@@ -157,7 +151,6 @@ namespace LineWars.Controllers
 
         public void ExecuteSimpleCommand(IActionCommand command)
         {
-            ValidateActiveSelf();
             if (HaveConstrains
                 && (!Constrains.CanExecuteSimpleAction()
                     || !Constrains.IsMyCommandType(command.Action.CommandType)))
@@ -199,7 +192,6 @@ namespace LineWars.Controllers
 
         public void SetUnitPreset(UnitBuyPreset preset)
         {
-            ValidateActiveSelf();
             if (HaveConstrains && !Constrains.CanSelectUnitBuyPreset(preset))
             {
                 Debug.LogError("Нельзя выбрать текущий пресет ввиду огрничения");
@@ -213,7 +205,6 @@ namespace LineWars.Controllers
 
         public void SelectCommandsPreset(CommandPreset preset)
         {
-            ValidateActiveSelf();
             if (stateMachine.CurrentState != waitingSelectCommandState)
                 throw new InvalidOperationException();
             if (!currentOnWaitingCommandMessage.Data.Contains(preset))
@@ -225,7 +216,6 @@ namespace LineWars.Controllers
 
         public void CancelCommandPreset()
         {
-            ValidateActiveSelf();
             if (stateMachine.CurrentState != waitingSelectCommandState)
             {
                 throw new InvalidOperationException("Is not targeted state to cancelAction");
@@ -236,7 +226,6 @@ namespace LineWars.Controllers
 
         public void SelectCurrentCommand(CommandType commandType)
         {
-            ValidateActiveSelf();
             if (HaveConstrains && !Constrains.CanSelectCurrentCommand())
             {
                 Debug.LogError("Нельзя выбрать конкретную команду ввиду ограничения");
@@ -262,7 +251,6 @@ namespace LineWars.Controllers
 
         public void CancelCurrentCommand()
         {
-            ValidateActiveSelf();
             if (stateMachine.CurrentState != currentCommandState)
                 throw new InvalidOperationException();
             stateMachine.SetState(findTargetState);
@@ -270,12 +258,6 @@ namespace LineWars.Controllers
 
         private void OnTurnChanged(PhaseType previousPhase, PhaseType currentPhase)
         {
-            if (!isActive)
-            {
-                skippedPhases.Add(currentPhase);
-                return;
-            }
-
             ToPhase(currentPhase);
         }
 
@@ -361,30 +343,6 @@ namespace LineWars.Controllers
         {
             CurrentOnWaitingCommandMessage = commandMessage;
             stateMachine.SetState(waitingSelectCommandState);
-        }
-
-        public void Activate()
-        {
-            if (isActive) return;
-            isActive = true;
-            if (skippedPhases.Count == 0)
-                ToPhase(PhaseManager.Instance.CurrentPhase);
-            foreach (var skippedPhase in skippedPhases)
-                ToPhase(skippedPhase);
-            skippedPhases.Clear();
-        }
-
-        public void Deactivate()
-        {
-            if (!isActive) return;
-            isActive = false;
-            ToPhase(PhaseType.Idle);
-        }
-
-        public void ValidateActiveSelf()
-        {
-            if (!isActive)
-                throw new InvalidOperationException("Коммандс манеджер не активен!");
         }
     }
 }
