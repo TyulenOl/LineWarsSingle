@@ -104,12 +104,7 @@ namespace LineWars.Model
                 BlueprintList.Add(command);
             }
         }
-
-        public void Visit(SacrificeForPerunAction<TNode, TEdge, TUnit> action)
-        {
-            
-        }
-
+        
         public void Visit(RamAction<TNode, TEdge, TUnit> action)
         {
             foreach (var node in Graph.GetNodesInRange(action.Executor.Node, 1))
@@ -124,20 +119,30 @@ namespace LineWars.Model
                 }
             }
         }
+        
+        public void Visit(SacrificeForPerunAction<TNode, TEdge, TUnit> action)
+        {
+            // TODO 
+        }
 
         public void Visit(BlowWithSwingAction<TNode, TEdge, TUnit> action)
         {
-          
+            // TODO 
         }
 
         public void Visit(ShotUnitAction<TNode, TEdge, TUnit> action)
         {
-           
+            // TODO 
         }
 
         public void Visit(RLBuildAction<TNode, TEdge, TUnit> action)
         {
-            
+            // TODO 
+        }
+
+        public void Visit(HealYourselfAction<TNode, TEdge, TUnit> action)
+        {
+            // TODO 
         }
 
 

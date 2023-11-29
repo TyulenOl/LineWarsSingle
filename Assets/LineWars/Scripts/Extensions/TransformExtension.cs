@@ -1,8 +1,25 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public static class TransformExtension
 {
+    public static int GetLastActiveChildIndex(this Transform transform)
+    {
+        try
+        {
+            return transform.GetChildren()
+                .Select((el, i) => (el, i))
+                .Last(tuple => tuple.el.gameObject.activeSelf).i;
+        }
+        catch (Exception)
+        {
+            return -1;
+        }
+
+    }
+
     public static IEnumerable<Transform> GetChildren(this Transform transform)
     {
         var childesCount = transform.childCount;

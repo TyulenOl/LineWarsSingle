@@ -40,4 +40,14 @@ public static class IEnumerableExtension
     {
         return enumerable.Aggregate((i1, i2) => comparison(i1, i2) < 0 ? i1 : i2);
     }
+
+    public static void SetActiveAll(this IEnumerable<GameObject> gameObjects, bool value)
+    {
+        foreach (var gameObject in gameObjects)
+            gameObject.SetActive(value);
+    }
+    public static IEnumerable<GameObject> GameObjects(this IEnumerable<Component> components)
+    {
+        return components.Select(x => x.gameObject);
+    }
 }

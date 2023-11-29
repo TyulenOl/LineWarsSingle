@@ -96,6 +96,12 @@ namespace LineWars.Model
             Result = new RLBuildAction<TNode, TEdge, TUnit>(Unit, action.PossibleBuildings, action.Factory);
             Result.ActionModifier = action.ActionModifier;
         }
+
+        public void Visit(HealYourselfAction<TNode, TEdge, TUnit> action)
+        {
+            Result = new HealYourselfAction<TNode, TEdge, TUnit>(Unit, action.HealAmount);
+            Result.ActionModifier = action.ActionModifier;
+        }
     }
 
     public static class CopyActionVisitor

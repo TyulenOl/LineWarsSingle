@@ -16,5 +16,6 @@ namespace LineWars.Model
         public void Visit(MonoBlowWithSwingAction action);
         public void Visit(MonoShotUnitAction action);
         public void Visit(MonoRLBuildAction action);
+        public void Visit(MonoHealYourselfAction action);
     }
 }
