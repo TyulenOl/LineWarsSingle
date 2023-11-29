@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using LineWars.Model;
 using UnityEngine;
@@ -39,6 +40,11 @@ namespace LineWars.Interface
                     chosenPresetInfoDrawer.Init(Player.LocalPlayer.Nation.GetUnitPrefab(presetDrawer.UnitBuyPreset.FirstUnitType));
                 });
             }
+        }
+
+        private void OnEnable()
+        {
+            chosenPresetInfoDrawer.RestoreDefaults();
         }
     }
 }
