@@ -56,6 +56,8 @@ namespace LineWars.Model
 
         private void ExecuteAttack(ITargetedAlive enemy)
         {
+            if (enemy is Unit unit1 && unit1.TryGetComponent(out AnimationResponses responses1))
+                responses1.TrySetDeathAnimation(AnimationResponseType.DistanceDied);
             base.Attack(enemy);
             if (enemy == null || enemy.CurrentHp <= 0)
             {
