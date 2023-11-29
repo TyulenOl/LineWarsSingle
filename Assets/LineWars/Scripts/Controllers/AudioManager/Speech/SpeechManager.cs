@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace LineWars.Controllers.Speech
+namespace LineWars.Controllers
 {
     [RequireComponent(typeof(AudioSource))]
     public class SpeechManager : MonoBehaviour

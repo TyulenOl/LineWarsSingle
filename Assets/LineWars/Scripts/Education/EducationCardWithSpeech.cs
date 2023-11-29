@@ -1,5 +1,5 @@
 ﻿using System;
-using LineWars.Controllers.Speech;
+using LineWars.Controllers;
 using UnityEngine;
 
 namespace LineWars.Education
