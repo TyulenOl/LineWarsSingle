@@ -7,7 +7,7 @@ namespace LineWars.Education
     {
         [Header("")]
         [SerializeField] private PointerToUnit unit;
-        [SerializeField] private PointerToUnit enemy;
+        [SerializeField] private Node node;
         
         public override bool IsMyCommandType(CommandType commandType)
         {
@@ -21,7 +21,7 @@ namespace LineWars.Education
 
         public override bool CanSelectTarget(int targetId, IMonoTarget target)
         {
-            return targetId == 0 && target.Equals(enemy.GetUnit());
+            return targetId == 0 && target.Equals(node);
         }
 
         public override bool CanSelectCurrentCommand()

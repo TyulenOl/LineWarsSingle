@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -378,7 +379,13 @@ namespace LineWars.Controllers
         {
             if (!isActive) return;
             isActive = false;
-            ToPhase(PhaseType.Idle);
+            StartCoroutine(DelayedToPhase());
+        
+            IEnumerator DelayedToPhase()
+            {
+                yield return null;
+                ToPhase(PhaseType.Idle);
+            }
         }
 
         public void ValidateActiveSelf()

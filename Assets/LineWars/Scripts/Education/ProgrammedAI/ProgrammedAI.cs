@@ -56,7 +56,6 @@ namespace LineWars.Model
 
         private void ExecuteProgrammedAITurn(PhaseType phaseType)
         {
-            base.ExecuteFight();
             if (turns[phaseType].TryGetNext(out var turn))
             {
                 turn.Execute();
