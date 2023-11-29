@@ -9,4 +9,3 @@ namespace LineWars.Interface
         public void FinishTurn() => Player.LocalPlayer.FinishTurn();
     }
 }
-

@@ -6,14 +6,11 @@ namespace LineWars.Interface
     [RequireComponent(typeof(PathCreator))]
     public class BezierUILineController : PathSceneTool
     {
-        [Header("Line Settings")] 
-        public float lineWidth = 1;
+        [Header("Line Settings")] public float lineWidth = 1;
 
-        [Header("Render settings")] 
-        public Color lineColor = Color.black;
-        
-        [SerializeField, HideInInspector] 
-        private BezierUILine line;
+        [Header("Render settings")] public Color lineColor = Color.black;
+
+        [SerializeField, HideInInspector] private BezierUILine line;
 
         protected override void PathUpdated()
         {
@@ -41,6 +38,7 @@ namespace LineWars.Interface
                 if (transform.parent != null)
                     line.transform.SetParent(transform.parent);
             }
+
             line.transform.rotation = Quaternion.identity;
             line.transform.position = transform.position;
 

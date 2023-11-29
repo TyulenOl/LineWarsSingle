@@ -8,6 +8,12 @@ namespace LineWars
     public class PlayerInitializer : MonoBehaviour
     {
         [SerializeField] private List<BasePlayer> playersPrefabs;
+
+        [Header("AI Options")]
+        [SerializeField] private GameEvaluator gameEvaluator;
+        [SerializeField] private AIBuyLogicData aiBuyLogicData;
+        [SerializeField] private int aiDepth;
+
         public T Initialize<T>(SpawnInfo spawnInfo) where T : BasePlayer
         {
             var player = Instantiate(playersPrefabs.OfType<T>().First());
@@ -31,7 +37,21 @@ namespace LineWars
                 }
             }
 
+            //слабейший костыль
+            if(player is EnemyAI enemyAI)
+                InitializeAISettings(enemyAI);
+            
             return player;
+        }
+
+        private void InitializeAISettings(EnemyAI enemyAI)
+        {
+            if(gameEvaluator != null)
+                enemyAI.SetNewGameEvaluator(gameEvaluator);
+            if(aiBuyLogicData != null)
+                enemyAI.SetNewBuyLogic(aiBuyLogicData);
+            if (aiDepth > 0)
+                enemyAI.Depth = aiDepth;
         }
     }
 }

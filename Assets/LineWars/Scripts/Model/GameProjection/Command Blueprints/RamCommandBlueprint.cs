@@ -20,7 +20,7 @@ namespace LineWars.Model
             var executor = projection.UnitsIndexList[ExecutorId];
             var node = projection.NodesIndexList[NodeId];
 
-            return new RamCommand<NodeProjection, EdgeProjection, UnitProjection, OwnedProjection, BasePlayerProjection>
+            return new RamCommand<NodeProjection, EdgeProjection, UnitProjection>
                 (executor, node);
         }
 
@@ -29,7 +29,7 @@ namespace LineWars.Model
             var executor = projection.UnitsIndexList[ExecutorId].Original;
             var node = projection.NodesIndexList[NodeId].Original;
 
-            return new RamCommand<Node, Edge, Unit, Owned, BasePlayer>
+            return new RamCommand<Node, Edge, Unit>
                 (executor, node);
         }
     }

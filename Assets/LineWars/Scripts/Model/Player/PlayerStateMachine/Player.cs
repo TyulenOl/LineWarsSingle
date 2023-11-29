@@ -17,7 +17,7 @@ namespace LineWars
 
         private IReadOnlyCollection<UnitType> potentialExecutors;
         private bool isTurnMade;
-        private HashSet<Node> additionalVisibleNodes = new ();
+        private readonly HashSet<Node> additionalVisibleNodes = new ();
 
         private StateMachine stateMachine;
         private PlayerPhase idlePhase;
@@ -26,21 +26,12 @@ namespace LineWars
         private PlayerPhase scoutPhase;
         private PlayerBuyPhase buyPhase;
         private PlayerReplenishPhase replenishPhase;
+
+        public event Action VisibilityRecalculated;
         
-        [field: SerializeField] public UnityEvent TurnMade {get; private set;}
         public IReadOnlyCollection<UnitType> PotentialExecutors => potentialExecutors;
-        public IReadOnlyDictionary<Node, bool> VisibilityMap;
+        public IReadOnlyDictionary<Node, bool> VisibilityMap { get; private set; }
         public IEnumerable<Node> AdditionalVisibleNodes => additionalVisibleNodes;
-        public bool IsTurnMade
-        {
-            get => isTurnMade;
-            private set
-            {
-                isTurnMade = value;
-                if(value)
-                    TurnMade.Invoke();
-            }
-        }
 
 
         protected override void Awake()
@@ -60,7 +51,6 @@ namespace LineWars
             base.OnEnable();
             OwnedAdded += OnOwnedAdded;
             OwnedRemoved += OnOwnerRemoved;
-            CommandsManager.Instance.CommandExecuted.AddListener(OnExecuteCommand);
         }
 
         protected override void OnDisable()
@@ -68,7 +58,6 @@ namespace LineWars
             base.OnDisable();
             OwnedAdded -= OnOwnedAdded;
             OwnedRemoved -= OnOwnerRemoved;
-            CommandsManager.Instance.CommandExecuted.RemoveListener(OnExecuteCommand);
         }
 
         private void InitializeStateMachine()
@@ -85,39 +74,15 @@ namespace LineWars
         private void OnOwnedAdded(Owned owned)
         {
             if(!(owned is Unit unit)) return;
-            unit.ActionPointsChanged.AddListener(ProcessActionPointsChange);
             unit.Died.AddListener(UnitOnDied);
         }
 
         private void OnOwnerRemoved(Owned owned)
         {
             if(!(owned is Unit unit)) return;
-            unit.ActionPointsChanged.RemoveListener(ProcessActionPointsChange);
             if (!unit.IsDied)
                 unit.Died.RemoveListener(UnitOnDied);
         }
-
-        private void ProcessActionPointsChange(int previousValue, int currentValue)
-        {
-            if (currentValue <= 0 && CurrentPhase != PhaseType.Idle)
-            {
-                IsTurnMade = true;
-                StartCoroutine(PauseCoroutine());
-            }
-
-            IEnumerator PauseCoroutine()
-            {
-                yield return new WaitForSeconds(pauseAfterTurn);
-                ExecuteTurn(PhaseType.Idle);
-            }
-        }
-        
-        public void FinishTurn()
-        {
-            if(!IsTurnMade) return;
-            ExecuteTurn(PhaseType.Idle);
-        }
-
         public IEnumerable<Unit> GetAllUnitsByPhase(PhaseType phaseType)
         {
             if (PhaseExecutorsData.PhaseToUnits.TryGetValue(phaseType, out var value))
@@ -133,59 +98,65 @@ namespace LineWars
         }
         
         #region Turns
-        public override void ExecuteBuy()
+
+        protected override void ExecuteBuy()
         {
             stateMachine.SetState(buyPhase);
             GameUI.Instance.SetEnemyTurn(false);
         }
 
-        public override void ExecuteArtillery()
+        protected override void ExecuteArtillery()
         {
             stateMachine.SetState(artilleryPhase);
             GameUI.Instance.ReDrawAllAvailability(GetAllUnitsByPhase(PhaseType.Artillery), true);
             GameUI.Instance.SetEnemyTurn(false);
         }
 
-        public override void ExecuteFight()
+        protected override void ExecuteFight()
         {
             stateMachine.SetState(fightPhase);
             GameUI.Instance.ReDrawAllAvailability(GetAllUnitsByPhase(PhaseType.Fight), true);
             GameUI.Instance.SetEnemyTurn(false);
         }
 
-        public override void ExecuteScout()
+        protected override void ExecuteScout()
         {
             stateMachine.SetState(scoutPhase);
             GameUI.Instance.ReDrawAllAvailability(GetAllUnitsByPhase(PhaseType.Scout), true);
             GameUI.Instance.SetEnemyTurn(false);
         }
 
-        public override void ExecuteIdle()//Exit
+        protected override void ExecuteIdle()
         {
             GameUI.Instance.ReDrawAllAvailability(MyUnits, false);
             GameUI.Instance.SetEnemyTurn(true);
             stateMachine.SetState(idlePhase);
         }
 
-        public override void ExecuteReplenish()
+        protected override void ExecuteReplenish()
         {
             base.ExecuteReplenish();
             stateMachine.SetState(replenishPhase);
+            if (additionalVisibleNodes.Count > 0)
+            {
+                additionalVisibleNodes.Clear();
+                RecalculateVisibility();
+            }
         }
 
         #endregion
 
         #region Check Turns
 
-        public override bool CanExecuteBuy() => true;
+        protected override bool CanExecuteBuy() => true;
 
-        public override bool CanExecuteArtillery() => CanExecutePhase(PhaseType.Artillery);
+        protected override bool CanExecuteArtillery() => CanExecutePhase(PhaseType.Artillery);
 
-        public override bool CanExecuteFight() => CanExecutePhase(PhaseType.Fight);
+        protected override bool CanExecuteFight() => CanExecutePhase(PhaseType.Fight);
 
-        public override bool CanExecuteScout() => CanExecutePhase(PhaseType.Scout);
+        protected override bool CanExecuteScout() => CanExecutePhase(PhaseType.Scout);
 
-        public override bool CanExecuteReplenish() => true;
+        protected override bool CanExecuteReplenish() => true;
 
         private bool CanExecutePhase(PhaseType phaseType)
         {
@@ -203,7 +174,8 @@ namespace LineWars
 
         #endregion
 
-        public void AddVisibleNode(Node node)
+        
+        public void AddAdditionalVisibleNode(Node node)
         {
             if (!MonoGraph.Instance.Nodes.Contains(node))
                 throw new ArgumentException();
@@ -213,7 +185,6 @@ namespace LineWars
                 return;
             additionalVisibleNodes.Add(node);
         }
-
         public bool RemoveVisibleNode(Node node) => additionalVisibleNodes.Remove(node);
         
         private void UnitOnDied(Unit diedUnit)
@@ -229,8 +200,10 @@ namespace LineWars
                 }
             }
         }
-        private void OnExecuteCommand(IExecutor executor, ITarget target)
+
+        protected override void OnBuyPreset(Node node, IEnumerable<Unit> units)
         {
+            base.OnBuyPreset(node, units);
             RecalculateVisibility();
         }
 
@@ -249,6 +222,7 @@ namespace LineWars
             }
 
             VisibilityMap = visibilityMap;
+            VisibilityRecalculated?.Invoke();
         }
     }
 }

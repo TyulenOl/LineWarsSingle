@@ -10,22 +10,19 @@ public class MaskRendererV3 : MonoBehaviour
 {
     public MaskRendererV3 Instance { get; private set; }
 
-    [Header("Settings")] 
-    [SerializeField] private bool autoInitialize;
+    [Header("Settings")] [SerializeField] private bool autoInitialize;
     [SerializeField, Min(0)] private int numberFramesSkippedBeforeUpdate = 60;
-    
-    [Header("Map")] 
-    [SerializeField] private Texture2D visibilityMap;
+
+    [Header("Map")] [SerializeField] private Texture2D visibilityMap;
     [SerializeField] private Transform startPosition;
     [SerializeField] private Transform endPosition;
     [SerializeField] [Range(0, 10)] private int blurRadius;
 
-    [Header("Shaders")]
-    [SerializeField] private ComputeShader maskShader;
+    [Header("Shaders")] [SerializeField] private ComputeShader maskShader;
     [SerializeField] private ComputeShader blurShader;
 
-    [Header("")] 
-    [SerializeField] private List<RenderNodeV3> nodes;
+    [Header("")] [SerializeField] private List<RenderNodeV3> nodes;
+    private List<RenderNodeV3> availableNodes;
 
 
     private RenderTexture visibilityMask;
@@ -58,10 +55,10 @@ public class MaskRendererV3 : MonoBehaviour
 
 
     private bool initialized;
-    
+
     private bool applyStarted;
     private bool needUpdate;
-    
+
 
     private struct NodesBuffer
     {
@@ -92,7 +89,7 @@ public class MaskRendererV3 : MonoBehaviour
     private void Update()
     {
         if (!initialized) return;
-        
+
         needUpdate = needUpdate || HashIsUpdated();
         if (needUpdate && !applyStarted)
         {
@@ -120,7 +117,7 @@ public class MaskRendererV3 : MonoBehaviour
         if (!CheckValid()) return;
 
         initialized = true;
-        
+
         blurHorID = blurShader.FindKernel("HorzBlurCs");
         blurVerID = blurShader.FindKernel("VertBlurCs");
 
@@ -137,7 +134,7 @@ public class MaskRendererV3 : MonoBehaviour
 
         UpdateHash();
         ApplyChanges();
-        
+
         bool CheckValid()
         {
             if (visibilityMap == null)
@@ -187,17 +184,34 @@ public class MaskRendererV3 : MonoBehaviour
 
     private void InitializeBuffer()
     {
-        buffer = new ComputeBuffer(nodes.Count * 5, sizeof(float));
+        var texSizeInWorldCoord = startPosition.position
+            .To2D()
+            .GetSize(endPosition.position.To2D());
+        
         nodeBuffers = new List<NodesBuffer>(nodes.Count);
+        availableNodes = new List<RenderNodeV3>();
         foreach (var node in nodes)
         {
-            var nodeBuffer = new NodesBuffer()
+            var pixelCoord = (node.transform.position - startPosition.position)
+                    .To2D()
+                    .GetPixelCoord(texSizeInWorldCoord, visibilityMap.GetTextureSize());
+            if (pixelCoord.CheckPixelCoord(visibilityMap.GetTextureSize()))
             {
-                NodeColor = GetNodeColor(node),
-                Visibility = node.Visibility
-            };
-            nodeBuffers.Add(nodeBuffer);
+                var nodeBuffer = new NodesBuffer()
+                {
+                    NodeColor = pixelCoord.GetPixelColor(visibilityMap),
+                    Visibility = node.Visibility
+                };
+                nodeBuffers.Add(nodeBuffer);
+                availableNodes.Add(node);
+            }
+            else
+            {
+                Debug.LogWarning($"Нода {node.name} не имеет цвета");
+            }
         }
+
+        buffer = new ComputeBuffer(nodeBuffers.Count * 5, sizeof(float));
 
         buffer.SetData(nodeBuffers);
     }
@@ -209,21 +223,8 @@ public class MaskRendererV3 : MonoBehaviour
 
         blurShader.SetTexture(blurVerID, horBlurOutputId, horBlurOutput);
         blurShader.SetTexture(blurVerID, verBlurOutputId, verBlurOutput);
-        
+
         blurShader.SetFloats(texSizeId, visibilityMap.width, visibilityMap.height);
-    }
-
-    private Color GetNodeColor(RenderNodeV3 renderNode)
-    {
-        var position = renderNode.transform.position;
-
-        var start = startPosition.position;
-        var end = endPosition.position;
-        
-        var x = Mathf.CeilToInt((position.x - start.x) / (end.x - start.x) * visibilityMap.width);
-        var y = Mathf.CeilToInt((position.y - start.y) / (end.y - start.y) * visibilityMap.height);
-        
-        return visibilityMap.GetPixel(x, y);
     }
 
     private void ApplyChanges()
@@ -263,28 +264,28 @@ public class MaskRendererV3 : MonoBehaviour
     private bool HashIsUpdated()
     {
         bool isUpdated = blurRadiusHash != blurRadius;
-        
+
         for (var i = 0; i < nodes.Count; i++)
         {
             if (isUpdated)
                 break;
-            
+
             var node = nodes[i];
             var nodeBuffer = nodeBuffers[i];
             isUpdated = Math.Abs(nodeBuffer.Visibility - node.Visibility) > 0.001f;
         }
-        
+
         return isUpdated;
     }
 
     private void UpdateHash()
     {
         blurRadiusHash = blurRadius;
-        
-        for (var i = 0; i < nodes.Count; i++)
+
+        for (var i = 0; i < availableNodes.Count; i++)
         {
             var nodeBuffer = nodeBuffers[i];
-            nodeBuffer.Visibility = nodes[i].Visibility;
+            nodeBuffer.Visibility = availableNodes[i].Visibility;
             nodeBuffers[i] = nodeBuffer;
         }
     }
@@ -307,7 +308,7 @@ public class MaskRendererV3 : MonoBehaviour
     }
 
     private IEnumerator ApplyChangesCoroutine()
-    {  
+    {
         applyStarted = true;
         for (int i = 0; i < numberFramesSkippedBeforeUpdate; i++)
             yield return null;
@@ -315,5 +316,52 @@ public class MaskRendererV3 : MonoBehaviour
         ApplyChanges();
         applyStarted = false;
         needUpdate = false;
+    }
+}
+
+public static class FogExtensions
+{
+    public static Vector2 To2D(this Vector3 vector3)
+    {
+        return vector3;
+    }
+
+    public static Vector2 GetSize(this Vector2 start, Vector2 end)
+    {
+        if (end.x < start.x || end.y < start.y)
+            throw new ArgumentException();
+        return end - start;
+    }
+
+    public static Vector2Int GetTextureSize(this Texture2D texture2D)
+    {
+        return new Vector2Int(texture2D.width, texture2D.height);
+    }
+
+    public static Vector2Int GetPixelCoord(
+        this Vector2 pointPositionInWorldCoord,
+        Vector2 texSizeInWorldCoord,
+        Vector2Int textureSizeInPixels)
+    {
+        var x = Mathf.CeilToInt(pointPositionInWorldCoord.x / texSizeInWorldCoord.x * textureSizeInPixels.x);
+        var y = Mathf.CeilToInt(pointPositionInWorldCoord.y / texSizeInWorldCoord.y * textureSizeInPixels.y);
+        return new Vector2Int(x, y);
+    }
+
+    public static bool CheckPixelCoord(
+        this Vector2Int pixelCoord,
+        Vector2Int textureSizeInPixels)
+    {
+        return pixelCoord.x > 0
+               && pixelCoord.x < textureSizeInPixels.x
+               && pixelCoord.y > 0
+               && pixelCoord.y < textureSizeInPixels.y;
+    }
+
+    public static Color GetPixelColor(this Vector2Int pixelCoord, Texture2D texture2D)
+    {
+        if (!pixelCoord.CheckPixelCoord(texture2D.GetTextureSize()))
+            throw new ArgumentOutOfRangeException();
+        return texture2D.GetPixel(pixelCoord.x, pixelCoord.y);
     }
 }

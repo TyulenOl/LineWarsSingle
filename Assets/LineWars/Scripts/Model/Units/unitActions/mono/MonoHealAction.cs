@@ -4,8 +4,9 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    public class MonoHealAction : MonoUnitAction<HealAction<Node, Edge, Unit, Owned, BasePlayer>>,
-        IHealAction<Node, Edge, Unit, Owned, BasePlayer>
+    [DisallowMultipleComponent]
+    public class MonoHealAction : MonoUnitAction<HealAction<Node, Edge, Unit>>,
+        IHealAction<Node, Edge, Unit>
     {
         [SerializeField] private SFXData healSfx;
         [field: SerializeField] public bool InitialIsMassHeal { get; private set; }
@@ -20,29 +21,19 @@ namespace LineWars.Model
         public void Heal(Unit target)
         {
             Action.Heal(target);
-            SfxManager.Instance.Play(healSfx);
+            Executor.PlaySfx(healSfx);
         }
-
-        public Type TargetType => typeof(Unit);
-        public bool IsMyTarget(ITarget target) => target is Unit;
-
-        public ICommandWithCommandType GenerateCommand(ITarget target)
+        
+        protected override HealAction<Node, Edge, Unit> GetAction()
         {
-            return new HealCommand<Node, Edge, Unit, Owned, BasePlayer>(this, (Unit) target);
-        }
-
-        public override void Accept(IMonoUnitVisitor visitor)
-        {
-            visitor.Visit(this);
-        }
-
-        protected override HealAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
-        {
-            var action = new HealAction<Node, Edge, Unit, Owned, BasePlayer>(
-                Unit,
+            var action = new HealAction<Node, Edge, Unit>(
+                Executor,
                 InitialIsMassHeal,
                 InitialHealingAmount);
             return action;
         }
+        
+        public override void Accept(IMonoUnitActionVisitor visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IUnitActionVisitor<TResult, Node, Edge, Unit> visitor) => visitor.Visit(this);
     }
 }

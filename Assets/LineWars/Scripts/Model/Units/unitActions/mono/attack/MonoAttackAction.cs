@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using JetBrains.Annotations;
 using LineWars.Controllers;
 using UnityEngine;
@@ -6,35 +7,45 @@ using UnityEngine;
 namespace LineWars.Model
 {
     [DisallowMultipleComponent]
-    public abstract class MonoAttackAction : MonoUnitAction<AttackAction<Node, Edge, Unit, Owned, BasePlayer>>,
-        IAttackAction<Node, Edge, Unit, Owned, BasePlayer>
+    public abstract class MonoAttackAction<TAction> :
+        MonoUnitAction<TAction>,
+        IAttackAction<Node, Edge, Unit>
+        where TAction : AttackAction<Node, Edge, Unit>
     {
-        private AttackAction<Node, Edge, Unit, Owned, BasePlayer> AttackAction
-            => (AttackAction<Node, Edge, Unit, Owned, BasePlayer>) Action;
-
         [SerializeField] protected SFXData attackSfx;
+
+        [SerializeField] protected SFXList sfxList;
+
+        private IDJ DJ;
+
         [field: SerializeField] public int InitialDamage { get; private set; }
         [field: SerializeField] public bool InitialIsPenetratingDamage { get; private set; }
 
 
-        public int Damage => AttackAction.Damage;
-        public bool IsPenetratingDamage => AttackAction.IsPenetratingDamage;
-        
+        public int Damage => Action.Damage;
+        public bool IsPenetratingDamage => Action.IsPenetratingDamage;
 
-        public virtual bool CanAttack(IAlive enemy, bool ignoreActionPointsCondition = false) =>
-            AttackAction.CanAttack(enemy, ignoreActionPointsCondition);
 
-        public virtual void Attack(IAlive enemy)
+        public override void Initialize()
         {
-            AttackAction.Attack(enemy);
-            SfxManager.Instance.Play(attackSfx);
+            base.Initialize();
+            DJ = new RandomDJ(1);
         }
 
-        public Type TargetType => typeof(IAlive);
-        public bool IsMyTarget(ITarget target) => target is IAlive;
-        public ICommandWithCommandType GenerateCommand(ITarget target)
+        public virtual bool CanAttack(ITargetedAlive enemy, bool ignoreActionPointsCondition = false) =>
+            Action.CanAttack(enemy, ignoreActionPointsCondition);
+
+        public virtual void Attack(ITargetedAlive enemy)
         {
-            return new AttackCommand<Node, Edge, Unit, Owned, BasePlayer>(this, (IAlive) target);
+            StartCoroutine(AttackCoroutine(enemy));
+        }
+
+        private IEnumerator AttackCoroutine(ITargetedAlive enemy)
+        {
+            Action.Attack(enemy);
+            Executor.PlaySfx(attackSfx);
+            yield return new WaitForSeconds(attackSfx.LengthInSeconds / 2);
+            Executor.PlaySfx(DJ.GetSound(sfxList));
         }
     }
 }

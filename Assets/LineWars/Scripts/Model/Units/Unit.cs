@@ -2,31 +2,44 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using LineWars.Extensions.Attributes;
+using LineWars.Controllers;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace LineWars.Model
 {
     [RequireComponent(typeof(UnitMovementLogic))]
-    public sealed class Unit : Owned, IUnit<Node, Edge, Unit, Owned, BasePlayer>
+    public sealed class Unit : Owned,
+        IUnit<Node, Edge, Unit>, 
+        IMonoExecutor,
+        IMonoTarget
     {
         [Header("Units Settings")] 
         [SerializeField, ReadOnlyInspector] private int index;
 
         [SerializeField] private string unitName;
-
+        [SerializeField][TextArea] private string unitDescription;
+        
         [SerializeField, Min(0)] private int maxHp;
         [SerializeField, Min(0)] private int maxArmor;
         [SerializeField, Min(0)] private int visibility;
-
+        [field: SerializeField] public Sprite Sprite { get; private set; }
+        
         [SerializeField] private UnitType unitType;
         [SerializeField] private UnitSize unitSize;
         [SerializeField] private LineType movementLineType;
         [SerializeField] private CommandPriorityData priorityData;
 
+        [Header("Sounds")] 
+        [SerializeField] [Min(0)] private SFXList HpHealedSounds;
+        [SerializeField] [Min(0)] private SFXList HpDamagedSounds;
+        private IDJ dj;
+        
         [Header("Actions Settings")] 
         [SerializeField] [Min(0)] private int maxActionPoints;
+
+        [Header("Animation Settings")]
+        [SerializeField] private UnitAnimation deathAnimation;
 
         [Header("DEBUG")] 
         [SerializeField, ReadOnlyInspector] private Node myNode;
@@ -49,12 +62,9 @@ namespace LineWars.Model
         private UnitMovementLogic movementLogic;
         
         
-        private Dictionary<CommandType, IMonoUnitAction<UnitAction<Node, Edge, Unit, Owned, BasePlayer>>> monoActionsDictionary;
-        public IEnumerable<IMonoUnitAction<UnitAction<Node, Edge, Unit, Owned, BasePlayer>>> MonoActions => monoActionsDictionary.Values;
+        private Dictionary<CommandType, IMonoUnitAction<UnitAction<Node, Edge, Unit>>> monoActionsDictionary;
+        public IEnumerable<IMonoUnitAction<UnitAction<Node, Edge, Unit>>> MonoActions => monoActionsDictionary.Values;
         public uint MaxPossibleActionRadius { get; private set; }
-        public IReadOnlyCollection<Type> PossibleTargetsTypes { get; private set; }
-        public TargetTypeActionsDictionary TargetTypeActionsDictionary { get; private set; }
-        private readonly ITargetActionGrouper grouper = new DefaultTargetActionGrouper();
 
         #region Properties
         public int Id => index;
@@ -76,7 +86,7 @@ namespace LineWars.Model
             set
             {
                 var previousValue = currentActionPoints;
-                currentActionPoints = Mathf.Max(0, value);
+                currentActionPoints = Mathf.Clamp(value, 0, MaxActionPoints);
                 ActionPointsChanged.Invoke(previousValue, currentActionPoints);
             }
         }
@@ -98,7 +108,10 @@ namespace LineWars.Model
             {
                 var before = currentHp;
                 currentHp = Mathf.Min(Mathf.Max(0, value), maxHp);
+                if(before == currentHp) return;
                 HpChanged.Invoke(before, currentHp);
+                SfxManager.Instance.Play(before < currentHp ? dj.GetSound(HpHealedSounds) : dj.GetSound(HpDamagedSounds));
+
                 if (currentHp == 0)
                 {
                     OnDied();
@@ -120,10 +133,12 @@ namespace LineWars.Model
             {
                 var before = currentArmor;
                 currentArmor = Mathf.Max(0, value);
+                if(before == currentArmor) return;
                 ArmorChanged.Invoke(before, currentArmor);
             }
         }
 
+        public string UnitDescription => unitDescription;
         public UnitType Type => unitType;
 
         public UnitDirection UnitDirection
@@ -167,8 +182,10 @@ namespace LineWars.Model
         
         private void Awake()
         {
+            dj = new RandomDJ(0.5f);
+            
             currentHp = maxHp;
-            currentArmor = maxArmor;
+            currentArmor = 0;
             currentActionPoints = maxActionPoints;
 
             movementLogic = GetComponent<UnitMovementLogic>();
@@ -177,16 +194,12 @@ namespace LineWars.Model
             index = SingleGame.Instance.AllUnits.Add(this);
             void InitialiseAllActions()
             {
-                // var serializeActions = gameObject.GetComponents<IMonoUnitAction<UnitAction<Node, Edge, Unit, Owned, BasePlayer>>>()
-                //     .OrderByDescending(x => x.Priority)
-                //     .ToArray();
-
                 var serializeActions = gameObject.GetComponents<Component>()
-                    .OfType<IMonoUnitAction<UnitAction<Node, Edge, Unit, Owned, BasePlayer>>>()
+                    .OfType<IMonoUnitAction<UnitAction<Node, Edge, Unit>>>()
                     .OrderByDescending(x => x.Priority)
                     .ToArray();
 
-                monoActionsDictionary = new Dictionary<CommandType, IMonoUnitAction<UnitAction<Node, Edge, Unit, Owned, BasePlayer>>>(serializeActions.Length);
+                monoActionsDictionary = new Dictionary<CommandType, IMonoUnitAction<UnitAction<Node, Edge, Unit>>>(serializeActions.Length);
                 foreach (var serializeAction in serializeActions)
                 {
                     serializeAction.Initialize();
@@ -198,17 +211,6 @@ namespace LineWars.Model
                 }
 
                 MaxPossibleActionRadius = MonoActions.Max(x => x.GetPossibleMaxRadius());
-
-                var targetActions = MonoActions
-                    .OfType<ITargetedAction>()
-                    .ToArray();
-                
-                PossibleTargetsTypes = targetActions
-                    .Select(x => x.TargetType)
-                    .Distinct()
-                    .ToArray();
-
-                TargetTypeActionsDictionary = grouper.GroupByType(targetActions);
             }
         }
 
@@ -218,31 +220,17 @@ namespace LineWars.Model
             UnitDirection = direction;
         }
 
-        public IEnumerable<IUnitAction<Node, Edge, Unit, Owned, BasePlayer>> Actions => MonoActions;
-        public T GetUnitAction<T>() where T : IUnitAction<Node, Edge, Unit, Owned, BasePlayer>
+        public IEnumerable<IUnitAction<Node, Edge, Unit>> Actions => MonoActions;
+        IEnumerable<IExecutorAction> IExecutor.Actions => Actions;
+
+        public T GetAction<T>() where T : IUnitAction<Node, Edge, Unit>
             => MonoActions.OfType<T>().FirstOrDefault();
 
-        public bool TryGetUnitAction<T>(out T action) where T : IUnitAction<Node, Edge, Unit, Owned, BasePlayer>
+        public bool TryGetAction<T>(out T action) where T : IUnitAction<Node, Edge, Unit>
         {
-            action = GetUnitAction<T>();
+            action = GetAction<T>();
             return action != null;
         }
-
-        public bool TryGetCommandForTarget(CommandType priorityType, ITarget target,
-            out ICommandWithCommandType command)
-        {
-            if (monoActionsDictionary.TryGetValue(priorityType, out var value)
-                && value is ITargetedAction targetedAction
-                && targetedAction.IsMyTarget(target))
-            {
-                command = targetedAction.GenerateCommand(target);
-                return true;
-            }
-
-            command = null;
-            return false;
-        }
-        
 
         private void OnDied()
         {
@@ -262,17 +250,38 @@ namespace LineWars.Model
 
             Owner.RemoveOwned(this);
             SingleGame.Instance.AllUnits.Remove(this);
+            if(deathAnimation == null)
+                Destroy(gameObject);
+            else
+            {
+                deathAnimation.Ended.AddListener(DestroyOnAnimationEnd);
+                var animContext = new AnimationContext()
+                {
+                    TargetNode = myNode,
+                    TargetUnit = this
+                };
+                deathAnimation.Execute(animContext);
+            }
+        }
+
+        private void DestroyOnAnimationEnd(UnitAnimation _)
+        {
+            deathAnimation.Ended.RemoveListener(DestroyOnAnimationEnd);
             Destroy(gameObject);
         }
 
         protected override void OnReplenish()
         {
             CurrentActionPoints = maxActionPoints;
-
+            CurrentArmor = 0;
+            
             foreach (var unitAction in MonoActions)
                 unitAction.OnReplenish();
         }
 
-        public T Accept<T>(IExecutorVisitor<T> visitor) => visitor.Visit(this);
+        public T Accept<T>(IMonoExecutorVisitor<T> visitor)
+        {
+            return visitor.Visit(this);
+        }
     }
 }

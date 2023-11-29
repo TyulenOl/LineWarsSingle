@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using LineWars.Extensions.Attributes;
 using UnityEngine;
 
 namespace LineWars.Model
@@ -10,7 +9,6 @@ namespace LineWars.Model
     public class NationEconomicLogic : ScriptableObject, IReadOnlyCollection<UnitBuyPreset>
     {
         [SerializeField, NamedArray("name")] private List<UnitBuyPreset> unitBuyPresets;
-
         public int Count => unitBuyPresets.Count;
         public IEnumerator<UnitBuyPreset> GetEnumerator() => unitBuyPresets.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => unitBuyPresets.GetEnumerator();

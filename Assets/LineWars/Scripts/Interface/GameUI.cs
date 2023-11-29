@@ -16,14 +16,14 @@ namespace LineWars.Interface
         [SerializeField] private EnemyTurnPanel enemyTurnPanel;
         [SerializeField] private List<Button> buttonsToBlockIfEnemyTurn;
 
-        private List<UnitDrawer> activeUnitDrawersHash = new ();
+        private List<UnitDrawer> activeUnitDrawersHash = new();
 
         private IExecutor currentExecutor;
-        private List<TargetDrawer> currentDrawers = new ();
+        private List<TargetDrawer> currentDrawers = new();
 
         private void Awake()
         {
-            if(Instance == null)
+            if (Instance == null)
             {
                 Instance = this;
             }
@@ -36,9 +36,32 @@ namespace LineWars.Interface
 
         private void Start()
         {
-            CommandsManager.Instance.ExecutorChanged.AddListener(OnExecutorChanged);
+            CommandsManager.Instance.ExecutorChanged += OnExecutorChanged;
+            CommandsManager.Instance.FightNeedRedraw += ReDrawCurrentTargets;
+            CommandsManager.Instance.BuyNeedRedraw += ReDrawBuyNodes;
             
             SubscribeEventForGameReferee();
+        }
+
+        public void ClearBuyNodes()
+        {
+            ReDrawBuyNodes(null);
+        }
+        
+        private void ReDrawBuyNodes(BuyStateMessage buyStateMessage)
+        {
+            foreach (var node in MonoGraph.Instance.Nodes)
+            {
+                node.GetComponent<NodeTargetDrawer>().ReDrawBuyInfo(false);
+            }
+            
+            if (buyStateMessage == null)
+                return;
+            
+            foreach (var node in buyStateMessage.NodesToSpawnPreset)
+            {
+                node.GetComponent<NodeTargetDrawer>().ReDrawBuyInfo(true);
+            }
         }
 
         private void SubscribeEventForGameReferee()
@@ -52,21 +75,34 @@ namespace LineWars.Interface
                         scoreText.text = $"{after}/{scoreReferee.ScoreForWin}";
                     }
                 };
-                
+
                 scoreText.text = $"{scoreReferee.GetScoreForPlayer(Player.LocalPlayer)}/{scoreReferee.ScoreForWin}";
             }
+            if (GameReferee.Instance is SiegeGameReferee siegeGameReferee)
+            {
+                siegeGameReferee.CurrentRoundsChanged += (currentRounds) =>
+                {
+                    scoreText.text = $"{currentRounds}/{siegeGameReferee.RoundsToWin}";
+                };
+
+                scoreText.text = $"{siegeGameReferee.CurrentRounds}/{siegeGameReferee.RoundsToWin}";
+            }
+            
+            if (GameReferee.Instance is NewDominationGameReferee dominationGameReferee)
+            {
+                dominationGameReferee.RoundsAmountChanged += () =>
+                {
+                    scoreText.text = $"{dominationGameReferee.RoundsToWin}";
+                };
+
+                scoreText.text = $"{dominationGameReferee.RoundsToWin}";
+            }
         }
-        
+
         private void OnExecutorChanged(IExecutor before, IExecutor after)
         {
-            if (before != null)
-                before.AnyActionCompleted -= ReDrawCurrentTargets;
-            
             currentExecutor = after;
-            ReDrawCurrentTargets();
             ReDrawAllAvailability(before, after);
-            if(currentExecutor == null) return;
-            currentExecutor.AnyActionCompleted += ReDrawCurrentTargets;
         }
 
         private void ReDrawAllAvailability(IExecutor before, IExecutor after)
@@ -74,7 +110,7 @@ namespace LineWars.Interface
             var unitsToReDraw = Player.LocalPlayer.GetAllUnitsByPhase(PhaseManager.Instance.CurrentPhase);
             if (after is null)
             {
-                if(before is { CanDoAnyAction: true })
+                if (before is { CanDoAnyAction: true })
                     ReDrawAllAvailability(unitsToReDraw, true);
             }
             else
@@ -87,7 +123,7 @@ namespace LineWars.Interface
         {
             foreach (var unit in units)
             {
-                if(!unit.CanDoAnyAction) continue;
+                if (!unit.CanDoAnyAction) continue;
                 var drawer = unit.GetComponent<UnitDrawer>();
                 drawer.ReDrawAvailability(isAvailable);
                 activeUnitDrawersHash.Add(drawer);
@@ -102,31 +138,73 @@ namespace LineWars.Interface
                 button.interactable = !isEnemyTurn;
             }
         }
-        
-        private void ReDrawCurrentTargets()
+
+        private void ReDrawCurrentTargets(ExecutorRedrawMessage message)
         {
             foreach (var currentDrawer in currentDrawers)
             {
-                if(currentDrawer == null) continue;
-                currentDrawer.ReDraw(CommandType.None);
+                if (currentDrawer == null) continue;
+                currentDrawer.ReDrawCommads(CommandType.None);
             }
+
+            if(message == null)
+                return;
+
             currentDrawers = new List<TargetDrawer>();
+
+            var dictionary = message.Data.GroupBy(info =>
+                {
+                    switch (info.Target)
+                    {
+                        case Node node:
+                            return node;
+                        case Unit unit:
+                            return unit.Node;
+                        default:
+                            return null;
+                    }
+                }, targetInfo => targetInfo.CommandType,
+                Tuple.Create);
             if (currentExecutor != null)
             {
-                ReDrawTargetsIcons(currentExecutor.GetAllAvailableTargets().ToList());
+                ReDrawTargetsIcons(dictionary);
             }
         }
 
-        private void ReDrawTargetsIcons(List<(ITarget, CommandType)> targets)
+        [Obsolete]
+        private void ReDrawTargetsIcons(IEnumerable<TargetActionInfo> targets)
         {
-            foreach (var valueTuple in targets)
+            foreach (var targetActionInfo in targets)
             {
-                var drawerScript = valueTuple.Item1 as MonoBehaviour;
+                var drawerScript = targetActionInfo.Target as MonoBehaviour;
                 if (drawerScript == null) continue;
                 var drawer = drawerScript.gameObject.GetComponent<TargetDrawer>();
                 if (drawer == null) continue;
                 currentDrawers.Add(drawer);
-                drawer.ReDraw(valueTuple.Item2);
+
+                if (drawer is NodeTargetDrawer nodeTargetDrawer)
+                {
+                    nodeTargetDrawer.ReDrawCommads(targets.Select(x => x.CommandType));
+                }
+                else
+                {
+                    drawer.ReDrawCommads(targetActionInfo.CommandType);
+                }
+            }
+        }
+
+        private void ReDrawTargetsIcons(IEnumerable<Tuple<Node, IEnumerable<CommandType>>> tuples)
+        {
+            foreach (var tuple in tuples)
+            {
+                var node = tuple.Item1;
+                var commands = tuple.Item2;
+                
+                if (node == null) continue;
+                var drawer = node.gameObject.GetComponent<NodeTargetDrawer>();
+                if (drawer == null) continue;
+                currentDrawers.Add(drawer);
+                drawer.ReDrawCommads(commands);
             }
         }
 

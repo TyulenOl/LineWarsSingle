@@ -2,21 +2,16 @@
 
 namespace LineWars.Model
 {
-    public class RLBlockAction<TNode, TEdge, TUnit, TOwned, TPlayer> :
-            UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>,
-            IRLBlockAction<TNode, TEdge, TUnit, TOwned, TPlayer>, ISimpleAction
-
-        #region Сonstraints
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TOwned : class, IOwned<TOwned, TPlayer>
-        where TPlayer : class, IBasePlayer<TOwned, TPlayer>
-        #endregion
+    public class RLBlockAction<TNode, TEdge, TUnit> :
+        UnitAction<TNode, TEdge, TUnit>,
+        IRLBlockAction<TNode, TEdge, TUnit>
+        where TNode : class, INodeForGame<TNode, TEdge, TUnit>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
+        where TUnit : class, IUnit<TNode, TEdge, TUnit>
 
     {
         private bool isBlocked;
-        
+
         public bool IsBlocked
         {
             get => isBlocked;
@@ -25,7 +20,7 @@ namespace LineWars.Model
                 var previous = isBlocked;
                 if (isBlocked == previous)
                     return;
-                
+
                 isBlocked = value;
                 CanBlockChanged?.Invoke(previous, isBlocked);
             }
@@ -33,23 +28,38 @@ namespace LineWars.Model
 
         public event Action<bool, bool> CanBlockChanged;
 
+        public override CommandType CommandType => CommandType.Block;
+
+        public RLBlockAction(TUnit executor) : base(executor)
+        {
+        }
+
         public bool CanBlock() => ActionPointsCondition();
 
         public void EnableBlock()
         {
-            MyUnit.CurrentArmor = MyUnit.CurrentActionPoints - ModifyActionPoints();
+            Executor.CurrentArmor = Executor.CurrentActionPoints - GetActionPointsAfterModify();
             CompleteAndAutoModify();
         }
 
-        public override CommandType CommandType => CommandType.Block;
-
-        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor) =>
-            visitor.Visit(this);
-
-        public ICommandWithCommandType GenerateCommand() => new RLBlockCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this);
-
-        public RLBlockAction(TUnit executor) : base(executor)
+        public override void OnReplenish()
         {
+            base.OnReplenish();
+            if (isBlocked)
+            {
+                isBlocked = false;
+                Executor.CurrentArmor = 0;
+            }
+        }
+
+        public override void Accept(IBaseUnitActionVisitor<TNode, TEdge, TUnit> visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        public override TResult Accept<TResult>(IUnitActionVisitor<TResult, TNode, TEdge, TUnit> visitor)
+        {
+            return visitor.Visit(this);
         }
     }
 }

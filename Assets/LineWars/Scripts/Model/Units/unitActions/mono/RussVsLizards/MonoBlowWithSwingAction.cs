@@ -1,28 +1,48 @@
-﻿using UnityEngine;
+﻿using System;
+using LineWars.Controllers;
+using UnityEngine;
 
 namespace LineWars.Model
 {
-    public class MonoBlowWithSwingAction: 
-        MonoUnitAction<BlowWithSwingAction<Node, Edge, Unit, Owned, BasePlayer>>,
-        IBlowWithSwingAction<Node, Edge, Unit, Owned, BasePlayer>
+    [DisallowMultipleComponent]
+    public class MonoBlowWithSwingAction :
+        MonoUnitAction<BlowWithSwingAction<Node, Edge, Unit>>,
+        IBlowWithSwingAction<Node, Edge, Unit>
     {
         [field: SerializeField] public int InitialDamage { get; private set; }
-        public int Damage => Action.Damage;
-        public bool CanBlowWithSwing() => Action.CanBlowWithSwing();
 
-        public void ExecuteBlowWithSwing()
-        {
-            //TODO: анимации и звуки
-            Action.ExecuteBlowWithSwing();
-        }
+        [SerializeField] private SFXList attackReactionSounds;
+        [SerializeField] private SFXData attackSound;
+
+        private IDJ dj;
         
-        protected override BlowWithSwingAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
+        public int Damage => Action.Damage;
+
+        private void Awake()
         {
-            return new BlowWithSwingAction<Node, Edge, Unit, Owned, BasePlayer>(Unit, InitialDamage);
+            dj = new RandomDJ(1);
         }
 
-        public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
+        public bool IsAvailable(Unit target)
+        {
+            return Action.IsAvailable(target);
+        }
 
-        public ICommandWithCommandType GenerateCommand() => new BlowWithSwingCommand<Node, Edge, Unit, Owned, BasePlayer>(this);
+        public void Execute(Unit target)
+        {
+            Executor.PlaySfx(attackSound);
+            Action.Execute(target);
+            Executor.PlaySfx(dj.GetSound(attackReactionSounds));
+        }
+
+        protected override BlowWithSwingAction<Node, Edge, Unit> GetAction()
+        {
+            return new BlowWithSwingAction<Node, Edge, Unit>(Executor, InitialDamage);
+        }
+
+        public override void Accept(IMonoUnitActionVisitor visitor) => visitor.Visit(this);
+
+        public override TResult Accept<TResult>(IUnitActionVisitor<TResult, Node, Edge, Unit> visitor) =>
+            visitor.Visit(this);
     }
 }

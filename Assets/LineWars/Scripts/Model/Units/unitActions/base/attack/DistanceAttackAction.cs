@@ -1,28 +1,36 @@
-﻿using System;
-using JetBrains.Annotations;
-
+﻿
 namespace LineWars.Model
 {
-    public class DistanceAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> :
-        AttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>,
-        IDistanceAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer>
+    public class DistanceAttackAction<TNode, TEdge, TUnit> :
+        AttackAction<TNode, TEdge, TUnit>,
+        IDistanceAttackAction<TNode, TEdge, TUnit>
     
         #region Сonstraints
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer> 
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TOwned : class, IOwned<TOwned, TPlayer>
-        where TPlayer: class, IBasePlayer<TOwned, TPlayer>
+        where TNode : class, INodeForGame<TNode, TEdge, TUnit>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit> 
+        where TUnit : class, IUnit<TNode, TEdge, TUnit>
         #endregion 
     {
-        protected readonly IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer> Graph;
+        protected readonly IGraphForGame<TNode, TEdge, TUnit> Graph;
         public uint Distance { get; }
 
+        public DistanceAttackAction(
+            TUnit executor,
+            int damage,
+            bool isPenetratingDamage,
+            uint distance,
+            IGraphForGame<TNode, TEdge, TUnit> graph) : base(executor, damage, isPenetratingDamage)
+        {
+            Distance = distance;
+            Graph = graph;
+        }
+
+        
         public override bool CanAttackFrom(TNode node, TUnit enemy, bool ignoreActionPointsCondition = false)
         {
             return !AttackLocked
                    && Damage > 0
-                   && enemy.Owner != MyUnit.Owner
+                   && enemy.OwnerId != Executor.OwnerId
                    && Graph.FindShortestPath(node, enemy.Node).Count - 1 <= Distance
                    && (ignoreActionPointsCondition || ActionPointsCondition());
         }
@@ -36,21 +44,8 @@ namespace LineWars.Model
         public override uint GetPossibleMaxRadius() => Distance;
 
         public override CommandType CommandType => CommandType.Fire;
-
-        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor)
-        {
-            visitor.Visit(this);
-        }
-
-        public DistanceAttackAction(
-            TUnit executor,
-            int damage,
-            bool isPenetratingDamage,
-            uint distance,
-            IGraphForGame<TNode, TEdge, TUnit, TOwned, TPlayer> graph) : base(executor, damage, isPenetratingDamage)
-        {
-            Distance = distance;
-            Graph = graph;
-        }
+        
+        public override void Accept(IBaseUnitActionVisitor<TNode, TEdge, TUnit> visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IUnitActionVisitor<TResult, TNode, TEdge, TUnit> visitor) => visitor.Visit(this);
     }
 }

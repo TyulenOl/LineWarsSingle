@@ -4,53 +4,66 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    public class MonoMoveAction : MonoUnitAction<MoveAction<Node, Edge, Unit, Owned, BasePlayer>>,
-        IMoveAction<Node, Edge, Unit, Owned, BasePlayer>
+    [DisallowMultipleComponent]
+    public class MonoMoveAction : MonoUnitAction<MoveAction<Node, Edge, Unit>>,
+        IMoveAction<Node, Edge, Unit>
     {
         [SerializeField] private SFXData moveSfx;
-        public event Action MoveAnimationEnded;
-        
+        [SerializeField] private SFXList reactionsSfx;
 
-        public bool CanMoveTo(Node target, bool ignoreActionPointsCondition = false) =>
-            Action.CanMoveTo(target, ignoreActionPointsCondition);
+        private IDJ dj;
+
+        public event Action MoveAnimationEnded;
+
+        protected override bool NeedAutoComplete => false;
+
+        public bool CanMoveTo(Node target) =>
+            Action.CanMoveTo(target);
 
         public override void Initialize()
         {
             base.Initialize();
-            Unit.MovementLogic.MovementIsOver += MovementLogicOnMovementIsOver;
+            Executor.MovementLogic.MovementIsOver += MovementLogicOnMovementIsOver;
+            dj = new RandomDJ(0.5f);
         }
 
         public void MoveTo(Node target)
         {
             Action.MoveTo(target);
-            Unit.MovementLogic.MoveTo(target.transform);
-            SfxManager.Instance.Play(moveSfx);
+            Executor.MovementLogic.MoveTo(target.transform.position);
+            Executor.MovementLogic.MovementIsOver += OnMoveEnd;
+            Executor.PlaySfx(moveSfx);
+            Executor.PlaySfx(dj.GetSound(reactionsSfx));
+            Player.LocalPlayer.RecalculateVisibility();
         }
 
-        private void MovementLogicOnMovementIsOver(Transform obj) => MoveAnimationEnded?.Invoke();
-
-        public Type TargetType => typeof(Node);
-        public bool IsMyTarget(ITarget target) => target is Node;
-
-        public ICommandWithCommandType GenerateCommand(ITarget target)
+        private void OnMoveEnd()
         {
-            return new MoveCommand<Node, Edge, Unit, Owned, BasePlayer>(this, (Node) target);
+            Executor.MovementLogic.MovementIsOver -= OnMoveEnd;
+            Complete();
         }
 
-        public override void Accept(IMonoUnitVisitor visitor)
+        private void MovementLogicOnMovementIsOver() => MoveAnimationEnded?.Invoke();
+
+        private void OnDestroy()
+        {
+            Executor.MovementLogic.MovementIsOver -= MovementLogicOnMovementIsOver;
+        }
+
+        protected override MoveAction<Node, Edge, Unit> GetAction()
+        {
+            var action = new MoveAction<Node, Edge, Unit>(Executor);
+            return action;
+        }
+
+        public override void Accept(IMonoUnitActionVisitor visitor)
         {
             visitor.Visit(this);
         }
 
-        private void OnDestroy()
+        public override TResult Accept<TResult>(IUnitActionVisitor<TResult, Node, Edge, Unit> visitor)
         {
-            Unit.MovementLogic.MovementIsOver -= MovementLogicOnMovementIsOver;
-        }
-
-        protected override MoveAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
-        {
-            var action = new MoveAction<Node, Edge, Unit, Owned, BasePlayer>(Unit);
-            return action;
+            return visitor.Visit(this);
         }
     }
 }

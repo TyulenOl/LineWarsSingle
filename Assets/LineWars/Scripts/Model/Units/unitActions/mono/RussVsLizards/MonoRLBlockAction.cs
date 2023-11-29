@@ -1,11 +1,18 @@
 ﻿using System;
+using LineWars.Controllers;
+using UnityEngine;
 
 namespace LineWars.Model
 {
+    [DisallowMultipleComponent]
     public class MonoRLBlockAction :
-        MonoUnitAction<RLBlockAction<Node, Edge, Unit, Owned, BasePlayer>>,
-        IRLBlockAction<Node, Edge, Unit, Owned, BasePlayer>
+        MonoUnitAction<RLBlockAction<Node, Edge, Unit>>,
+        IRLBlockAction<Node, Edge, Unit>
     {
+        [SerializeField] protected SFXList sfxList;
+
+        private IDJ DJ;
+        
         private void OnDestroy()
         {
             CanBlockChanged = null;
@@ -15,20 +22,28 @@ namespace LineWars.Model
         public event Action<bool, bool> CanBlockChanged;
 
         public bool CanBlock() => Action.CanBlock();
+
+        private void Awake()
+        {
+            DJ = new RandomDJ(0.75f);
+        }
+
         public void EnableBlock()
         {
             //TODO: анимации и звуки
             Action.EnableBlock();
+            if(sfxList != null)
+                Executor.PlaySfx(DJ.GetSound(sfxList));
         }
 
-        public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
-        public ICommandWithCommandType GenerateCommand() => new RLBlockCommand<Node, Edge, Unit, Owned, BasePlayer>(this);
-        
-        protected override RLBlockAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
+        protected override RLBlockAction<Node, Edge, Unit> GetAction()
         {
-            var action = new RLBlockAction<Node, Edge, Unit, Owned, BasePlayer>(Unit);
+            var action = new RLBlockAction<Node, Edge, Unit>(Executor);
             action.CanBlockChanged += (before, after) => CanBlockChanged?.Invoke(before, after);
             return action;
         }
+        
+        public override void Accept(IMonoUnitActionVisitor visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IUnitActionVisitor<TResult, Node, Edge, Unit> visitor) => visitor.Visit(this);
     }
 }

@@ -3,123 +3,53 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace LineWars.Model
 {
-    public class MoveAction<TNode, TEdge, TUnit, TOwned, TPlayer> :
-        UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>, 
-        IMoveAction<TNode, TEdge, TUnit, TOwned, TPlayer>
-    
-        #region Сonstraints
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer> 
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TOwned : class, IOwned<TOwned, TPlayer>
-        where TPlayer: class, IBasePlayer<TOwned, TPlayer>
-        #endregion 
+    public class MoveAction<TNode, TEdge, TUnit> :
+        UnitAction<TNode, TEdge, TUnit>,
+        IMoveAction<TNode, TEdge, TUnit>
+        where TNode : class, INodeForGame<TNode, TEdge, TUnit>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
+        where TUnit : class, IUnit<TNode, TEdge, TUnit>
+
     {
-        public bool CanMoveTo([NotNull] TNode target, bool ignoreActionPointsCondition = false)
+        public override CommandType CommandType => CommandType.Move;
+
+        public MoveAction(TUnit executor) : base(executor)
         {
-            var r1 = MyUnit.Node != target;
-            var r2 = OwnerCondition();
-            var r3 = SizeCondition();
-            var r4 = LineCondition();
-            var r5 = (ignoreActionPointsCondition || ActionPointsCondition());
+        }
 
-            return MyUnit.Node != target
-                   && OwnerCondition()
-                   && SizeCondition()
-                   && LineCondition()
-                   && (ignoreActionPointsCondition || ActionPointsCondition());
-
-            bool SizeCondition()
-            {
-                return MyUnit.Size == UnitSize.Little && target.AnyIsFree
-                       || MyUnit.Size == UnitSize.Large && target.AllIsFree;
-            }
-
-            bool LineCondition()
-            {
-                var line = MyUnit.Node.GetLine(target);
-                return line != null
-                       && MyUnit.CanMoveOnLineWithType(line.LineType);
-            }
-
-            bool OwnerCondition()
-            {
-                return target.Owner == null
-                       || target.Owner == MyUnit.Owner
-                       || target.Owner != MyUnit.Owner && target.AllIsFree;
-            }
+        public bool CanMoveTo([NotNull] TNode target)
+        {
+            return ActionPointsCondition()
+                   && UnitUtilities<TNode, TEdge, TUnit>.CanMoveTo(Executor, target);
         }
 
         public void MoveTo([NotNull] TNode target)
-        { 
-            var startNode = MyUnit.Node;
-
-            if (startNode.LeftUnit == MyUnit)
-                startNode.LeftUnit = null;
-            if (startNode.RightUnit == MyUnit)
-                startNode.RightUnit = null;
-
+        {
             InspectNodeForCallback();
-            AssignNewNode();
-
-            
+            UnitUtilities<TNode, TEdge, TUnit>.MoveTo(Executor, target);
             CompleteAndAutoModify();
 
             void InspectNodeForCallback()
             {
-                if (target.Owner == null)
+                if (target.OwnerId == -1)
                 {
                     OnCapturingFreeNode();
                     return;
                 }
 
-                if (target.Owner != MyUnit.Owner) //?????????
+                if (target.OwnerId != Executor.OwnerId)
                 {
                     OnCapturingEnemyNode();
                     if (target.IsBase)
                         OnCapturingEnemyBase();
                 }
             }
-
-            void AssignNewNode()
-            {
-                MyUnit.Node = target;
-                if (MyUnit.Size == UnitSize.Large)
-                {
-                    target.LeftUnit = MyUnit;
-                    target.RightUnit = MyUnit;
-                }
-                else if (target.LeftIsFree && (MyUnit.UnitDirection == UnitDirection.Left ||
-                                               MyUnit.UnitDirection == UnitDirection.Right && !target.RightIsFree))
-                {
-                    target.LeftUnit = MyUnit;
-                    MyUnit.UnitDirection = UnitDirection.Left;
-                }
-                else
-                {
-                    target.RightUnit = MyUnit;
-                    MyUnit.UnitDirection = UnitDirection.Right;
-                }
-
-                if (MyUnit.Owner != target.Owner)
-                    target.ConnectTo(MyUnit.Owner);
-            }
         }
 
-        public override CommandType CommandType => CommandType.Move;
+        public override void Accept(IBaseUnitActionVisitor<TNode, TEdge, TUnit> visitor) => visitor.Visit(this);
 
-        public Type TargetType => typeof(TNode);
-        public bool IsMyTarget(ITarget target) => target is TNode;
-
-        public ICommandWithCommandType GenerateCommand(ITarget target)
-        {
-            return new MoveCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this, (TNode) target);
-        }
-
-        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor)
-        {
+        public override TResult Accept<TResult>(IUnitActionVisitor<TResult, TNode, TEdge, TUnit> visitor) =>
             visitor.Visit(this);
-        }
 
         #region CallBack
 
@@ -136,9 +66,5 @@ namespace LineWars.Model
         }
 
         #endregion
-
-        public MoveAction(TUnit executor) : base(executor)
-        {
-        }
     }
 }

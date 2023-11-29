@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -6,11 +7,10 @@ namespace LineWars.Model
 {
     public static class BasePlayerUtility
     {
-        private static int globalUnitIndex;
         public static bool CanSpawnUnit(Node node, Unit unit, UnitDirection unitDirection = UnitDirection.Any)
         {
             return node != null && unit != null &&
-                   (unit.Size == UnitSize.Large && node.LeftIsFree && node.RightIsFree 
+                   (unit.Size == UnitSize.Large && node.LeftIsFree && node.RightIsFree
                     || unit.Size == UnitSize.Little && (
                         unitDirection is UnitDirection.Left or UnitDirection.Any && node.LeftIsFree
                         || unitDirection is UnitDirection.Right or UnitDirection.Any && node.RightIsFree
@@ -18,10 +18,13 @@ namespace LineWars.Model
                    );
         }
 
-        public static Unit CreateUnitForPlayer(BasePlayer player, Node node, Unit unitPrefab,
+        public static Unit CreateUnitForPlayer(
+            BasePlayer player,
+            Node node,
+            Unit unitPrefab,
             UnitDirection unitDirection = UnitDirection.Any)
         {
-            var unit = Object.Instantiate(unitPrefab, player.transform);
+            var unit = UnityEngine.Object.Instantiate(unitPrefab, player.transform);
             unit.transform.position = node.transform.position;
 
             if (unit.Size == UnitSize.Large)
@@ -47,17 +50,39 @@ namespace LineWars.Model
                 }
 
             Owned.Connect(player, unit);
-
-            unit.name = $"{unit.UnitName}{globalUnitIndex}";
-            globalUnitIndex++;
             return unit;
         }
-        
+
+        public static PurchaseInfo GetPresetPurchaseInfo(this BasePlayer player, UnitBuyPreset preset)
+        {
+            var result = player.Rules.CostFunction.Calculate(
+                preset.FirstUnitType,
+                preset.Cost,
+                player.GetCountUnitByType(preset.FirstUnitType)
+            );
+            return result;
+        }
+
+        public static UnitSize GetUnitSizeByTypeForPlayer(this UnitType type, BasePlayer player)
+        {
+            return player.GetUnitPrefab(type).Size;
+        }
+
         public static int GetCountUnitByType(this BasePlayer player, UnitType type)
         {
-            return player.OwnedObjects
-                .OfType<Unit>()
+            return player.MyUnits
                 .Count(x => x.Type == type);
+        }
+
+        public static IEnumerable<Unit> GetAllUnits(BasePlayer player, Func<Unit, bool> predicate)
+        {
+            return player.MyUnits
+                .Where(predicate);
+        }
+
+        public static IEnumerable<Unit> GetAllUnits(BasePlayer player)
+        {
+            return GetAllUnits(player, (_) => true);
         }
     }
 }

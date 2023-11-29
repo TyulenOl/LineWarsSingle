@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using LineWars.Extensions;
+using LineWars.Interface;
 using LineWars.Model;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -15,7 +15,7 @@ namespace LineWars
     {
         public static SingleGame Instance { get; private set; }
         [Header("Logic")]
-        [SerializeField] private Spawn playerSpawn;
+        [SerializeField] private PlayerBuilder playerSpawn;
         
         [Header("References")]
         [SerializeField] private PlayerInitializer playerInitializer;
@@ -23,8 +23,9 @@ namespace LineWars
         [Header("Debug")] 
         [SerializeField] private bool isAI;
 
-        public readonly IndexList<BasePlayer> AllPlayers = new IndexList<BasePlayer> ();
-        public readonly IndexList<Unit> AllUnits = new IndexList<Unit>();//сру и не стесняюсь!
+        public readonly IndexList<BasePlayer> AllPlayers = new();
+        public readonly IndexList<Unit> AllUnits = new();
+        
         private Player player;
         
 
@@ -32,6 +33,7 @@ namespace LineWars
         private SpawnInfo playerSpawnInfo;
         
         public SceneName MyScene => (SceneName) SceneManager.GetActiveScene().buildIndex;
+        public PlayerInitializer PlayerInitializer => playerInitializer;
         private bool HasSpawnPoint() => spawnInfosStack.Count > 0;
         private SpawnInfo GetSpawnPoint() => spawnInfosStack.Pop();
 
@@ -84,9 +86,21 @@ namespace LineWars
                 return;
             }
 
-            playerSpawnInfo = playerSpawn
-                ? MonoGraph.Instance.Spawns.First(info => info.SpawnNode == playerSpawn)
-                : MonoGraph.Instance.Spawns.First();
+            if (playerSpawn != null)
+            {
+                playerSpawnInfo = MonoGraph.Instance.Spawns
+                    .FirstOrDefault(info => info.SpawnNode == playerSpawn);
+            }
+            else
+            {
+                Debug.LogWarning("Ой ей вы не настроили спавн игрока");
+                playerSpawnInfo = MonoGraph.Instance.Spawns.FirstOrDefault();
+            }
+
+            if (playerSpawnInfo == null)
+            {
+                throw new InvalidOperationException("Игра не может быть продолжена, так нет свавна для игрока");
+            }
             
             spawnInfosStack = MonoGraph.Instance.Spawns
                 .Where(x => x != playerSpawnInfo)
@@ -117,7 +131,7 @@ namespace LineWars
         private void WinGame()
         {
             Debug.Log("<color=yellow>Вы Победили</color>");
-            if (!Game.IsNormalStart) return;
+            if (!GameVariables.IsNormalStart) return;
             WinLoseUI.isWin = true;
             SceneTransition.LoadScene(SceneName.WinOrLoseScene);
             CompaniesDataBase.ChooseMission.isCompleted = true;
@@ -127,7 +141,7 @@ namespace LineWars
         private void LoseGame()
         {
             Debug.Log("<color=red>Потрачено</color>");
-            if (!Game.IsNormalStart) return;
+            if (!GameVariables.IsNormalStart) return;
             WinLoseUI.isWin = false;
             SceneTransition.LoadScene(SceneName.WinOrLoseScene);
         }

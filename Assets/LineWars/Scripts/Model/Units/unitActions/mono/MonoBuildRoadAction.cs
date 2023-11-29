@@ -4,8 +4,10 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    public class MonoBuildRoadAction : MonoUnitAction<BuildAction<Node, Edge, Unit, Owned, BasePlayer>>,
-        IBuildAction<Node, Edge, Unit, Owned, BasePlayer>
+    [DisallowMultipleComponent]
+    public class MonoBuildRoadAction :
+        MonoUnitAction<BuildAction<Node, Edge, Unit>>,
+        IBuildAction<Node, Edge, Unit>
     {
         [SerializeField] private SFXData buildSfx;
 
@@ -15,25 +17,15 @@ namespace LineWars.Model
         public void UpRoad(Edge edge)
         {
             Action.UpRoad(edge);
-            SfxManager.Instance.Play(buildSfx);
+            Executor.PlaySfx(buildSfx);
         }
-
-        public Type TargetType => typeof(Edge);
-        public bool IsMyTarget(ITarget target) => target is Edge;
-
-        public ICommandWithCommandType GenerateCommand(ITarget target)
+        
+        protected override BuildAction<Node, Edge, Unit> GetAction()
         {
-            return new BuildCommand<Node, Edge, Unit, Owned, BasePlayer>(this, (Edge) target);
+            return new BuildAction<Node, Edge, Unit>(Executor);
         }
 
-        protected override BuildAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
-        {
-            return new BuildAction<Node, Edge, Unit, Owned, BasePlayer>(Unit);
-        }
-
-        public override void Accept(IMonoUnitVisitor visitor)
-        {
-            visitor.Visit(this);
-        }
+        public override void Accept(IMonoUnitActionVisitor visitor) => visitor.Visit(this);
+        public override TResult Accept<TResult>(IUnitActionVisitor<TResult, Node, Edge, Unit> visitor) => visitor.Visit(this);
     }
 }

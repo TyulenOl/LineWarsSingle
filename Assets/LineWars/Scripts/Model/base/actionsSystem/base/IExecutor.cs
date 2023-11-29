@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace LineWars.Model
 {
@@ -6,10 +7,17 @@ namespace LineWars.Model
     {
         public int MaxActionPoints { get; set; }
         public int CurrentActionPoints { get; set; }
+        public IEnumerable<IExecutorAction> Actions { get; }
         public event Action AnyActionCompleted;
-        
+
         public bool CanDoAnyAction => CurrentActionPoints > 0;
-        public bool TryGetCommandForTarget(CommandType priorityType, ITarget target, out ICommandWithCommandType command);
-        public T Accept<T>(IExecutorVisitor<T> visitor);
+    }
+
+    public interface IExecutor<TExecutor, in TAction> : IExecutor
+        where TExecutor : IExecutor<TExecutor, TAction>
+        where TAction : IExecutorAction<TExecutor>
+    {
+        public bool TryGetAction<T>(out T action) where T : TAction;
+        public T GetAction<T>() where T : TAction;
     }
 }

@@ -6,10 +6,9 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    public class MonoGraph : MonoBehaviour,
-        IGraphForGame<Node, Edge, Unit, Owned, BasePlayer>
+    public class MonoGraph : MonoBehaviour, IGraphForGame<Node, Edge, Unit>
     {
-        private GraphForGame<Node, Edge, Unit, Owned, BasePlayer> modelGraph;
+        private GraphForGame<Node, Edge, Unit> modelGraph;
         public static MonoGraph Instance { get; private set; }
 
         [field: SerializeField] public GameObject NodesParent { get; set; }
@@ -40,12 +39,12 @@ namespace LineWars.Model
             allNodes = FindObjectsOfType<Node>();
             allEdges = FindObjectsOfType<Edge>();
             GenerateSpawnInfo();
-            modelGraph = new GraphForGame<Node, Edge, Unit, Owned, BasePlayer>(allNodes, allEdges);
+            modelGraph = new GraphForGame<Node, Edge, Unit>(allNodes, allEdges);
         }
 
         private void GenerateSpawnInfo()
         {
-            var spawns = FindObjectsOfType<Spawn>();
+            var spawns = FindObjectsOfType<PlayerBuilder>();
 
             var initialInfos = FindObjectsOfType<Node>();
 
@@ -64,8 +63,8 @@ namespace LineWars.Model
         }
 
 
-        public Dictionary<Node, bool> GetVisibilityInfo(BasePlayer player) =>
-            Instance.modelGraph.GetVisibilityInfo(player);
+        public Dictionary<Node, bool> GetVisibilityInfo(BasePlayer player)
+            => modelGraph.GetVisibilityInfo(player.MyNodes);
 
         public IEnumerable<Node> GetVisibilityNodes(IEnumerable<Node> ownedNodes)
             => modelGraph.GetVisibilityNodes(ownedNodes);
@@ -74,12 +73,23 @@ namespace LineWars.Model
             [NotNull] Node start,
             [NotNull] Node end,
             Func<Node, Node, bool> condition = null)
-            => modelGraph.FindShortestPath(start, end, condition);
+        {
+            return modelGraph.FindShortestPath(start, end, condition);
+        }
 
         public IEnumerable<Node> GetNodesInRange(
             Node startNode,
             uint range,
             Func<Node, Node, bool> condition = null)
-            => modelGraph.GetNodesInRange(startNode, range, condition);
+        {
+            return modelGraph.GetNodesInRange(startNode, range, condition);
+        }
+
+        public IEnumerable<Node> MultiStartsLimitedBfs(
+            IReadOnlyDictionary<Node, int> startNodes,
+            IReadOnlyDictionary<Node, int> interferingNodes)
+        {
+            return modelGraph.MultiStartsLimitedBfs(startNodes, interferingNodes);
+        }
     }
 }

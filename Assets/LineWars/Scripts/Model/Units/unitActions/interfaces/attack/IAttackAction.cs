@@ -1,23 +1,26 @@
-﻿
-
-namespace LineWars.Model
+﻿namespace LineWars.Model
 {
-    public interface IAttackAction<TNode, TEdge, TUnit, TOwned, TPlayer> :
+    public interface IAttackAction<TNode, TEdge, TUnit> :
         IActionWithDamage,
-        IUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>,
-        ITargetedAction
+        IUnitAction<TNode, TEdge, TUnit>,
+        ITargetedAction<ITargetedAlive>
+        where TNode : class, INodeForGame<TNode, TEdge, TUnit>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
+        where TUnit : class, IUnit<TNode, TEdge, TUnit>
     
-        #region Сonstraints
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer> 
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TOwned : class, IOwned<TOwned, TPlayer>
-        where TPlayer: class, IBasePlayer<TOwned, TPlayer>
-        #endregion 
     {
         bool IsPenetratingDamage { get; }
-        
-        bool CanAttack(IAlive enemy, bool ignoreActionPointsCondition = false);
-        void Attack(IAlive enemy);
+
+        bool CanAttack(ITargetedAlive enemy, bool ignoreActionPointsCondition = false);
+        void Attack(ITargetedAlive enemy);
+
+
+        bool ITargetedAction<ITargetedAlive>.IsAvailable(ITargetedAlive target) => CanAttack(target);
+        void ITargetedAction<ITargetedAlive>.Execute(ITargetedAlive target) => Attack(target);
+
+        IActionCommand ITargetedAction<ITargetedAlive>.GenerateCommand(ITargetedAlive target)
+        {
+            return new AttackCommand<TNode, TEdge, TUnit>(this, target);
+        }
     }
 }

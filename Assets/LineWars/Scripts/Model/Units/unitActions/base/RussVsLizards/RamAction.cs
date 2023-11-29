@@ -4,35 +4,30 @@ using System.Linq;
 
 namespace LineWars.Model
 {
-    public class RamAction<TNode, TEdge, TUnit, TOwned, TPlayer> :
-            UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>,
-            IRamAction<TNode, TEdge, TUnit, TOwned, TPlayer>
-
-        #region Сonstraints
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TOwned : class, IOwned<TOwned, TPlayer>
-        where TPlayer : class, IBasePlayer<TOwned, TPlayer>
-        #endregion
+    public class RamAction<TNode, TEdge, TUnit> :
+        UnitAction<TNode, TEdge, TUnit>,
+        IRamAction<TNode, TEdge, TUnit>
+        where TNode : class, INodeForGame<TNode, TEdge, TUnit>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
+        where TUnit : class, IUnit<TNode, TEdge, TUnit>
 
     {
-        private readonly IMoveAction<TNode, TEdge, TUnit, TOwned, TPlayer> moveAction;
+        public int Damage { get; }
 
         public override CommandType CommandType => CommandType.Ram;
 
-        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor) =>
-            visitor.Visit(this);
-
-        public int Damage { get; }
+        public RamAction(TUnit executor, int damage) : base(executor)
+        {
+            Damage = damage;
+        }
 
         public bool CanRam(TNode node)
         {
-            var line = MyUnit.Node.GetLine(node);
+            var line = Executor.Node.GetLine(node);
             return ActionPointsCondition()
                    && line != null
-                   && MyUnit.CanMoveOnLineWithType(line.LineType)
-                   && node.Owner != MyUnit.Owner
+                   && Executor.CanMoveOnLineWithType(line.LineType)
+                   && node.OwnerId != Executor.OwnerId
                    && !node.AllIsFree;
         }
 
@@ -44,62 +39,52 @@ namespace LineWars.Model
             }
         }
 
-        public IEnumerator SlowRam(TNode node)
+        public IEnumerator SlowRam(TNode enemyNode)
         {
-            var enemies = node.Units
+            var enemies = enemyNode.Units
                 .ToArray();
-            var enemyOwner = node.Owner;
-            var possibleNodeForRetreat = node
+            var damage = Damage / enemies.Length;
+            var possibleNodeForRetreat = enemyNode
                 .GetNeighbors()
-                .Where(x => x.Owner == enemyOwner)
+                .Where(node => node.OwnerId == enemyNode.OwnerId)
                 .ToArray();
 
             foreach (var enemy in enemies)
             {
-                if (enemy.CurrentHp + enemy.CurrentArmor <= Damage)
+                if (enemy.CurrentHp + enemy.CurrentArmor <= damage)
                 {
                     enemy.CurrentHp = 0;
-                    yield return new DiedUnit() {Unit = enemy};
-                    continue;
-                }
-
-                var enemyMoveAction = enemy.GetUnitAction<IMoveAction<TNode, TEdge, TUnit, TOwned, TPlayer>>();
-                if (enemyMoveAction == null)
-                {
-                    enemy.CurrentHp = 0;
-                    yield return new DiedUnit() {Unit = enemy};
+                    yield return new DiedUnit(enemy);
                     continue;
                 }
 
                 var nodeForRetreat = possibleNodeForRetreat
-                    .FirstOrDefault(x => enemyMoveAction.CanMoveTo(x));
+                    .FirstOrDefault(x => UnitUtilities<TNode, TEdge, TUnit>.CanMoveTo(enemy, x));
                 if (nodeForRetreat == null)
                 {
                     enemy.CurrentHp = 0;
-                    yield return new DiedUnit() {Unit = enemy};
+                    yield return new DiedUnit(enemy);
                     continue;
                 }
 
-                moveAction.MoveTo(nodeForRetreat);
-                yield return new MovedUnit() {Unit = enemy};
-                enemy.DealDamageThroughArmor(Damage);
+                enemy.DealDamageThroughArmor(damage);
+                UnitUtilities<TNode, TEdge, TUnit>.MoveTo(enemy, nodeForRetreat);
+                yield return new MovedUnit(enemy, nodeForRetreat);
             }
 
-            moveAction.MoveTo(node);
+            UnitUtilities<TNode, TEdge, TUnit>.MoveTo(Executor, enemyNode);
+            yield return new MovedUnit(Executor, enemyNode);
             CompleteAndAutoModify();
         }
-        public Type TargetType => typeof(TNode);
-        public bool IsMyTarget(ITarget target) => target is TNode;
 
-        public ICommandWithCommandType GenerateCommand(ITarget target)
+        public override void Accept(IBaseUnitActionVisitor<TNode, TEdge, TUnit> visitor)
         {
-            return new RamCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(MyUnit, (TNode) target);
+            visitor.Visit(this);
         }
 
-        public RamAction(TUnit executor, int damage) : base(executor)
+        public override TResult Accept<TResult>(IUnitActionVisitor<TResult, TNode, TEdge, TUnit> visitor)
         {
-            Damage = damage;
-            moveAction = MyUnit.GetUnitAction<IMoveAction<TNode, TEdge, TUnit, TOwned, TPlayer>>();
+            return visitor.Visit(this);
         }
     }
 }

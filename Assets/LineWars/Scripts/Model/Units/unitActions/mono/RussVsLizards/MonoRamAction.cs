@@ -1,23 +1,27 @@
-﻿using System;
-using System.Collections;
+﻿using JetBrains.Annotations;
 using UnityEngine;
 
 namespace LineWars.Model
 {
+    [DisallowMultipleComponent]
     public class MonoRamAction :
-        MonoUnitAction<RamAction<Node, Edge, Unit, Owned, BasePlayer>>,
-        IRamAction<Node, Edge, Unit, Owned, BasePlayer>
+        MonoUnitAction<RamAction<Node, Edge, Unit>>,
+        IRamAction<Node, Edge, Unit>
     {
-       
         private MonoMoveAction moveAction;
+        protected override bool NeedAutoComplete => false;
         [field: SerializeField] public int InitialDamage { get; private set; }
+        [SerializeField] private RamAnimation ramAnimation;
+
+        private int ramResponsesPlayingCount;
+        private Node currentNode;
 
         public override void Initialize()
         {
             base.Initialize();
-            moveAction = Unit.GetUnitAction<MonoMoveAction>();
+            moveAction = Executor.GetAction<MonoMoveAction>();
         }
-        
+
         public int Damage => Action.Damage;
 
         public bool CanRam(Node node)
@@ -27,52 +31,89 @@ namespace LineWars.Model
 
         public void Ram(Node node)
         {
-            //TODO: анимации и звуки
-            StartCoroutine(RamCoroutine(node));
+            currentNode = node;
+            if (ramAnimation == null)
+            {
+                Executor.transform.position = node.transform.position;
+                ExecuteRam();
+                return;
+            }
+            var animContext = new AnimationContext()
+            {
+                TargetNode = node
+            };
+            ramAnimation.Execute(animContext);
+            ramAnimation.Rammed.AddListener(OnAnimationEnded);
         }
 
-        // Чтобы работать с анимациями
-        public IEnumerator RamCoroutine(Node node)
+        private void OnAnimationEnded(RamAnimation _)
         {
-            var moved = false;
+            ramAnimation.Rammed.RemoveListener(OnAnimationEnded);
+            ExecuteRam();
+        }
 
-            var slowRamEnumerator = Action.SlowRam(node);
+        private void ExecuteRam()
+        {
+            var slowRamEnumerator = Action.SlowRam(currentNode);
+
             while (slowRamEnumerator.MoveNext())
             {
                 var current = slowRamEnumerator.Current;
-                if (current is MovedUnit movedUnit)
+                //DiedUnit?
+                if (current is not MovedUnit movedUnit) continue;
+
+                var currentUnit = (Unit)movedUnit.Unit;
+                var currentNode = (Node)movedUnit.DestinationNode;
+
+                if (!currentUnit.TryGetComponent(out AnimationResponses responses))
                 {
-                    var unit = (Unit) movedUnit.Unit;
-                    var monoMoveAction = unit.GetUnitAction<MonoMoveAction>();
-                    monoMoveAction.MoveAnimationEnded += OnAnimationEnded;
-                    moved = true;
+                    currentUnit.transform.position = currentNode.transform.position;
+                    continue;
+                }
 
-                    while (moved)
-                        yield return null;
+                var animContext = new AnimationContext()
+                {
+                    TargetNode = (Node)movedUnit.DestinationNode
+                };
 
-                    void OnAnimationEnded()
+                if (responses.CanRespond(AnimationResponseType.Rammed))
+                {
+                    var response = responses.Respond(AnimationResponseType.Rammed, animContext);
+
+                    if (response.IsPlaying)
                     {
-                        moved = false;
-                        monoMoveAction.MoveAnimationEnded -= OnAnimationEnded;
+                        ramResponsesPlayingCount++;
+                        response.Ended.AddListener(OnRespondRamEnded);
                     }
                 }
             }
+
+            if (ramResponsesPlayingCount == 0)
+                Complete();
         }
 
-        public Type TargetType => typeof(Node);
-        public bool IsMyTarget(ITarget target) => target is Node;
-
-        public ICommandWithCommandType GenerateCommand(ITarget target)
+        private void OnRespondRamEnded(UnitAnimation animation)
         {
-            return new RamCommand<Node, Edge, Unit, Owned, BasePlayer>(Unit, (Node) target);
+            ramResponsesPlayingCount--;
+            animation.Ended.RemoveListener(OnRespondRamEnded);
+            if(ramResponsesPlayingCount == 0)
+                Complete();
         }
-        
-        protected override RamAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
+
+        protected override RamAction<Node, Edge, Unit> GetAction()
         {
-            var action = new RamAction<Node, Edge, Unit, Owned, BasePlayer>(Unit, InitialDamage);
+            var action = new RamAction<Node, Edge, Unit>(Executor, InitialDamage);
             return action;
         }
 
-        public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
+        public override void Accept(IMonoUnitActionVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        public override TResult Accept<TResult>(IUnitActionVisitor<TResult, Node, Edge, Unit> visitor)
+        {
+            return visitor.Visit(this);
+        }
     }
 }

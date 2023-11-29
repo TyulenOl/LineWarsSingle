@@ -10,18 +10,19 @@ namespace LineWars.Interface
     [RequireComponent(typeof(Unit), typeof(TargetDrawer))]
     public class UnitDrawer : MonoBehaviour
     {
-        [Header("Animate Settings")]
-        [SerializeField] private Vector2 offset;
+        [Header("Animate Settings")] [SerializeField]
+        private Vector2 offset;
+
         [SerializeField] private Color damageColor = Color.red;
         [SerializeField] private Color armorDamageColor = Color.blue;
         [SerializeField] private Color healColor = Color.green;
-        
-        [Header("Reference")]
-        [SerializeField] private UnitDamageAnimator leftPart;
+
+        [Header("Reference")] [SerializeField] private UnitDamageAnimator leftPart;
         [SerializeField] private UnitDamageAnimator rightPart;
-        
-        [Header("CharacteristicsDrawers")]
-        [SerializeField] private UnitPartDrawer leftDrawer;
+
+        [Header("CharacteristicsDrawers")] [SerializeField]
+        private UnitPartDrawer leftDrawer;
+
         [SerializeField] private UnitPartDrawer rightDrawer;
 
         private Unit unit;
@@ -32,43 +33,52 @@ namespace LineWars.Interface
         {
             unit = GetComponent<Unit>();
 
-            unit.ActionPointsChanged.AddListener((_,newValue) => ExecuteForAllDrawers(drawer =>
+            unit.ActionPointsChanged.AddListener((_, newValue) => ExecuteForAllDrawers(drawer =>
             {
                 drawer.ReDrawActivity(newValue != 0);
                 ReDrawCharacteristics();
             }));
-            if (unit.TryGetUnitAction<MonoBlockAction>(out var action))
-                action.CanBlockChanged += (_,newBool) => ExecuteForAllDrawers(drawer => drawer.ReDrawCanBlock(newBool));
-            
+            if (unit.TryGetAction<MonoBlockAction>(out var action))
+                action.CanBlockChanged +=
+                    (_, newBool) => ExecuteForAllDrawers(drawer => drawer.ReDrawCanBlock(newBool));
+
             if (leftPart != null)
             {
                 leftPart.offset = offset;
             }
-            
+
             if (rightPart != null)
             {
                 rightPart.offset = offset;
             }
 
             allDrawers = new List<UnitPartDrawer>
-            { leftDrawer, rightDrawer }
+                    {leftDrawer, rightDrawer}
                 .Where(x => x is not null)
                 .ToList();
-            
-            if(leftDrawer != null)
+
+            if (leftDrawer != null)
                 leftDrawer.CurrentUnit = unit;
-            if(rightDrawer != null)
+            if (rightDrawer != null)
                 rightDrawer.CurrentUnit = unit;
 
             targetDrawer = GetComponent<TargetDrawer>();
-        }
 
+            Player.LocalPlayer.VisibilityRecalculated += LocalPlayerOnVisibilityRecalculated;
+        }
+        
+        
         private void OnEnable()
         {
             unit.UnitDirectionChange.AddListener(OnUnitDirectionChange);
             unit.ArmorChanged.AddListener(OnUnitArmorChange);
             unit.HpChanged.AddListener(OnUnitHpChange);
             ReDrawCharacteristics();
+        }
+
+        private void LocalPlayerOnVisibilityRecalculated()
+        {
+            //gameObject.SetActive(unit.Node.IsVisible);
         }
 
         private void OnDisable()
@@ -82,7 +92,7 @@ namespace LineWars.Interface
         {
             if (size == UnitSize.Little && direction == UnitDirection.Left)
                 DrawLeft();
-            else 
+            else
                 DrawRight();
         }
 
@@ -90,23 +100,24 @@ namespace LineWars.Interface
         {
             if (leftPart != null && leftPart.gameObject.activeSelf)
                 leftPart.AnimateDamageText((after - before).ToString(), armorDamageColor);
-            
+
             if (rightPart != null && rightPart.gameObject.activeSelf)
                 rightPart.AnimateDamageText((after - before).ToString(), armorDamageColor);
             ReDrawCharacteristics();
         }
-        
+
         private void OnUnitHpChange(int before, int after)
         {
+            if (before == after) return;
             var diff = after - before;
-            var color = diff > 0 ? healColor : damageColor; 
-            
+            var color = diff > 0 ? healColor : damageColor;
+
             if (leftPart != null && leftPart.gameObject.activeSelf)
                 leftPart.AnimateDamageText((diff).ToString(), color);
-            
+
             if (rightPart != null && rightPart.gameObject.activeSelf)
                 rightPart.AnimateDamageText((diff).ToString(), color);
-            
+
             ReDrawCharacteristics();
         }
 
@@ -115,20 +126,19 @@ namespace LineWars.Interface
         {
             ExecuteForAllDrawers((drawer => drawer.ReDrawAvailability(available)));
         }
-        
+
         public void DrawLeft()
         {
-            
             if (leftPart != null)
             {
                 leftPart.gameObject.SetActive(true);
                 targetDrawer.image = leftDrawer.targetSprite;
             }
-            
+
             if (rightPart != null)
                 rightPart.gameObject.SetActive(false);
         }
-        
+
         public void DrawRight()
         {
             if (leftPart != null)
@@ -162,6 +172,11 @@ namespace LineWars.Interface
             {
                 action.Invoke(drawer);
             }
+        }
+
+        private void OnDestroy()
+        {
+            Player.LocalPlayer.VisibilityRecalculated -= LocalPlayerOnVisibilityRecalculated;
         }
     }
 }

@@ -1,8 +1,6 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using LineWars.Controllers;
-using LineWars.Extensions.Attributes;
 using LineWars.Model;
 using UnityEngine;
 

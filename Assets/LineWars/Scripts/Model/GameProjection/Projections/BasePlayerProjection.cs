@@ -5,77 +5,24 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace LineWars.Model
 {
-    public class BasePlayerProjection :
-        IBasePlayer<OwnedProjection,
-            BasePlayerProjection>, IReadOnlyBasePlayerProjection
+    public class BasePlayerProjection : IBasePlayer, IReadOnlyBasePlayerProjection
     {
         private NodeProjection baseProjection;
-        private HashSet<OwnedProjection> ownedObjects;
-        public int Id { get; private set; }
-        public BasePlayer Original { get; private set; }
+        public HashSet<OwnedProjection> OwnedObjects { get; set; }
+        public int Id { get; set; }
+        public BasePlayer Original { get; set; }
         public GameProjection Game { get; set; }
-        public NodeProjection Base
-        {
-            get => baseProjection;
-
-            set
-            {
-                if (value == null)
-                {
-                    baseProjection = null;
-                    return;
-                }
-
-                if (value.Owner != this) throw new ArgumentException();
-
-                baseProjection = value;
-            }
-        }
-        public PlayerRules Rules { get; private set; }
-        public PhaseExecutorsData PhaseExecutorsData { get; private set; }
-        public NationEconomicLogic EconomicLogic { get; private set; } 
+        public PlayerRules Rules { get; set; }
+        public PhaseExecutorsData PhaseExecutorsData { get; set; }
+        public NationEconomicLogic EconomicLogic { get; set; } 
         public int Income { get; set; }
         public int CurrentMoney { get; set; }
-        public IReadOnlyCollection<OwnedProjection> OwnedObjects => ownedObjects;
 
-        public BasePlayerProjection(
-            int id,
-            PlayerRules rules, 
-            int income, int currentMoney,
-            PhaseExecutorsData executorsData,
-            NationEconomicLogic economicLogic,
-            BasePlayer original = null,
-            IReadOnlyCollection<OwnedProjection> ownedObjects = null,
-            NodeProjection playerBase = null)
-        {
-            Id = id;
-            Original = original;
-            Base = playerBase;
-            Rules = rules;
-            Income = income;
-            CurrentMoney = currentMoney;
-            PhaseExecutorsData = executorsData;
-            EconomicLogic = economicLogic;
-            if(ownedObjects != null) 
-                this.ownedObjects = new HashSet<OwnedProjection>(ownedObjects);
-            else 
-                this.ownedObjects = new HashSet<OwnedProjection>();
-        }
-
-       public BasePlayerProjection(BasePlayer original, IReadOnlyCollection<OwnedProjection> ownedObjects = null, NodeProjection playerBase = null)
-            : this(original.Id, original.Rules, original.Income, original.CurrentMoney, original.PhaseExecutorsData, original.EconomicLogic, original, ownedObjects, playerBase)
-        {
-        }
-
-        public BasePlayerProjection(IReadOnlyBasePlayerProjection playerProjection, IReadOnlyCollection<OwnedProjection> ownedObjects = null, NodeProjection playerBase = null)
-             : this(playerProjection.Id, playerProjection.Rules, playerProjection.Income, playerProjection.CurrentMoney,
-                   playerProjection.PhaseExecutorsData, playerProjection.EconomicLogic, playerProjection.Original,
-                   ownedObjects, playerBase)
-        { }
+        IReadOnlyCollection<OwnedProjection> IReadOnlyBasePlayerProjection.OwnedObjects => OwnedObjects;
 
         public void SimulateReplenish()
         {
-            foreach(var owned in ownedObjects)
+            foreach(var owned in OwnedObjects)
             {
                 owned.Replenish();
             }
@@ -89,7 +36,7 @@ namespace LineWars.Model
                 owned.Owner.RemoveOwned(owned);
 
             CheckOwnedValidity(owned);
-            ownedObjects.Add(owned);
+            OwnedObjects.Add(owned);
             
         }
 
@@ -98,8 +45,7 @@ namespace LineWars.Model
             if(newProj is UnitProjection newUnit)
             {
                 foreach(var oldUnit in OwnedObjects
-                    .Where(owned => owned is UnitProjection)
-                    .Select(owned => (UnitProjection)owned))
+                            .OfType<UnitProjection>())
                 {
                     if (newUnit.Id == oldUnit.Id)
                         throw new InvalidOperationException();
@@ -109,8 +55,7 @@ namespace LineWars.Model
             if(newProj is NodeProjection newNode)
             {
                 foreach(var oldNode in OwnedObjects
-                    .Where (owned => owned is NodeProjection)
-                    .Select (owned => (NodeProjection)owned))
+                            .OfType<NodeProjection>())
                 {
                     if(newNode.Id == oldNode.Id)
                         throw new InvalidOperationException();
@@ -118,20 +63,20 @@ namespace LineWars.Model
             }
         }
 
-        public bool CanSpawnPreset(UnitBuyPreset preset)
+        public bool CanBuyPreset(UnitBuyPreset preset)
         {
-            return Base.LeftUnit == null && Base.RightUnit == null;
+            return false; //TODO: Сделать шота
         }
 
         public void RemoveOwned([NotNull] OwnedProjection owned)
         {
             if (owned == null) throw new ArgumentNullException(nameof(owned));
-            if (!ownedObjects.Contains(owned)) return;
+            if (!OwnedObjects.Contains(owned)) return;
 
-            ownedObjects.Remove(owned);
+            OwnedObjects.Remove(owned);
         }
 
-        public void SpawnPreset(UnitBuyPreset preset)
+        public void BuyPreset(UnitBuyPreset preset)
         {
             var leftUnit = preset.FirstUnitType; // СПРОСИТЬ У ПАШИ
         }
@@ -140,7 +85,6 @@ namespace LineWars.Model
     public interface IReadOnlyBasePlayerProjection : INumbered
     {
         public BasePlayer Original { get; }
-        public NodeProjection Base { get; }
         public PlayerRules Rules { get; }
         public PhaseExecutorsData PhaseExecutorsData { get; }  
         public NationEconomicLogic EconomicLogic { get; }

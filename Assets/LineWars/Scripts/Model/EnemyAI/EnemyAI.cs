@@ -1,4 +1,3 @@
-using LineWars.Extensions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
+using JetBrains.Annotations;
 
 namespace LineWars.Model
 {
@@ -13,38 +13,64 @@ namespace LineWars.Model
     {
         [SerializeField] private EnemyDifficulty difficulty;
         [SerializeField] private float actionCooldown;
-        [SerializeField] private EnemyAIPersonality personality;
+        [SerializeField] private AIBuyLogicData buyLogicData;
         [SerializeField] private GameEvaluator gameEvaluator;
-        [SerializeField] private int depth;
+        [field: SerializeField] public int Depth { get; set; }
         [SerializeField] private float commandPause;
         [SerializeField] private float firstCommandPause;
 
-        private EnemyAIBuySelector buySelector;
+        private AIBuyLogic buyLogic;
 
-        protected override void Awake()
+        public override void Initialize(SpawnInfo spawnInfo)
         {
-            base.Awake();
-            buySelector = new EnemyAIBuySelector();
+            base.Initialize(spawnInfo);
+            buyLogic = buyLogicData.CreateAILogic(this);
         }
+
+        // protected override void OnBuyPreset(Node node, IEnumerable<Unit> units)
+        // {
+        //     base.OnBuyPreset(node, units);
+        //     if (node.IsVisible) return;
+        //     foreach (var unit in units)
+        //     {
+        //         unit.gameObject.SetActive(false);
+        //     }
+        // }
+
+        public void SetNewBuyLogic([NotNull] AIBuyLogicData buyData)
+        {
+            if (buyLogicData == null)
+                Debug.LogError("Buy Logic Data cannot be null!");
+            buyLogicData = buyData;
+            buyLogic = buyData.CreateAILogic(this);
+        }
+
+        public void SetNewGameEvaluator([NotNull] GameEvaluator evaluator)
+        {
+            if (evaluator == null)
+                Debug.LogError("Evaluator cannot be null!");
+            gameEvaluator = evaluator;
+        }
+
 
         #region Turns
 
-        public override void ExecuteBuy()
+        protected override void ExecuteBuy()
         {
             StartCoroutine(BuyCoroutine());
             IEnumerator BuyCoroutine()
             {
-                if (buySelector.TryGetPreset(this, out var preset))
-                    SpawnPreset(preset);
+                buyLogic.CalculateBuy();
                 yield return null;
                 ExecuteTurn(PhaseType.Idle);
             }
         }
-        public override void ExecuteArtillery() => ExecuteAITurn(PhaseType.Artillery);
-        public override void ExecuteFight() => ExecuteAITurn(PhaseType.Fight);
-        public override void ExecuteScout() => ExecuteAITurn(PhaseType.Scout);
 
-        public override void ExecuteReplenish()
+        protected override void ExecuteArtillery() => ExecuteAITurn(PhaseType.Artillery);
+        protected override void ExecuteFight() => ExecuteAITurn(PhaseType.Fight);
+        protected override void ExecuteScout() => ExecuteAITurn(PhaseType.Scout);
+
+        protected override void ExecuteReplenish()
         {
             base.ExecuteReplenish();
             StartCoroutine(ReplenishCoroutine());
@@ -58,14 +84,13 @@ namespace LineWars.Model
         public async void ExecuteAITurn(PhaseType phase)
         {
             var gameProjection = 
-                GameProjection.GetProjectionFromMono(SingleGame.Instance.AllPlayers.Values, MonoGraph.Instance, PhaseManager.Instance);
-
+                GameProjectionCreator.FromMono(SingleGame.Instance.AllPlayers.Values, MonoGraph.Instance, PhaseManager.Instance);
             var possibleCommands = CommandBlueprintCollector.CollectAllCommands(gameProjection);
             var tasksList = new List<Task<(int, List<ICommandBlueprint>)>>();
             foreach ( var command in possibleCommands )
             {
                 var commandChain = new List<ICommandBlueprint>();
-                tasksList.Add(ExploreOutcomes(gameProjection, command, depth, -1, commandChain, true));
+                tasksList.Add(ExploreOutcomes(gameProjection, command, Depth, -1, commandChain, true));
             }
 
             var commandEvalList = await Task.WhenAll(tasksList.ToArray());
@@ -104,7 +129,7 @@ namespace LineWars.Model
                 throw new ArgumentException();
 
             currentExecutorId = blueprint.ExecutorId;
-            var newGame = GameProjection.GetCopy(gameProjection);
+            var newGame = GameProjectionCreator.FromProjection(gameProjection);
             var thisCommand = blueprint.GenerateCommand(newGame);
             thisCommand.Execute();
 
@@ -135,7 +160,7 @@ namespace LineWars.Model
             }
 
             var possibleCommands = CommandBlueprintCollector.CollectAllCommands(newGame)
-            .Where(newBlueprint => currentExecutorId == -1 || newBlueprint.ExecutorId != currentExecutorId)
+            .Where(newBlueprint => currentExecutorId == -1 || newBlueprint.ExecutorId == currentExecutorId)
             .Select(newBlueprint => MinMax(newGame, newBlueprint, depth, currentExecutorId, firstCommandChain, isSavingCommands));
 
             if (thisPlayerProjection != newGame.CurrentPlayer)
@@ -164,11 +189,12 @@ namespace LineWars.Model
         #endregion
 
         #region Check Turns
-        public override bool CanExecuteBuy() => true;
-        public override bool CanExecuteArtillery() => CanExecutePhase(PhaseType.Artillery);
-        public override bool CanExecuteFight() => CanExecutePhase(PhaseType.Fight);
-        public override bool CanExecuteScout() => CanExecutePhase(PhaseType.Scout);
-        public override bool CanExecuteReplenish() => true;
+
+        protected override bool CanExecuteBuy() => true;
+        protected override bool CanExecuteArtillery() => CanExecutePhase(PhaseType.Artillery);
+        protected override bool CanExecuteFight() => CanExecutePhase(PhaseType.Fight);
+        protected override bool CanExecuteScout() => CanExecutePhase(PhaseType.Scout);
+        protected override bool CanExecuteReplenish() => true;
 
         private bool CanExecutePhase(PhaseType phase)
         {

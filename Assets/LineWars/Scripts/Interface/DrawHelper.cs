@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using LineWars;
@@ -6,7 +7,6 @@ using UnityEngine;
 
 public static class DrawHelper
 {
-
     public static Sprite GetSpriteByCharacteristicType(CharacteristicType characteristicType)
     {
         switch (characteristicType)
@@ -22,22 +22,31 @@ public static class DrawHelper
             default: return Resources.Load<Sprite>("UI/Sorokin/Icons/Heal");
         }
     }
-    
+
     public static Sprite GetSpriteByCommandType(CommandType commandType)
     {
         switch (commandType)
         {
             case CommandType.MeleeAttack:
                 return Resources.Load<Sprite>("UI/Sorokin/Icons/AttackOrder");
+            case CommandType.Ram:
+                return Resources.Load<Sprite>("UI/Sorokin/Icons/RamOrder");
+            case CommandType.ShotUnit:
+                return Resources.Load<Sprite>("UI/Sorokin/Icons/ThrowOrder");
+            case CommandType.BlowWithSwing:
+                return Resources.Load<Sprite>("UI/Sorokin/Icons/BlowOrder");
             case CommandType.Heal:
                 return Resources.Load<Sprite>("UI/Sorokin/Icons/Heal");
+            case CommandType.SacrificePerun:
+                return Resources.Load<Sprite>("UI/Sorokin/Icons/SacryficeOrder");
             case CommandType.Fire:
-                return Resources.Load<Sprite>("UI/Icons/Icon_Focus");
+                return Resources.Load<Sprite>("UI/Sorokin/Icons/DistanseAttackOrder");
             case CommandType.Move:
                 return Resources.Load<Sprite>("UI/Sorokin/Icons/MoveOrder");
             case CommandType.Build:
                 return Resources.Load<Sprite>("UI/Icons/Upgrade");
-            default: return Resources.Load<Sprite>("UI/Icons/Icon_Focus");
+
+            default: return Resources.Load<Sprite>("UI/Sorokin/Icons/DistanseAttackOrder");
         }
     }
 
@@ -46,20 +55,21 @@ public static class DrawHelper
         switch (phaseType)
         {
             case PhaseType.Artillery:
-            return "Артподготовка";
+                return "Артподготовка";
             case PhaseType.Idle:
-            return "Рутина";
+                return "Рутина";
             case PhaseType.Buy:
-            return "Подкрепление";
+                return "Подкрепление";
             case PhaseType.Fight:
-            return "Боевые действия";
+                return "Боевые действия";
             case PhaseType.Scout:
-            return "Разведка";
+                return "Разведка";
             default: return "Подготовка";
         }
     }
- 
-    
+
+
+    [Obsolete]
     public static Sprite GetSpriteByUnitType(UnitType characteristicType)
     {
         switch (characteristicType)
@@ -73,7 +83,7 @@ public static class DrawHelper
             default: return Resources.Load<Sprite>("UI/Icons/rifle-type");
         }
     }
-    
+
     public static string GetNameByUnitType(UnitType characteristicType)
     {
         switch (characteristicType)

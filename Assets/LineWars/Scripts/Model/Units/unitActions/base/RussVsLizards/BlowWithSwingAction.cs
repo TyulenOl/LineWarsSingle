@@ -1,46 +1,53 @@
 ﻿namespace LineWars.Model
 {
-    public class BlowWithSwingAction<TNode, TEdge, TUnit, TOwned, TPlayer> :
-            UnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>,
-            IBlowWithSwingAction<TNode, TEdge, TUnit, TOwned, TPlayer>
-
-        #region Сonstraints
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TOwned : class, IOwned<TOwned, TPlayer>
-        where TPlayer : class, IBasePlayer<TOwned, TPlayer>
-        #endregion
+    public class BlowWithSwingAction<TNode, TEdge, TUnit> :
+        UnitAction<TNode, TEdge, TUnit>,
+        IBlowWithSwingAction<TNode, TEdge, TUnit>
+        where TNode : class, INodeForGame<TNode, TEdge, TUnit>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
+        where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
+        public int Damage { get; }
         public override CommandType CommandType => CommandType.BlowWithSwing;
 
-        public override void Accept(IUnitActionVisitor<TNode, TEdge, TUnit, TOwned, TPlayer> visitor) =>
-            visitor.Visit(this);
 
-        public ICommandWithCommandType GenerateCommand() => new BlowWithSwingCommand<TNode, TEdge, TUnit, TOwned, TPlayer>(this);
-
-        public int Damage { get; }
-        public bool CanBlowWithSwing() => ActionPointsCondition();
-
-        public void ExecuteBlowWithSwing()
+        public bool IsAvailable(TUnit target)
         {
-            foreach (var neighbor in MyUnit.Node.GetNeighbors())
+            return ActionPointsCondition()
+                   && target.Node.GetLine(Executor.Node) != null
+                   && target.OwnerId != Executor.OwnerId;
+        }
+
+        public void Execute(TUnit target)
+        {
+            foreach (var neighbor in Executor.Node.GetNeighbors())
             {
                 if (neighbor.AllIsFree)
                     continue;
-                if (neighbor.Owner == MyUnit.Owner)
+                if (neighbor.OwnerId == Executor.OwnerId)
                     continue;
                 foreach (var unit in neighbor.Units)
                 {
-                    unit.DealDamageThroughArmor(Damage); 
+                    unit.DealDamageThroughArmor(Damage);
                 }
             }
+
             CompleteAndAutoModify();
         }
 
         public BlowWithSwingAction(TUnit executor, int damage) : base(executor)
         {
             Damage = damage;
+        }
+
+        public override void Accept(IBaseUnitActionVisitor<TNode, TEdge, TUnit> visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        public override TResult Accept<TResult>(IUnitActionVisitor<TResult, TNode, TEdge, TUnit> visitor)
+        {
+            return visitor.Visit(this);
         }
     }
 }

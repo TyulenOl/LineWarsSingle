@@ -1,16 +1,15 @@
 using System.Collections.Generic;
 
-namespace LineWars.Extensions
+
+public static class IReadOnlyListExtensions
 {
-    public static class IReadOnlyListExtensions
+    public static int FindIndex<T>(this IReadOnlyList<T> list, T obj)
     {
-        public static int FindIndex<T>(this IReadOnlyList<T> list, T obj)
+        for (var i = 0; i < list.Count; i++)
         {
-            for(var i = 0; i < list.Count; i++)
-            {
-                if (list[i].Equals(obj)) return i;
-            }
-            return -1;
+            if (list[i].Equals(obj)) return i;
         }
+
+        return -1;
     }
 }

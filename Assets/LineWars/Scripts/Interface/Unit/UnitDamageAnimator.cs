@@ -1,7 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using LineWars.Extensions;
 using TMPro;
 using UnityEngine;
 
@@ -11,18 +9,18 @@ namespace LineWars.Interface
     {
         [HideInInspector] public Vector2 offset;
         [SerializeField] private float animationThreshold = 0.5f;
-        
-        [Header("Reference")]
-        [SerializeField] private TMP_Text damageText;
+
+        [Header("Reference")] [SerializeField] private TMP_Text damageText;
 
         private int currentCoroutineIndex = -1;
         private float globalProgress = 1;
 
         private bool CanStartAnimation => globalProgress > animationThreshold;
+
         public float AnimationThreshold
         {
             get => animationThreshold;
-            set => animationThreshold = Math.Min(Math.Max(0,value), 1);
+            set => animationThreshold = Math.Min(Math.Max(0, value), 1);
         }
 
         private void Awake()
@@ -44,7 +42,7 @@ namespace LineWars.Interface
 
             StartCoroutine(AnimateDamageTextCoroutine(text, textColor));
         }
-        
+
         private IEnumerator AnimateDamageTextCoroutine(string text, Color textColor)
         {
             var myIndex = ++currentCoroutineIndex;
@@ -64,9 +62,10 @@ namespace LineWars.Interface
 
                 if (currentCoroutineIndex == myIndex)
                     globalProgress = localProgress;
-                
+
                 yield return null;
             }
+
             Destroy(instantiate.gameObject);
         }
     }

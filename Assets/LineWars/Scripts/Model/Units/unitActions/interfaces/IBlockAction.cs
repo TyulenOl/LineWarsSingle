@@ -4,23 +4,29 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace LineWars.Model
 {
-    public interface IBlockAction<TNode, TEdge, TUnit, TOwned, TPlayer>:
-        IUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>, ISimpleAction
-    
-        #region Сonstraints
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer> 
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TOwned : class, IOwned<TOwned, TPlayer>
-        where TPlayer: class, IBasePlayer<TOwned, TPlayer>
-        #endregion 
+    public interface IBlockAction<TNode, TEdge, TUnit>:
+        IUnitAction<TNode, TEdge, TUnit>, 
+        ISimpleAction
+        where TNode : class, INodeForGame<TNode, TEdge, TUnit>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit> 
+        where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
         bool IsBlocked { get; }
         bool Protection { get; }
+        IntModifier ContrAttackDamageModifier { get; }
         event Action<bool, bool> CanBlockChanged;
         bool CanBlock();
         void EnableBlock();
         bool CanContrAttack([NotNull] TUnit enemy);
         void ContrAttack([NotNull] TUnit enemy);
+        
+        
+        bool ISimpleAction.CanExecute() => CanBlock();
+        void ISimpleAction.Execute() => Execute();
+
+        IActionCommand ISimpleAction.GenerateCommand()
+        {
+            return new BlockCommand<TNode, TEdge, TUnit>(this);
+        }
     }
 }

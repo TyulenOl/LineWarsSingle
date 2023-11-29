@@ -9,7 +9,8 @@ namespace LineWars.Model
         Default,
         Russia,
         Deutschland,
-        GreatBritain
+        GreatBritain,
+        OldRus
     }
 
     public static class NationHelper
@@ -19,7 +20,8 @@ namespace LineWars.Model
             {NationType.Default, "По-умолчанию"},
             {NationType.Russia, "Россия"},
             {NationType.Deutschland, "Германия"},
-            {NationType.GreatBritain, "Британия"}
+            {NationType.GreatBritain, "Британия"},
+            {NationType.OldRus, "Древние русы"}
         };
         
         public static string GetNationName(NationType type)

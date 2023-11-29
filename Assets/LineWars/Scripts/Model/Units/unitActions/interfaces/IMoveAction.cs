@@ -3,19 +3,25 @@
 
 namespace LineWars.Model
 {
-    public interface IMoveAction<TNode, TEdge, TUnit, TOwned, TPlayer>:
-        IUnitAction<TNode, TEdge, TUnit, TOwned, TPlayer>,
-        ITargetedAction
-        
+    public interface IMoveAction<TNode, TEdge, TUnit>:
+        IUnitAction<TNode, TEdge, TUnit>,
+        ITargetedAction<TNode>
+
         #region Сonstraints
-        where TNode : class, TOwned, INodeForGame<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit, TOwned, TPlayer> 
-        where TUnit : class, TOwned, IUnit<TNode, TEdge, TUnit, TOwned, TPlayer>
-        where TOwned : class, IOwned<TOwned, TPlayer>
-        where TPlayer: class, IBasePlayer<TOwned, TPlayer>
+        where TNode : class, INodeForGame<TNode, TEdge, TUnit>
+        where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit> 
+        where TUnit : class, IUnit<TNode, TEdge, TUnit>
         #endregion 
     {
-        bool CanMoveTo([NotNull] TNode target, bool ignoreActionPointsCondition = false);
+        bool CanMoveTo([NotNull] TNode target);
         void MoveTo([NotNull] TNode target);
+        
+        
+        bool ITargetedAction<TNode>.IsAvailable(TNode target) => CanMoveTo(target);
+        void ITargetedAction<TNode>.Execute(TNode target) => MoveTo(target);
+        IActionCommand ITargetedAction<TNode>.GenerateCommand(TNode target)
+        {
+            return new MoveCommand<TNode, TEdge, TUnit>(this, target);
+        }
     }
 }

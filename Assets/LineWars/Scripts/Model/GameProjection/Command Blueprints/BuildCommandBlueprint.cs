@@ -22,9 +22,7 @@ namespace LineWars.Model
             var edge = projection.EdgesIndexList[EdgeId];   
 
             return new BuildCommand
-                <NodeProjection, EdgeProjection, UnitProjection, 
-                OwnedProjection, BasePlayerProjection>
-                (engineer, edge);
+                <NodeProjection, EdgeProjection, UnitProjection>(engineer, edge);
         }
 
         public ICommand GenerateMonoCommand(GameProjection projection)
@@ -33,7 +31,7 @@ namespace LineWars.Model
             var edge = projection.EdgesIndexList[EdgeId].Original;
 
             return new BuildCommand
-                <Node, Edge, Unit, Owned, BasePlayer>(engineer, edge);
+                <Node, Edge, Unit>(engineer, edge);
         }
     }
 }

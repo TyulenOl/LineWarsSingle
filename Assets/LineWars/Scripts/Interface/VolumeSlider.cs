@@ -4,22 +4,19 @@ using LineWars.Controllers;
 
 namespace LineWars.Interface
 {
-    [RequireComponent(typeof(Slider))]
     public class VolumeSlider : MonoBehaviour
     {
         [SerializeField] private VolumeType channelType;
-        private Slider slider;
+        [SerializeField] private Scrollbar scrollbar;
 
-        private void Awake()
-        {
-            slider = GetComponent<Slider>();
-        }
 
         private void Start()
         {
             var volume = VolumeUpdater.Instance.GetVolume(channelType);
-            slider.value = volume;
-            slider.onValueChanged.AddListener(OnValueChanged);
+            if (scrollbar == null)
+                Debug.Log(name);
+            scrollbar.value = volume;
+            scrollbar.onValueChanged.AddListener(OnValueChanged);
         }
 
         private void OnValueChanged(float value)
@@ -28,4 +25,3 @@ namespace LineWars.Interface
         }
     }
 }
-

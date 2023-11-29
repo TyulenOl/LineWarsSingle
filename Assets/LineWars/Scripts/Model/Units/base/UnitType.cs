@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace LineWars.Model
 {
     public enum UnitType
@@ -11,7 +13,12 @@ namespace LineWars.Model
         Cavalry,
         Artillery,
         Doctor,
-        Tank
+        Tank,
+        Mechnik,
+        Luchnik,
+        DobrynyaNikitich,
+        Knyaz,
+        AlyoshaPopovich,
+        IlyaMuromec
     }
-    
 }

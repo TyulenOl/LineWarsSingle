@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using LineWars.Extensions.Attributes;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
 namespace LineWars.Model
 {
     public class Edge : MonoBehaviour,
-        IEdgeForGame<Node, Edge, Unit, Owned, BasePlayer>,
-        ISerializationCallbackReceiver
+        IEdgeForGame<Node, Edge, Unit>,
+        ISerializationCallbackReceiver,
+        IPointerClickHandler,
+        INumbered,
+        IMonoTarget
     {
         [Header("Graph Settings")]
         [SerializeField] private int index;
@@ -30,8 +33,7 @@ namespace LineWars.Model
         [SerializeField] [ReadOnlyInspector] private int hp;
 
         [field: Header("Events")]
-        [field: SerializeField]
-        public UnityEvent<int, int> HpChanged { get; private set; }
+        [field: SerializeField] public UnityEvent<int, int> HpChanged { get; private set; }
 
         [field: SerializeField] public UnityEvent<LineType, LineType> LineTypeChanged { get; private set; }
 
@@ -54,8 +56,17 @@ namespace LineWars.Model
             set => lineMap[LineType].MaxHp = value;
         }
 
-        public Node FirstNode => firstNode;
-        public Node SecondNode => secondNode;
+        public Node FirstNode
+        {
+            get => firstNode;
+            set => firstNode = value;
+        }
+
+        public Node SecondNode
+        {
+            get => secondNode;
+            set => secondNode = value;
+        }
 
         public int CurrentHp
         {
@@ -85,17 +96,16 @@ namespace LineWars.Model
                 lineType = value;
                 LineTypeChanged.Invoke(before, lineType);
                 CurrentHp = MaxHp;
-                RedrawLine();
             }
         }
         
         public CommandPriorityData CommandPriorityData => priorityData;
 
-        private float CurrentWidth => lineMap.TryGetValue(lineType, out var ch) 
+        public float GetCurrentWidth() => lineMap.TryGetValue(lineType, out var ch) 
             ? ch.Width 
             : 0.1f;
 
-        private Sprite CurrentSprite => lineMap.TryGetValue(lineType, out var ch)
+        public Sprite GetCurrentSprite() => lineMap.TryGetValue(lineType, out var ch)
             ? ch.Sprite
             : Resources.Load<Sprite>("Sprites/Road");
 
@@ -116,31 +126,7 @@ namespace LineWars.Model
         {
             LineType = LineTypeHelper.Up(LineType);
         }
-
-        public void Redraw()
-        {
-            name = $"Edge{Id} from {(FirstNode ? FirstNode.name : "Null")} to {(SecondNode ? SecondNode.name : "None")}";
-            RedrawLine();
-            AlineCollider();
-        }
-        private void RedrawLine()
-        {
-            var v1 = firstNode?firstNode.Position: Vector2.zero;
-            var v2 = secondNode?secondNode.Position: Vector2.right;
-            var distance = Vector2.Distance(v1, v2);
-            var center = v1;
-            var newSecondNodePosition = v2 - center;
-            var radian = Mathf.Atan2(newSecondNodePosition.y, newSecondNodePosition.x) * 180 / Mathf.PI;
-            edgeSpriteRenderer.transform.rotation = Quaternion.Euler(0, 0, radian);
-            edgeSpriteRenderer.transform.position = (v1 + v2) / 2;
-
-            edgeSpriteRenderer.size = new Vector2(distance, CurrentWidth);
-            edgeSpriteRenderer.sprite = CurrentSprite;
-        }
-        private void AlineCollider()
-        {
-            edgeCollider.size = edgeSpriteRenderer.size;
-        }
+        
         public void OnBeforeSerialize()
         {
         }
@@ -161,6 +147,11 @@ namespace LineWars.Model
                         lineMap[value] = new LineTypeCharacteristics(value);
                 }
             }
+        }
+
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            Selector.SelectedObject = gameObject;
         }
     }
 }

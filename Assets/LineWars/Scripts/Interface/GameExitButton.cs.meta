@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/LineWars/Scripts/Interface/GameExitButton.cs.meta
+guid: 3d0d701f8a75d634fba59ea5741c3ba7
+========
+guid: ec3dec837ffc2a047b093dfaac181fd7
+>>>>>>>> newModel:Assets/LineWars/Scripts/Model/EnemyAI/Evaluators/AdvancedEvaluator.cs.meta
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

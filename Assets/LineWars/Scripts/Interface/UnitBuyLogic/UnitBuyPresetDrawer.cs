@@ -1,4 +1,5 @@
 using System;
+using LineWars.Controllers;
 using LineWars.Model;
 using TMPro;
 using UnityEngine;
@@ -10,13 +11,14 @@ namespace LineWars.Interface
     {
         [SerializeField] private TMP_Text cost;
         [SerializeField] private Image image;
+        [SerializeField] private Image moneyImage;
+        [SerializeField] private Image backgroundImage;
         [SerializeField] private Button button;
         [SerializeField] private Image ifChosenPanel;
-        [SerializeField] private Image ifUnAvailablePanel;
-        [SerializeField] private Image ifAvailablePanel;
+        [SerializeField] private Image ifCannotBuyImage;
 
         private bool isAvailable;
-        
+
         public Button Button => button;
 
         private UnitBuyPreset unitBuyPreset;
@@ -33,37 +35,47 @@ namespace LineWars.Interface
             }
         }
 
-        private void Awake()
+        private void Start()
         {
             PhaseManager.Instance.PhaseChanged.AddListener(OnPhaseChanged);
+            CommandsManager.Instance.BuyNeedRedraw += (_) => SetAvailable();
         }
 
         private void OnPhaseChanged(PhaseType phaseTypeOld, PhaseType phaseTypeNew)
         {
-            if(phaseTypeNew != PhaseType.Buy) return;
-            SetAvailable(Player.LocalPlayer.CanSpawnPreset(unitBuyPreset));
+            if (phaseTypeNew != PhaseType.Buy) return;
+            SetAvailable();
         }
 
         private void Init()
         {
             image.sprite = unitBuyPreset.Image;
             cost.text = unitBuyPreset.Cost.ToString();
-            SetAvailable(Player.LocalPlayer.CanSpawnPreset(unitBuyPreset));
+            SetAvailable();
         }
 
-        
+
         public void SetChosen(bool isChosen)
         {
-            if(isAvailable)
+            if (isAvailable)
+            {
                 ifChosenPanel.gameObject.SetActive(isChosen);
-            else
-                ifUnAvailablePanel.gameObject.SetActive(isChosen);
+            }
         }
-        
-        private void SetAvailable(bool isAvailable)
+
+        private void SetAvailable()
         {
-            ifAvailablePanel.gameObject.SetActive(!isAvailable);
-            this.isAvailable = isAvailable;
+            var purchaseInfo = Player.LocalPlayer.GetPresetPurchaseInfo(unitBuyPreset);
+            ifCannotBuyImage.gameObject.SetActive(!purchaseInfo.CanBuy);
+            isAvailable = purchaseInfo.CanBuy && Player.LocalPlayer.CanBuyPreset(unitBuyPreset);
+            button.interactable = isAvailable;
+            var color = isAvailable ? Color.white : new Color(226 / 255f, 43 / 255f, 18 / 255f, 255 / 255f);
+            cost.color = color;
+            moneyImage.color = color;
+            ifChosenPanel.gameObject.SetActive(false);
+            backgroundImage.color = !isAvailable ? Color.gray : new Color(226 / 255f, 43 / 255f, 18 / 255f, 255 / 255f);
+            image.color = isAvailable ? Color.white : Color.gray;
+            cost.text = purchaseInfo.Cost.ToString();
         }
     }
 }

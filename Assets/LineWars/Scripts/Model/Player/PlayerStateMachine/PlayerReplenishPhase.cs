@@ -19,11 +19,10 @@ namespace LineWars
             public override void OnEnter()
             {
                 base.OnEnter();
-                player.StartCoroutine(IdleCroroutine());
-                IEnumerator IdleCroroutine()
+                player.StartCoroutine(IdleCoroutine());
+                IEnumerator IdleCoroutine()
                 {
                     yield return null;
-                    player.IsTurnMade = true;
                     player.ExecuteTurn(PhaseType.Idle);
                 }
             }

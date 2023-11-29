@@ -34,6 +34,7 @@ namespace LineWars
                     element.gameObject.SetActive(false);
                 }
             }
+
             stackElements = new Stack<UIStackElement>();
             PushElement(initializeElement);
         }
@@ -41,13 +42,13 @@ namespace LineWars
         public void PushElement(UIStackElement uiStackElement)
         {
             if (uiStackElement == null) return;
-            
+
             if (stackElements.Count != 0)
             {
                 var previousElement = stackElements.Peek();
                 previousElement.OnClose();
             }
-            
+
             stackElements.Push(uiStackElement);
             uiStackElement.OnOpen();
         }
@@ -56,7 +57,7 @@ namespace LineWars
         {
             if (stackElements.Count == 0)
                 return;
-            
+
             var element = stackElements.Pop();
             element.OnClose();
 

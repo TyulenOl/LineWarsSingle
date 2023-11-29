@@ -11,12 +11,12 @@ namespace LineWars.Interface
     {
         private void OnEnable()
         {
-            CommandsManager.Instance.ExecutorChanged.AddListener(ExecutorChanged);
+            CommandsManager.Instance.ExecutorChanged += ExecutorChanged;
         }
 
         private void OnDisable()
         {
-            CommandsManager.Instance.ExecutorChanged.RemoveListener(ExecutorChanged);
+            CommandsManager.Instance.ExecutorChanged -= ExecutorChanged;
         }
 
         private void ExecutorChanged(IExecutor oldExecutor, IExecutor newExecutor)

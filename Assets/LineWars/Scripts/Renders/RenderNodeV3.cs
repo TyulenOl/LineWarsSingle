@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using LineWars.Extensions;
 using UnityEngine;
 
 public class RenderNodeV3 : MonoBehaviour
@@ -22,6 +21,8 @@ public class RenderNodeV3 : MonoBehaviour
     private void Awake()
     {
         Visibility = 0;
+        if (hiddenNodeSpriteRenderer.sprite != null)
+            return;
         hiddenNodeSprites = hiddenNodeSprites.Where(x => x != null).ToList();
         if (hiddenNodeSprites.Count != 0)
             hiddenNodeSpriteRenderer.sprite = hiddenNodeSprites[Random.Range(0, hiddenNodeSprites.Count)];

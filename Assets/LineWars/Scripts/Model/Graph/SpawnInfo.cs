@@ -9,10 +9,10 @@ namespace LineWars.Model
     public class SpawnInfo
     {
          public readonly int PlayerIndex;
-         public readonly Spawn SpawnNode;
+         public readonly PlayerBuilder SpawnNode;
          public readonly List<Node> Nodes;
 
-         public SpawnInfo(int playerIndex, Spawn spawnNode, IEnumerable<Node> nodeInfos)
+         public SpawnInfo(int playerIndex, PlayerBuilder spawnNode, IEnumerable<Node> nodeInfos)
          {
              PlayerIndex = playerIndex;
              SpawnNode = spawnNode;

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using LineWars.Extensions.Attributes;
 using UnityEngine;
 
 namespace LineWars
@@ -50,7 +49,7 @@ namespace LineWars
         private void Start()
         {
             Initialize();
-            Game.IsNormalStart = true;
+            GameVariables.IsNormalStart = true;
         }
 
         private void Initialize()

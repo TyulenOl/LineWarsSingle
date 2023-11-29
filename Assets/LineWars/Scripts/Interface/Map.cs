@@ -1,14 +1,14 @@
 using UnityEngine;
 
-namespace LineWars.Scripts.Interface
+namespace LineWars.Interface
 {
     public class Map : MonoBehaviour
     {
         private static Map Instance { get; set; }
         private static SpriteRenderer mapSpriteRenderer;
-    
+
         public static SpriteRenderer MapSpriteRenderer => Instance != null ? mapSpriteRenderer : null;
-        
+
 
         private void Awake()
         {

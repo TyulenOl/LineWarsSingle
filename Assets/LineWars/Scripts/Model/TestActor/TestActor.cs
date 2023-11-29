@@ -1,9 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using LineWars.Extensions.Attributes;
 using UnityEngine;
-using LineWars.Controllers;
 
 namespace LineWars.Model
 {
@@ -75,32 +70,33 @@ namespace LineWars.Model
         }
         
         #region Turns
-        public override void ExecuteBuy()
+
+        protected override void ExecuteBuy()
         {
             stateMachine.SetState(buyState);
         }
 
-        public override void ExecuteArtillery()
+        protected override void ExecuteArtillery()
         {
             stateMachine.SetState(artilleryState);
         }
 
-        public override void ExecuteFight()
+        protected override void ExecuteFight()
         {
             stateMachine.SetState(fightState);
         }
 
-        public override void ExecuteScout()
+        protected override void ExecuteScout()
         {
             stateMachine.SetState(scoutState);
         }
-        
-        public override void ExecuteIdle()
+
+        protected override void ExecuteIdle()
         {
             stateMachine.SetState(idleState);
         }
 
-        public override void ExecuteReplenish()
+        protected override void ExecuteReplenish()
         {
             base.ExecuteReplenish();
             stateMachine.SetState(replenishState);
@@ -108,14 +104,15 @@ namespace LineWars.Model
         #endregion
         
         #region Check Turns
-        public override bool CanExecuteBuy() => true;
 
-        public override bool CanExecuteArtillery() => ArtilleryLeft > 0;
-    
-        public override bool CanExecuteFight() => FightLeft > 0;
+        protected override bool CanExecuteBuy() => true;
 
-        public override bool CanExecuteScout() => ScoutLeft > 0;
-        public override bool CanExecuteReplenish() => true;
+        protected override bool CanExecuteArtillery() => ArtilleryLeft > 0;
+
+        protected override bool CanExecuteFight() => FightLeft > 0;
+
+        protected override bool CanExecuteScout() => ScoutLeft > 0;
+        protected override bool CanExecuteReplenish() => true;
         #endregion
     }
 }

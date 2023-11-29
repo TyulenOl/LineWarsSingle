@@ -8,9 +8,9 @@ namespace DataStructures
     public class IndexList<T> : IReadOnlyIndexList<T>
     {
         private int lastIndex;
-        private Dictionary<int, T> indexToObject;
-        private Dictionary<T, int> objectToIndex;
-        private HashSet<int> indexesSet;
+        private readonly Dictionary<int, T> indexToObject;
+        private readonly Dictionary<T, int> objectToIndex;
+        private readonly HashSet<int> indexesSet;
 
         public IReadOnlyDictionary<T, int> ObjectToIndex => objectToIndex;
 
@@ -22,8 +22,7 @@ namespace DataStructures
             indexesSet = new HashSet<int>();    
         }
 
-        public IndexList(IReadOnlyDictionary<int, T> dict)
-            :this()
+        public IndexList(IReadOnlyDictionary<int, T> dict) :this()
         {
             var maxIndex = int.MinValue;
             foreach (var pair in dict)

@@ -6,11 +6,12 @@ using UnityEngine.UI;
 
 namespace LineWars
 {
-    public class MissionUI: MonoBehaviour
+    public class MissionUI : MonoBehaviour
     {
         [SerializeField] private TMP_Text missionName;
-        [SerializeField] private Button completedButton;
-        [SerializeField] private Button uncompletedButton;
+        [SerializeField] private Image completedImage;
+        [SerializeField] private Image uncompletedImage;
+        [SerializeField] private Button button;
 
         private MissionState currentState;
         private Action<MissionState> clicked;
@@ -22,8 +23,7 @@ namespace LineWars
 
         private void Start()
         {
-            completedButton.onClick.AddListener(OnClickButton);
-            uncompletedButton.onClick.AddListener(OnClickButton);
+            button.onClick.AddListener(OnClickButton);
         }
 
         private void OnClickButton()
@@ -36,15 +36,15 @@ namespace LineWars
             if (missionName == null)
                 Debug.LogError($"{nameof(missionName)} is null on {name}");
         }
-        
+
         public void Initialize(MissionState state, Action<MissionState> clicked)
         {
             var data = state.missionData;
             missionName.text = $"{data.MissionName}";
             this.clicked = clicked;
             this.currentState = state;
-            completedButton.gameObject.SetActive(state.isCompleted);
-            uncompletedButton.gameObject.SetActive(!state.isCompleted);
+            completedImage.gameObject.SetActive(state.isCompleted);
+            uncompletedImage.gameObject.SetActive(!state.isCompleted);
         }
     }
 }

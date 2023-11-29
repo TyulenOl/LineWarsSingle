@@ -1,52 +1,107 @@
 ﻿using System;
+using LineWars.Controllers;
+using UnityEngine;
 
 namespace LineWars.Model
 {
+    [DisallowMultipleComponent]
     public class MonoShotUnitAction :
-        MonoUnitAction<ShotUnitAction<Node, Edge, Unit, Owned, BasePlayer>>,
-        IShotUnitActon<Node, Edge, Unit, Owned, BasePlayer>
+        MonoUnitAction<ShotUnitAction<Node, Edge, Unit>>,
+        IShotUnitAction<Node, Edge, Unit>
     {
-        protected override ShotUnitAction<Node, Edge, Unit, Owned, BasePlayer> GetAction()
+
+        [SerializeField] private SFXList ThrowRusSounds;
+        [SerializeField] private SFXList ThrowLizardSounds;
+        [SerializeField] private SFXList FallSoundsList;
+
+        private IDJ dj;
+        
+        protected override bool NeedAutoComplete => false;
+        public bool IsAvailable(Unit target1) => Action.IsAvailable(target1);
+
+        public bool IsAvailable(Unit target1, Node target2) => Action.IsAvailable(target1, target2);
+
+        private void Awake()
         {
-            return new ShotUnitAction<Node, Edge, Unit, Owned, BasePlayer>(Unit);
+            dj = new RandomDJ(1);
         }
 
-        public override void Accept(IMonoUnitVisitor visitor) => visitor.Visit(this);
-
-        public Unit TakenUnit => Action.TakenUnit;
-
-        public bool CanTakeUnit(Unit unit)
+        public void Execute(Unit unitTarget, Node nodeTarget)
         {
-            return Action.CanTakeUnit(unit);
+            if(unitTarget.TryGetComponent(out AnimationResponses responses))
+                TryExecuteWithAnimations(unitTarget, nodeTarget, responses);
+            else
+                ExecuteInstant(unitTarget, nodeTarget);
         }
 
-        public void TakeUnit(Unit unit)
+        private void TryExecuteWithAnimations(Unit unitTarget, 
+                Node nodeTarget,
+                AnimationResponses responses)
         {
-            Action.TakeUnit(unit);
-        }
-
-        public bool CanShotUnitTo(Node node)
-        {
-            return Action.CanShotUnitTo(node);
-        }
-
-        public void ShotUnitTo(Node node)
-        {
-            Action.ShotUnitTo(node);
-        }
-
-        public Type TargetType => Action.TargetType;
-        public Type[] MyTargets => Action.MyTargets;
-        public bool IsMyTarget(ITarget target) => Action.IsMyTarget(target);
-
-        public ICommandWithCommandType GenerateCommand(ITarget target)
-        {
-            if (TakenUnit == null)
+            if(!responses.CanRespond(AnimationResponseType.ComeTo)
+                || !responses.CanRespond(AnimationResponseType.Throw))
             {
-                return new TakeUnitCommand<Node, Edge, Unit, Owned, BasePlayer>(this, (Unit) target);
+                Debug.Log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+                ExecuteInstant(unitTarget, nodeTarget);
+                return;
             }
+            var animContext = new AnimationContext()
+            {
+                TargetNode = Executor.Node,
+                TargetUnit = Executor
+            };
 
-            return new ShotUnitCommand<Node, Edge, Unit, Owned, BasePlayer>(this, (Node) target);
+            if (unitTarget.Owner == Executor.Owner)
+            {
+                Executor.PlaySfx(dj.GetSound(ThrowRusSounds));
+            }
+            else
+            {
+                Executor.PlaySfx(dj.GetSound(ThrowLizardSounds));
+            }
+            
+            var walkAnimation = responses.Respond(AnimationResponseType.ComeTo, animContext);
+            walkAnimation.Ended.AddListener(OnWalkEnded);
+            
+            void OnWalkEnded(UnitAnimation animation)
+            {
+                animation.Ended.RemoveListener(OnWalkEnded);
+                var throwContext = new AnimationContext()
+                {
+                    TargetNode = nodeTarget,
+                    TargetUnit = null
+
+                };
+                var throwAnimation = responses.Respond(AnimationResponseType.Throw, throwContext);
+                throwAnimation.Ended.AddListener(OnThrowEnded);
+            }
+            
+            void OnThrowEnded(UnitAnimation animation)
+            {
+                animation.Ended.RemoveListener(OnThrowEnded);
+                Action.Execute(unitTarget, nodeTarget);
+                Complete();
+                Player.LocalPlayer.RecalculateVisibility();
+                Executor.PlaySfx(dj.GetSound(FallSoundsList));
+            }
         }
+
+        private void ExecuteInstant(Unit unitTarget, Node nodeTarget)
+        {
+            unitTarget.MovementLogic.MoveTo(nodeTarget.transform.position);
+            Action.Execute(unitTarget, nodeTarget);
+            Player.LocalPlayer.RecalculateVisibility();
+            Complete();
+        }
+
+        protected override ShotUnitAction<Node, Edge, Unit> GetAction()
+        {
+            return new ShotUnitAction<Node, Edge, Unit>(Executor);
+        }
+
+        public override void Accept(IMonoUnitActionVisitor visitor) => visitor.Visit(this);
+
+        public override TResult Accept<TResult>(IUnitActionVisitor<TResult, Node, Edge, Unit> visitor) =>
+            visitor.Visit(this);
     }
 }
