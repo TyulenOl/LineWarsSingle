@@ -234,7 +234,7 @@ namespace LineWars.Controllers
                 {
                     if (Executor is {CanDoAnyAction: true})
                     {
-                        Debug.LogError("Вы как-то завершили ход, хотя у текущего executora остались очки действия");
+                        Debug.LogWarning("Вы как-то завершили ход, хотя у текущего executora остались очки действия");
                     }
 
                     stateMachine.SetState(idleState);
