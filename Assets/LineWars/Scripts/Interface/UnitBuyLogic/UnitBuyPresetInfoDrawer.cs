@@ -27,6 +27,7 @@ public class UnitBuyPresetInfoDrawer : MonoBehaviour
         armorAmount.text = unit.MaxArmor.ToString();
         hpAmount.text = unit.MaxHp.ToString();
         actionPointsAmount.text = unit.MaxActionPoints.ToString();
+        damageAmount.text = "?";
 
         if (damageAmount != null)
         {
@@ -38,5 +39,24 @@ public class UnitBuyPresetInfoDrawer : MonoBehaviour
         var rect = unitImage.rectTransform.rect;
         unitImage.rectTransform.sizeDelta = new Vector2(rect.size.x * unit.Sprite.rect.width / unit.Sprite.rect.height,
             rect.size.y);
+    }
+
+    public void RestoreDefaults()
+    {
+        unitName.text = "Выберите воина";
+        unitDescription.text = "";
+
+        armorAmount.text = "?";
+        hpAmount.text = "?";
+        actionPointsAmount.text = "?";
+        damageAmount.text = "?";
+
+        if (damageAmount != null)
+        {
+            damageAmount.text = "0";
+        }
+        
+        unitImage.gameObject.SetActive(false);
+        unitImage.sprite = null;
     }
 }

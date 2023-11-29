@@ -11,8 +11,9 @@ namespace LineWars.Education
 
         private void OnEnable()
         {
-            manager.Play(speech);
+            CommandsManager.Instance.Deactivate();
             manager.SpeechEnded += ManagerOnSpeechEnded;
+            manager.Play(speech);
         }
 
         private void ManagerOnSpeechEnded()
