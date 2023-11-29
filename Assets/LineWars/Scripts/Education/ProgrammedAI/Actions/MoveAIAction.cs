@@ -1,10 +1,8 @@
-﻿using System;
-using LineWars.Model;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace LineWars
+namespace LineWars.Model
 {
-    public class MoveAITurn : AITurn
+    public class MoveAIAction : AIAction
     {
         [SerializeField] private PointerToUnit unit;
         [SerializeField] private Node toNode;

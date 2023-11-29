@@ -1,4 +1,4 @@
-﻿namespace LineWars
+﻿namespace LineWars.Model
 {
     public enum SelectedUnit
     {

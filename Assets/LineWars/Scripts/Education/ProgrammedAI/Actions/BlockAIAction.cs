@@ -1,9 +1,8 @@
-﻿using LineWars.Model;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace LineWars
+namespace LineWars.Model
 {
-    public class BlockAITurn: AITurn
+    public class BlockAIAction: AIAction
     {
         [SerializeField] private PointerToUnit unit;
         public override void Execute()

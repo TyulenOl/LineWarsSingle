@@ -1,10 +1,7 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using LineWars.Controllers;
 using UnityEngine;
 
-namespace LineWars
+namespace LineWars.Education
 {
     public class Education : MonoBehaviour
     {
@@ -13,7 +10,6 @@ namespace LineWars
 
         private void Start()
         {
-            commandsManager.Deactivate();
         }
 
 

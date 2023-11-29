@@ -86,6 +86,11 @@ namespace LineWars.Controllers
             throw new System.NotImplementedException();
         }
 
+        public IEnumerable<TargetActionInfo> Visit(IHealYouSelfAction<Node, Edge, Unit> action)
+        {
+            return ForSimple(action);
+        }
+
 
         private static IEnumerable<TargetActionInfo> ForSimple<TAction>(TAction action)
             where TAction : ISimpleAction, IUnitAction<Node, Edge, Unit>

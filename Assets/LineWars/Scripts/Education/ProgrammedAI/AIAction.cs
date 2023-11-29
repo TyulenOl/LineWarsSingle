@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 
-namespace LineWars
+namespace LineWars.Model
 {
-    public abstract class AITurn: MonoBehaviour
+    public abstract class AIAction: MonoBehaviour
     {
         public abstract void Execute();
     }

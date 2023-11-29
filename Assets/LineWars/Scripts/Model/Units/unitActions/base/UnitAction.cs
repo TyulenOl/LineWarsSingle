@@ -14,8 +14,6 @@ namespace LineWars.Model
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
         #endregion
     {
-        public TUnit Executor => base.Executor;
-        
         protected UnitAction(TUnit executor) : base(executor)
         {
         }

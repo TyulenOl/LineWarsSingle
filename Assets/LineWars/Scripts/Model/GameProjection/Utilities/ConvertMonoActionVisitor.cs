@@ -99,6 +99,12 @@ namespace LineWars.Model
             Result.ActionModifier = action.Action.ActionModifier;
         }
 
+        public void Visit(MonoHealYouSelfAction action)
+        {
+            Result = new HealYourselfAction<NodeProjection, EdgeProjection, UnitProjection>(Unit, action.HealAmount);
+            Result.ActionModifier = action.Action.ActionModifier;
+        }
+
         public static ConvertMonoActionVisitor Create(UnitProjection unit, 
             IGraphForGame<NodeProjection, EdgeProjection, UnitProjection> graph)
 

@@ -38,6 +38,9 @@ namespace LineWars.Controllers
                 if (!executor.CanDoAnyAction)
                     return;
 
+                if (Manager.HaveConstrains && !Manager.Constrains.CanSelectExecutor(executor))
+                    return;
+
                 Manager.Executor = executor;
                 Manager.stateMachine.SetState(Manager.findTargetState);
             }

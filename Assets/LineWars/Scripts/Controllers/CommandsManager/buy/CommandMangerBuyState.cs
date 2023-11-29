@@ -21,6 +21,8 @@ namespace LineWars.Controllers
                 Manager.State = CommandsManagerStateType.Buy;
                 Selector.ManySelectedObjectsChanged += OnSelectedObjectsChanged;
                 Manager.SendBuyReDrawMessage(GetNodes());
+                currentNode = null;
+                currentBuyPreset = null;
             }
 
             private IEnumerable<Node> GetNodes()
@@ -32,6 +34,8 @@ namespace LineWars.Controllers
             {
                 base.OnExit();
                 Selector.ManySelectedObjectsChanged -= OnSelectedObjectsChanged;
+                currentNode = null;
+                currentBuyPreset = null;
             }
 
             private void OnSelectedObjectsChanged(IEnumerable<GameObject> _, IEnumerable<GameObject> gameObjects)
@@ -39,6 +43,8 @@ namespace LineWars.Controllers
                 if(currentBuyPreset == null)
                     return;
                 var node = gameObjects.GetComponentMany<Node>().FirstOrDefault();
+                if (Manager.HaveConstrains && !Manager.Constrains.CanSelectNode(node))
+                    return;
                 if (node == null || currentNode == node)
                 {
                     currentNode = null;
@@ -68,7 +74,7 @@ namespace LineWars.Controllers
                 {
                     var newCommand = new BuyPresetOnNodeCommand(Manager.Player, currentNode, currentBuyPreset);
                     UnitsController.ExecuteCommand(newCommand);
-                    //currentBuyPreset = null;
+                    Manager.CommandIsExecuted?.Invoke(newCommand);
                     currentNode = null;
                     Manager.SendBuyReDrawMessage(GetNodes());
                 }

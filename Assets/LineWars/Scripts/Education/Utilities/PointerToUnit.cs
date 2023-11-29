@@ -2,7 +2,7 @@
 using LineWars.Model;
 using UnityEngine;
 
-namespace LineWars
+namespace LineWars.Model
 {
     [Serializable]
     public class PointerToUnit

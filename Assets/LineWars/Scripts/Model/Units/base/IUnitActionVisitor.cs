@@ -18,5 +18,6 @@
         public TResult Visit(IBlowWithSwingAction<TNode, TEdge, TUnit> action);
         public TResult Visit(IShotUnitAction<TNode, TEdge, TUnit> action);
         public TResult Visit(IRLBuildAction<TNode, TEdge, TUnit> action);
+        public TResult Visit(IHealYouSelfAction<TNode, TEdge, TUnit> action);
     }
 }

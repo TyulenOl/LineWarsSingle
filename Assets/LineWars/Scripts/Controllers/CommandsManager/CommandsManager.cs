@@ -10,8 +10,13 @@ namespace LineWars.Controllers
     {
         public static CommandsManager Instance { get; private set; }
 
+        [SerializeField, ReadOnlyInspector] private bool isActive = true;
         public bool ActiveSelf => isActive;
-        private bool isActive = true;
+
+
+        [field: SerializeField] private CommandsManagerConstrainsBase Constrains { get; set; }
+        public bool HaveConstrains => Constrains != null;
+        public bool NotHaveConstraints => Constrains == null;
 
         private IMonoTarget target;
         private IMonoExecutor executor;
@@ -30,15 +35,11 @@ namespace LineWars.Controllers
 
 
         [SerializeField] private List<CommandType> hiddenCommands;
-
         private HashSet<CommandType> hiddenCommandsSet;
-        public event Action<IMonoTarget, IMonoTarget> TargetChanged;
-        public event Action<IMonoExecutor, IMonoExecutor> ExecutorChanged;
 
-        private OnWaitingCommandMessage currentOnWaitingCommandMessage;
-        public event Action<OnWaitingCommandMessage> InWaitingCommandState;
+        private readonly List<PhaseType> skippedPhases = new();
 
-        private List<PhaseType> skippedPhases = new();
+        public event Action<ICommand> CommandIsExecuted;
 
         [SerializeField, ReadOnlyInspector] private CommandsManagerStateType state;
 
@@ -60,6 +61,9 @@ namespace LineWars.Controllers
 
         private Player Player => Player.LocalPlayer;
 
+
+        private OnWaitingCommandMessage currentOnWaitingCommandMessage;
+
         private OnWaitingCommandMessage CurrentOnWaitingCommandMessage
         {
             get => currentOnWaitingCommandMessage;
@@ -70,10 +74,12 @@ namespace LineWars.Controllers
             }
         }
 
+        public event Action<OnWaitingCommandMessage> InWaitingCommandState;
+
+
         public event Action<ExecutorRedrawMessage> FightNeedRedraw;
         public event Action<BuyStateMessage> BuyNeedRedraw;
 
-        public bool CommandIsExecuted => stateMachine.CurrentState == waitingExecuteCommandState;
 
         public IMonoTarget Target
         {
@@ -87,6 +93,9 @@ namespace LineWars.Controllers
             }
         }
 
+        public event Action<IMonoTarget, IMonoTarget> TargetChanged;
+
+
         public IMonoExecutor Executor
         {
             get => executor;
@@ -98,6 +107,9 @@ namespace LineWars.Controllers
                     ExecutorChanged?.Invoke(previousExecutor, executor);
             }
         }
+
+        public event Action<IMonoExecutor, IMonoExecutor> ExecutorChanged;
+
 
         private void Awake()
         {
@@ -142,9 +154,17 @@ namespace LineWars.Controllers
             return stateMachine.CurrentState == findTargetState && Executor.CanDoAnyAction;
         }
 
-        public void ExecuteCommand(IActionCommand command)
+        public void ExecuteSimpleCommand(IActionCommand command)
         {
             ValidateActiveSelf();
+            if (HaveConstrains
+                && (!Constrains.CanExecuteSimpleAction()
+                    || !Constrains.IsMyCommandType(command.Action.CommandType)))
+            {
+                Debug.LogError($"Нельзя исполнить простую команду введу ограничения");
+                return;
+            }
+
             if (!CanExecuteAnyCommand())
                 throw new InvalidOperationException(
                     $"В текущем состоянии командс менеджера {State} нельзя исполнить команду");
@@ -153,8 +173,6 @@ namespace LineWars.Controllers
 
         private void ExecuteCommandButIgnoreConstrains(IActionCommand command)
         {
-            if (Executor as MonoBehaviour == null)
-                Debug.LogError("EXECUTOR is missing");
             canCancelExecutor = false;
             stateMachine.SetState(waitingExecuteCommandState);
             var action = command.Action;
@@ -163,6 +181,8 @@ namespace LineWars.Controllers
 
             void OnActionCompleted()
             {
+                action.ActionCompleted -= OnActionCompleted;
+                CommandIsExecuted?.Invoke(command);
                 if (Executor as MonoBehaviour == null || !Executor.CanDoAnyAction)
                 {
                     Player.FinishTurn();
@@ -172,8 +192,6 @@ namespace LineWars.Controllers
                     SendFightRedrawMessage();
                     stateMachine.SetState(findTargetState);
                 }
-
-                action.ActionCompleted -= OnActionCompleted;
             }
         }
 
@@ -181,6 +199,12 @@ namespace LineWars.Controllers
         public void SetUnitPreset(UnitBuyPreset preset)
         {
             ValidateActiveSelf();
+            if (HaveConstrains && !Constrains.CanSelectUnitBuyPreset(preset))
+            {
+                Debug.LogError("Нельзя выбрать текущий пресет ввиду огрничения");
+                return;
+            }
+
             if (stateMachine.CurrentState != buyState)
                 throw new InvalidOperationException("Can't set unit preset while not in buy state!");
             buyState.SetUnitPreset(preset);
@@ -192,6 +216,8 @@ namespace LineWars.Controllers
             if (stateMachine.CurrentState != waitingSelectCommandState)
                 throw new InvalidOperationException();
             if (!currentOnWaitingCommandMessage.Data.Contains(preset))
+                throw new ArgumentException(nameof(preset));
+            if (!preset.IsActive)
                 throw new ArgumentException(nameof(preset));
             ProcessCommandPreset(preset);
         }
@@ -210,6 +236,12 @@ namespace LineWars.Controllers
         public void SelectCurrentCommand(CommandType commandType)
         {
             ValidateActiveSelf();
+            if (HaveConstrains && !Constrains.CanSelectCurrentCommand())
+            {
+                Debug.LogError("Нельзя выбрать конкретную команду ввиду ограничения");
+                return;
+            }
+
             if (stateMachine.CurrentState != findTargetState)
                 throw new InvalidOperationException();
             if (CheckContainsActions(commandType))
@@ -276,22 +308,21 @@ namespace LineWars.Controllers
 
         private void ProcessCommandPreset(CommandPreset preset)
         {
-            var presetExecutor = preset.Executor;
-            var presetAction = preset.Action;
-            var presetTarget = preset.Target;
-            switch (presetAction)
+            if (!preset.IsActive) return;
+
+            switch (preset.Action)
             {
                 case IMultiTargetedAction targetedAction:
                 {
-                    Target = presetTarget;
-                    multiTargetState.Prepare(targetedAction, presetTarget);
+                    Target = preset.Target;
+                    multiTargetState.Prepare(targetedAction, preset.Target);
                     stateMachine.SetState(multiTargetState);
                     break;
                 }
                 case ITargetedActionCommandGenerator generator:
                 {
-                    Target = presetTarget;
-                    var command = generator.GenerateCommand(presetTarget);
+                    Target = preset.Target;
+                    var command = generator.GenerateCommand(preset.Target);
                     ExecuteCommandButIgnoreConstrains(command);
                     break;
                 }
@@ -321,7 +352,7 @@ namespace LineWars.Controllers
             BuyNeedRedraw?.Invoke(new BuyStateMessage(nodes));
         }
 
-        private void ClearBuyReDrawMessage()
+        private void SendBuyClearReDrawMessage()
         {
             BuyNeedRedraw?.Invoke(null);
         }

@@ -23,14 +23,18 @@ namespace LineWars.Controllers
         public IExecutorAction Action { get; }
         public IMonoTarget Target { get; }
         public IMonoExecutor Executor { get; }
+        
+        public bool IsActive { get; }
 
         public CommandPreset(
             IMonoExecutor executor,
             IMonoTarget target,
-            IExecutorAction action)
+            IExecutorAction action,
+            bool isActive)
         {
             Target = target;
             Action = action;
+            IsActive = isActive;
             Executor = executor;
         }
     }

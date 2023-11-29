@@ -13,7 +13,7 @@ public static class TransformExtension
                 .Select((el, i) => (el, i))
                 .Last(tuple => tuple.el.gameObject.activeSelf).i;
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return -1;
         }

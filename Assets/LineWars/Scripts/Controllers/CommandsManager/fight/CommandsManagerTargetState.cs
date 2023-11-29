@@ -10,7 +10,6 @@ namespace LineWars.Controllers
     {
         private class CommandsManagerFindTargetState : CommandsManagerState
         {
-
             public CommandsManagerFindTargetState(CommandsManager manager) : base(manager)
             {
             }
@@ -32,24 +31,31 @@ namespace LineWars.Controllers
                 if (newObject == null)
                     return;
                 if (Selector.SelectedObjects
-                    .Any(x => x.TryGetComponent(out IMonoExecutor executor)
-                              && executor == Manager.executor))
+                        .Any(x => x.TryGetComponent(out IMonoExecutor executor) && executor == Manager.executor)
+                    && Manager.canCancelExecutor
+                    && (Manager.Constrains == null || Manager.Constrains.CanCancelExecutor))
                 {
                     CancelExecutor();
                     return;
                 }
 
-                var targets = Selector.SelectedObjects
+                var presets = Selector.SelectedObjects
                     .GetComponentMany<IMonoTarget>()
-                    .ToArray();
-
-                var presets = targets
                     .SelectMany(target => GetAllActionsForPair(Manager.executor, target)
-                        .Select(action => new CommandPreset(Manager.Executor, target, action)))
+                        .Select(action =>
+                            new CommandPreset(
+                                Manager.Executor,
+                                target,
+                                action,
+                                Manager.NotHaveConstraints || (
+                                    Manager.Constrains.CanSelectTarget(0, target)
+                                    && Manager.Constrains.IsMyCommandType(action.CommandType)
+                                )
+                            )))
+                    .GroupBy(x => x.Action.CommandType)
+                    .Select(x => x.First())
                     .ToArray();
 
-                presets = presets.GroupBy(x=> x.Action.CommandType).Select(x => x.First()).ToArray();
-                
                 switch (presets.Length)
                 {
                     case 0:
@@ -58,6 +64,8 @@ namespace LineWars.Controllers
                         Manager.ProcessCommandPreset(presets[0]);
                         break;
                     default:
+                        if (presets.All(preset => !preset.IsActive))
+                            break;
                         Manager.GoToWaitingSelectCommandState(
                             new OnWaitingCommandMessage(
                                 presets,
@@ -73,16 +81,13 @@ namespace LineWars.Controllers
             {
                 return executor.Actions
                     .OfType<ITargetedAction>()
-                    .Where(x => x.IsAvailable(target) 
+                    .Where(x => x.IsAvailable(target)
                                 && CheckAction(x));
             }
 
             private void CancelExecutor()
             {
-                if (!Manager.canCancelExecutor) return;
                 Manager.Executor = null;
-                Debug.Log("EXECUTOR CANCELED");
-
                 Manager.stateMachine.SetState(Manager.findExecutorState);
             }
 

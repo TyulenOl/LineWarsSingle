@@ -1,9 +1,8 @@
-﻿using LineWars.Model;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace LineWars
+namespace LineWars.Model
 {
-    public class MeleeAttackAITurn : AITurn
+    public class MeleeAttackAIAction : AIAction
     {
         [SerializeField] private PointerToUnit myUnit;
         [SerializeField] private PointerToUnit enemyUnit;
