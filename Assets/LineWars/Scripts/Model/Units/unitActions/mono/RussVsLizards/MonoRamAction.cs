@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using JetBrains.Annotations;
 using UnityEngine;
 
 namespace LineWars.Model
@@ -10,7 +9,12 @@ namespace LineWars.Model
         IRamAction<Node, Edge, Unit>
     {
         private MonoMoveAction moveAction;
+        protected override bool NeedAutoComplete => false;
         [field: SerializeField] public int InitialDamage { get; private set; }
+        [SerializeField] private RamAnimation ramAnimation;
+
+        private int ramResponsesPlayingCount;
+        private Node currentNode;
 
         public override void Initialize()
         {
@@ -27,39 +31,73 @@ namespace LineWars.Model
 
         public void Ram(Node node)
         {
-            //TODO: анимации и звуки
-            StartCoroutine(RamCoroutine(node));
+            currentNode = node;
+            if (ramAnimation == null)
+            {
+                Executor.transform.position = node.transform.position;
+                ExecuteRam();
+                return;
+            }
+            var animContext = new AnimationContext()
+            {
+                TargetNode = node
+            };
+            ramAnimation.Execute(animContext);
+            ramAnimation.Rammed.AddListener(OnAnimationEnded);
         }
 
-        // Чтобы работать с анимациями
-        public IEnumerator RamCoroutine(Node node)
+        private void OnAnimationEnded(RamAnimation _)
         {
-            var moved = false;
+            ramAnimation.Rammed.RemoveListener(OnAnimationEnded);
+            ExecuteRam();
+        }
 
-            var slowRamEnumerator = Action.SlowRam(node);
+        private void ExecuteRam()
+        {
+            var slowRamEnumerator = Action.SlowRam(currentNode);
+
             while (slowRamEnumerator.MoveNext())
             {
                 var current = slowRamEnumerator.Current;
-                if (current is MovedUnit movedUnit)
+                //DiedUnit?
+                if (current is not MovedUnit movedUnit) continue;
+
+                var currentUnit = (Unit)movedUnit.Unit;
+                var currentNode = (Node)movedUnit.DestinationNode;
+
+                if (!currentUnit.TryGetComponent(out AnimationResponses responses))
                 {
-                    var unit = (Unit) movedUnit.Unit;
-                    var movementLogic = unit.MovementLogic;
-                    movementLogic.MoveTo(((Node) movedUnit.DestinationNode).transform.position);
-                    movementLogic.MovementIsOver += OnAnimationEnded;
-                    moved = true;
+                    currentUnit.transform.position = currentNode.transform.position;
+                    continue;
+                }
 
-                    while (moved)
-                        yield return null;
+                var animContext = new AnimationContext()
+                {
+                    TargetNode = (Node)movedUnit.DestinationNode
+                };
 
-                    void OnAnimationEnded()
+                if (responses.CanRespond(AnimationResponseType.Rammed))
+                {
+                    var response = responses.Respond(AnimationResponseType.Rammed, animContext);
+
+                    if (response.IsPlaying)
                     {
-                        moved = false;
-                        movementLogic.MovementIsOver -= OnAnimationEnded;
+                        ramResponsesPlayingCount++;
+                        response.Ended.AddListener(OnRespondRamEnded);
                     }
                 }
             }
 
-            Player.LocalPlayer.RecalculateVisibility();
+            if (ramResponsesPlayingCount == 0)
+                Complete();
+        }
+
+        private void OnRespondRamEnded(UnitAnimation animation)
+        {
+            ramResponsesPlayingCount--;
+            animation.Ended.RemoveListener(OnRespondRamEnded);
+            if(ramResponsesPlayingCount == 0)
+                Complete();
         }
 
         protected override RamAction<Node, Edge, Unit> GetAction()

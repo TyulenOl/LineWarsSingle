@@ -24,7 +24,6 @@ namespace LineWars.Model
         public override void Initialize()
         {
             base.Initialize();
-            TryInitializeAttackAnimation();
             Action.Moved += node =>
             {
                 Player.LocalPlayer.RecalculateVisibility();
@@ -42,13 +41,6 @@ namespace LineWars.Model
                 base.Attack(enemy);
                 Complete();
             }    
-        }
-
-        private void TryInitializeAttackAnimation()
-        {
-            if (attackAnimation == null)
-                return;
-            attackAnimation.Initialize(Executor);
         }
 
         private void AttackWithAnimation(Unit targetUnit)

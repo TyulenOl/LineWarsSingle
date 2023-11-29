@@ -14,10 +14,6 @@
         public LineType LineType { get; set; }
 
         public bool HasOriginal => Original != null;
-
-        public EdgeProjection()
-        {
-        }
     }
 
     public interface IReadOnlyEdgeProjection : INumbered

@@ -27,7 +27,6 @@ namespace LineWars.Model
         public override void Initialize()
         {
             base.Initialize();
-            TryInitializeAnimation();
         }
 
         public override void Attack(ITargetedAlive enemy)
@@ -53,14 +52,6 @@ namespace LineWars.Model
                 distanceAttackAnimation.Ended.RemoveListener(AttackOnEvent);
                 ExecuteAttack(enemy);
             }
-        }
-
-        private void TryInitializeAnimation()
-        {
-            if (distanceAttackAnimation == null)
-                return;
-
-            distanceAttackAnimation.Initialize(Executor);
         }
 
         private void ExecuteAttack(ITargetedAlive enemy)

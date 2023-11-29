@@ -8,7 +8,12 @@ namespace LineWars.Model
         MeleeDamaged,
         DistanceDamaged,
         ComeTo,
-        Throw
+        Throw,
+        Rammed,
+        MeleeDied,
+        DistanceDied,
+        RammedDied,
+        ShotDied
     }
 
     [DisallowMultipleComponent]
