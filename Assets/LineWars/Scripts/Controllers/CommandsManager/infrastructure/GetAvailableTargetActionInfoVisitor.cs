@@ -86,7 +86,7 @@ namespace LineWars.Controllers
             throw new System.NotImplementedException();
         }
 
-        public IEnumerable<TargetActionInfo> Visit(IHealYouSelfAction<Node, Edge, Unit> action)
+        public IEnumerable<TargetActionInfo> Visit(IHealYourselfAction<Node, Edge, Unit> action)
         {
             return ForSimple(action);
         }

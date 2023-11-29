@@ -3,7 +3,7 @@
 namespace LineWars.Model
 {
     public class HealYourSelfCommand<TNode, TEdge, TUnit> :
-        ActionCommand<TUnit, IHealYouSelfAction<TNode, TEdge, TUnit>>
+        ActionCommand<TUnit, IHealYourselfAction<TNode, TEdge, TUnit>>
         where TNode : class, INodeForGame<TNode, TEdge, TUnit>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
@@ -14,7 +14,7 @@ namespace LineWars.Model
             healAmount = Action.HealAmount;
         }
 
-        public HealYourSelfCommand([NotNull] IHealYouSelfAction<TNode, TEdge, TUnit> action) : base(action)
+        public HealYourSelfCommand([NotNull] IHealYourselfAction<TNode, TEdge, TUnit> action) : base(action)
         {
             healAmount = Action.HealAmount;
         }

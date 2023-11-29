@@ -1,6 +1,6 @@
 ﻿namespace LineWars.Model
 {
-    public interface IHealYouSelfAction<TNode, TEdge, TUnit> :
+    public interface IHealYourselfAction<TNode, TEdge, TUnit> :
         IUnitAction<TNode, TEdge, TUnit>,
         ISimpleAction
         where TNode : class, INodeForGame<TNode, TEdge, TUnit>

@@ -99,7 +99,7 @@ namespace LineWars.Model
             Result.ActionModifier = action.Action.ActionModifier;
         }
 
-        public void Visit(MonoHealYouSelfAction action)
+        public void Visit(MonoHealYourselfAction action)
         {
             Result = new HealYourselfAction<NodeProjection, EdgeProjection, UnitProjection>(Unit, action.HealAmount);
             Result.ActionModifier = action.Action.ActionModifier;

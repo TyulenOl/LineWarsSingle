@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    public class MonoHealYouSelfAction: MonoUnitAction<HealYourselfAction<Node,Edge,Unit>>,
-        IHealYouSelfAction<Node, Edge, Unit>
+    public class MonoHealYourselfAction: MonoUnitAction<HealYourselfAction<Node,Edge,Unit>>,
+        IHealYourselfAction<Node, Edge, Unit>
     {
         [SerializeField, Min(0)] private int initialHealAmount;
         public int HealAmount => Action.HealAmount;
@@ -21,6 +21,7 @@ namespace LineWars.Model
 
         public void Execute()
         {
+            //TODO анимации и звуки
             Action.Execute();
         }
         
