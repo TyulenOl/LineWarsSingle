@@ -158,7 +158,7 @@ namespace LineWars
         }
 
 
-        private void WinGame()
+        public void WinGame()
         {
             Debug.Log("<color=yellow>Вы Победили</color>");
             if (!GameVariables.IsNormalStart) return;
@@ -168,7 +168,7 @@ namespace LineWars
             CompaniesDataBase.SaveChooseMission();
         }
 
-        private void LoseGame()
+        public void LoseGame()
         {
             Debug.Log("<color=red>Потрачено</color>");
             if (!GameVariables.IsNormalStart) return;
