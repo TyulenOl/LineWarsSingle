@@ -1,7 +1,6 @@
-using LineWars.Model;
 using System;
 
-namespace LineWars.Controllers
+namespace LineWars.Model
 {
     public interface ITurnLogic
     {

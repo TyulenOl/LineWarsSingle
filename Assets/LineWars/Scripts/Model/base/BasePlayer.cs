@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using LineWars.Controllers;
 using UnityEngine;
 
 
@@ -288,151 +289,17 @@ namespace LineWars.Model
         
         public Unit GetUnitPrefab(UnitType unitType) => Nation.GetUnitPrefab(unitType);
 
-        public void FinishTurn()
-        {
-            StartCoroutine(Coroutine());
-
-            IEnumerator Coroutine()
-            {
-                yield return null;
-                ExecuteTurn(PhaseType.Idle);
-            }
-        }
-
-        public void ExecuteTurn(PhaseType phaseType) //1)Fight 2) Idle
-        {
-            if (PhaseExceptions.Contains(phaseType))
-            {
-                StartCoroutine(SkipTurnCoroutine());
-                return;
-            }
-
-            var previousPhase = CurrentPhase; // 1)Idle 2)Idle
-            switch (phaseType)
-            {
-                case PhaseType.Replenish:
-                    ExecuteReplenish();
-                    break;
-                case PhaseType.Idle:
-                    ExecuteIdle();
-                    break;
-                case PhaseType.Buy:
-                    ExecuteBuy();
-                    break;
-                case PhaseType.Artillery:
-                    ExecuteArtillery();
-                    break;
-                case PhaseType.Fight:
-                    ExecuteFight(); //1) -> ExTurn Idle
-                    break;
-                case PhaseType.Scout:
-                    ExecuteScout();
-                    break;
-                default:
-                    Debug.LogWarning($"Phase.{phaseType} is not implemented in \"ExecuteTurn\"! "
-                                     + "Change IActor to acommodate for this phase!");
-                    break;
-            }
-
-            CurrentPhase = phaseType;
-            TurnChanged?.Invoke(previousPhase, CurrentPhase); //2) Idle Idle //2) Idle Fight
-
-            IEnumerator SkipTurnCoroutine()
-            {
-                yield return null;
-                TurnChanged?.Invoke(phaseType, PhaseType.Idle);
-            }
-        }
-
-        public bool CanExecuteTurn(PhaseType phaseType)
-        {
-            switch (phaseType)
-            {
-                case PhaseType.Idle:
-                    return true;
-                case PhaseType.Buy:
-                    return CanExecuteBuy();
-                case PhaseType.Artillery:
-                    return CanExecuteArtillery();
-                case PhaseType.Fight:
-                    return CanExecuteFight();
-                case PhaseType.Scout:
-                    return CanExecuteScout();
-                case PhaseType.Replenish:
-                    return CanExecuteReplenish();
-            }
-
-            Debug.LogWarning
-            ($"Phase.{phaseType} is not implemented in \"CanExecuteTurn\"! "
-             + "Change IActor to acommodate for this phase!");
-            return false;
-        }
-
-        #region Turns
-
-        protected virtual void ExecuteBuy()
-        {
-        }
-
-        protected virtual void ExecuteArtillery()
-        {
-        }
-
-        protected virtual void ExecuteFight()
-        {
-        }
-
-        protected virtual void ExecuteScout()
-        {
-        }
 
 
-        protected virtual void ExecuteIdle()
-        {
-        }
+        public abstract bool CanExecuteTurn(PhaseType phaseType);
+
+        public abstract ITurnLogic GetTurnLogic(PhaseType phaseType);
 
         protected virtual void ExecuteReplenish()
         {
-            if (isFirstReplenish)
-            {
-                isFirstReplenish = false;
-                return;
-            }
-
             CurrentMoney += Income;
             foreach (var owned in OwnedObjects)
                 owned.Replenish();
         }
-
-        #endregion
-
-        #region Check Turns
-
-        protected virtual bool CanExecuteBuy()
-        {
-            return false;
-        }
-
-        protected virtual bool CanExecuteArtillery()
-        {
-            return false;
-        }
-
-        protected virtual bool CanExecuteFight()
-        {
-            return false;
-        }
-
-        protected virtual bool CanExecuteScout()
-        {
-            return false;
-        }
-
-        protected virtual bool CanExecuteReplenish()
-        {
-            return false;
-        }
-
-        #endregion
     }
 }
