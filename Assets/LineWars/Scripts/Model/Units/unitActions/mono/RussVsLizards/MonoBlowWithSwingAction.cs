@@ -1,5 +1,4 @@
-﻿using System;
-using LineWars.Controllers;
+﻿using LineWars.Controllers;
 using UnityEngine;
 
 namespace LineWars.Model
@@ -13,6 +12,7 @@ namespace LineWars.Model
 
         [SerializeField] private SFXList attackReactionSounds;
         [SerializeField] private SFXData attackSound;
+        [SerializeField] private UnitAnimation swingAnimation;
 
         private IDJ dj;
         
@@ -31,7 +31,62 @@ namespace LineWars.Model
         public void Execute(Unit target)
         {
             Executor.PlaySfx(attackSound);
+
+            if (swingAnimation != null)
+            {
+                var context = new AnimationContext()
+                {
+                    TargetUnit = target
+                };
+
+                swingAnimation.Execute(context);
+                swingAnimation.Ended.AddListener(ExecuteOnAnimationEnd);
+            }
+            else
+            {
+                AttackWithResponse(target);
+            }
+
+            void ExecuteOnAnimationEnd(UnitAnimation animation)
+            {
+                animation.Ended.RemoveListener(ExecuteOnAnimationEnd);
+                AttackWithResponse(target);
+            }
+        }
+
+        private void AttackWithResponse(Unit target)
+        {
+            foreach (var neighbor in Executor.Node.GetNeighbors())
+            {
+                if (neighbor.AllIsFree)
+                    continue;
+                if (neighbor.OwnerId == Executor.OwnerId)
+                    continue;
+                foreach (var unit in neighbor.Units)
+                if (unit.TryGetComponent<AnimationResponses>(out var responses))
+                    responses.TrySetDeathAnimation(AnimationResponseType.SwingDied);
+                    
+            }
             Action.Execute(target);
+            foreach (var neighbor in Executor.Node.GetNeighbors())
+            {
+                if (neighbor.AllIsFree)
+                    continue;
+                if (neighbor.OwnerId == Executor.OwnerId)
+                    continue;
+                foreach (var unit in neighbor.Units)
+                if(unit.TryGetComponent<AnimationResponses>(out var responses))
+                {
+                    var context = new AnimationContext()
+                    {
+                        TargetUnit = Executor,
+                        TargetNode = Executor.Node
+                    };
+
+                    responses.Respond(AnimationResponseType.SwingDamaged, context);
+                    responses.SetDefaultDeathAnimation();
+                }
+            }
             Executor.PlaySfx(dj.GetSound(attackReactionSounds));
         }
 

@@ -38,9 +38,6 @@ namespace LineWars.Model
         [Header("Actions Settings")] 
         [SerializeField] [Min(0)] private int maxActionPoints;
 
-        [Header("Animation Settings")]
-        [SerializeField] private UnitAnimation deathAnimation;
-
         [Header("DEBUG")] 
         [SerializeField, ReadOnlyInspector] private Node myNode;
 
@@ -250,23 +247,23 @@ namespace LineWars.Model
 
             Owner.RemoveOwned(this);
             SingleGame.Instance.AllUnits.Remove(this);
-            if(deathAnimation == null)
+            if(!TryGetComponent(out AnimationResponses responses) || responses.CurrentDeathAnimation == null) 
                 Destroy(gameObject);
             else
             {
-                deathAnimation.Ended.AddListener(DestroyOnAnimationEnd);
+                responses.CurrentDeathAnimation.Ended.AddListener(DestroyOnAnimationEnd);
                 var animContext = new AnimationContext()
                 {
                     TargetNode = myNode,
                     TargetUnit = this
                 };
-                deathAnimation.Execute(animContext);
+                responses.CurrentDeathAnimation.Execute(animContext);
             }
         }
 
-        private void DestroyOnAnimationEnd(UnitAnimation _)
+        private void DestroyOnAnimationEnd(UnitAnimation animation)
         {
-            deathAnimation.Ended.RemoveListener(DestroyOnAnimationEnd);
+            animation.Ended.RemoveListener(DestroyOnAnimationEnd);
             Destroy(gameObject);
         }
 

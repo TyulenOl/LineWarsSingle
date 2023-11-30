@@ -2,7 +2,7 @@
 
 namespace LineWars.Model
 {
-    public class BlockAIAction: AIAction
+    public class BlockProgrammedAIAction: ProgrammedAIAction
     {
         [SerializeField] private PointerToUnit unit;
         public override void Execute()

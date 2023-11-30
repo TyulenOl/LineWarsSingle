@@ -2,7 +2,7 @@
 
 namespace LineWars.Model
 {
-    public class MoveAIAction : AIAction
+    public class MoveProgrammedAIAction : ProgrammedAIAction
     {
         [SerializeField] private PointerToUnit unit;
         [SerializeField] private Node toNode;

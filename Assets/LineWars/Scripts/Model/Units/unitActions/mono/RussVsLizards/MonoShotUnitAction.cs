@@ -1,5 +1,4 @@
-﻿using System;
-using LineWars.Controllers;
+﻿using LineWars.Controllers;
 using UnityEngine;
 
 namespace LineWars.Model
@@ -41,15 +40,9 @@ namespace LineWars.Model
             if(!responses.CanRespond(AnimationResponseType.ComeTo)
                 || !responses.CanRespond(AnimationResponseType.Throw))
             {
-                Debug.Log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
                 ExecuteInstant(unitTarget, nodeTarget);
                 return;
             }
-            var animContext = new AnimationContext()
-            {
-                TargetNode = Executor.Node,
-                TargetUnit = Executor
-            };
 
             if (unitTarget.Owner == Executor.Owner)
             {
@@ -59,9 +52,36 @@ namespace LineWars.Model
             {
                 Executor.PlaySfx(dj.GetSound(ThrowLizardSounds));
             }
-            
+            var animContext = new AnimationContext()
+            {
+                TargetNode = Executor.Node,
+                TargetUnit = Executor
+            };
+
             var walkAnimation = responses.Respond(AnimationResponseType.ComeTo, animContext);
             walkAnimation.Ended.AddListener(OnWalkEnded);
+            TrySetDeathAnimations();
+            
+            
+            void TrySetDeathAnimations()
+            {
+                if(unitTarget.TryGetComponent(out AnimationResponses unitTargetResponses))
+                    unitTargetResponses.TrySetDeathAnimation(AnimationResponseType.ShotUpDied);
+                if(nodeTarget.LeftUnit != null && nodeTarget.LeftUnit.TryGetComponent(out AnimationResponses leftResponses))
+                    leftResponses.TrySetDeathAnimation(AnimationResponseType.ShotBottomDied);
+                if(nodeTarget.RightUnit != null && nodeTarget.RightUnit.TryGetComponent(out AnimationResponses rightResponses))
+                    rightResponses.TrySetDeathAnimation(AnimationResponseType.ShotBottomDied);
+            }
+
+            void TrySetDefaultDeathAnimations()
+            {
+                if (unitTarget != null && unitTarget.TryGetComponent(out AnimationResponses unitTargetResponses))
+                    unitTargetResponses.SetDefaultDeathAnimation();
+                if (nodeTarget.LeftUnit != null && nodeTarget.LeftUnit.TryGetComponent(out AnimationResponses leftResponses))
+                    leftResponses.SetDefaultDeathAnimation();
+                if (nodeTarget.RightUnit != null && nodeTarget.RightUnit.TryGetComponent(out AnimationResponses rightResponses))
+                    rightResponses.SetDefaultDeathAnimation();
+            }
             
             void OnWalkEnded(UnitAnimation animation)
             {
@@ -80,9 +100,30 @@ namespace LineWars.Model
             {
                 animation.Ended.RemoveListener(OnThrowEnded);
                 Action.Execute(unitTarget, nodeTarget);
+                RespondToImpact();
                 Complete();
+                TrySetDefaultDeathAnimations();
                 Player.LocalPlayer.RecalculateVisibility();
                 Executor.PlaySfx(dj.GetSound(FallSoundsList));
+            }
+
+            void RespondToImpact()
+            {
+                var context = new AnimationContext()
+                {
+                    TargetNode = Executor.Node,
+                    TargetUnit = Executor
+                };
+                if (unitTarget != null && unitTarget.TryGetComponent(out AnimationResponses unitTargetResponses))
+                    unitTargetResponses.Respond(AnimationResponseType.ShotUpDamaged, context);
+                if (nodeTarget.LeftUnit != null 
+                    && nodeTarget.LeftUnit != unitTarget 
+                    && nodeTarget.LeftUnit.TryGetComponent(out AnimationResponses leftResponses))
+                    leftResponses.Respond(AnimationResponseType.ShotBottomDamaged, context);
+                if (nodeTarget.RightUnit != null 
+                    && nodeTarget.RightUnit != unitTarget 
+                    && nodeTarget.RightUnit.TryGetComponent(out AnimationResponses rightResponses))
+                    rightResponses.Respond(AnimationResponseType.ShotUpDamaged, context);
             }
         }
 
