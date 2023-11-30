@@ -84,6 +84,7 @@ namespace LineWars.Model
 
         protected virtual void Start()
         {
+            PhaseManager.Instance.RegisterActor(this);
         }
 
         protected virtual void OnEnable()
