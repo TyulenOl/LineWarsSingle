@@ -1,5 +1,5 @@
 using System.Linq;
-using LineWars.Controllers;
+using LineWars.Model;
 
 namespace LineWars
 {
@@ -18,20 +18,19 @@ namespace LineWars
             public override void OnEnter()
             {
                 base.OnEnter();
-                var turnLogics = manager.Actors
+                var elligbleActors = manager.Actors
                     .Where((actor) => actor.CanExecuteTurn(Type))
-                    .Select((actor) => actor.GetTurnLogic(Type))
                     .ToArray();
-                actorsLeft = turnLogics.Length;
-                foreach (var logic in turnLogics) 
-                    logic.Ended += OnTurnLogicEnd;
-                foreach(var logic in turnLogics)
-                    logic.Start();
+                actorsLeft = elligbleActors.Length;
+                foreach (var actor in elligbleActors) 
+                    actor.TurnEnded += OnTurnLogicEnd;
+                foreach(var actor in elligbleActors)
+                    actor.ExecuteTurn(Type);
             }
 
-            private void OnTurnLogicEnd(ITurnLogic logic)
+            private void OnTurnLogicEnd(IActor actor)
             {
-                logic.Ended -= OnTurnLogicEnd;
+                actor.TurnEnded -= OnTurnLogicEnd;
                 actorsLeft--;
                 
                 if(AreActorsDone)

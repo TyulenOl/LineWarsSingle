@@ -9,7 +9,7 @@ namespace LineWars.Model
 {
     public partial class EnemyAI
     {
-        public class EnemyAITurnLogic : ITurnLogic
+        public class EnemyAITurnLogic
         {
             private readonly EnemyAI ai;
 
@@ -18,7 +18,7 @@ namespace LineWars.Model
                 this.ai = ai;
             }
 
-            public event Action<ITurnLogic> Ended;
+            public event Action Ended;
 
             public void Start()
             {
@@ -46,9 +46,9 @@ namespace LineWars.Model
                     var command = blueprint.GenerateMonoCommand(gameProjection);
                     UnitsController.ExecuteCommand(command);
                     yield return new WaitForSeconds(ai.commandPause);
-                } 
+                }
 
-                Ended?.Invoke(this);
+                Ended?.Invoke();
             }
 
             private Task<PossibleOutcome[]> FindAllOutcomes(GameProjection gameProjection)

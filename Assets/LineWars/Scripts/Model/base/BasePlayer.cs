@@ -51,6 +51,9 @@ namespace LineWars.Model
         public event Action<Owned> OwnedRemoved;
         public event Action<int, int> CurrentMoneyChanged;
         public event Action<int, int> IncomeChanged;
+        public event Action<IActor> TurnStarted;
+        public event Action<IActor> TurnEnded;
+
         public IReadOnlyCollection<Owned> OwnedObjects => myOwned;
         public bool IsMyOwn(Owned owned) => myOwned.Contains(owned);
 
@@ -292,14 +295,23 @@ namespace LineWars.Model
 
 
         public abstract bool CanExecuteTurn(PhaseType phaseType);
-
-        public abstract ITurnLogic GetTurnLogic(PhaseType phaseType);
+        public abstract void ExecuteTurn(PhaseType phaseType);
 
         protected virtual void ExecuteReplenish()
         {
             CurrentMoney += Income;
             foreach (var owned in OwnedObjects)
                 owned.Replenish();
+        }
+
+        protected void InvokeTurnStarted()
+        {
+            TurnStarted?.Invoke(this);
+        }
+
+        protected void InvokeTurnEnded()
+        {
+            TurnEnded?.Invoke(this);
         }
     }
 }

@@ -1,9 +1,6 @@
-using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using LineWars.Model;
-using LineWars.Controllers;
 
 namespace LineWars
 {
@@ -11,7 +8,6 @@ namespace LineWars
     {
         public class PhaseAlternatingState : Phase
         {
-            private ITurnLogic currentTurnLogic;
 
             public PhaseAlternatingState(PhaseType phase, PhaseManager manager) : base(phase, manager)
             {
@@ -21,7 +17,6 @@ namespace LineWars
             public override void OnEnter()
             {
                 base.OnEnter();
-                currentTurnLogic = null;
             }
 
             private void CycleNewActor()
@@ -33,15 +28,13 @@ namespace LineWars
                     return;
                 }
                 manager.currentActorId = nextActorId;
-                currentTurnLogic = manager.CurrentActor.GetTurnLogic(Type);
-                currentTurnLogic.Ended += OnTurnLogicEnd;
-                currentTurnLogic.Start();
+                manager.CurrentActor.TurnEnded += OnTurnLogicEnd;
+                manager.CurrentActor.ExecuteTurn(Type);
             }
 
-            private void OnTurnLogicEnd(ITurnLogic _)
+            private void OnTurnLogicEnd(IActor _)
             {
-                currentTurnLogic.Ended -= OnTurnLogicEnd;
-                currentTurnLogic = null;
+                manager.CurrentActor.TurnEnded -= OnTurnLogicEnd;
                 manager.StartCoroutine(CycleCoroutine());
                 
                 IEnumerator CycleCoroutine()

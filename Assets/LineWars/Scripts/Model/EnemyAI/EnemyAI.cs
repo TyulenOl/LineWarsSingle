@@ -17,11 +17,13 @@ namespace LineWars.Model
         [SerializeField] private float firstCommandPause;
 
         private AIBuyLogic buyLogic;
+        private EnemyAITurnLogic turnLogic;
 
         public override void Initialize(SpawnInfo spawnInfo)
         {
             base.Initialize(spawnInfo);
             buyLogic = buyLogicData.CreateAILogic(this);
+            turnLogic = new EnemyAITurnLogic(this);
         }
 
         public void SetNewBuyLogic([NotNull] AIBuyLogicData buyData)
@@ -43,6 +45,8 @@ namespace LineWars.Model
         {
             if (phase == PhaseType.Replenish)
                 return true;
+            if(phase == PhaseType.Buy)
+                return true;
             var executors = PhaseExecutorsData.PhaseToUnits[phase];
             foreach (var owned in OwnedObjects)
             {
@@ -54,13 +58,29 @@ namespace LineWars.Model
             return false;
         }
 
-        public override ITurnLogic GetTurnLogic(PhaseType phaseType)
+        public override void ExecuteTurn(PhaseType phaseType)
         {
+            InvokeTurnStarted();
             if (phaseType == PhaseType.Replenish)
-                return new SimpleTurnLogic(ExecuteReplenish);
+            {
+                ExecuteReplenish();
+                InvokeTurnEnded();
+                return;
+            }
             if (phaseType == PhaseType.Buy)
-                return new SimpleTurnLogic(buyLogic.CalculateBuy);
-            return new EnemyAITurnLogic(this);
+            {
+                buyLogic.CalculateBuy();
+                InvokeTurnEnded();
+                return;
+            }
+            turnLogic.Ended += OnTurnLogicEnd;
+            turnLogic.Start();
+        }
+
+        private void OnTurnLogicEnd()
+        {
+            turnLogic.Ended -= OnTurnLogicEnd;
+            InvokeTurnEnded();
         }
     }
 }
