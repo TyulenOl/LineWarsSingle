@@ -38,5 +38,10 @@ namespace LineWars.Controllers
         {
             SpeechEnded?.Invoke();
         }
+        
+        public void StopAllSounds()
+        {
+            source.Stop();
+        }
     }
 }

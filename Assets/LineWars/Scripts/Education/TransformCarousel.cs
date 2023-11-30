@@ -25,7 +25,7 @@ public class TransformCarousel : MonoBehaviour
         Move(i => i - 1);
     }
 
-    private void Move(Unity.Plastic.Newtonsoft.Json.Serialization.Func<int, int> moveFunc)
+    private void Move(Func<int, int> moveFunc)
     {
         var children = transform.GetChildren().ToArray();
         if (!CheckChildren(children))
