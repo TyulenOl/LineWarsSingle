@@ -1,6 +1,6 @@
 ﻿namespace LineWars.Model
 {
-    public class SkipAIAction: AIAction
+    public class SkipProgrammedAIAction: ProgrammedAIAction
     {
         public override void Execute()
         {

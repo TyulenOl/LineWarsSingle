@@ -2,7 +2,7 @@
 
 namespace LineWars.Model
 {
-    public abstract class AIAction: MonoBehaviour
+    public abstract class ProgrammedAIAction: MonoBehaviour
     {
         public abstract void Execute();
     }

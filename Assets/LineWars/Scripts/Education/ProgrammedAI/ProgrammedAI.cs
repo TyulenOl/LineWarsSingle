@@ -5,7 +5,7 @@ namespace LineWars.Model
 {
     public class ProgrammedAI : BasePlayer
     {
-        [SerializeField] private SerializedDictionary<PhaseType, AIActions> turnsForPhase;
+        [SerializeField] private SerializedDictionary<PhaseType, ProgrammedAIActions> turnsForPhase;
 
         protected override bool CanExecuteReplenish() => true;
 
@@ -38,7 +38,6 @@ namespace LineWars.Model
         protected override void ExecuteScout()
         {
             base.ExecuteScout();
-            ;
             ExecuteProgrammedAITurn(PhaseType.Scout);
         }
 
@@ -70,6 +69,8 @@ namespace LineWars.Model
         {
             if (turnsForPhase[phaseType].TryGetNext(out var turn))
             {
+                if (turn is IAIActionWithNeedProgrammedPlayer needProgrammedPlayer)
+                    needProgrammedPlayer.Prepare(this);
                 turn.Execute();
             }
             else
