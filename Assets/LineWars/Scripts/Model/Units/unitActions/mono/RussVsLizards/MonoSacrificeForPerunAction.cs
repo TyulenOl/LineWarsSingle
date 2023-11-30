@@ -9,7 +9,7 @@ namespace LineWars.Model
         MonoUnitAction<SacrificeForPerunAction<Node, Edge, Unit>>,
         ISacrificeForPerunAction<Node, Edge, Unit>
     {
-        [SerializeField] private PerunAnimation perunAnimation;
+        [SerializeField] private UnitAnimation perunAnimation;
         
         [SerializeField] protected SFXData sacrSfx;
 

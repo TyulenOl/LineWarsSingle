@@ -1,4 +1,4 @@
-﻿using JetBrains.Annotations;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace LineWars.Model
@@ -54,17 +54,31 @@ namespace LineWars.Model
 
         private void ExecuteRam()
         {
+            var units = new List<Unit>()
+            {
+                currentNode.LeftUnit, currentNode.RightUnit
+            };
+
+            foreach (var unit in units)
+            {
+                if (unit == null)
+                    continue;
+                if (unit.TryGetComponent<AnimationResponses>(out var responses))
+                    responses.TrySetDeathAnimation(AnimationResponseType.RammedDied);
+            }
+
             var slowRamEnumerator = Action.SlowRam(currentNode);
 
             while (slowRamEnumerator.MoveNext())
             {
                 var current = slowRamEnumerator.Current;
-                //DiedUnit?
                 if (current is not MovedUnit movedUnit) continue;
 
                 var currentUnit = (Unit)movedUnit.Unit;
                 var currentNode = (Node)movedUnit.DestinationNode;
 
+                if (currentUnit == Executor)
+                    continue;
                 if (!currentUnit.TryGetComponent(out AnimationResponses responses))
                 {
                     currentUnit.transform.position = currentNode.transform.position;
@@ -86,6 +100,14 @@ namespace LineWars.Model
                         response.Ended.AddListener(OnRespondRamEnded);
                     }
                 }
+            }
+
+            foreach (var unit in units)
+            {
+                if (unit == null)
+                    continue;
+                if (unit.TryGetComponent<AnimationResponses>(out var responses))
+                    responses.SetDefaultDeathAnimation();
             }
 
             if (ramResponsesPlayingCount == 0)

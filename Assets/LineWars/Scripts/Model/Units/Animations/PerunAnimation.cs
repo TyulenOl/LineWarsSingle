@@ -7,7 +7,6 @@ namespace LineWars.Model
     public class PerunAnimation : UnitAnimation
     {
         [SerializeField] private float deathTimeInSeconds = 0.6f;
-        [SerializeField] private UnitAnimation standardDeathAnimation;
 
         [Header("Shake Settings")]
         [SerializeField] private float initialShakeMagnitude = 0.3f;
@@ -27,7 +26,6 @@ namespace LineWars.Model
 
         private SpriteRenderer mainSprite;
         private Vector2 startPosition;
-        public UnityEvent<PerunAnimation> UnitDead;
         private Node targetNode;
 
         private float shakeMagnitude;
@@ -45,7 +43,7 @@ namespace LineWars.Model
             shakeMagnitude = initialShakeMagnitude;
             startPosition = mainSprite.transform.position;
             StartCoroutine(ShakesCoroutine());
-            Destroy(standardDeathAnimation);
+            ownerUnit.GetComponent<AnimationResponses>().NullifyDeathAnimation();
         }
 
         private IEnumerator ShakesCoroutine()
@@ -62,7 +60,6 @@ namespace LineWars.Model
                 if(passedTime > deathTimeInSeconds)
                 {
                     yield return new WaitForSeconds(pauseBeforeLightningInSeconds);
-                    UnitDead.Invoke(this);
                     Strike();
                     yield break;
                 }
