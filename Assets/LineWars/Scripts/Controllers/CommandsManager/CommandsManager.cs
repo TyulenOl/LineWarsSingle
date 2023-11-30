@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -10,11 +9,9 @@ namespace LineWars.Controllers
     public partial class CommandsManager : MonoBehaviour
     {
         public static CommandsManager Instance { get; private set; }
-
-        [SerializeField, ReadOnlyInspector] private bool isActive = true;
-        public bool ActiveSelf => isActive;
-
-
+        [field:SerializeField, ReadOnlyInspector] public bool ActiveSelf { get; private set; } = true;
+        
+        
         [field: SerializeField] private CommandsManagerConstrainsBase Constrains { get; set; }
         public bool HaveConstrains => Constrains != null;
         public bool NotHaveConstraints => Constrains == null;
@@ -37,11 +34,11 @@ namespace LineWars.Controllers
 
         [SerializeField] private List<CommandType> hiddenCommands;
         private HashSet<CommandType> hiddenCommandsSet;
-
-        private readonly List<PhaseType> skippedPhases = new();
-
+        private ActionInvokerBase actionInvoker;
+        
         public event Action<ICommand> CommandIsExecuted;
 
+        
         [SerializeField, ReadOnlyInspector] private CommandsManagerStateType state;
 
         private CommandsManagerStateType State
@@ -51,8 +48,8 @@ namespace LineWars.Controllers
             {
                 var previousValue = state;
                 state = value;
-                StateExited?.Invoke(previousValue);
-                StateEntered?.Invoke(state);
+                InvokeAction(() =>StateExited?.Invoke(previousValue));
+                InvokeAction(() =>StateEntered?.Invoke(value));
             }
         }
 
@@ -61,6 +58,7 @@ namespace LineWars.Controllers
 
 
         private Player Player => Player.LocalPlayer;
+        private PhaseManager PhaseManager => PhaseManager.Instance; 
 
 
         private OnWaitingCommandMessage currentOnWaitingCommandMessage;
@@ -70,7 +68,7 @@ namespace LineWars.Controllers
             get => currentOnWaitingCommandMessage;
             set
             {
-                InWaitingCommandState?.Invoke(value);
+                InvokeAction(() => InWaitingCommandState?.Invoke(value));
                 currentOnWaitingCommandMessage = value;
             }
         }
@@ -89,8 +87,8 @@ namespace LineWars.Controllers
             {
                 var previousTarget = target;
                 target = value;
-                if (previousTarget != target)
-                    TargetChanged?.Invoke(previousTarget, target);
+                if (previousTarget != value)
+                    actionInvoker.Invoke(() => TargetChanged?.Invoke(previousTarget, value));
             }
         }
 
@@ -104,8 +102,8 @@ namespace LineWars.Controllers
             {
                 var previousExecutor = executor;
                 executor = value;
-                if (previousExecutor != executor)
-                    ExecutorChanged?.Invoke(previousExecutor, executor);
+                if (previousExecutor != value)
+                    InvokeAction(() => ExecutorChanged?.Invoke(previousExecutor, value));
             }
         }
 
@@ -136,19 +134,20 @@ namespace LineWars.Controllers
             buyState = new CommandsManagerBuyState(this);
 
             hiddenCommandsSet = hiddenCommands.ToHashSet();
+
+            actionInvoker = new GameObject(nameof(DelayInvoker)).AddComponent<DelayInvoker>();
+            actionInvoker.transform.SetParent(transform);
         }
 
         private void Start()
         {
-            if(isActive)
-                stateMachine.SetState(findExecutorState);
-            Player.LocalPlayer.TurnChanged += OnTurnChanged;
+            Player.TurnChanged += OnTurnChanged;
         }
 
         private void OnDestroy()
         {
             stateMachine.SetState(idleState);
-            Player.LocalPlayer.TurnChanged -= OnTurnChanged;
+            Player.TurnChanged -= OnTurnChanged;
         }
 
         public bool CanExecuteAnyCommand()
@@ -158,7 +157,6 @@ namespace LineWars.Controllers
 
         public void ExecuteSimpleCommand(IActionCommand command)
         {
-            ValidateActiveSelf();
             if (HaveConstrains
                 && (!Constrains.CanExecuteSimpleAction()
                     || !Constrains.IsMyCommandType(command.Action.CommandType)))
@@ -184,7 +182,7 @@ namespace LineWars.Controllers
             void OnActionCompleted()
             {
                 action.ActionCompleted -= OnActionCompleted;
-                CommandIsExecuted?.Invoke(command);
+                InvokeAction(() => CommandIsExecuted?.Invoke(command));
                 if (Executor as MonoBehaviour == null || !Executor.CanDoAnyAction)
                 {
                     Player.FinishTurn();
@@ -200,7 +198,6 @@ namespace LineWars.Controllers
 
         public void SetUnitPreset(UnitBuyPreset preset)
         {
-            ValidateActiveSelf();
             if (HaveConstrains && !Constrains.CanSelectUnitBuyPreset(preset))
             {
                 Debug.LogError("Нельзя выбрать текущий пресет ввиду огрничения");
@@ -214,7 +211,6 @@ namespace LineWars.Controllers
 
         public void SelectCommandsPreset(CommandPreset preset)
         {
-            ValidateActiveSelf();
             if (stateMachine.CurrentState != waitingSelectCommandState)
                 throw new InvalidOperationException();
             if (!currentOnWaitingCommandMessage.Data.Contains(preset))
@@ -226,7 +222,6 @@ namespace LineWars.Controllers
 
         public void CancelCommandPreset()
         {
-            ValidateActiveSelf();
             if (stateMachine.CurrentState != waitingSelectCommandState)
             {
                 throw new InvalidOperationException("Is not targeted state to cancelAction");
@@ -237,7 +232,6 @@ namespace LineWars.Controllers
 
         public void SelectCurrentCommand(CommandType commandType)
         {
-            ValidateActiveSelf();
             if (HaveConstrains && !Constrains.CanSelectCurrentCommand())
             {
                 Debug.LogError("Нельзя выбрать конкретную команду ввиду ограничения");
@@ -263,7 +257,6 @@ namespace LineWars.Controllers
 
         public void CancelCurrentCommand()
         {
-            ValidateActiveSelf();
             if (stateMachine.CurrentState != currentCommandState)
                 throw new InvalidOperationException();
             stateMachine.SetState(findTargetState);
@@ -271,12 +264,10 @@ namespace LineWars.Controllers
 
         private void OnTurnChanged(PhaseType previousPhase, PhaseType currentPhase)
         {
-            if (!isActive)
+            if (!ActiveSelf)
             {
-                skippedPhases.Add(currentPhase);
                 return;
             }
-
             ToPhase(currentPhase);
         }
 
@@ -340,22 +331,22 @@ namespace LineWars.Controllers
                 actionSelector ?? (action => !hiddenCommandsSet.Contains(action.CommandType)));
             var data = Executor.Accept(visitor).ToArray();
             var message = new ExecutorRedrawMessage(data);
-            FightNeedRedraw?.Invoke(message);
+            InvokeAction(() => FightNeedRedraw?.Invoke(message));
         }
 
         private void SendFightClearMassage()
         {
-            FightNeedRedraw?.Invoke(null);
+            InvokeAction(() =>FightNeedRedraw?.Invoke(null));
         }
 
         private void SendBuyReDrawMessage(IEnumerable<Node> nodes)
         {
-            BuyNeedRedraw?.Invoke(new BuyStateMessage(nodes));
+            InvokeAction(() => BuyNeedRedraw?.Invoke(new BuyStateMessage(nodes)));
         }
 
         private void SendBuyClearReDrawMessage()
         {
-            BuyNeedRedraw?.Invoke(null);
+            InvokeAction(() => BuyNeedRedraw?.Invoke(null));
         }
 
         private void GoToWaitingSelectCommandState(OnWaitingCommandMessage commandMessage)
@@ -364,34 +355,26 @@ namespace LineWars.Controllers
             stateMachine.SetState(waitingSelectCommandState);
         }
 
+        private void InvokeAction(Action action)
+        {
+            actionInvoker.Invoke(action);
+        }
+
+
         public void Activate()
         {
-            if (isActive) return;
-            isActive = true;
-            if (skippedPhases.Count == 0)
-                ToPhase(PhaseManager.Instance.CurrentPhase);
-            foreach (var skippedPhase in skippedPhases)
-                ToPhase(skippedPhase);
-            skippedPhases.Clear();
+            if (ActiveSelf)
+                return;
+            ActiveSelf = true;
+            ToPhase(PhaseManager.CurrentPhase);
         }
-
+        
         public void Deactivate()
         {
-            if (!isActive) return;
-            isActive = false;
-            StartCoroutine(DelayedToPhase());
-        
-            IEnumerator DelayedToPhase()
-            {
-                yield return null;
-                ToPhase(PhaseType.Idle);
-            }
-        }
-
-        public void ValidateActiveSelf()
-        {
-            if (!isActive)
-                throw new InvalidOperationException("Коммандс манеджер не активен!");
+            if (!ActiveSelf)
+                return;
+            ActiveSelf = false;
+            ToPhase(PhaseType.Idle);
         }
     }
 }

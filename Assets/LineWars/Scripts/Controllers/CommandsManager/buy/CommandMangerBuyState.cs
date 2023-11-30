@@ -74,7 +74,7 @@ namespace LineWars.Controllers
                 {
                     var newCommand = new BuyPresetOnNodeCommand(Manager.Player, currentNode, currentBuyPreset);
                     UnitsController.ExecuteCommand(newCommand);
-                    Manager.CommandIsExecuted?.Invoke(newCommand);
+                    Manager.InvokeAction(() => Manager.CommandIsExecuted?.Invoke(newCommand));
                     currentNode = null;
                     Manager.SendBuyReDrawMessage(GetNodes());
                 }

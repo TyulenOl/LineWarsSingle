@@ -62,6 +62,7 @@ namespace LineWars
         {
             foreach(var actor in actors)
             {
+                // ничего не отпишет
                 actor.TurnChanged -= GetInvokingEndingTurn(actor);
             }
             stateMachine.SetState(idleState);
@@ -147,6 +148,8 @@ namespace LineWars
             PhaseChanged.Invoke(previousPhase, ((Phase)currentState).Type);
         }
 
+        
+        // !!!лямбду нельзя отписать
         private Action<PhaseType, PhaseType> GetInvokingEndingTurn(IActor actor)
         {
             return (previousType, currentType) => ActorTurnChanged?.Invoke(actor, previousType, currentType);
