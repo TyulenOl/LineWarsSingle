@@ -63,7 +63,7 @@ namespace LineWars
             InitializeGameReferee();
             
             RegisterAllPlayers();
-
+            //RegisterActors();
 
             StartCoroutine(StartGameCoroutine());
 
@@ -76,7 +76,7 @@ namespace LineWars
 
         private void RegisterAllPlayers()
         {
-            foreach (var (key, value) in AllPlayers)
+            foreach (var (key, value) in AllPlayers.Reverse())
             {
                 PhaseManager.Instance.RegisterActor(value);
                 Debug.Log($"{value.name} registered");

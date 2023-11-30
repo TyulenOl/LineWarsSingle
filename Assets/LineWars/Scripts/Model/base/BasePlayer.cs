@@ -299,7 +299,7 @@ namespace LineWars.Model
             }
         }
 
-        public void ExecuteTurn(PhaseType phaseType)
+        public void ExecuteTurn(PhaseType phaseType) //1)Fight 2) Idle
         {
             if (PhaseExceptions.Contains(phaseType))
             {
@@ -307,7 +307,7 @@ namespace LineWars.Model
                 return;
             }
 
-            var previousPhase = CurrentPhase;
+            var previousPhase = CurrentPhase; // 1)Idle 2)Idle
             switch (phaseType)
             {
                 case PhaseType.Replenish:
@@ -323,7 +323,7 @@ namespace LineWars.Model
                     ExecuteArtillery();
                     break;
                 case PhaseType.Fight:
-                    ExecuteFight();
+                    ExecuteFight(); //1) -> ExTurn Idle
                     break;
                 case PhaseType.Scout:
                     ExecuteScout();
@@ -335,7 +335,7 @@ namespace LineWars.Model
             }
 
             CurrentPhase = phaseType;
-            TurnChanged?.Invoke(previousPhase, CurrentPhase);
+            TurnChanged?.Invoke(previousPhase, CurrentPhase); //2) Idle Idle //2) Idle Fight
 
             IEnumerator SkipTurnCoroutine()
             {

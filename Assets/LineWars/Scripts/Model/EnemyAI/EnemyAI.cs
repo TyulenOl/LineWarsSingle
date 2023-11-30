@@ -27,16 +27,6 @@ namespace LineWars.Model
             buyLogic = buyLogicData.CreateAILogic(this);
         }
 
-        // protected override void OnBuyPreset(Node node, IEnumerable<Unit> units)
-        // {
-        //     base.OnBuyPreset(node, units);
-        //     if (node.IsVisible) return;
-        //     foreach (var unit in units)
-        //     {
-        //         unit.gameObject.SetActive(false);
-        //     }
-        // }
-
         public void SetNewBuyLogic([NotNull] AIBuyLogicData buyData)
         {
             if (buyLogicData == null)
