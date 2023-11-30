@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using LineWars.Model;
 using UnityEngine;
-using System.Linq;
 
-namespace LineWars
+namespace LineWars.Controllers
 {
     public class PlayerInitializer
     {
