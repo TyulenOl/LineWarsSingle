@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using UnityEngine;
 using JetBrains.Annotations;
-
+using UnityEngine.Rendering;
 
 namespace LineWars.Model
 {
@@ -43,6 +43,9 @@ namespace LineWars.Model
 
         public override bool CanExecuteTurn(PhaseType phase)
         {
+            if(!base.CanExecuteTurn(phase)) //плохо? сделать явную проверку на PhaseExceptions?
+                return false;
+
             if (phase == PhaseType.Replenish)
                 return true;
             if(phase == PhaseType.Buy)
@@ -60,27 +63,27 @@ namespace LineWars.Model
 
         public override void ExecuteTurn(PhaseType phaseType)
         {
-            InvokeTurnStarted();
+            InvokeTurnStarted(phaseType);
             if (phaseType == PhaseType.Replenish)
             {
                 ExecuteReplenish();
-                InvokeTurnEnded();
+                InvokeTurnEnded(phaseType);
                 return;
             }
             if (phaseType == PhaseType.Buy)
             {
                 buyLogic.CalculateBuy();
-                InvokeTurnEnded();
+                InvokeTurnEnded(phaseType);
                 return;
             }
             turnLogic.Ended += OnTurnLogicEnd;
             turnLogic.Start();
-        }
 
-        private void OnTurnLogicEnd()
-        {
-            turnLogic.Ended -= OnTurnLogicEnd;
-            InvokeTurnEnded();
+            void OnTurnLogicEnd()
+            {
+                turnLogic.Ended -= OnTurnLogicEnd;
+                InvokeTurnEnded(phaseType);
+            }
         }
     }
 }

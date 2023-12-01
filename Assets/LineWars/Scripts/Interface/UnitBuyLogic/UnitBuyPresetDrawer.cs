@@ -37,11 +37,11 @@ namespace LineWars.Interface
 
         private void Start()
         {
-            PhaseManager.Instance.PhaseChanged.AddListener(OnPhaseChanged);
+            PhaseManager.Instance.PhaseEntered.AddListener(OnPhaseEntered);
             CommandsManager.Instance.BuyNeedRedraw += (_) => SetAvailable();
         }
 
-        private void OnPhaseChanged(PhaseType phaseTypeOld, PhaseType phaseTypeNew)
+        private void OnPhaseEntered(PhaseType phaseTypeNew)
         {
             if (phaseTypeNew != PhaseType.Buy) return;
             SetAvailable();

@@ -26,33 +26,25 @@ namespace LineWars.Model
         [field: SerializeField] public PhaseExecutorsData PhaseExecutorsData { get; private set; }
         public NationEconomicLogic EconomicLogic => Nation.NationEconomicLogic;
         public List<Node> InitialSpawns { get; private set; }
-
         [field: SerializeField, ReadOnlyInspector] public Node Base { get; private set; }
-
         [field: SerializeField, ReadOnlyInspector] public PlayerRules Rules { get; private set; }
-
-        public PhaseType CurrentPhase { get; private set; }
         public Nation Nation { get; private set; }
 
         public HashSet<PhaseType> PhaseExceptions { get; set; }
-
 
         private readonly HashSet<Owned> myOwned = new();
         private readonly List<Node> nodes = new();
         private readonly List<Unit> units = new();
 
-        private bool isFirstReplenish = true;
-
         public IEnumerable<Node> MyNodes => nodes;
         public IEnumerable<Unit> MyUnits => units;
 
-        public event Action<PhaseType, PhaseType> TurnChanged;
         public event Action<Owned> OwnedAdded;
         public event Action<Owned> OwnedRemoved;
         public event Action<int, int> CurrentMoneyChanged;
         public event Action<int, int> IncomeChanged;
-        public event Action<IActor> TurnStarted;
-        public event Action<IActor> TurnEnded;
+        public event Action<IActor, PhaseType> TurnStarted;
+        public event Action<IActor, PhaseType> TurnEnded;
 
         public IReadOnlyCollection<Owned> OwnedObjects => myOwned;
         public bool IsMyOwn(Owned owned) => myOwned.Contains(owned);
@@ -292,9 +284,11 @@ namespace LineWars.Model
         
         public Unit GetUnitPrefab(UnitType unitType) => Nation.GetUnitPrefab(unitType);
 
+        public virtual bool CanExecuteTurn(PhaseType phaseType)
+        {
+            return !PhaseExceptions.Contains(phaseType);
+        }
 
-
-        public abstract bool CanExecuteTurn(PhaseType phaseType);
         public abstract void ExecuteTurn(PhaseType phaseType);
 
         protected virtual void ExecuteReplenish()
@@ -304,14 +298,14 @@ namespace LineWars.Model
                 owned.Replenish();
         }
 
-        protected void InvokeTurnStarted()
+        protected void InvokeTurnStarted(PhaseType phaseType)
         {
-            TurnStarted?.Invoke(this);
+            TurnStarted?.Invoke(this, phaseType);
         }
 
-        protected void InvokeTurnEnded()
+        protected void InvokeTurnEnded(PhaseType phaseType)
         {
-            TurnEnded?.Invoke(this);
+            TurnEnded?.Invoke(this, phaseType);
         }
     }
 }

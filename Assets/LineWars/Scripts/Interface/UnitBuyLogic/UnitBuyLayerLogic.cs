@@ -38,10 +38,10 @@ public class UnitBuyLayerLogic : MonoBehaviour
 
     private void Start()
     {
-        Player.LocalPlayer.TurnChanged += OnPhaseChanged;
+        Player.LocalPlayer.TurnStarted += OnPhaseStarted;
     }
 
-    private void OnPhaseChanged(PhaseType phaseTypeOld, PhaseType phaseTypeNew)
+    private void OnPhaseStarted(IActor _,PhaseType phaseTypeNew)
     {
         if (phaseTypeNew != PhaseType.Buy) return;
         CurrentPreset = null;

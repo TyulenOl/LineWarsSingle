@@ -192,7 +192,7 @@ namespace LineWars
             {
                 {AIType.EnemyAI, typeof(EnemyAI)},
                 {AIType.TestActor, typeof(TestActor)},
-                {AIType.ProgrammedAI, typeof(ProgrammedAI)}
+                //{AIType.ProgrammedAI, typeof(ProgrammedAI)}
             };
 
         public static Type ToType(this AIType aiType)

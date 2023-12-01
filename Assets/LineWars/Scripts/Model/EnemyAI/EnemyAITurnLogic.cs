@@ -30,7 +30,6 @@ namespace LineWars.Model
                 var gameProjection =
                     GameProjectionCreator.FromMono(SingleGame.Instance.AllPlayers.Values, MonoGraph.Instance, PhaseManager.Instance);
                 var allCommmandsTask = FindAllOutcomes(gameProjection);
-                allCommmandsTask.Start();
                 yield return new WaitUntil(() => allCommmandsTask.IsCompleted);
                 var commandEvalList = allCommmandsTask.Result;
 
@@ -70,7 +69,7 @@ namespace LineWars.Model
             {
                 var task = new Task<PossibleOutcome>(
                     () => MinMax(gameProjection, blueprint, depth, currentExecutorId, firstCommandChain, isSavingCommands));
-                //task.Start();
+                task.Start();
                 return task;
             }
 

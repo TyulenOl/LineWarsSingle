@@ -1,3 +1,4 @@
+using UnityEngine;
 using System.Linq;
 using LineWars.Model;
 
@@ -28,8 +29,10 @@ namespace LineWars
                     actor.ExecuteTurn(Type);
             }
 
-            private void OnTurnLogicEnd(IActor actor)
+            private void OnTurnLogicEnd(IActor actor, PhaseType phaseType)
             {
+                if (phaseType != Type)
+                    Debug.LogWarning($"IActor Ended Wrong Phase! was: {phaseType}; should be: {Type}");
                 actor.TurnEnded -= OnTurnLogicEnd;
                 actorsLeft--;
                 

@@ -29,12 +29,12 @@ namespace LineWars
         public override void Initialize([NotNull] Player me, IEnumerable<BasePlayer> enemies)
         {
             base.Initialize(me, enemies);
-            PhaseManager.Instance.PhaseChanged.AddListener(OnPhaseChanged);
+            PhaseManager.Instance.PhaseEntered.AddListener(OnPhaseEntered);
             me.OwnedRemoved += OnRemoveOwned;
             me.PhaseExceptions.Add(PhaseType.Buy);
         }
 
-        private void OnPhaseChanged(PhaseType previous, PhaseType current)
+        private void OnPhaseEntered(PhaseType current)
         {
             if (current != PhaseType.Replenish)
                 return;
@@ -42,7 +42,7 @@ namespace LineWars
             if(CurrentRounds >= roundsToWin)
             {
                 Win(); 
-                PhaseManager.Instance.PhaseChanged.RemoveListener(OnPhaseChanged);
+                PhaseManager.Instance.PhaseEntered.RemoveListener(OnPhaseEntered);
                 Me.OwnedRemoved -= OnRemoveOwned;
             }
         }
