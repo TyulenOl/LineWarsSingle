@@ -228,32 +228,33 @@ namespace LineWars.Controllers
             buyState.SetUnitPreset(preset);
         }
 
-        public void SelectCommandsPreset(CommandPreset preset)
+        public bool SelectCommandsPreset(CommandPreset preset)
         {
             if (!ActiveSelf)
             {
                 ActiveSelfLog(nameof(SelectCommandsPreset));
-                return;
+                return false;
             }
             
             if (stateMachine.CurrentState != waitingSelectCommandState)
             {
                 InvalidStateLog(nameof(SelectCommandsPreset));
-                return;
+                return false;
             }
 
             if (!currentOnWaitingCommandMessage.Data.Contains(preset))
             {
                 Debug.LogError($"You cant select this command preset because this command preset in not owned!", gameObject);
-                return;
+                return false;
             }
             
             if (!preset.IsActive)
             {
                 Debug.LogError("You cant select this command preset because this command preset is not active!", gameObject);
-                return;
+                return false;
             }
             ProcessCommandPreset(preset);
+            return true;
         }
 
         public void CancelCommandPreset()
@@ -273,36 +274,38 @@ namespace LineWars.Controllers
             stateMachine.SetState(findTargetState);
         }
 
-        public void SelectCurrentCommand(CommandType commandType)
+        public bool SelectCurrentCommand(CommandType commandType)
         {
             if (!ActiveSelf)
             {
                 ActiveSelfLog(nameof(SelectCurrentCommand));
-                return;
+                return false;
             }
             
             if (HaveConstrains && !Constrains.CanSelectCurrentCommand())
             {
                 ConstrainsLog(nameof(SelectCurrentCommand));
-                return;
+                return false;
             }
 
             if (stateMachine.CurrentState != findTargetState)
             {
                 InvalidStateLog(nameof(SelectCurrentCommand));
-                return;
+                return false;
             }
 
             if (CheckContainsActions(commandType))
             {
                 Debug.LogError($"You cant {nameof(SelectCurrentCommand)} because {nameof(Executor)} will not be able to perform this");
-                return;
+                return false;
             }
             if (Executor.Actions.First(x => x.CommandType == commandType) is not ITargetedAction)
                 throw new NotImplementedException();
             currentCommandState.Prepare(commandType);
             stateMachine.SetState(currentCommandState);
 
+            return true;
+            
             bool CheckContainsActions(CommandType commandType)
             {
                 return !Executor.Actions

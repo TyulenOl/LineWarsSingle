@@ -1,4 +1,5 @@
 
+using System.Collections;
 using UnityEngine;
 
 namespace LineWars.Model
@@ -13,12 +14,18 @@ namespace LineWars.Model
             if (slashEffect == null )
             {
                 Debug.LogWarning($"{nameof(slashEffect)} is null on {name}");
+                IsPlaying = true;
+
+                StartCoroutine(StopPlayCoroutine());
                 return;
             }
 
             if (effectPosition == null)
             {
                 Debug.LogWarning($"{nameof(effectPosition)} is null on {name}");
+                IsPlaying = true;
+                
+                StartCoroutine(StopPlayCoroutine());
                 return;
             }
             
@@ -31,6 +38,13 @@ namespace LineWars.Model
                 IsPlaying = false;
                 if (effect != null)
                     effect.Ended -= OnEffectEnd;    
+            }
+
+            // кастылище
+            IEnumerator StopPlayCoroutine()
+            {
+                yield return null;
+                IsPlaying = false;
             }
         }
     }
