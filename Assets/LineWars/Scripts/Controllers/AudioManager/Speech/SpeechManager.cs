@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
 
 namespace LineWars.Controllers
@@ -30,10 +31,22 @@ namespace LineWars.Controllers
         {
             if (audioClip == null)
                 return;
-            source.PlayOneShot(audioClip);
-            Invoke(nameof(InvokeSpeechEnded), audioClip.length);
+            StartCoroutine(PlayCoroutine(audioClip));
         }
 
+        private IEnumerator PlayCoroutine(AudioClip audioClip)
+        {
+            source.PlayOneShot(audioClip);
+            yield return new WaitForSeconds(audioClip.length);
+            InvokeSpeechEnded();
+        }
+        
+        public void StopAllSounds()
+        {
+            StopAllCoroutines();
+            source.Stop();
+        }
+        
         private void InvokeSpeechEnded()
         {
             SpeechEnded?.Invoke();
