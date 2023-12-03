@@ -37,7 +37,8 @@ namespace LineWars.Model
         SacrificePerun,
         Ram,
         BlowWithSwing,
-        ShotUnit
+        ShotUnit,
+        VodaBajkalskaya
     }
 }   
 

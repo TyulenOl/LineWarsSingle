@@ -30,10 +30,10 @@ namespace LineWars
         public override void Initialize([NotNull] Player me, IEnumerable<BasePlayer> enemies)
         {
             base.Initialize(me, enemies);
-            PhaseManager.Instance.PhaseChanged.AddListener(OnPhaseChanged);
+            PhaseManager.Instance.PhaseEntered.AddListener(OnPhaseEntered);
         }
 
-        private void OnPhaseChanged(PhaseType previousType, PhaseType currentType)
+        private void OnPhaseEntered(PhaseType currentType)
         {
             if (currentType != PhaseType.Replenish)
                 return;
@@ -41,7 +41,7 @@ namespace LineWars
             if (PastRounds >= rounds)
             {
                 CalculateVictory();
-                PhaseManager.Instance.PhaseChanged.RemoveListener(OnPhaseChanged);
+                PhaseManager.Instance.PhaseEntered.RemoveListener(OnPhaseEntered);
             }
         }
 

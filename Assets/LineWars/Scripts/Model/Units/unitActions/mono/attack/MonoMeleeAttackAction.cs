@@ -55,6 +55,9 @@ namespace LineWars.Model
 
             void AttackOnEvent(UnitMeleeAttackAnimation _)
             {
+                if (targetUnit.TryGetComponent(out AnimationResponses responses1))
+                    responses1.TrySetDeathAnimation(AnimationResponseType.MeleeDied);
+
                 base.Attack(targetUnit);
                 attackAnimation.Attacked.RemoveListener(AttackOnEvent);
                 if(targetUnit == null || targetUnit.CurrentHp <= 0)

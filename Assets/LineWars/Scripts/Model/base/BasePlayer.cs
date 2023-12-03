@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using LineWars.Controllers;
 using UnityEngine;
 
 
@@ -13,8 +14,7 @@ namespace LineWars.Model
     /// </summary>
     public abstract class BasePlayer : MonoBehaviour, IActor, IBasePlayer
     {
-        [field: SerializeField, ReadOnlyInspector]
-        public int Id { get; private set; }
+        [field: SerializeField, ReadOnlyInspector] public int Id { get; private set; }
 
         [SerializeField, ReadOnlyInspector] private int money;
 
@@ -23,37 +23,29 @@ namespace LineWars.Model
         /// </summary>
         [SerializeField, ReadOnlyInspector] private int income;
 
-        [field: SerializeField] public List<Node> InitialSpawns { get; private set; }
         [field: SerializeField] public PhaseExecutorsData PhaseExecutorsData { get; private set; }
         public NationEconomicLogic EconomicLogic => Nation.NationEconomicLogic;
-
-        [field: SerializeField, ReadOnlyInspector]
-        public Node Base { get; private set; }
-
-        [field: SerializeField, ReadOnlyInspector]
-        public PlayerRules Rules { get; private set; }
-
-        public PhaseType CurrentPhase { get; private set; }
+        public List<Node> InitialSpawns { get; private set; }
+        [field: SerializeField, ReadOnlyInspector] public Node Base { get; private set; }
+        [field: SerializeField, ReadOnlyInspector] public PlayerRules Rules { get; private set; }
         public Nation Nation { get; private set; }
 
         public HashSet<PhaseType> PhaseExceptions { get; set; }
 
-
-        private HashSet<Owned> myOwned = new();
+        private readonly HashSet<Owned> myOwned = new();
         private readonly List<Node> nodes = new();
         private readonly List<Unit> units = new();
-
-        private bool isFirstReplenish = true;
 
         public IEnumerable<Node> MyNodes => nodes;
         public IEnumerable<Unit> MyUnits => units;
 
-        public event Action<PhaseType, PhaseType> TurnChanged;
         public event Action<Owned> OwnedAdded;
         public event Action<Owned> OwnedRemoved;
         public event Action<int, int> CurrentMoneyChanged;
         public event Action<int, int> IncomeChanged;
-        public event Action Defeated;
+        public event Action<IActor, PhaseType> TurnStarted;
+        public event Action<IActor, PhaseType> TurnEnded;
+
         public IReadOnlyCollection<Owned> OwnedObjects => myOwned;
         public bool IsMyOwn(Owned owned) => myOwned.Contains(owned);
 
@@ -88,11 +80,6 @@ namespace LineWars.Model
 
         protected virtual void Start()
         {
-            if (PhaseManager.Instance != null)
-            {
-                PhaseManager.Instance.RegisterActor(this);
-                Debug.Log($"{name} registered");
-            }
         }
 
         protected virtual void OnEnable()
@@ -112,18 +99,12 @@ namespace LineWars.Model
             CurrentMoney = Rules.StartMoney;
             Income = Rules.DefaultIncome;
             Nation = spawnInfo.SpawnNode.Nation;
-
-            SingleGame.Instance.AllPlayers.Add(spawnInfo.PlayerIndex, this);
+            
             name = $"{GetType().Name}{spawnInfo.PlayerIndex} {spawnInfo.SpawnNode.name}";
 
             InitialSpawns = spawnInfo.SpawnNode.InitialSpawns;
         }
-
-        protected virtual void OnDestroy()
-        {
-            SingleGame.Instance.AllPlayers.Remove(this);
-        }
-
+        
         #region SpawnUnit
 
         public bool CanSpawnUnit(Node node, UnitType type)
@@ -294,180 +275,37 @@ namespace LineWars.Model
         {
             nodes.Remove(node);
             Income -= Mathf.RoundToInt(Rules.IncomeModifier.Modify(node.BaseIncome));
-
-            if (nodes.Count == 0)
-                Defeat();
         }
 
         protected virtual void BeforeRemoveOwned(Unit unit)
         {
             units.Remove(unit);
         }
-
-        public void Defeat()
-        {
-            OnDefeat();
-            Defeated?.Invoke();
-        }
-
-        protected virtual void OnDefeat()
-        {
-            foreach (var unit in MyUnits.ToList())
-                Destroy(unit.gameObject);
-            foreach (var node in MyNodes.ToList())
-                node.Owner = null;
-
-            myOwned = new HashSet<Owned>();
-            Destroy(gameObject);
-        }
-
+        
         public Unit GetUnitPrefab(UnitType unitType) => Nation.GetUnitPrefab(unitType);
 
-        public void FinishTurn()
+        public virtual bool CanExecuteTurn(PhaseType phaseType)
         {
-            StartCoroutine(Coroutine());
-
-            IEnumerator Coroutine()
-            {
-                yield return null;
-                ExecuteTurn(PhaseType.Idle);
-            }
+            return !PhaseExceptions.Contains(phaseType);
         }
 
-        public void ExecuteTurn(PhaseType phaseType)
-        {
-            if (PhaseExceptions.Contains(phaseType))
-            {
-                StartCoroutine(SkipTurnCoroutine());
-                return;
-            }
-
-            var previousPhase = CurrentPhase;
-            switch (phaseType)
-            {
-                case PhaseType.Replenish:
-                    ExecuteReplenish();
-                    break;
-                case PhaseType.Idle:
-                    ExecuteIdle();
-                    break;
-                case PhaseType.Buy:
-                    ExecuteBuy();
-                    break;
-                case PhaseType.Artillery:
-                    ExecuteArtillery();
-                    break;
-                case PhaseType.Fight:
-                    ExecuteFight();
-                    break;
-                case PhaseType.Scout:
-                    ExecuteScout();
-                    break;
-                default:
-                    Debug.LogWarning($"Phase.{phaseType} is not implemented in \"ExecuteTurn\"! "
-                                     + "Change IActor to acommodate for this phase!");
-                    break;
-            }
-
-            CurrentPhase = phaseType;
-            TurnChanged?.Invoke(previousPhase, CurrentPhase);
-
-            IEnumerator SkipTurnCoroutine()
-            {
-                yield return null;
-                TurnChanged?.Invoke(phaseType, PhaseType.Idle);
-            }
-        }
-
-        public bool CanExecuteTurn(PhaseType phaseType)
-        {
-            switch (phaseType)
-            {
-                case PhaseType.Idle:
-                    return true;
-                case PhaseType.Buy:
-                    return CanExecuteBuy();
-                case PhaseType.Artillery:
-                    return CanExecuteArtillery();
-                case PhaseType.Fight:
-                    return CanExecuteFight();
-                case PhaseType.Scout:
-                    return CanExecuteScout();
-                case PhaseType.Replenish:
-                    return CanExecuteReplenish();
-            }
-
-            Debug.LogWarning
-            ($"Phase.{phaseType} is not implemented in \"CanExecuteTurn\"! "
-             + "Change IActor to acommodate for this phase!");
-            return false;
-        }
-
-        #region Turns
-
-        protected virtual void ExecuteBuy()
-        {
-        }
-
-        protected virtual void ExecuteArtillery()
-        {
-        }
-
-        protected virtual void ExecuteFight()
-        {
-        }
-
-        protected virtual void ExecuteScout()
-        {
-        }
-
-
-        protected virtual void ExecuteIdle()
-        {
-        }
+        public abstract void ExecuteTurn(PhaseType phaseType);
 
         protected virtual void ExecuteReplenish()
         {
-            if (isFirstReplenish)
-            {
-                isFirstReplenish = false;
-                return;
-            }
-
             CurrentMoney += Income;
             foreach (var owned in OwnedObjects)
                 owned.Replenish();
         }
 
-        #endregion
-
-        #region Check Turns
-
-        protected virtual bool CanExecuteBuy()
+        protected void InvokeTurnStarted(PhaseType phaseType)
         {
-            return false;
+            TurnStarted?.Invoke(this, phaseType);
         }
 
-        protected virtual bool CanExecuteArtillery()
+        protected void InvokeTurnEnded(PhaseType phaseType)
         {
-            return false;
+            TurnEnded?.Invoke(this, phaseType);
         }
-
-        protected virtual bool CanExecuteFight()
-        {
-            return false;
-        }
-
-        protected virtual bool CanExecuteScout()
-        {
-            return false;
-        }
-
-        protected virtual bool CanExecuteReplenish()
-        {
-            return false;
-        }
-
-        #endregion
     }
 }

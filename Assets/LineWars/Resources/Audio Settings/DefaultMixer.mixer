@@ -33,6 +33,20 @@ AudioMixerGroupController:
   m_Mute: 0
   m_Solo: 0
   m_BypassEffects: 0
+--- !u!244 &-5820429754161336840
+AudioMixerEffectController:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_EffectID: 145ed83d9d5517846aef67e7cc1204ea
+  m_EffectName: Attenuation
+  m_MixLevel: d1ba5b99dd3c77947b8f29ad2c4248a2
+  m_Parameters: []
+  m_SendTarget: {fileID: 0}
+  m_EnableWetMix: 0
+  m_Bypass: 0
 --- !u!244 &-5650334380076651905
 AudioMixerEffectController:
   m_ObjectHideFlags: 3
@@ -47,6 +61,25 @@ AudioMixerEffectController:
   m_SendTarget: {fileID: 0}
   m_EnableWetMix: 0
   m_Bypass: 0
+--- !u!243 &-3190648823176664732
+AudioMixerGroupController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Speech
+  m_AudioMixer: {fileID: 24100000}
+  m_GroupID: fc96643591f804e4b8418efff02f33b4
+  m_Children: []
+  m_Volume: d47e1604afc34aa4e8c643df63478e97
+  m_Pitch: 9e6f72bd9f93817419543fb1b11ad1a0
+  m_Send: 00000000000000000000000000000000
+  m_Effects:
+  - {fileID: -5820429754161336840}
+  m_UserColorIndex: 0
+  m_Mute: 0
+  m_Solo: 0
+  m_BypassEffects: 0
 --- !u!241 &24100000
 AudioMixerController:
   m_ObjectHideFlags: 0
@@ -69,11 +102,14 @@ AudioMixerController:
     name: Music
   - guid: dfe8274a800084246b425262cded3bec
     name: SFX
+  - guid: d47e1604afc34aa4e8c643df63478e97
+    name: Speech
   m_AudioMixerGroupViews:
   - guids:
     - 379c1f14f06dd264a80f75338c4baff4
     - 79bd45d4fb1f0a44e88f25d49b967ad2
     - 07d50530c3794c04e9d12eab0b3cae2c
+    - fc96643591f804e4b8418efff02f33b4
     name: View
   m_CurrentViewIndex: 0
   m_TargetSnapshot: {fileID: 24500006}
@@ -89,6 +125,7 @@ AudioMixerGroupController:
   m_Children:
   - {fileID: 242378959727938585}
   - {fileID: -5847626944594875907}
+  - {fileID: -3190648823176664732}
   m_Volume: fc3dcaaef0e17c644889c6863ef0685b
   m_Pitch: 407a5c652870919448da5c66b2e34115
   m_Send: 00000000000000000000000000000000

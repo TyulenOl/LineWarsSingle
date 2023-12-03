@@ -25,7 +25,7 @@ namespace LineWars.Model
         public UnitDirection UnitDirection { get; set; }
         public TNode Node { get; set; }
 
-        public IEnumerable<IUnitAction<TNode, TEdge, TUnit>> Actions { get; }
+        public new IEnumerable<IUnitAction<TNode, TEdge, TUnit>> Actions { get; }
 
         public void DealDamageThroughArmor(int value)
         {
@@ -40,8 +40,7 @@ namespace LineWars.Model
             CurrentArmor -= blockedDamage;
             CurrentHp -= notBlockedDamage;
         }
-
-        public bool IsDied => CurrentHp <= 0;
+        
         public bool CanMoveOnLineWithType(LineType lineType) => lineType >= MovementLineType;
 
         public bool TryGetNeighbour([NotNullWhen(true)] out TUnit neighbour)

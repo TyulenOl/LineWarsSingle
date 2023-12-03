@@ -4,16 +4,8 @@ namespace LineWars.Model
 {
     public class TestActor : BasePlayer
     {
-        private PhaseType currentPhase;
         private StateMachine stateMachine;
 
-        private TestActorIdleState idleState;
-        private TestActorBuyState buyState;
-        private TestActorArtilleryState artilleryState;
-        private TestActorFightState fightState;
-        private TestActorScoutState scoutState;
-        private TestActorReplenishState replenishState;
-        
         [SerializeField] private int artilleryUnits;
         [SerializeField] private int fightUnits;
         [SerializeField] private int scoutUnits;
@@ -23,96 +15,87 @@ namespace LineWars.Model
         [ReadOnlyInspector] public int FightLeft;
         [ReadOnlyInspector] public int ScoutLeft;
 
-        [Header("Buy Options")]
-        [SerializeField] private float minBuyTime;
-        [SerializeField] private float maxBuyTime;
-
-        [Header("Other Phase Options")]
-        [SerializeField] private float minOtherTime;
-        [SerializeField] private float maxOtherTime;
-        [SerializeField] private int minUnitNum;
-        [SerializeField] private int maxUnitNum;
-
         #region Attributes
-        public float MinBuyTime => minBuyTime;
-        public float MaxBuyTime => maxBuyTime;
-        public float MinOtherTime => minOtherTime;
-        public float MaxOtherTime => maxOtherTime;  
-        public int MinUnitNum => minUnitNum;
-        public int MaxUnitNum => maxUnitNum;
         public int ArtilleryUnits => artilleryUnits;
         public int FightUnits => fightUnits;
         public int ScoutUnits => scoutUnits;
         #endregion
 
-        protected override void Awake() 
+        public override void ExecuteTurn(PhaseType phaseType)
         {
-            base.Awake();
-            IntitializeStateMachine();
+            Debug.Log($"TestActor {Id} is starting {phaseType} Turn");
+            InvokeTurnStarted(phaseType);
+            switch(phaseType)
+            {
+                case PhaseType.Buy:
+                    ExecuteBuy();
+                    break;
+                case PhaseType.Artillery:
+                    ExecuteArtillery();
+                    break;
+                case PhaseType.Fight:
+                    ExecuteFight();
+                    break;
+                case PhaseType.Scout:
+                    ExecuteScout();
+                    break;
+                case PhaseType.Replenish:
+                    ExecuteReplenish();
+                    break;
+            }
+            Debug.Log($"TestActor is ending {phaseType} Turn");
+            InvokeTurnEnded(phaseType);
         }
 
-        private void IntitializeStateMachine()
+        private void ExecuteFight()
         {
-            stateMachine = new StateMachine();
-
-            idleState = new TestActorIdleState();
-            buyState = new TestActorBuyState(this, SetNewPhase);
-            artilleryState = new TestActorArtilleryState(this, SetNewPhase);
-            fightState = new TestActorFightState(this, SetNewPhase);
-            scoutState = new TestActorScoutState(this, SetNewPhase);
-            replenishState = new TestActorReplenishState(this, SetNewPhase);
-
+            FightLeft--;
         }
 
-        private void SetNewPhase(PhaseType phaseType)
+        private void ExecuteScout()
         {
-            currentPhase = phaseType;
-        }
-        
-        #region Turns
-
-        protected override void ExecuteBuy()
-        {
-            stateMachine.SetState(buyState);
+            ScoutLeft--;
         }
 
-        protected override void ExecuteArtillery()
+        private void ExecuteBuy()
         {
-            stateMachine.SetState(artilleryState);
+            ArtilleryLeft = ArtilleryUnits;
+            FightLeft = FightUnits;
+            ScoutLeft = ScoutUnits;
         }
 
-        protected override void ExecuteFight()
+        private void ExecuteArtillery()
         {
-            stateMachine.SetState(fightState);
-        }
-
-        protected override void ExecuteScout()
-        {
-            stateMachine.SetState(scoutState);
-        }
-
-        protected override void ExecuteIdle()
-        {
-            stateMachine.SetState(idleState);
+            ArtilleryLeft--;
         }
 
         protected override void ExecuteReplenish()
         {
             base.ExecuteReplenish();
-            stateMachine.SetState(replenishState);
+            ArtilleryLeft = ArtilleryUnits;
+            FightLeft = FightUnits;
+            ScoutLeft = ScoutUnits;
         }
-        #endregion
-        
-        #region Check Turns
 
-        protected override bool CanExecuteBuy() => true;
+        public override bool CanExecuteTurn(PhaseType phaseType)
+        {
+            if(!base.CanExecuteTurn(phaseType)) 
+                return false;
 
-        protected override bool CanExecuteArtillery() => ArtilleryLeft > 0;
+            switch(phaseType)
+            {
+                case PhaseType.Buy:
+                case PhaseType.Replenish:
+                    return true;
+                case PhaseType.Fight:
+                    return FightLeft > 0;
+                case PhaseType.Scout:
+                    return ScoutLeft > 0;
+                case PhaseType.Artillery:
+                    return ArtilleryLeft > 0;
+            }
 
-        protected override bool CanExecuteFight() => FightLeft > 0;
-
-        protected override bool CanExecuteScout() => ScoutLeft > 0;
-        protected override bool CanExecuteReplenish() => true;
-        #endregion
+            return false;
+        }
     }
 }

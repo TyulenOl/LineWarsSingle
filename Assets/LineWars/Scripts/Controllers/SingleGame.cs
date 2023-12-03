@@ -6,34 +6,39 @@ using System.Data;
 using System.Linq;
 using LineWars.Interface;
 using LineWars.Model;
+using LineWars.Controllers;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace LineWars
 {
-    public class SingleGame: MonoBehaviour
+    public class SingleGame : MonoBehaviour
     {
         public static SingleGame Instance { get; private set; }
-        [Header("Logic")]
-        [SerializeField] private PlayerBuilder playerSpawn;
-        
-        [Header("References")]
-        [SerializeField] private PlayerInitializer playerInitializer;
-        
-        [Header("Debug")] 
-        [SerializeField] private bool isAI;
+
+        [Header("Logic")] [SerializeField] private PlayerBuilder playerSpawn;
+
+        [Header("Players")] [SerializeField] private Player playerPrefab;
+        [SerializeField] private List<BasePlayer> enemiesPrefabs;
+        [SerializeField] private AIType aiType;
+
+        [Header("AI Options")] [SerializeField]
+        private GameEvaluator gameEvaluator;
+
+        [SerializeField] private AIBuyLogicData aiBuyLogicData;
+        [SerializeField, Min(1)] private int aiDepth;
 
         public readonly IndexList<BasePlayer> AllPlayers = new();
         public readonly IndexList<Unit> AllUnits = new();
-        
+
+        private PlayerInitializer playerInitializer = new();
         private Player player;
-        
+
 
         private Stack<SpawnInfo> spawnInfosStack;
         private SpawnInfo playerSpawnInfo;
-        
+
         public SceneName MyScene => (SceneName) SceneManager.GetActiveScene().buildIndex;
-        public PlayerInitializer PlayerInitializer => playerInitializer;
         private bool HasSpawnPoint() => spawnInfosStack.Count > 0;
         private SpawnInfo GetSpawnPoint() => spawnInfosStack.Pop();
 
@@ -54,15 +59,27 @@ namespace LineWars
             InitializeSpawns();
             InitializePlayer();
             InitializeAIs();
-            
+
             InitializeGameReferee();
             
-            
+            RegisterAllPlayers();
+            //RegisterActors();
+
             StartCoroutine(StartGameCoroutine());
+
             IEnumerator StartGameCoroutine()
             {
                 yield return null;
                 PhaseManager.Instance.StartGame();
+            }
+        }
+
+        private void RegisterAllPlayers()
+        {
+            foreach (var (key, value) in AllPlayers.Reverse())
+            {
+                PhaseManager.Instance.RegisterActor(value);
+                Debug.Log($"{value.name} registered");
             }
         }
 
@@ -76,7 +93,7 @@ namespace LineWars
             GameReferee.Instance.Wined += WinGame;
             GameReferee.Instance.Losed += LoseGame;
         }
-        
+
 
         private void InitializeSpawns()
         {
@@ -101,34 +118,48 @@ namespace LineWars
             {
                 throw new InvalidOperationException("Игра не может быть продолжена, так нет свавна для игрока");
             }
-            
+
             spawnInfosStack = MonoGraph.Instance.Spawns
                 .Where(x => x != playerSpawnInfo)
                 .ToStack(true);
         }
 
         private void InitializePlayer()
-        { 
-            player = playerInitializer.Initialize<Player>(playerSpawnInfo);
+        {
+            player = playerInitializer.Initialize(playerPrefab, playerSpawnInfo);
             player.RecalculateVisibility(false);
+            AllPlayers.Add(player.Id, player);
         }
-        
+
 
         private void InitializeAIs()
         {
             while (HasSpawnPoint())
             {
                 var spawnPoint = GetSpawnPoint();
-                BasePlayer enemy = isAI
-                    ? playerInitializer.Initialize<EnemyAI>(spawnPoint)
-                    : playerInitializer.Initialize<TestActor>(spawnPoint); 
+                var enemy = playerInitializer.Initialize(
+                    enemiesPrefabs.First(x => x.GetType() == aiType.ToType()),
+                    spawnPoint);
 
-                //AllPlayers.Add(enemy);
+                if (enemy is EnemyAI enemyAI)
+                    InitializeAISettings(enemyAI);
+
+                AllPlayers.Add(enemy.Id, enemy);
             }
         }
-        
 
-        private void WinGame()
+        private void InitializeAISettings(EnemyAI enemyAI)
+        {
+            if (gameEvaluator != null)
+                enemyAI.SetNewGameEvaluator(gameEvaluator);
+            if (aiBuyLogicData != null)
+                enemyAI.SetNewBuyLogic(aiBuyLogicData);
+            if (aiDepth > 0)
+                enemyAI.Depth = aiDepth;
+        }
+
+
+        public void WinGame()
         {
             Debug.Log("<color=yellow>Вы Победили</color>");
             if (!GameVariables.IsNormalStart) return;
@@ -138,12 +169,37 @@ namespace LineWars
             CompaniesDataBase.SaveChooseMission();
         }
 
-        private void LoseGame()
+        public void LoseGame()
         {
             Debug.Log("<color=red>Потрачено</color>");
             if (!GameVariables.IsNormalStart) return;
             WinLoseUI.isWin = false;
             SceneTransition.LoadScene(SceneName.WinOrLoseScene);
+        }
+    }
+
+    public enum AIType
+    {
+        EnemyAI,
+        TestActor,
+        ProgrammedAI
+    }
+
+    public static class AITypeExtensions
+    {
+        private static readonly Dictionary<AIType, Type> aiTypeToTypeMap
+            = new()
+            {
+                {AIType.EnemyAI, typeof(EnemyAI)},
+                {AIType.TestActor, typeof(TestActor)},
+                //{AIType.ProgrammedAI, typeof(ProgrammedAI)}
+            };
+
+        public static Type ToType(this AIType aiType)
+        {
+            if (aiTypeToTypeMap.TryGetValue(aiType, out var type))
+                return type;
+            throw new IndexOutOfRangeException();
         }
     }
 }

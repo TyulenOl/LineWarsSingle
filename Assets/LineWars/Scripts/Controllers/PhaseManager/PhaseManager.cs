@@ -10,20 +10,19 @@ namespace LineWars
     public partial class PhaseManager : MonoBehaviour
     {
         private List<IActor> actors;
-
         [field: SerializeField] public PhaseOrderData OrderData { get; protected set; }
         
         public event Action<IActor, PhaseType, PhaseType> ActorTurnChanged;
 
-        public UnityEvent<PhaseType, PhaseType> PhaseChanged;
+        public UnityEvent<PhaseType> PhaseEntered;
+        public UnityEvent<PhaseType> PhaseExited;
 
         private StateMachine stateMachine;
-        private Phase idleState;
-        private PhaseSimultaneousState buyState;
+        private PhaseSynchronousState buyState;
         private PhaseAlternatingState artilleryState;
         private PhaseAlternatingState fightState;
         private PhaseAlternatingState scoutState;
-        private PhaseSimultaneousState replenishState;
+        private PhaseSynchronousState replenishState;
         
         private Dictionary<PhaseType, Phase> typeToPhase;
         private int currentActorId;
@@ -58,15 +57,6 @@ namespace LineWars
             stateMachine.OnPhysics();
         }
 
-        private void OnDisable() 
-        {
-            foreach(var actor in actors)
-            {
-                actor.TurnChanged -= GetInvokingEndingTurn(actor);
-            }
-            stateMachine.SetState(idleState);
-        }
-        
         public void StartGame()
         {
             Debug.Log("Game Started!");
@@ -80,37 +70,16 @@ namespace LineWars
                 Debug.LogError($"{actor} is already registered!");
             }
             actors.Add(actor);
-            actor.TurnChanged += GetInvokingEndingTurn(actor);
-        }
-
-        public void ForceSkipPhase()
-        {
-            switch (CurrentPhase)
-            {
-                case PhaseType.Buy:
-                    stateMachine.SetState(artilleryState);
-                    break;
-                case PhaseType.Artillery:
-                    stateMachine.SetState(fightState);
-                    break;
-                case PhaseType.Fight:
-                    stateMachine.SetState(scoutState);
-                    break;
-                case PhaseType.Scout:
-                    stateMachine.SetState(replenishState);
-                    break;
-            }
         }
 
         private void IntitializeStateMachine()
         {
             stateMachine = new StateMachine();
-            idleState = new Phase(PhaseType.Idle, this);
-            buyState = new PhaseSimultaneousState(PhaseType.Buy, this);
+            buyState = new PhaseSynchronousState(PhaseType.Buy, this);
             artilleryState = new PhaseAlternatingState(PhaseType.Artillery, this);
             fightState = new PhaseAlternatingState(PhaseType.Fight, this);
             scoutState = new PhaseAlternatingState(PhaseType.Scout, this);
-            replenishState = new PhaseSimultaneousState(PhaseType.Replenish, this);
+            replenishState = new PhaseSynchronousState(PhaseType.Replenish, this);
             
             typeToPhase = new Dictionary<PhaseType, Phase>()
             {
@@ -120,36 +89,40 @@ namespace LineWars
                 {PhaseType.Scout, scoutState},
                 {PhaseType.Replenish, replenishState}
             };
+        }
+        
+        private void ToNextPhase()
+        {
+            StartCoroutine(NextCoroutine());
 
-            InitializeTransitions();
+            IEnumerator NextCoroutine()
+            {
+                yield return null;
+                stateMachine.SetState(GetNextPhase((Phase)stateMachine.CurrentState));
+            }
         }
 
-        private void InitializeTransitions()
+        private Phase GetNextPhase(PhaseType phaseType)
         {
-            for(var i = 0; i < OrderData.Order.Count - 1; i++)
-            {
-                var from = typeToPhase[OrderData.Order[i]];
-                var to = typeToPhase[OrderData.Order[i + 1]];
-                stateMachine.AddTransition(from, to, () => from.AreActorsDone);
-            }
+            var nextState = phaseType.Next(OrderData);
+            return (typeToPhase[nextState]);
+        }
 
-            var firstState = typeToPhase[OrderData.Order[0]];
-            var lastState = typeToPhase[OrderData.Order[OrderData.Order.Count - 1]];
-            stateMachine.AddTransition(lastState, firstState, () => lastState.AreActorsDone);
+        private Phase GetNextPhase(Phase phase)
+        {
+            return GetNextPhase(phase.Type);
         }
 
         private void OnStateChanged(State previousState, State currentState)
         {
-            PhaseType previousPhase = PhaseType.Idle;
-            if(previousState != null)
-                previousPhase = ((Phase)previousState).Type;
-            
-            PhaseChanged.Invoke(previousPhase, ((Phase)currentState).Type);
-        }
-
-        private Action<PhaseType, PhaseType> GetInvokingEndingTurn(IActor actor)
-        {
-            return (previousType, currentType) => ActorTurnChanged?.Invoke(actor, previousType, currentType);
+            if (previousState != null)   
+                PhaseExited?.Invoke(((Phase)previousState).Type);
+            if (currentState == null)
+            {
+                Debug.LogError("Current State can't be null!");
+                return;
+            }
+            PhaseEntered?.Invoke(((Phase)currentState).Type);
         }
     }
 }

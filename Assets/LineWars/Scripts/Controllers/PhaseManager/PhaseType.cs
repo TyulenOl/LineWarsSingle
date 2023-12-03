@@ -5,7 +5,6 @@ namespace LineWars
 {
     public enum PhaseType
     {
-        Idle,
         Buy,
         Artillery,
         Fight,
@@ -25,7 +24,6 @@ namespace LineWars
         public static Dictionary<PhaseType, PhaseMode> TypeToMode
             = new Dictionary<PhaseType, PhaseMode>()
             {
-                {PhaseType.Idle, PhaseMode.NotPlayable},
                 {PhaseType.Buy, PhaseMode.Simultaneous},
                 {PhaseType.Artillery, PhaseMode.Alternating},
                 {PhaseType.Fight,PhaseMode.Alternating},
@@ -33,14 +31,18 @@ namespace LineWars
                 {PhaseType.Replenish, PhaseMode.NotPlayable}
             };
 
-        public static PhaseType Next(PhaseType type, PhaseOrderData orderData)
+        public static PhaseType Next(this PhaseType type, PhaseOrderData orderData)
         {
-            if (type == PhaseType.Idle) throw new ArgumentException("Idle Phase don't have next Phases!"); 
             var index = orderData.FindIndex(type);
             if (index == -1) throw new ArgumentException("Order Data doesn't contains given PhaseType!");
 
             var newIndex = (index + 1) % orderData.Count;
             return orderData[newIndex];
+        }
+
+        public static bool IsAnyFightPhase(this PhaseType phaseType)
+        {
+            return phaseType is PhaseType.Artillery or PhaseType.Scout or PhaseType.Fight;
         }
     }
 }

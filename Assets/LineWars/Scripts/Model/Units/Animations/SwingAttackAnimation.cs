@@ -1,21 +1,25 @@
-using System.Collections;
-using System.Collections.Generic;
+
 using UnityEngine;
 
-namespace LineWars
+namespace LineWars.Model
 {
-    public class SwingAttackAnimation : MonoBehaviour
+    public class SwingAttackAnimation : UnitAnimation
     {
-        // Start is called before the first frame update
-        void Start()
-        {
-        
-        }
+        [SerializeField] private SimpleEffect slashEffect;
+        [SerializeField] private GameObject effectPosition;
 
-        // Update is called once per frame
-        void Update()
+        public override void Execute(AnimationContext context)
         {
-        
+            var effect = Instantiate(slashEffect, effectPosition.transform.position, Quaternion.identity);
+            effect.Ended += OnEffectEnd;
+            IsPlaying = true;
+
+            void OnEffectEnd()
+            {
+                IsPlaying = false;
+                if (effect != null)
+                    effect.Ended -= OnEffectEnd;    
+            }
         }
     }
 }

@@ -13,12 +13,10 @@ namespace LineWars.Interface
             var executor = CommandsManager.Instance.Executor;
             if (executor is Unit unit)
             {
-                unit.CurrentHp += 2;
-                unit.CurrentActionPoints = 0;
-                Player.LocalPlayer.FinishTurn();
+                var command = new HealYourSelfCommand<Node, Edge, Unit>(unit);
+                if (command.CanExecute())
+                    CommandsManager.Instance.ExecuteSimpleCommand(command);
             }
-            
-            //TODO переписать на команду
         }
     }
 }   

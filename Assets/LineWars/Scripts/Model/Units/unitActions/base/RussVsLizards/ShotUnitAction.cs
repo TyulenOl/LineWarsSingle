@@ -52,7 +52,7 @@ namespace LineWars.Model
 
             if (node.AllIsFree)
             {
-                AssignNode(takenUnit, node);
+                AssignNodeAndUnit(takenUnit, node);
             }
             else
             {
@@ -64,7 +64,7 @@ namespace LineWars.Model
                 takenUnit.DealDamageThroughArmor(enemyDamage);
                 if (!takenUnit.IsDied)
                 {
-                    AssignNode(takenUnit, node);
+                    AssignNodeAndUnit(takenUnit, node);
                 }
             }
 
@@ -72,7 +72,7 @@ namespace LineWars.Model
             CompleteAndAutoModify();
         }
 
-        private static void AssignNode(TUnit takenUnit, TNode node)
+        private static void AssignNodeAndUnit(TUnit takenUnit, TNode node)
         {
             takenUnit.Node = node;
             takenUnit.UnitDirection = UnitDirection.Left;

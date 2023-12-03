@@ -15,7 +15,7 @@ namespace LineWars
             {
                 var command = new RLBlockCommand<Node, Edge, Unit>(unit);
                 if (command.CanExecute())
-                    CommandsManager.Instance.ExecuteCommand(command);
+                    CommandsManager.Instance.ExecuteSimpleCommand(command);
             }
         }
     }

@@ -1,23 +1,14 @@
 ﻿using System.Collections.Generic;
 using LineWars.Model;
 using UnityEngine;
-using System.Linq;
 
-namespace LineWars
+namespace LineWars.Controllers
 {
-    public class PlayerInitializer : MonoBehaviour
+    public class PlayerInitializer
     {
-        [SerializeField] private List<BasePlayer> playersPrefabs;
-
-        [Header("AI Options")]
-        [SerializeField] private GameEvaluator gameEvaluator;
-        [SerializeField] private AIBuyLogicData aiBuyLogicData;
-        [SerializeField] private int aiDepth;
-
-        public T Initialize<T>(SpawnInfo spawnInfo) where T : BasePlayer
+        public T Initialize<T>(T player, SpawnInfo spawnInfo) where T : BasePlayer
         {
-            var player = Instantiate(playersPrefabs.OfType<T>().First());
-            
+            player = Object.Instantiate(player);
             player.Initialize(spawnInfo);
 
             foreach (var node in spawnInfo.Nodes)
@@ -37,21 +28,7 @@ namespace LineWars
                 }
             }
 
-            //слабейший костыль
-            if(player is EnemyAI enemyAI)
-                InitializeAISettings(enemyAI);
-            
             return player;
-        }
-
-        private void InitializeAISettings(EnemyAI enemyAI)
-        {
-            if(gameEvaluator != null)
-                enemyAI.SetNewGameEvaluator(gameEvaluator);
-            if(aiBuyLogicData != null)
-                enemyAI.SetNewBuyLogic(aiBuyLogicData);
-            if (aiDepth > 0)
-                enemyAI.Depth = aiDepth;
         }
     }
 }
