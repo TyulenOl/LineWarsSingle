@@ -36,7 +36,7 @@ namespace LineWars.Model
 
         public string GetLog()
         {
-            return $"Юнит {attacker} контратаковал юнита {blocker}";
+            return $"Unit {attacker} counterattacked enemy {blocker}";
         }
     }
 }

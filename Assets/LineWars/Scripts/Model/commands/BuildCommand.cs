@@ -24,7 +24,7 @@ namespace LineWars.Model
 
         public override string GetLog()
         {
-            return $"Инженер {Executor} улучшил дорогу {Target}";
+            return $"Engineer {Executor} up road {Target}";
         }
     }
 }

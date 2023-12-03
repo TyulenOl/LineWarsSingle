@@ -28,7 +28,7 @@
 
         public string GetLog()
         {
-            return $"Игрок {player} заспавнил на базе пресет юнитов {unitPreset.Name}";
+            return $"Player {player} spawn preset {unitPreset.Name} on base";
         }
     }
 }
