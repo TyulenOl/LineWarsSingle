@@ -42,7 +42,7 @@ public class TransformCarousel : MonoBehaviour
     {
         if (children.Length == 0)
         {
-            Debug.LogWarning($"Карусель {name} пуста");
+            Debug.LogWarning($"Carousel {name} is empty!");
             return false;
         }
 
