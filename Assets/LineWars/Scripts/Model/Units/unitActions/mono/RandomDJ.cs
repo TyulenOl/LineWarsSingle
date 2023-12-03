@@ -17,6 +17,8 @@ namespace LineWars.Model
         
         public SFXData GetSound(SFXList list)
         {
+            if (list == null)
+                return null;
             var sounds = list.ToArray();
             if (UnityEngine.Random.Range(0f, 1f) > proximity)
                 return null;

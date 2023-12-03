@@ -161,7 +161,7 @@ namespace LineWars.Controllers
                 && (!Constrains.CanExecuteSimpleAction()
                     || !Constrains.IsMyCommandType(command.Action.CommandType)))
             {
-                Debug.LogError($"Нельзя исполнить простую команду введу ограничения");
+                Debug.LogError($"Нельзя исполнить простую команду ввиду ограничения");
                 return;
             }
 
