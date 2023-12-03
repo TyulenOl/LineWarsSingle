@@ -23,7 +23,7 @@ namespace LineWars.Model
 
         public override string GetLog()
         {
-            return $"{Executor} атаковал {Target}";
+            return $"{Executor} attacked {Target}";
         }
     }
 }

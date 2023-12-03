@@ -29,7 +29,7 @@ namespace LineWars.Model
 
         public override string GetLog()
         {
-            return $"Юнит {Executor} встал в защиту";
+            return $"Unit {Executor} stood up for the defense";
         }
     }
 }

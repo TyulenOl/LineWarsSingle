@@ -23,7 +23,7 @@ namespace LineWars.Model
 
         public override string GetLog()
         {
-            return $"Доктор {Executor} похилил {Target}";
+            return $"Doctor {Executor} heal {Target}";
         }
     }
 }

@@ -25,7 +25,7 @@ namespace LineWars.Model
 
         public string GetLog()
         {
-            return $"Игрок {Player} купил {Preset.Name} в ноде {Node}";
+            return $"Player {Player} buy preset {Preset.Name} in node {Node}";
         }
     }
 }
