@@ -28,6 +28,9 @@ namespace LineWars.Controllers
 
             private void OnSelectedObjectChanged(GameObject lastObject, GameObject newObject)
             {
+                if (!Manager.ActiveSelf)
+                    return;
+                
                 if (newObject == null)
                     return;
                 if (Selector.SelectedObjects

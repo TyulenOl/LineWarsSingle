@@ -157,6 +157,12 @@ namespace LineWars.Controllers
 
         public void ExecuteSimpleCommand(IActionCommand command)
         {
+            if (!ActiveSelf)
+            {
+                ActiveSelfLog(nameof(ExecuteSimpleCommand));
+                return;
+            }
+            
             if (HaveConstrains
                 && (!Constrains.CanExecuteSimpleAction()
                     || !Constrains.IsMyCommandType(command.Action.CommandType)))
@@ -201,6 +207,12 @@ namespace LineWars.Controllers
 
         public void SetUnitPreset(UnitBuyPreset preset)
         {
+            if (!ActiveSelf)
+            {
+                ActiveSelfLog(nameof(SetUnitPreset));
+                return;
+            }
+            
             if (HaveConstrains && !Constrains.CanSelectUnitBuyPreset(preset))
             {
                 ConstrainsLog(nameof(SetUnitPreset));
@@ -218,6 +230,12 @@ namespace LineWars.Controllers
 
         public void SelectCommandsPreset(CommandPreset preset)
         {
+            if (!ActiveSelf)
+            {
+                ActiveSelfLog(nameof(SelectCommandsPreset));
+                return;
+            }
+            
             if (stateMachine.CurrentState != waitingSelectCommandState)
             {
                 InvalidStateLog(nameof(SelectCommandsPreset));
@@ -240,6 +258,12 @@ namespace LineWars.Controllers
 
         public void CancelCommandPreset()
         {
+            if (!ActiveSelf)
+            {
+                ActiveSelfLog(nameof(CancelCommandPreset));
+                return;
+            }
+            
             if (stateMachine.CurrentState != waitingSelectCommandState)
             {
                 InvalidStateLog(nameof(CancelCommandPreset));
@@ -251,9 +275,15 @@ namespace LineWars.Controllers
 
         public void SelectCurrentCommand(CommandType commandType)
         {
+            if (!ActiveSelf)
+            {
+                ActiveSelfLog(nameof(SelectCurrentCommand));
+                return;
+            }
+            
             if (HaveConstrains && !Constrains.CanSelectCurrentCommand())
             {
-                ConstrainsLog(nameof(SelectCommandsPreset));
+                ConstrainsLog(nameof(SelectCurrentCommand));
                 return;
             }
 
@@ -283,6 +313,12 @@ namespace LineWars.Controllers
 
         public void CancelCurrentCommand()
         {
+            if (!ActiveSelf)
+            {
+                ActiveSelfLog(nameof(CancelCurrentCommand));
+                return;
+            }
+            
             if (stateMachine.CurrentState != currentCommandState)
             {
                 InvalidStateLog(nameof(CancelCurrentCommand));
@@ -293,10 +329,6 @@ namespace LineWars.Controllers
 
         private void OnTurnChanged(PhaseType previousPhase, PhaseType currentPhase)
         {
-            if (!ActiveSelf)
-            {
-                return;
-            }
             ToPhase(currentPhase);
         }
 
@@ -395,7 +427,6 @@ namespace LineWars.Controllers
             if (ActiveSelf)
                 return;
             ActiveSelf = true;
-            ToPhase(PhaseManager.CurrentPhase);
         }
         
         public void Deactivate()
@@ -403,7 +434,6 @@ namespace LineWars.Controllers
             if (!ActiveSelf)
                 return;
             ActiveSelf = false;
-            ToPhase(PhaseType.Idle);
         }
 
 
@@ -415,6 +445,11 @@ namespace LineWars.Controllers
         private void InvalidStateLog(string methodName)
         {
             Debug.LogError($"This is invalid state {state} for action {methodName}", gameObject);
+        }
+
+        private void ActiveSelfLog(string methodName)
+        {
+            Debug.LogError($"Cant execute {methodName} because {nameof(CommandsManager)} is no active!", gameObject);
         }
     }
 }

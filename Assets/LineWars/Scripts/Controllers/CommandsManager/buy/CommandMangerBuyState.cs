@@ -40,6 +40,9 @@ namespace LineWars.Controllers
 
             private void OnSelectedObjectsChanged(IEnumerable<GameObject> _, IEnumerable<GameObject> gameObjects)
             {
+                if (!Manager.ActiveSelf)
+                    return;
+                
                 if(currentBuyPreset == null)
                     return;
                 var node = gameObjects.GetComponentMany<Node>().FirstOrDefault();
