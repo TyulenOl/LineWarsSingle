@@ -118,7 +118,7 @@ namespace LineWars.Controllers
             }
             else
             {
-                Debug.LogError("Больше чем два CommandsManager на сцене");
+                Debug.LogError($"More than two {nameof(CommandsManager)} on stage");
             }
 
             stateMachine = new StateMachine();
@@ -161,13 +161,16 @@ namespace LineWars.Controllers
                 && (!Constrains.CanExecuteSimpleAction()
                     || !Constrains.IsMyCommandType(command.Action.CommandType)))
             {
-                Debug.LogError($"Нельзя исполнить простую команду ввиду ограничения");
+                ConstrainsLog(nameof(ExecuteSimpleCommand));
                 return;
             }
 
             if (!CanExecuteAnyCommand())
-                throw new InvalidOperationException(
-                    $"В текущем состоянии командс менеджера {State} нельзя исполнить команду");
+            {
+                InvalidStateLog(nameof(ExecuteSimpleCommand));
+                return;
+            }
+            
             ExecuteCommandButIgnoreConstrains(command);
         }
 
@@ -200,23 +203,38 @@ namespace LineWars.Controllers
         {
             if (HaveConstrains && !Constrains.CanSelectUnitBuyPreset(preset))
             {
-                Debug.LogError("Нельзя выбрать текущий пресет ввиду огрничения");
+                ConstrainsLog(nameof(SetUnitPreset));
                 return;
             }
 
             if (stateMachine.CurrentState != buyState)
-                throw new InvalidOperationException("Can't set unit preset while not in buy state!");
+            {
+                InvalidStateLog(nameof(SetUnitPreset));
+                return;
+            }
+            
             buyState.SetUnitPreset(preset);
         }
 
         public void SelectCommandsPreset(CommandPreset preset)
         {
             if (stateMachine.CurrentState != waitingSelectCommandState)
-                throw new InvalidOperationException();
+            {
+                InvalidStateLog(nameof(SelectCommandsPreset));
+                return;
+            }
+
             if (!currentOnWaitingCommandMessage.Data.Contains(preset))
-                throw new ArgumentException(nameof(preset));
+            {
+                Debug.LogError($"You cant select this command preset because this command preset in not owned!", gameObject);
+                return;
+            }
+            
             if (!preset.IsActive)
-                throw new ArgumentException(nameof(preset));
+            {
+                Debug.LogError("You cant select this command preset because this command preset is not active!", gameObject);
+                return;
+            }
             ProcessCommandPreset(preset);
         }
 
@@ -224,7 +242,8 @@ namespace LineWars.Controllers
         {
             if (stateMachine.CurrentState != waitingSelectCommandState)
             {
-                throw new InvalidOperationException("Is not targeted state to cancelAction");
+                InvalidStateLog(nameof(CancelCommandPreset));
+                return;
             }
 
             stateMachine.SetState(findTargetState);
@@ -234,14 +253,21 @@ namespace LineWars.Controllers
         {
             if (HaveConstrains && !Constrains.CanSelectCurrentCommand())
             {
-                Debug.LogError("Нельзя выбрать конкретную команду ввиду ограничения");
+                ConstrainsLog(nameof(SelectCommandsPreset));
                 return;
             }
 
             if (stateMachine.CurrentState != findTargetState)
-                throw new InvalidOperationException();
+            {
+                InvalidStateLog(nameof(SelectCurrentCommand));
+                return;
+            }
+
             if (CheckContainsActions(commandType))
-                throw new InvalidOperationException();
+            {
+                Debug.LogError($"You cant {nameof(SelectCurrentCommand)} because {nameof(Executor)} will not be able to perform this");
+                return;
+            }
             if (Executor.Actions.First(x => x.CommandType == commandType) is not ITargetedAction)
                 throw new NotImplementedException();
             currentCommandState.Prepare(commandType);
@@ -258,7 +284,10 @@ namespace LineWars.Controllers
         public void CancelCurrentCommand()
         {
             if (stateMachine.CurrentState != currentCommandState)
-                throw new InvalidOperationException();
+            {
+                InvalidStateLog(nameof(CancelCurrentCommand));
+                return;
+            }
             stateMachine.SetState(findTargetState);
         }
 
@@ -279,7 +308,7 @@ namespace LineWars.Controllers
                 {
                     if (Executor is {CanDoAnyAction: true})
                     {
-                        Debug.LogWarning("Вы как-то завершили ход, хотя у текущего executora остались очки действия");
+                        Debug.LogWarning("You somehow ended a turn even though the current executor still has action points");
                     }
 
                     stateMachine.SetState(idleState);
@@ -375,6 +404,17 @@ namespace LineWars.Controllers
                 return;
             ActiveSelf = false;
             ToPhase(PhaseType.Idle);
+        }
+
+
+        private void ConstrainsLog(string methodName)
+        {
+            Debug.LogError($"Cant invoke {methodName} because you have constrains {Constrains.name}.", gameObject);
+        }
+
+        private void InvalidStateLog(string methodName)
+        {
+            Debug.LogError($"This is invalid state {state} for action {methodName}", gameObject);
         }
     }
 }

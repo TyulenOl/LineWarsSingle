@@ -10,6 +10,18 @@ namespace LineWars.Model
 
         public override void Execute(AnimationContext context)
         {
+            if (slashEffect == null )
+            {
+                Debug.LogWarning($"{nameof(slashEffect)} is null on {name}");
+                return;
+            }
+
+            if (effectPosition == null)
+            {
+                Debug.LogWarning($"{nameof(effectPosition)} is null on {name}");
+                return;
+            }
+            
             var effect = Instantiate(slashEffect, effectPosition.transform.position, Quaternion.identity);
             effect.Ended += OnEffectEnd;
             IsPlaying = true;

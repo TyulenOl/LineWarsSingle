@@ -15,7 +15,7 @@ namespace LineWars
 
             if(capturePoints.Count <= 0)
             {
-                Debug.LogWarning("Точки захвата не были назначены!");
+                Debug.LogWarning($"{nameof(CaptureThePointsGameReferee)} have not found any {nameof(capturePoints)}!");
             }
 
             foreach(var node in capturePoints)

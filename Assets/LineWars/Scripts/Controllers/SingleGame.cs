@@ -15,15 +15,17 @@ namespace LineWars
     public class SingleGame : MonoBehaviour
     {
         public static SingleGame Instance { get; private set; }
+        
+        [Header("Logic")] 
+        [SerializeField] private PlayerBuilder playerSpawn;
 
-        [Header("Logic")] [SerializeField] private PlayerBuilder playerSpawn;
-
-        [Header("Players")] [SerializeField] private Player playerPrefab;
+        [Header("Players")] 
+        [SerializeField] private Player playerPrefab;
         [SerializeField] private List<BasePlayer> enemiesPrefabs;
         [SerializeField] private AIType aiType;
 
-        [Header("AI Options")] [SerializeField]
-        private GameEvaluator gameEvaluator;
+        [Header("AI Options")]
+        [SerializeField] private GameEvaluator gameEvaluator;
 
         [SerializeField] private AIBuyLogicData aiBuyLogicData;
         [SerializeField, Min(1)] private int aiDepth;
@@ -62,7 +64,7 @@ namespace LineWars
 
             InitializeGameReferee();
             
-            RegisterAllPlayers();
+            //RegisterAllPlayers();
 
 
             StartCoroutine(StartGameCoroutine());
@@ -175,6 +177,12 @@ namespace LineWars
             if (!GameVariables.IsNormalStart) return;
             WinLoseUI.isWin = false;
             SceneTransition.LoadScene(SceneName.WinOrLoseScene);
+        }
+
+        private void OnDestroy()
+        {
+            SfxManager.Instance?.StopAllSounds();
+            SpeechManager.Instance?.StopAllSounds();
         }
     }
 
