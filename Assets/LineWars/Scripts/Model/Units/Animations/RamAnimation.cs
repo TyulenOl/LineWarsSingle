@@ -26,7 +26,7 @@ namespace LineWars.Model
             startPosition = ownerUnit.transform.position;
 
             targetNode = context.TargetNode;
-            IsPlaying = true;
+            StartAnimation();
         }
 
         private void Update()
@@ -50,7 +50,10 @@ namespace LineWars.Model
                 Rammed.Invoke(this);    
 
             if (newPosition == destination)
-                IsPlaying = false;
+            {
+                EndAnimation();
+                isRamming = false;
+            }
         }
         private void Prepare()
         {

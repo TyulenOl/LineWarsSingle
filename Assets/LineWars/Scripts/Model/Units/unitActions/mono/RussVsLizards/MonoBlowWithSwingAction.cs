@@ -39,8 +39,8 @@ namespace LineWars.Model
                     TargetUnit = target
                 };
 
-                swingAnimation.Execute(context);
                 swingAnimation.Ended.AddListener(ExecuteOnAnimationEnd);
+                swingAnimation.Execute(context);
             }
             else
             {
