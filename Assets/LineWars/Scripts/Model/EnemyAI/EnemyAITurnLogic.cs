@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -22,18 +23,21 @@ namespace LineWars.Model
 
             public void Start()
             {
-                ai.StartCoroutine(StartAITurnCoroutine());
+                StartAITurn();
             }
 
-            private IEnumerator StartAITurnCoroutine()
+            private async void StartAITurn()
             {
                 var gameProjection =
                     GameProjectionCreator.FromMono(SingleGame.Instance.AllPlayers.Values, MonoGraph.Instance, PhaseManager.Instance);
-                var allCommmandsTask = FindAllOutcomes(gameProjection);
-                yield return new WaitUntil(() => allCommmandsTask.IsCompleted);
-                var commandEvalList = allCommmandsTask.Result;
+                //DEBUG
+                var stopwatch = new Stopwatch();
+                stopwatch.Start();
+                var allCommands = await FindAllOutcomes(gameProjection);
+                stopwatch.Stop();
+                UnityEngine.Debug.Log(stopwatch.ElapsedMilliseconds);
 
-                yield return ExecuteTurnCoroutine(commandEvalList, gameProjection);
+                ai.StartCoroutine(ExecuteTurnCoroutine(allCommands, gameProjection));
             }
 
             private IEnumerator ExecuteTurnCoroutine(PossibleOutcome[] commandEvalList, GameProjection gameProjection)
@@ -104,6 +108,10 @@ namespace LineWars.Model
                         newGame.CycleTurn();
                     else
                         newGame.CyclePlayers();
+                }
+                if(newGame.CurrentPhase == PhaseType.Buy)
+                {
+                    newGame.CycleTurn();
                 }
                 if (depth == 0 || newGame.CurrentPhase == PhaseType.Buy)
                 {
