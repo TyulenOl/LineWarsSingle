@@ -60,6 +60,7 @@ namespace DataStructures
             var index = objectToIndex[item];
             indexToObject.Remove(index);
             objectToIndex.Remove(item);
+            indexesSet.Remove(index);
         }
 
         public void Remove(int index)
@@ -73,6 +74,7 @@ namespace DataStructures
             lastIndex = 0;
             indexToObject.Clear();
             objectToIndex.Clear();
+            indexesSet.Clear();
         }
 
         public static IndexList<T> GetIndexListFromList(IEnumerable<T> list)

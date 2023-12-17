@@ -8,45 +8,62 @@ namespace LineWars.Model
     public class DepthDetailsData
         : ScriptableObject
     {
-        public class DepthDetailsResponse
-        {
-            public readonly bool InDepth;
-            public readonly IReadOnlyCollection<DepthDetailsData> AvailableCommands;
-
-            public DepthDetailsResponse(bool inDepth, IReadOnlyCollection<DepthDetailsData> availableCommands)
-            {
-                InDepth = inDepth;
-                AvailableCommands = availableCommands;
-            }   
-        }
-
-        [Serializable]
-        public class DepthDetails
-        {
-            [SerializeField] private int endTurn;
-            [SerializeField] private List<CommandType> availableCommands;
-            private HashSet<CommandType> availableCommandsHashSet;
-            public int EndTurn => endTurn;
-            public IReadOnlyCollection<CommandType> Commands => availableCommandsHashSet;
-
-            public void BuildHashSet()
-            {
-                availableCommandsHashSet = new HashSet<CommandType>(availableCommands);
-            }
-        }
-
         [SerializeField] private List<DepthDetails> turnIntervals;
+        private List<DepthDetailsResponse> depthDetails;
+        private DepthDetailsResponse nullResponse;
+        
+        public int TotalDepth => depthDetails.Count;
+
 
         private void OnEnable()
         {
-            foreach(var turnInterval in turnIntervals)
-                turnInterval.BuildHashSet();
+            InitializeDictionary();
+            nullResponse = new DepthDetailsResponse(false, null);
         }
 
-/*        public DepthDetailsResponse GetDepthDetails(int depth)
+        private void InitializeDictionary()
         {
-
+            depthDetails = new List<DepthDetailsResponse>();
+            foreach (var details in turnIntervals)
+            {
+                var commandsHashSet = new HashSet<CommandType>(details.AvailableCommands);
+                var response = new DepthDetailsResponse(true, commandsHashSet);
+                for(var i = 0; i < details.TurnDuration; i++)
+                {
+                    depthDetails.Add(response);
+                }
+            }
         }
-*/
+
+        public DepthDetailsResponse GetDepthDetails(int depth)
+        {
+            if (depth <= 0)
+                throw new InvalidOperationException("Depth should be positive!");
+            depth--;
+            if (depth < depthDetails.Count)
+                return depthDetails[depth];
+            return nullResponse;
+        }
+    }
+
+    [Serializable]
+    public class DepthDetails
+    {
+        [SerializeField] private int turnDuration;
+        [SerializeField] private List<CommandType> availableCommands;
+        public int TurnDuration => turnDuration;
+        public IReadOnlyList<CommandType> AvailableCommands => availableCommands;
+    }
+
+    public class DepthDetailsResponse
+    {
+        public readonly bool InDepth;
+        public readonly IReadOnlyCollection<CommandType> AvailableCommands;
+
+        public DepthDetailsResponse(bool inDepth, IReadOnlyCollection<CommandType> availableCommands)
+        {
+            InDepth = inDepth;
+            AvailableCommands = availableCommands;
+        }
     }
 }
