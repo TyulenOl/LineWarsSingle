@@ -77,7 +77,7 @@ namespace DataStructures
             indexesSet.Clear();
         }
 
-        public static IndexList<T> GetIndexListFromList(IEnumerable<T> list)
+        public static IndexList<T> FromList(IEnumerable<T> list)
         {
             var indexList = new IndexList<T>();
 

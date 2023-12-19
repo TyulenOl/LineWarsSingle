@@ -13,6 +13,7 @@ namespace LineWars.Model
         public class EnemyAITurnLogic
         {
             private readonly EnemyAI ai;
+            private int comCount;
 
             public EnemyAITurnLogic(EnemyAI ai)
             {
@@ -35,7 +36,7 @@ namespace LineWars.Model
                 stopwatch.Start();
                 var allCommands = await FindAllOutcomes(gameProjection);
                 stopwatch.Stop();
-                UnityEngine.Debug.Log(stopwatch.ElapsedMilliseconds);
+                UnityEngine.Debug.Log($"{stopwatch.ElapsedMilliseconds} ms");
 
                 ai.StartCoroutine(ExecuteTurnCoroutine(allCommands, gameProjection));
             }
@@ -70,7 +71,6 @@ namespace LineWars.Model
                 return Task.WhenAll(tasksList.ToArray());
             }
 
-
             private Task<PossibleOutcome> ExploreOutcome(GameProjection gameProjection, ICommandBlueprint blueprint, int depth,
                 int currentExecutorId, List<ICommandBlueprint> firstCommandChain, bool isSavingCommands)
             {
@@ -85,8 +85,6 @@ namespace LineWars.Model
             {
                 if (currentExecutorId != -1 && blueprint.ExecutorId != currentExecutorId)
                     throw new ArgumentException();
-                //UnityEngine.Debug.Log("MINMAX!");
-                //DebugBullshit(gameProjection);
                 currentExecutorId = blueprint.ExecutorId;
                 var newGame = GameProjectionCreator.FromProjection(gameProjection);
                 var thisCommand = blueprint.GenerateCommand(newGame);
@@ -136,7 +134,6 @@ namespace LineWars.Model
                             currentValue = newValue;
                         if (newValue.Score <= alpha)
                         {
-                            //UnityEngine.Debug.Log("AlphaPruned!");
                             return currentValue;
                         }
                         if (newValue.Score < beta)
@@ -149,13 +146,11 @@ namespace LineWars.Model
                     var currentValue = new PossibleOutcome(int.MinValue, null);
                     foreach(var command in possibleCommands)
                     {
-                        //UnityEngine.Debug.Log("Sex");
                         var newValue = MinMax(newGame, command, depth, currentExecutorId, firstCommandChain, isSavingCommands, alpha, beta);
                         if(newValue.Score > currentValue.Score)
                             currentValue = newValue;
                         if(newValue.Score >= beta)
-                        {
-                            //UnityEngine.Debug.Log("BetaPruned!");
+                        { 
                             return currentValue;
                         }
                         if (newValue.Score > alpha)
