@@ -65,7 +65,7 @@ namespace LineWars
         {
             RecalculateVisibility();
             if (CurrentPhase != null 
-                && (object)CommandsManager.Instance.Executor != diedUnit) //Из-за этого случался баг с ShotUnit?
+                && (object)CommandsManager.Instance.Executor != diedUnit) //РР·-Р·Р° СЌС‚РѕРіРѕ СЃР»СѓС‡Р°Р»СЃСЏ Р±Р°Рі СЃ ShotUnit? РҐР—
             {
                 FinishTurn();
             }
@@ -85,7 +85,7 @@ namespace LineWars
             }
         }
 
-        public void FinishTurn() //Сделать InvokeTurnEnded virtual?
+        public void FinishTurn() //РЎРґРµР»Р°С‚СЊ InvokeTurnEnded virtual? // РЅР°СЂСѓС€С‚СЃСЏ SRP
         {
             if(CurrentPhase == null)
             {
@@ -112,7 +112,6 @@ namespace LineWars
                     potentialExecutors = PhaseExecutorsData[phaseType];
                     GameUI.Instance.SetEnemyTurn(false);
                     GameUI.Instance.ReDrawAllAvailability(GetAllUnitsByPhase(phaseType), true);
-                    GameUI.Instance.SetEnemyTurn(false);
                     break;
             }
         }
@@ -130,7 +129,7 @@ namespace LineWars
 
         public override bool CanExecuteTurn(PhaseType phaseType)
         {
-            if(!base.CanExecuteTurn(phaseType)) //плохо? сделать явное сравнение на PhaseExceptions?
+            if(!base.CanExecuteTurn(phaseType)) //РїР»РѕС…Рѕ? СЃРґРµР»Р°С‚СЊ СЏРІРЅРѕРµ СЃСЂР°РІРЅРµРЅРёРµ РЅР° PhaseExceptions?
                 return false;
             if (phaseType == PhaseType.Buy || phaseType == PhaseType.Replenish)
                 return true;

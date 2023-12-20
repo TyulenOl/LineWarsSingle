@@ -334,21 +334,16 @@ namespace LineWars.Controllers
 
         private void OnTurnEnded(IActor _, PhaseType phaseType)
         {
-            if (Executor is { CanDoAnyAction: true })
+            if (Executor is {CanDoAnyAction: true})
             {
-                Debug.LogWarning("Вы как-то завершили ход, хотя у текущего executora остались очки действия");
+                Debug.LogWarning("You somehow ended a turn even though the current executor still has action points", gameObject);
             }
-
+            
             stateMachine.SetState(idleState);
         }
 
         private void OnTurnStarted(IActor _, PhaseType phaseType)
         {
-            ToPhase(currentPhase);
-            if (!ActiveSelf)
-            {
-                return;
-            }
             ToPhase(phaseType);
         }
 
@@ -356,16 +351,6 @@ namespace LineWars.Controllers
         {
             switch (phaseType)
             {
-                case PhaseType.Idle:
-                {
-                    if (Executor is {CanDoAnyAction: true})
-                    {
-                        Debug.LogWarning("You somehow ended a turn even though the current executor still has action points");
-                    }
-
-                    stateMachine.SetState(idleState);
-                    break;
-                }
                 case PhaseType.Buy when Player.CanExecuteTurn(phaseType):
                 {
                     stateMachine.SetState(buyState);
@@ -454,7 +439,6 @@ namespace LineWars.Controllers
             if (!ActiveSelf)
                 return;
             ActiveSelf = false;
-            Player.FinishTurn();
         }
 
 

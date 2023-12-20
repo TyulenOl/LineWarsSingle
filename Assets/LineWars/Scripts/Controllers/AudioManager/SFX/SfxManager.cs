@@ -61,7 +61,8 @@ namespace LineWars.Controllers
 
         public void StopAllSounds()
         {
-            source.Stop();
+            if (source != null)
+                source.Stop();
         }
     }
 }

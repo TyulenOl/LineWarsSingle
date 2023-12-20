@@ -3,8 +3,7 @@ using System.Runtime.Serialization;
 using System.Xml;
 using UnityEngine;
 
-namespace LineWars
-{
+
     public static class Serializer
     {
         public static void WriteObject<T>(string fileName, T obj)
@@ -20,4 +19,3 @@ namespace LineWars
             return JsonUtility.FromJson<T>(json);
         }
     }
-}
