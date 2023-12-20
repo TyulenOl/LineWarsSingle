@@ -41,7 +41,7 @@ namespace LineWars.Model
             set
             {
                 currentHp = value;
-                if (value == 0)
+                if (value <= 0)
                 {
                     Died?.Invoke(this);
                     RemoveFromNode();
@@ -114,6 +114,11 @@ namespace LineWars.Model
 
         private void RemoveFromOwner()
         {
+            if (Owner == null || this == null)
+            {
+                var vd = 1;
+            }
+
             Owner.RemoveOwned(this);
         }
 

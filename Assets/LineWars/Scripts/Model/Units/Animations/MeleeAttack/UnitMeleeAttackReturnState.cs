@@ -1,3 +1,4 @@
+using UnityEditor.ProjectWindowCallback;
 using UnityEngine;
 
 namespace LineWars.Model
@@ -27,7 +28,7 @@ namespace LineWars.Model
                    && (animation.ownerUnit == animation.targetNode.LeftUnit ||
                    animation.ownerUnit == animation.targetNode.RightUnit)) 
                 {
-                    animation.IsPlaying = true;
+                    animation.EndAnimation();
                     animation.stateMachine.SetState(animation.idleState);
                 }
             }
@@ -43,7 +44,7 @@ namespace LineWars.Model
                 }
                 else
                 {
-                    animation.Ended.Invoke(animation);
+                    animation.EndAnimation();
                     animation.stateMachine.SetState(animation.idleState);
                 }
             }

@@ -122,17 +122,60 @@ namespace LineWars.Model
         
         public void Visit(SacrificeForPerunAction<TNode, TEdge, TUnit> action)
         {
-            // TODO 
+            var unitId = action.Executor.Id;
+
+            foreach (var node in Graph.Nodes)
+            {
+                if(action.CanSacrifice(node))
+                {
+                    var nodeId = node.Id;
+                    var command = new PerunActionCommandBlueprint(unitId, nodeId);
+
+                    BlueprintList.Add(command);
+                }
+            }
         }
 
         public void Visit(BlowWithSwingAction<TNode, TEdge, TUnit> action)
         {
-            // TODO 
-        }
+            foreach (var node in Graph.GetNodesInRange(action.Executor.Node, 1))
+            {
+                if(!node.LeftIsFree)
+                {
+                    ProcessUnit(node);  
+                    return;
+                }
+                if(!node.RightIsFree)
+                {
+                    ProcessUnit(node);
+                    return;
+                }
+            }
 
+            void ProcessUnit(TNode node)
+            {
+                var command = new SwingCommandBlueprint(action.Executor.Id, node.LeftUnit.Id);
+                BlueprintList.Add(command);
+            }
+        }
         public void Visit(ShotUnitAction<TNode, TEdge, TUnit> action)
         {
-            // TODO 
+            foreach (var node in Graph.GetNodesInRange(action.Executor.Node, 1))
+            {
+                if (!node.LeftIsFree)
+                    ProcessUnit(node.LeftUnit);
+                if (!node.RightIsFree)
+                    ProcessUnit(node.RightUnit);
+            }
+
+            void ProcessUnit(TUnit unit)
+            {
+                foreach (var nodeTarget in Graph.Nodes)
+                {
+                    if (action.IsAvailable(unit, nodeTarget))
+                        BlueprintList.Add(new ShotUnitBlueprint(action.Executor.Id, unit.Id, nodeTarget.Id));
+                }
+            }    
         }
 
         public void Visit(RLBuildAction<TNode, TEdge, TUnit> action)

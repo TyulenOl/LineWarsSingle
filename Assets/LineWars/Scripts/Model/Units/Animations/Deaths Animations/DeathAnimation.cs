@@ -30,7 +30,7 @@ namespace LineWars.Model
                 mainSprite = leftSprite;
             else
                 mainSprite = rightSprite;
-            IsPlaying = true;
+            StartAnimation();
             startPosition = ownerUnit.transform.position;
             foreach(var element in uiElements) 
                 element.SetActive(false);
@@ -43,7 +43,7 @@ namespace LineWars.Model
             currentTime += Time.deltaTime;
             if(currentTime >= animationTime)
             {
-                IsPlaying = false;
+                EndAnimation();
                 return;
             }
 

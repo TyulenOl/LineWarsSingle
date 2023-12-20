@@ -9,17 +9,20 @@ namespace LineWars.Model
 {
     public partial class EnemyAI : BasePlayer
     {
-        [SerializeField] private EnemyDifficulty difficulty;
-        [SerializeField] private float actionCooldown;
+        [Header("AI Options")]
+        [SerializeField] private DepthDetailsData depthDetailsData;
         [SerializeField] private AIBuyLogicData buyLogicData;
         [SerializeField] private GameEvaluator gameEvaluator;
-        [field: SerializeField] public int Depth { get; set; }
+
+        [Header("Timing Options")]
+        [SerializeField] private float actionCooldown;
         [SerializeField] private float commandPause;
         [SerializeField] private float firstCommandPause;
 
         private AIBuyLogic buyLogic;
         private EnemyAITurnLogic turnLogic;
 
+        public int Depth => depthDetailsData.TotalDepth;
         public override void Initialize(SpawnInfo spawnInfo)
         {
             base.Initialize(spawnInfo);
@@ -40,6 +43,16 @@ namespace LineWars.Model
             if (evaluator == null)
                 Debug.LogError("Evaluator cannot be null!");
             gameEvaluator = evaluator;
+        }
+
+        public void SetNewDepthDetailData([NotNull] DepthDetailsData depthDetailsData)
+        {
+            if (depthDetailsData == null)
+            {
+                Debug.LogError("Depth Detail Data cannot be null!");
+                return;
+            }
+            this.depthDetailsData = depthDetailsData;
         }
 
         public override bool CanExecuteTurn(PhaseType phase)

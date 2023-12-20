@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -12,6 +13,7 @@ namespace LineWars.Model
         public class EnemyAITurnLogic
         {
             private readonly EnemyAI ai;
+            private int comCount;
 
             public EnemyAITurnLogic(EnemyAI ai)
             {
@@ -22,18 +24,21 @@ namespace LineWars.Model
 
             public void Start()
             {
-                ai.StartCoroutine(StartAITurnCoroutine());
+                StartAITurn();
             }
 
-            private IEnumerator StartAITurnCoroutine()
+            private async void StartAITurn()
             {
                 var gameProjection =
                     GameProjectionCreator.FromMono(SingleGame.Instance.AllPlayers.Values, MonoGraph.Instance, PhaseManager.Instance);
-                var allCommmandsTask = FindAllOutcomes(gameProjection);
-                yield return new WaitUntil(() => allCommmandsTask.IsCompleted);
-                var commandEvalList = allCommmandsTask.Result;
+                //DEBUG
+                var stopwatch = new Stopwatch();
+                stopwatch.Start();
+                var allCommands = await FindAllOutcomes(gameProjection);
+                stopwatch.Stop();
+                UnityEngine.Debug.Log($"{stopwatch.ElapsedMilliseconds} ms");
 
-                yield return ExecuteTurnCoroutine(commandEvalList, gameProjection);
+                ai.StartCoroutine(ExecuteTurnCoroutine(allCommands, gameProjection));
             }
 
             private IEnumerator ExecuteTurnCoroutine(PossibleOutcome[] commandEvalList, GameProjection gameProjection)
@@ -52,17 +57,19 @@ namespace LineWars.Model
 
             private Task<PossibleOutcome[]> FindAllOutcomes(GameProjection gameProjection)
             {
-                var possibleCommands = CommandBlueprintCollector.CollectAllCommands(gameProjection);
+                var possibleCommands = 
+                    CommandBlueprintCollector.CollectAllCommands(
+                    gameProjection,
+                    ai.depthDetailsData.GetDepthDetails(1).AvailableCommands);
                 var tasksList = new List<Task<PossibleOutcome>>();
                 foreach (var command in possibleCommands)
                 {
                     var commandChain = new List<ICommandBlueprint>();
-                    tasksList.Add(ExploreOutcome(gameProjection, command, ai.Depth, -1, commandChain, true));
+                    tasksList.Add(ExploreOutcome(gameProjection, command, 1, -1, commandChain, true));
                 }
 
                 return Task.WhenAll(tasksList.ToArray());
             }
-
 
             private Task<PossibleOutcome> ExploreOutcome(GameProjection gameProjection, ICommandBlueprint blueprint, int depth,
                 int currentExecutorId, List<ICommandBlueprint> firstCommandChain, bool isSavingCommands)
@@ -74,11 +81,10 @@ namespace LineWars.Model
             }
 
             private PossibleOutcome MinMax(GameProjection gameProjection, ICommandBlueprint blueprint, int depth,
-                int currentExecutorId, List<ICommandBlueprint> firstCommandChain, bool isSavingCommands)
+                int currentExecutorId, List<ICommandBlueprint> firstCommandChain, bool isSavingCommands, int alpha = int.MinValue, int beta = int.MaxValue)
             {
                 if (currentExecutorId != -1 && blueprint.ExecutorId != currentExecutorId)
                     throw new ArgumentException();
-
                 currentExecutorId = blueprint.ExecutorId;
                 var newGame = GameProjectionCreator.FromProjection(gameProjection);
                 var thisCommand = blueprint.GenerateCommand(newGame);
@@ -97,7 +103,7 @@ namespace LineWars.Model
 
                 if (IsTurnOver(newGame, currentExecutorId))
                 {
-                    depth--;
+                    depth++;
                     currentExecutorId = -1;
                     isSavingCommands = false;
                     if (!newGame.IsUnitPhaseAvailable())
@@ -105,24 +111,62 @@ namespace LineWars.Model
                     else
                         newGame.CyclePlayers();
                 }
-                if (depth == 0 || newGame.CurrentPhase == PhaseType.Buy)
+                if(newGame.CurrentPhase == PhaseType.Buy)
+                {
+                    newGame.CycleTurn();
+                }
+                if (depth > ai.Depth || newGame.CurrentPhase == PhaseType.Buy)
                 {
                     return new(ai.gameEvaluator.Evaluate(newGame, thisPlayerProjection), firstCommandChain);
                 }
 
-                var possibleCommands = CommandBlueprintCollector.CollectAllCommands(newGame)
-                .Where(newBlueprint => currentExecutorId == -1 || newBlueprint.ExecutorId == currentExecutorId)
-                .Select(newBlueprint => MinMax(newGame, newBlueprint, depth, currentExecutorId, firstCommandChain, isSavingCommands));
+                var availableCommands = ai.depthDetailsData.GetDepthDetails(depth).AvailableCommands;
+                var possibleCommands = CommandBlueprintCollector.CollectAllCommands(newGame, availableCommands)
+                .Where(newBlueprint => currentExecutorId == -1 || newBlueprint.ExecutorId == currentExecutorId);
 
                 if (thisPlayerProjection != newGame.CurrentPlayer)
                 {
-                    var minChain = possibleCommands.MinItem((i1, i2) => i1.Score.CompareTo(i2.Score));
-                    return minChain;
+                    var currentValue = new PossibleOutcome(int.MaxValue, null);
+                    foreach (var command in possibleCommands)
+                    {
+                        var newValue = MinMax(newGame, command, depth, currentExecutorId, firstCommandChain, isSavingCommands, alpha, beta);
+                        if (newValue.Score < currentValue.Score)
+                            currentValue = newValue;
+                        if (newValue.Score <= alpha)
+                        {
+                            return currentValue;
+                        }
+                        if (newValue.Score < beta)
+                            beta = newValue.Score;
+                    }
+                    return currentValue;
                 }
                 else
                 {
-                    var maxChain = possibleCommands.MaxItem((i1, i2) => i1.Score.CompareTo(i2.Score));
-                    return maxChain;
+                    var currentValue = new PossibleOutcome(int.MinValue, null);
+                    foreach(var command in possibleCommands)
+                    {
+                        var newValue = MinMax(newGame, command, depth, currentExecutorId, firstCommandChain, isSavingCommands, alpha, beta);
+                        if(newValue.Score > currentValue.Score)
+                            currentValue = newValue;
+                        if(newValue.Score >= beta)
+                        { 
+                            return currentValue;
+                        }
+                        if (newValue.Score > alpha)
+                            alpha = newValue.Score;
+                    }
+                    return currentValue;
+                }
+            }
+
+            private void DebugBullshit(GameProjection game)
+            {
+                UnityEngine.Debug.Log($"{game.UnitsIndexList.Count} Units");
+                foreach (var unit in game.UnitsIndexList.Values)
+                {
+                    if (unit.CurrentHp <= 0)
+                        UnityEngine.Debug.Log("you suck!");
                 }
             }
 

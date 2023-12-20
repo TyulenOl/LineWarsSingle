@@ -28,7 +28,7 @@ namespace LineWars
         [SerializeField] private GameEvaluator gameEvaluator;
 
         [SerializeField] private AIBuyLogicData aiBuyLogicData;
-        [SerializeField, Min(1)] private int aiDepth;
+        [SerializeField] private DepthDetailsData depthDetailsData;
 
         public readonly IndexList<BasePlayer> AllPlayers = new();
         public readonly IndexList<Unit> AllUnits = new();
@@ -156,8 +156,8 @@ namespace LineWars
                 enemyAI.SetNewGameEvaluator(gameEvaluator);
             if (aiBuyLogicData != null)
                 enemyAI.SetNewBuyLogic(aiBuyLogicData);
-            if (aiDepth > 0)
-                enemyAI.Depth = aiDepth;
+            if (depthDetailsData != null)
+                enemyAI.SetNewDepthDetailData(depthDetailsData);
         }
 
 

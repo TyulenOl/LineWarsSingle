@@ -15,7 +15,7 @@ namespace LineWars.Model
         public override void Execute(AnimationContext context)
         {
             StartCoroutine(StartStopCoroutine());
-            IsPlaying = true;
+            StartAnimation();
         }
 
         private IEnumerator StartStopCoroutine()
@@ -25,7 +25,7 @@ namespace LineWars.Model
             yield return new WaitForSeconds(timeInSeconds);
             StopCoroutine(shakesCoroutine);
             ownerUnit.transform.position = startPosition;
-            IsPlaying = false;
+            EndAnimation();
         }
 
         private IEnumerator ShakesCoroutine()
