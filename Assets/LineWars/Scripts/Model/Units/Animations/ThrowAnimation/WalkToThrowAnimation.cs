@@ -11,7 +11,7 @@ namespace LineWars.Model
         {
             var moveDirection = (context.TargetUnit.transform.position - ownerUnit.transform.position) * movementRange;
             destination = transform.position + moveDirection;
-            IsPlaying = true;
+            StartAnimation();
         }
 
         private void Update()
@@ -32,7 +32,7 @@ namespace LineWars.Model
         {
             if((Vector2)ownerUnit.transform.position == destination)
             {
-                IsPlaying = false;
+                EndAnimation();
             }
         }
     }

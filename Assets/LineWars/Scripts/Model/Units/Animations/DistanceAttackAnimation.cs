@@ -18,9 +18,8 @@ namespace LineWars.Model
             var angle = CalculateAngle(projectilePosition, destination);
             shootProjectileInstance = 
                 Instantiate(shootProjectilePrefab, projectilePosition, Quaternion.Euler(0,0, angle));
-            
-            IsPlaying = true;
-            
+
+            StartAnimation();
         }
 
         private void Update()
@@ -45,7 +44,7 @@ namespace LineWars.Model
             {
                 Destroy(shootProjectileInstance);
                 shootProjectileInstance = null;
-                IsPlaying = false;
+                EndAnimation();
             }
         }
 
