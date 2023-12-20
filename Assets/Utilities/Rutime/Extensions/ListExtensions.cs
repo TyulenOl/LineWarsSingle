@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 
 
-public static class IReadOnlyListExtensions
+public static class ListExtensions
 {
     public static int FindIndex<T>(this IReadOnlyList<T> list, T obj)
     {

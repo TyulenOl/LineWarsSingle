@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 
 
-public static class IEnumerableExtension
+public static class EnumerableExtension
 {
     public static Stack<T> ToStack<T>(this IEnumerable<T> enumerable, bool useReverse = false)
     {

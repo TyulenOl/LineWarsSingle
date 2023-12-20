@@ -25,9 +25,9 @@ void CSMain(uint3 id : SV_DispatchThreadID)
         
         const float4 pixelColor = _VisibilityMap[id.xy];
         
-        if (nodeColor.r == pixelColor.r
-            && nodeColor.g == pixelColor.g
-            && nodeColor.b == pixelColor.b)
+        if (abs(nodeColor.r - pixelColor.r) < 0.0001f
+            && abs(nodeColor.g - pixelColor.g) < 0.0001f
+            && abs(nodeColor.b - pixelColor.b) < 0.0001f)
         {
             _VisibilityMaskV3[id.xy] = visibility;
         }
