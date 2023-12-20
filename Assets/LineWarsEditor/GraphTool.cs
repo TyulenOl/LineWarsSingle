@@ -22,11 +22,20 @@ public class GraphTool : EditorTool
 
     public override void OnActivated()
     {
+        Debug.Log("ON ACTIVATE");
         base.OnActivated();
 
         edgePrefab = Resources.Load<Edge>("Prefabs/Edge");
         nodePrefab = Resources.Load<Node>("Prefabs/Node");
 
+        if (edgePrefab == null)
+        {
+            Debug.LogError("Can't Find Edge Prefab!");
+        }
+        if(nodePrefab == null)
+        {
+            Debug.LogError("Can't Find Node Prefab!");
+        }
         AssignGraph();
 
         foreach (var gameObject in FindObjectsOfType<GameObject>())

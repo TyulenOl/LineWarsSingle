@@ -141,13 +141,15 @@ namespace LineWars.Controllers
 
         private void Start()
         {
-            Player.TurnChanged += OnTurnChanged;
+            Player.TurnEnded += OnTurnEnded;
+            Player.TurnStarted += OnTurnStarted;
         }
 
         private void OnDestroy()
         {
             stateMachine.SetState(idleState);
-            Player.TurnChanged -= OnTurnChanged;
+            Player.TurnEnded -= OnTurnStarted;
+            Player.TurnStarted -= OnTurnStarted;
         }
 
         public bool CanExecuteAnyCommand()
@@ -330,9 +332,24 @@ namespace LineWars.Controllers
             stateMachine.SetState(findTargetState);
         }
 
-        private void OnTurnChanged(PhaseType previousPhase, PhaseType currentPhase)
+        private void OnTurnEnded(IActor _, PhaseType phaseType)
+        {
+            if (Executor is { CanDoAnyAction: true })
+            {
+                Debug.LogWarning("Вы как-то завершили ход, хотя у текущего executora остались очки действия");
+            }
+
+            stateMachine.SetState(idleState);
+        }
+
+        private void OnTurnStarted(IActor _, PhaseType phaseType)
         {
             ToPhase(currentPhase);
+            if (!ActiveSelf)
+            {
+                return;
+            }
+            ToPhase(phaseType);
         }
 
         private void ToPhase(PhaseType phaseType)
@@ -437,6 +454,7 @@ namespace LineWars.Controllers
             if (!ActiveSelf)
                 return;
             ActiveSelf = false;
+            Player.FinishTurn();
         }
 
 

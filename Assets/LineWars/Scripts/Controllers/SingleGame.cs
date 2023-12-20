@@ -78,7 +78,7 @@ namespace LineWars
 
         private void RegisterAllPlayers()
         {
-            foreach (var (key, value) in AllPlayers)
+            foreach (var (key, value) in AllPlayers.Reverse())
             {
                 PhaseManager.Instance.RegisterActor(value);
                 Debug.Log($"{value.name} registered");
@@ -200,7 +200,7 @@ namespace LineWars
             {
                 {AIType.EnemyAI, typeof(EnemyAI)},
                 {AIType.TestActor, typeof(TestActor)},
-                {AIType.ProgrammedAI, typeof(ProgrammedAI)}
+                //{AIType.ProgrammedAI, typeof(ProgrammedAI)}
             };
 
         public static Type ToType(this AIType aiType)
