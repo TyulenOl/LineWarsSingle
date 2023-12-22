@@ -4,7 +4,7 @@ namespace LineWars.Model
 {
     public class DeckInfoToDeckConverter : IConverter<DeckInfo, Deck>
     {
-        private IReadOnlyDictionary<int, DeckCard> idToCard;
+        private readonly IReadOnlyDictionary<int, DeckCard> idToCard;
 
         public DeckInfoToDeckConverter(IReadOnlyDictionary<int, DeckCard> idToCard)
         {

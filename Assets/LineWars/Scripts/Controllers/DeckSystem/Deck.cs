@@ -4,7 +4,7 @@ namespace LineWars.Model
 {
     public class Deck : IDeck<DeckCard>
     {
-        private List<DeckCard> cards = new();
+        private readonly List<DeckCard> cards = new();
         public string Name { get; set; }
         public IReadOnlyList<DeckCard> Cards => cards;
 

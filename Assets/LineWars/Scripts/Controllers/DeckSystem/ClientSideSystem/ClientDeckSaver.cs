@@ -3,20 +3,12 @@ using System.IO;
 
 namespace LineWars.Model
 {
-    public class ClientDeckSaver : ISaver<Deck>
+    public class ClientDeckSaver : SaverConvertDecorator<Deck, DeckInfo>
     {
-        private IConverter<Deck, DeckInfo> deckConverter;
-        public ClientDeckSaver(IConverter<Deck, DeckInfo> deckConverter)
+        public ClientDeckSaver(
+            ISaver<DeckInfo> innerSaver,
+            IConverter<Deck, DeckInfo> converter) : base(innerSaver, converter)
         {
-            this.deckConverter = deckConverter;
-        }
-
-        public void Save(Deck value, int id)
-        {
-            var newDeckInfo = deckConverter.Convert(value);
-            var deckJson = JsonUtility.ToJson(newDeckInfo);
-            var path = ClientDeckInfoSystemUtilities.GetDeckInfoFilePath(id);
-            File.WriteAllText(path, deckJson);
         }
     }
 }
