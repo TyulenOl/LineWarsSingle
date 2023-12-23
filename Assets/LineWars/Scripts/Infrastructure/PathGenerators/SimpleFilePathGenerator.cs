@@ -10,9 +10,9 @@ namespace LineWars.Model
     {
         private readonly string fileExtension;
 
-        public SimpleFilePathGenerator(string fileExtensionWithoutDot)
+        public SimpleFilePathGenerator(string fileExtension)
         {
-            fileExtension = fileExtensionWithoutDot;
+            this.fileExtension = fileExtension.Replace(".", "");
         }
         
         public string GeneratePath(int id)

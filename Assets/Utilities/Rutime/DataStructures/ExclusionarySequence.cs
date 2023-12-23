@@ -4,19 +4,24 @@ using System.Linq;
 
 namespace DataStructures
 {
-    public class RegeneratingSequence: IEnumerable<int>
+    /// <summary>
+    /// Вечный генератор чисел
+    /// Пример: start = 1, excludedNums = {2,4,5,10}
+    /// Результат: 1,3,6,7,8,9,11,12,13,14...
+    /// </summary>
+    public class ExclusionarySequence: IEnumerable<int>
     {
         private readonly int start;
         private readonly IEnumerator<int> occupiedPositionsEnumerator;
 
         private int next;
-        private int nextOccupied;
+        private int nextExcluded;
 
-        public RegeneratingSequence(int start, IEnumerable<int> occupiedPositions)
+        public ExclusionarySequence(int start, IEnumerable<int> excludedNums)
         {
             this.start = start;
             next = start;
-            occupiedPositionsEnumerator = occupiedPositions
+            occupiedPositionsEnumerator = excludedNums
                 .Distinct()
                 .OrderBy(e => e)
                 .GetEnumerator();
@@ -26,7 +31,7 @@ namespace DataStructures
 
         private void FindNextOccupiedPosition()
         {
-            nextOccupied = occupiedPositionsEnumerator.MoveNext()
+            nextExcluded = occupiedPositionsEnumerator.MoveNext()
                 ? occupiedPositionsEnumerator.Current
                 : start - 1;
         }
@@ -35,7 +40,7 @@ namespace DataStructures
         {
             while (true)
             {
-                if (next != nextOccupied)
+                if (next != nextExcluded)
                 {
                     return next;
                 }

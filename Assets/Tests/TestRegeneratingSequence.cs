@@ -9,14 +9,14 @@ namespace Tests
         [Test]
         public void Test1()
         {
-            var sequence = new RegeneratingSequence(0, new[] {1, 2, 4, 10});
+            var sequence = new ExclusionarySequence(0, new[] {1, 2, 4, 10});
             CollectionAssert.AreEqual(new[] {0, 3, 5, 6}, sequence.Take(4));
         }
 
         [Test]
         public void Test2()
         {
-            var sequence = new RegeneratingSequence(0, new[] {1, 2, 4, 10});
+            var sequence = new ExclusionarySequence(0, new[] {1, 2, 4, 10});
             Assert.AreEqual(0, sequence.Peek());
             Assert.AreEqual(0, sequence.Peek());
             Assert.AreEqual(0, sequence.Pop());
@@ -28,7 +28,7 @@ namespace Tests
         [Test]
         public void Test3()
         {
-            var sequence = new RegeneratingSequence(0, new[] {1, 2, 2, 2, 2, 2, 4, 10});
+            var sequence = new ExclusionarySequence(0, new[] {1, 2, 2, 2, 2, 2, 4, 10});
             CollectionAssert.AreEqual(new[] {0, 3, 5, 6}, sequence.Take(4));
         }
     }

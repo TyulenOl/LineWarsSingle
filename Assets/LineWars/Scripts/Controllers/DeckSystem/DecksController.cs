@@ -8,7 +8,7 @@ using UnityEngine;
 namespace LineWars.Model
 {
     /// <summary>
-    /// Класс ответственный за созранение целостности данных 
+    /// Класс ответственный за сохранение целостности данных о деках
     /// </summary>
     public class DecksController: MonoBehaviour
     {
@@ -16,15 +16,15 @@ namespace LineWars.Model
 
         private IProvider<Deck> provider;
         private List<Deck> allDecks;
-        private RegeneratingSequence sequence;
+        private ExclusionarySequence sequence;
         
         public void Initialize([NotNull] IProvider<Deck> provider)
         {
             this.provider = provider ?? throw new ArgumentNullException(nameof(provider));
             allDecks = provider.LoadAll().ToList();
-            sequence = new RegeneratingSequence(0, allDecks.Select(x => x.Id));
+            sequence = new ExclusionarySequence(0, allDecks.Select(x => x.Id));
         }
-
+        
         public IDeckBuilder<Deck, DeckCard> StartBuildNewDeck()
         {
             var builder = deckBuilderFactory.CreateNew();
@@ -32,11 +32,12 @@ namespace LineWars.Model
             return builder;
         }
 
-        public Deck FinishBuild(IDeckBuilder<Deck, DeckCard> deckBuilder)
+        public Deck FinishBuildDeck(IDeckBuilder<Deck, DeckCard> deckBuilder)
         {
             var deck = deckBuilder.Build();
             provider.Save(deck, deck.Id);
             sequence.Pop();
+            allDecks.Add(deck);
             return deck;
         }
     }

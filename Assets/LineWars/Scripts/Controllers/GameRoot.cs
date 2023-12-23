@@ -11,8 +11,9 @@ namespace LineWars.Controllers
         [SerializeField] private DeckProvider deckProvider;
         [SerializeField] private DecksController decksController;
         
-        public DecksController DecksController => decksController;
         public ScriptableDeckCardsStorage CardsDatabase => cardsDatabase;
+        public DeckProvider DeckProvider => deckProvider;
+        public DecksController DecksController => decksController;
         
 
         protected override void OnAwake()
