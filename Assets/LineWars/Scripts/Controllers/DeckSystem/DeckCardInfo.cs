@@ -8,6 +8,6 @@ namespace LineWars.Model
 {
     public class DeckCardInfo
     {
-        public int CardId { get; set; }
+        public int CardId;
     }
 }

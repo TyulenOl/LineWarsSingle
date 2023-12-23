@@ -1,8 +1,8 @@
 ﻿namespace LineWars.Model
 {
-    public class SampleJsonFileLoader<T>: FileDownloader<T>
+    public class JsonFileLoader<T>: FileDownloader<T>
     {
-        public SampleJsonFileLoader() : base(
+        public JsonFileLoader() : base(
             new SimpleFilePathGenerator<T>("json"),
             new FromJsonConverter<T>())
         {

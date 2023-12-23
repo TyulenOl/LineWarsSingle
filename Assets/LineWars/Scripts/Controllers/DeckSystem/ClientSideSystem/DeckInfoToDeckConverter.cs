@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace LineWars.Model
 {
@@ -13,15 +14,11 @@ namespace LineWars.Model
 
         public Deck Convert(DeckInfo value)
         {
-            var deck = new Deck();
-            deck.Name = value.Name;
-            foreach (var card in value.Cards)
-            {
-                var newCard = idToCard[card.CardId];
-                deck.AddCard(newCard);
-            }
-
-            return deck;
+            return new Deck(
+                value.Id,
+                value.Name,
+                value.Cards.Select(e => idToCard[e.CardId])
+            );
         }
     }
 }

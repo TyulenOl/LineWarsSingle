@@ -2,14 +2,14 @@
 
 namespace DataStructures
 {
-    public class DontDestroyOnLoadSingleton<T>: MonoBehaviour
+    public abstract class DontDestroyOnLoadSingleton<T>: MonoBehaviour
         where T: DontDestroyOnLoadSingleton<T>
     {
         private static T instance;
 
         public static T Instance => instance;
 
-        protected virtual void Awake()
+        void Awake()
         {
             if (GetType() != typeof(T))
             {
@@ -21,11 +21,14 @@ namespace DataStructures
             {
                 instance = (T) this;
                 DontDestroyOnLoad(gameObject);
+                OnAwake();
             }
             else
             {
                 Destroy(gameObject);
             }
         }
+
+        protected abstract void OnAwake();
     }
 }

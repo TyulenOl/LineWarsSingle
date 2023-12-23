@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace LineWars.Model
 {
@@ -16,17 +17,20 @@ namespace LineWars.Model
         
         public string GeneratePath(int id)
         {
-            return $"{GetDirectoryPath()}/{nameof(T)}_{id}.{fileExtension}";
+            return $"{GetDirectoryPath()}/{typeof(T).Name}_{id}.{fileExtension}";
         }
 
         public IEnumerable<string> GeneratePaths()
         {
-            return Directory.EnumerateFiles(GetDirectoryPath(), $"*.{fileExtension}");
+            var dir = GetDirectoryPath();
+            if (Directory.Exists(dir))
+                return Directory.EnumerateFiles(dir, $"*.{fileExtension}");
+            return Enumerable.Empty<string>();
         }
 
         private string GetDirectoryPath()
         {
-            return $"{PathsHelper.RootPathForSaves}/{nameof(T)}";
+            return $"{PathsHelper.RootPathForSaves}/{typeof(T).Name}";
         }
     }
 }

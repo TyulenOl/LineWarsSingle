@@ -16,7 +16,10 @@ namespace LineWars.Model
         public void Save(T value, int id)
         {
             var path = pathGenerator.GeneratePath(id);
+            var dir = Path.GetDirectoryName(path);
             var str = converter.Convert(value);
+            if (dir != null)
+                Directory.CreateDirectory(dir);
             File.WriteAllText(path, str);
         }
     }

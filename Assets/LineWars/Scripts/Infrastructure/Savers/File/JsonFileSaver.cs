@@ -1,8 +1,8 @@
 ﻿namespace LineWars.Model
 {
-    public class SampleJsonFileSaver<TValue>: FileSaver<TValue>
+    public class JsonFileSaver<TValue>: FileSaver<TValue>
     {
-        public SampleJsonFileSaver() : base(
+        public JsonFileSaver() : base(
             new SimpleFilePathGenerator<TValue>("json"),
             new ToJsonConverter<TValue>())
         {

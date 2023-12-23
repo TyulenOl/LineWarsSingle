@@ -2,6 +2,7 @@
 
 namespace LineWars.Model
 {
+    [CreateAssetMenu(menuName = "DeckBuilding/DeckCard", order = 53)]
     public class DeckCard :
         ScriptableObject,
         IDeckCard
@@ -9,11 +10,9 @@ namespace LineWars.Model
         [SerializeField] private string cardName;
         [SerializeField] private string description;
         [SerializeField] private Unit unit;
-        [SerializeField] private int cost;
 
         public string Name => cardName;
         public string Description => description;
         public Unit Unit => unit;
-        public int Cost => cost;
     }
 }

@@ -11,6 +11,14 @@ namespace LineWars.Model
         private readonly IAllDownloader<TOut> innerLoader;
         private readonly IConverter<TOut, TIn> converter;
 
+        public AllDownloaderConvertDecorator(
+            IAllDownloader<TOut> innerLoader,
+            IConverter<TOut, TIn> converter)
+        {
+            this.innerLoader = innerLoader;
+            this.converter = converter;
+        }
+
         public IEnumerable<TIn> LoadAll()
         {
             return innerLoader.LoadAll()

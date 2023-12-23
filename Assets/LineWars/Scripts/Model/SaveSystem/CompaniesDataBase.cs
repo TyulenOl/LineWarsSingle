@@ -89,8 +89,7 @@ namespace LineWars
                 }
             }
         }
-
-        public static bool IsExists => Instance != null;
+        
         public static void SaveAllStates()
         {
             foreach (var state in CurrenCompanyStates)
