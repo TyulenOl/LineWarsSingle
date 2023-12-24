@@ -12,7 +12,6 @@ namespace LineWars
             private readonly PhaseType type;
             public PhaseType Type => type;
             protected readonly PhaseManager manager;
-            public virtual bool AreActorsDone => manager.Actors.All((actor) => !actor.CanExecuteTurn(Type));
 
             public Phase(PhaseType phase, PhaseManager phaseManager)
             {

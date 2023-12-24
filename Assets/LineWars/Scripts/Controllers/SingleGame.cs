@@ -28,7 +28,7 @@ namespace LineWars
         [SerializeField] private GameEvaluator gameEvaluator;
 
         [SerializeField] private AIBuyLogicData aiBuyLogicData;
-        [SerializeField, Min(1)] private int aiDepth;
+        [SerializeField] private DepthDetailsData depthDetailsData;
 
         public readonly IndexList<BasePlayer> AllPlayers = new();
         public readonly IndexList<Unit> AllUnits = new();
@@ -78,7 +78,7 @@ namespace LineWars
 
         private void RegisterAllPlayers()
         {
-            foreach (var (key, value) in AllPlayers)
+            foreach (var (key, value) in AllPlayers.Reverse())
             {
                 PhaseManager.Instance.RegisterActor(value);
                 Debug.Log($"{value.name} registered");
@@ -156,26 +156,28 @@ namespace LineWars
                 enemyAI.SetNewGameEvaluator(gameEvaluator);
             if (aiBuyLogicData != null)
                 enemyAI.SetNewBuyLogic(aiBuyLogicData);
-            if (aiDepth > 0)
-                enemyAI.Depth = aiDepth;
+            if (depthDetailsData != null)
+                enemyAI.SetNewDepthDetailData(depthDetailsData);
         }
 
 
         public void WinGame()
         {
             Debug.Log("<color=yellow>Вы Победили</color>");
-            if (!GameVariables.IsNormalStart) return;
+            if (!GameVariables.IsNormalStart)
+                return;
             WinLoseUI.isWin = true;
+            GameRoot.Instance.CompaniesController.WinChoseMission();
             SceneTransition.LoadScene(SceneName.WinOrLoseScene);
-            CompaniesDataBase.ChooseMission.isCompleted = true;
-            CompaniesDataBase.SaveChooseMission();
         }
 
         public void LoseGame()
         {
             Debug.Log("<color=red>Потрачено</color>");
-            if (!GameVariables.IsNormalStart) return;
+            if (!GameVariables.IsNormalStart)
+                return;
             WinLoseUI.isWin = false;
+            GameRoot.Instance.CompaniesController.DefeatChoseMission();
             SceneTransition.LoadScene(SceneName.WinOrLoseScene);
         }
 
@@ -200,7 +202,7 @@ namespace LineWars
             {
                 {AIType.EnemyAI, typeof(EnemyAI)},
                 {AIType.TestActor, typeof(TestActor)},
-                {AIType.ProgrammedAI, typeof(ProgrammedAI)}
+                //{AIType.ProgrammedAI, typeof(ProgrammedAI)}
             };
 
         public static Type ToType(this AIType aiType)

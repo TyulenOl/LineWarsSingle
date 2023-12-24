@@ -43,7 +43,7 @@ namespace LineWars.Model
             currentSpeed = Random.Range(minSpeed, maxSpeed);
             currentRotationInDegrees = Random.Range(minRotationInDegrees, maxRotationInDegrees);
 
-            IsPlaying = true;
+            StartAnimation();
         }
 
         private void Update()
@@ -84,7 +84,7 @@ namespace LineWars.Model
             {
                 mainSprite.transform.rotation = initialRotation;
                 mainSprite.transform.localScale = initialLocalScale;
-                IsPlaying = false;
+                EndAnimation();
             }
         }
     }

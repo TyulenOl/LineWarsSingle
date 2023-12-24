@@ -56,8 +56,6 @@ public static class DrawHelper
         {
             case PhaseType.Artillery:
                 return "Артподготовка";
-            case PhaseType.Idle:
-                return "Рутина";
             case PhaseType.Buy:
                 return "Подкрепление";
             case PhaseType.Fight:

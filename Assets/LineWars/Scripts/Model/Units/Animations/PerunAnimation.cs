@@ -39,7 +39,7 @@ namespace LineWars.Model
                 mainSprite = rightSprite;
 
             targetNode = context.TargetNode;
-            IsPlaying = true;
+            StartAnimation();
             shakeMagnitude = initialShakeMagnitude;
             startPosition = mainSprite.transform.position;
             StartCoroutine(ShakesCoroutine());
@@ -74,7 +74,7 @@ namespace LineWars.Model
             {
                 yield return new WaitForSeconds(lightningTimeInSeconds);
                 Destroy(lightningInstance);
-                IsPlaying = false;
+                EndAnimation();
             }
         }
     }

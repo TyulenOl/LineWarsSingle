@@ -1,8 +1,7 @@
-using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using LineWars.Model;
+using UnityEngine;
 
 namespace LineWars
 {
@@ -10,90 +9,56 @@ namespace LineWars
     {
         public class PhaseAlternatingState : Phase
         {
-            //private IActor CurrentActor => manager.Actors[manager.currentActorId];
-
-            public override bool AreActorsDone
-            {
-                get
-                {
-                    var actorsAreFree = true;
-                    foreach (var actor in manager.actors)
-                    {
-                        if (actor.CurrentPhase == Type)
-                        {
-                            actorsAreFree = false;
-                            break;
-                        }
-                    }
-
-                    return base.AreActorsDone && actorsAreFree;
-                }
-            }
-
             public PhaseAlternatingState(PhaseType phase, PhaseManager manager) : base(phase, manager)
-            {
-                
+            { 
             }
 
             public override void OnEnter()
             {
                 base.OnEnter();
-                if(AreActorsDone) return;
-                manager.ActorTurnChanged += OnActorsTurnChanged;
-                Begin();
+                CycleNewActor();
             }
 
-            public override void OnExit()
+            private void CycleNewActor()
             {
-                base.OnExit();
-                manager.ActorTurnChanged -= OnActorsTurnChanged;
-            }
-            
-            private void Begin()
-            {
-                if(AreActorsDone) return;
-                
-                PickNewActor();
+                var nextActorId = FindNextActor(manager.Actors, manager.currentActorId);
+                if (nextActorId == -1)
+                {
+                    manager.ToNextPhase();
+                    return;
+                }
+                manager.currentActorId = nextActorId;
+                manager.CurrentActor.TurnEnded += OnTurnLogicEnd;
                 manager.CurrentActor.ExecuteTurn(Type);
             }
-            
-            private bool PickNewActor()
-            {
-                if(AreActorsDone) return false;
 
-                var potentialActorId = manager.currentActorId;
-                while(true)
-                {
-                    potentialActorId = (potentialActorId + 1) % manager.Actors.Count;
-                    if(manager.Actors[potentialActorId].CanExecuteTurn(Type))
-                    {
-                        manager.currentActorId = potentialActorId;
-                        return true;
-                    }
+            private void OnTurnLogicEnd(IActor _, PhaseType phaseType)
+            {
+                if (phaseType != Type)
+                    Debug.LogWarning($"IActor Ended Wrong Phase! was: {phaseType}; should be: {Type}");
+                manager.CurrentActor.TurnEnded -= OnTurnLogicEnd;
+                manager.StartCoroutine(CycleCoroutine());
+                
+                IEnumerator CycleCoroutine()
+                { 
+                    yield return null;
+                    CycleNewActor();
                 }
             }
 
-            private void OnActorsTurnChanged(IActor actor, PhaseType previousPhase, PhaseType currentPhase)
+            private int FindNextActor(IReadOnlyList<IActor> actors, int currentActorId)
             {
-                if(previousPhase != Type)
+                var potentialActorId = currentActorId;
+                var startActorId = currentActorId;
+                while (true)
                 {
-                    if(previousPhase != PhaseType.Idle)
-                    {
-                        Debug.LogError($"{actor} ended turn {previousPhase}; Phase {Type} is parsing it instead!");
-                    }
-                    return;
+                    potentialActorId = (potentialActorId + 1) % actors.Count;    
+                    if (actors[potentialActorId].CanExecuteTurn(Type))
+                        return potentialActorId;
+                    if (startActorId == potentialActorId)
+                        return -1;
                 }
-
-                if (actor != manager.CurrentActor)
-                {
-                    Debug.LogError($"{manager.CurrentActor} is making a turn; {actor} is ended the turn instead!");
-                    return;
-                }
-
-                if (PickNewActor())
-                    manager.CurrentActor.ExecuteTurn(Type);
             }
         }
     }
 }
-

@@ -2,11 +2,10 @@ using System;
 using System.Collections;
 using System.Linq;
 using System.Collections.Generic;
-using LineWars.Controllers;
 using LineWars.Interface;
 using LineWars.Model;
 using UnityEngine;
-using UnityEngine.Events;
+using LineWars.Controllers;
 
 namespace LineWars
 {
@@ -16,19 +15,11 @@ namespace LineWars
         [SerializeField] private float pauseAfterTurn;
 
         private IReadOnlyCollection<UnitType> potentialExecutors;
-        private bool isTurnMade;
-        private readonly HashSet<Node> additionalVisibleNodes = new ();
-
-        private StateMachine stateMachine;
-        private PlayerPhase idlePhase;
-        private PlayerPhase artilleryPhase;
-        private PlayerPhase fightPhase;
-        private PlayerPhase scoutPhase;
-        private PlayerBuyPhase buyPhase;
-        private PlayerReplenishPhase replenishPhase;
+        private readonly HashSet<Node> additionalVisibleNodes = new();
 
         public event Action VisibilityRecalculated;
-        
+
+        public PhaseType? CurrentPhase { get; protected set; } 
         public IReadOnlyCollection<UnitType> PotentialExecutors => potentialExecutors;
         public IReadOnlyDictionary<Node, bool> VisibilityMap { get; private set; }
         public IEnumerable<Node> AdditionalVisibleNodes => additionalVisibleNodes;
@@ -41,9 +32,6 @@ namespace LineWars
                 Debug.LogError("More than two players on the scene!");
             else
                 LocalPlayer = this;
-
-            
-            InitializeStateMachine();
         }
         
         protected override void OnEnable()
@@ -60,17 +48,6 @@ namespace LineWars
             OwnedRemoved -= OnOwnerRemoved;
         }
 
-        private void InitializeStateMachine()
-        {
-            stateMachine = new StateMachine();
-            idlePhase = new PlayerPhase(this, PhaseType.Idle);
-            buyPhase = new PlayerBuyPhase(this, PhaseType.Buy);
-            artilleryPhase = new PlayerPhase(this, PhaseType.Artillery);
-            fightPhase = new PlayerPhase(this, PhaseType.Fight);
-            scoutPhase = new PlayerPhase(this, PhaseType.Scout);
-            replenishPhase = new PlayerReplenishPhase(this, PhaseType.Replenish);
-        }
-
         private void OnOwnedAdded(Owned owned)
         {
             if(!(owned is Unit unit)) return;
@@ -83,6 +60,17 @@ namespace LineWars
             if (!unit.IsDied)
                 unit.Died.RemoveListener(UnitOnDied);
         }
+
+        private void UnitOnDied(Unit diedUnit)
+        {
+            RecalculateVisibility();
+            if (CurrentPhase != null 
+                && (object)CommandsManager.Instance.Executor != diedUnit) //Из-за этого случался баг с ShotUnit? ХЗ
+            {
+                FinishTurn();
+            }
+        }
+
         public IEnumerable<Unit> GetAllUnitsByPhase(PhaseType phaseType)
         {
             if (PhaseExecutorsData.PhaseToUnits.TryGetValue(phaseType, out var value))
@@ -96,70 +84,56 @@ namespace LineWars
                 }
             }
         }
-        
-        #region Turns
 
-        protected override void ExecuteBuy()
+        public void FinishTurn() //Сделать InvokeTurnEnded virtual? // наруштся SRP
         {
-            stateMachine.SetState(buyPhase);
-            GameUI.Instance.SetEnemyTurn(false);
+            if(CurrentPhase == null)
+            {
+                Debug.LogError("Cannot finish turn: CurrentPhase == null!");
+                return;
+            }
+            InvokeTurnEnded(CurrentPhase.Value);
+            CurrentPhase = null;
         }
 
-        protected override void ExecuteArtillery()
+        public override void ExecuteTurn(PhaseType phaseType)
         {
-            stateMachine.SetState(artilleryPhase);
-            GameUI.Instance.ReDrawAllAvailability(GetAllUnitsByPhase(PhaseType.Artillery), true);
-            GameUI.Instance.SetEnemyTurn(false);
-        }
-
-        protected override void ExecuteFight()
-        {
-            stateMachine.SetState(fightPhase);
-            GameUI.Instance.ReDrawAllAvailability(GetAllUnitsByPhase(PhaseType.Fight), true);
-            GameUI.Instance.SetEnemyTurn(false);
-        }
-
-        protected override void ExecuteScout()
-        {
-            stateMachine.SetState(scoutPhase);
-            GameUI.Instance.ReDrawAllAvailability(GetAllUnitsByPhase(PhaseType.Scout), true);
-            GameUI.Instance.SetEnemyTurn(false);
-        }
-
-        protected override void ExecuteIdle()
-        {
-            GameUI.Instance.ReDrawAllAvailability(MyUnits, false);
-            GameUI.Instance.SetEnemyTurn(true);
-            stateMachine.SetState(idlePhase);
+            CurrentPhase = phaseType;
+            InvokeTurnStarted(phaseType);
+            switch (phaseType)
+            {
+                case PhaseType.Buy:
+                    GameUI.Instance.SetEnemyTurn(false);
+                    break;
+                case PhaseType.Replenish:
+                    ExecuteReplenish();
+                    break;
+                default:
+                    potentialExecutors = PhaseExecutorsData[phaseType];
+                    GameUI.Instance.SetEnemyTurn(false);
+                    GameUI.Instance.ReDrawAllAvailability(GetAllUnitsByPhase(phaseType), true);
+                    break;
+            }
         }
 
         protected override void ExecuteReplenish()
         {
             base.ExecuteReplenish();
-            stateMachine.SetState(replenishPhase);
             if (additionalVisibleNodes.Count > 0)
             {
                 additionalVisibleNodes.Clear();
                 RecalculateVisibility();
             }
+            FinishTurn();
         }
 
-        #endregion
-
-        #region Check Turns
-
-        protected override bool CanExecuteBuy() => true;
-
-        protected override bool CanExecuteArtillery() => CanExecutePhase(PhaseType.Artillery);
-
-        protected override bool CanExecuteFight() => CanExecutePhase(PhaseType.Fight);
-
-        protected override bool CanExecuteScout() => CanExecutePhase(PhaseType.Scout);
-
-        protected override bool CanExecuteReplenish() => true;
-
-        private bool CanExecutePhase(PhaseType phaseType)
+        public override bool CanExecuteTurn(PhaseType phaseType)
         {
+            if(!base.CanExecuteTurn(phaseType)) //плохо? сделать явное сравнение на PhaseExceptions?
+                return false;
+            if (phaseType == PhaseType.Buy || phaseType == PhaseType.Replenish)
+                return true;
+
             var phaseExecutors = PhaseExecutorsData.PhaseToUnits[phaseType];
 
             foreach (var owned in OwnedObjects)
@@ -171,9 +145,6 @@ namespace LineWars
 
             return false;
         }
-
-        #endregion
-
         
         public void AddAdditionalVisibleNode(Node node)
         {
@@ -185,21 +156,8 @@ namespace LineWars
                 return;
             additionalVisibleNodes.Add(node);
         }
+
         public bool RemoveVisibleNode(Node node) => additionalVisibleNodes.Remove(node);
-        
-        private void UnitOnDied(Unit diedUnit)
-        {
-            StartCoroutine(UnitOnDiedCoroutine());
-            IEnumerator UnitOnDiedCoroutine()
-            {
-                yield return null;
-                RecalculateVisibility();
-                if(CurrentPhase != PhaseType.Idle)
-                {
-                    ExecuteTurn(PhaseType.Idle);
-                }
-            }
-        }
 
         protected override void OnBuyPreset(Node node, IEnumerable<Unit> units)
         {

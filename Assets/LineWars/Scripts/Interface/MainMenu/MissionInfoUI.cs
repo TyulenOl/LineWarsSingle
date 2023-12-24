@@ -15,11 +15,6 @@ namespace LineWars
 
         private SceneName sceneToLoad;
 
-        private void Awake()
-        {
-            CheckValid();
-        }
-
         private void OnEnable()
         {
             startButton.onClick.AddListener(OnStartButtonClick);
@@ -34,28 +29,10 @@ namespace LineWars
         {
             SceneTransition.LoadScene(sceneToLoad);
         }
-
-        private void CheckValid()
-        {
-            if (missionName == null)
-                Debug.LogError($"{nameof(missionName)} is null on {name}");
-
-            if (missionDescription == null)
-                Debug.LogError($"{nameof(missionDescription)} is null on {name}");
-
-            if (missionImage == null)
-                Debug.LogError($"{nameof(missionImage)} is null on {name}");
-
-            //if (missionStatus == null)
-            //Debug.LogError($"{nameof(missionStatus)} is null on {name}");
-
-            if (startButton == null)
-                Debug.LogError($"{nameof(startButton)} is null on {name}");
-        }
-
-        public void Initialize(MissionState state)
-        {
-            var data = state.missionData;
+        
+        public void Redraw(MissionData data)
+        { 
+            gameObject.SetActive(true);
             missionName.text = data.MissionName;
             missionDescription.text = data.MissionDescription;
             missionImage.sprite = data.MissionImage;

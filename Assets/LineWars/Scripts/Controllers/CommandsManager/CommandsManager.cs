@@ -141,13 +141,15 @@ namespace LineWars.Controllers
 
         private void Start()
         {
-            Player.TurnChanged += OnTurnChanged;
+            Player.TurnEnded += OnTurnEnded;
+            Player.TurnStarted += OnTurnStarted;
         }
 
         private void OnDestroy()
         {
             stateMachine.SetState(idleState);
-            Player.TurnChanged -= OnTurnChanged;
+            Player.TurnEnded -= OnTurnStarted;
+            Player.TurnStarted -= OnTurnStarted;
         }
 
         public bool CanExecuteAnyCommand()
@@ -157,6 +159,12 @@ namespace LineWars.Controllers
 
         public void ExecuteSimpleCommand(IActionCommand command)
         {
+            if (!ActiveSelf)
+            {
+                ActiveSelfLog(nameof(ExecuteSimpleCommand));
+                return;
+            }
+            
             if (HaveConstrains
                 && (!Constrains.CanExecuteSimpleAction()
                     || !Constrains.IsMyCommandType(command.Action.CommandType)))
@@ -201,6 +209,12 @@ namespace LineWars.Controllers
 
         public void SetUnitPreset(UnitBuyPreset preset)
         {
+            if (!ActiveSelf)
+            {
+                ActiveSelfLog(nameof(SetUnitPreset));
+                return;
+            }
+            
             if (HaveConstrains && !Constrains.CanSelectUnitBuyPreset(preset))
             {
                 ConstrainsLog(nameof(SetUnitPreset));
@@ -216,30 +230,43 @@ namespace LineWars.Controllers
             buyState.SetUnitPreset(preset);
         }
 
-        public void SelectCommandsPreset(CommandPreset preset)
+        public bool SelectCommandsPreset(CommandPreset preset)
         {
+            if (!ActiveSelf)
+            {
+                ActiveSelfLog(nameof(SelectCommandsPreset));
+                return false;
+            }
+            
             if (stateMachine.CurrentState != waitingSelectCommandState)
             {
                 InvalidStateLog(nameof(SelectCommandsPreset));
-                return;
+                return false;
             }
 
             if (!currentOnWaitingCommandMessage.Data.Contains(preset))
             {
                 Debug.LogError($"You cant select this command preset because this command preset in not owned!", gameObject);
-                return;
+                return false;
             }
             
             if (!preset.IsActive)
             {
                 Debug.LogError("You cant select this command preset because this command preset is not active!", gameObject);
-                return;
+                return false;
             }
             ProcessCommandPreset(preset);
+            return true;
         }
 
         public void CancelCommandPreset()
         {
+            if (!ActiveSelf)
+            {
+                ActiveSelfLog(nameof(CancelCommandPreset));
+                return;
+            }
+            
             if (stateMachine.CurrentState != waitingSelectCommandState)
             {
                 InvalidStateLog(nameof(CancelCommandPreset));
@@ -249,30 +276,38 @@ namespace LineWars.Controllers
             stateMachine.SetState(findTargetState);
         }
 
-        public void SelectCurrentCommand(CommandType commandType)
+        public bool SelectCurrentCommand(CommandType commandType)
         {
+            if (!ActiveSelf)
+            {
+                ActiveSelfLog(nameof(SelectCurrentCommand));
+                return false;
+            }
+            
             if (HaveConstrains && !Constrains.CanSelectCurrentCommand())
             {
-                ConstrainsLog(nameof(SelectCommandsPreset));
-                return;
+                ConstrainsLog(nameof(SelectCurrentCommand));
+                return false;
             }
 
             if (stateMachine.CurrentState != findTargetState)
             {
                 InvalidStateLog(nameof(SelectCurrentCommand));
-                return;
+                return false;
             }
 
             if (CheckContainsActions(commandType))
             {
                 Debug.LogError($"You cant {nameof(SelectCurrentCommand)} because {nameof(Executor)} will not be able to perform this");
-                return;
+                return false;
             }
             if (Executor.Actions.First(x => x.CommandType == commandType) is not ITargetedAction)
                 throw new NotImplementedException();
             currentCommandState.Prepare(commandType);
             stateMachine.SetState(currentCommandState);
 
+            return true;
+            
             bool CheckContainsActions(CommandType commandType)
             {
                 return !Executor.Actions
@@ -283,6 +318,12 @@ namespace LineWars.Controllers
 
         public void CancelCurrentCommand()
         {
+            if (!ActiveSelf)
+            {
+                ActiveSelfLog(nameof(CancelCurrentCommand));
+                return;
+            }
+            
             if (stateMachine.CurrentState != currentCommandState)
             {
                 InvalidStateLog(nameof(CancelCurrentCommand));
@@ -291,29 +332,25 @@ namespace LineWars.Controllers
             stateMachine.SetState(findTargetState);
         }
 
-        private void OnTurnChanged(PhaseType previousPhase, PhaseType currentPhase)
+        private void OnTurnEnded(IActor _, PhaseType phaseType)
         {
-            if (!ActiveSelf)
+            if (Executor is {CanDoAnyAction: true})
             {
-                return;
+                Debug.LogWarning("You somehow ended a turn even though the current executor still has action points", gameObject);
             }
-            ToPhase(currentPhase);
+            
+            stateMachine.SetState(idleState);
+        }
+
+        private void OnTurnStarted(IActor _, PhaseType phaseType)
+        {
+            ToPhase(phaseType);
         }
 
         private void ToPhase(PhaseType phaseType)
         {
             switch (phaseType)
             {
-                case PhaseType.Idle:
-                {
-                    if (Executor is {CanDoAnyAction: true})
-                    {
-                        Debug.LogWarning("You somehow ended a turn even though the current executor still has action points");
-                    }
-
-                    stateMachine.SetState(idleState);
-                    break;
-                }
                 case PhaseType.Buy when Player.CanExecuteTurn(phaseType):
                 {
                     stateMachine.SetState(buyState);
@@ -395,7 +432,6 @@ namespace LineWars.Controllers
             if (ActiveSelf)
                 return;
             ActiveSelf = true;
-            ToPhase(PhaseManager.CurrentPhase);
         }
         
         public void Deactivate()
@@ -403,7 +439,6 @@ namespace LineWars.Controllers
             if (!ActiveSelf)
                 return;
             ActiveSelf = false;
-            ToPhase(PhaseType.Idle);
         }
 
 
@@ -415,6 +450,11 @@ namespace LineWars.Controllers
         private void InvalidStateLog(string methodName)
         {
             Debug.LogError($"This is invalid state {state} for action {methodName}", gameObject);
+        }
+
+        private void ActiveSelfLog(string methodName)
+        {
+            Debug.LogError($"Cant execute {methodName} because {nameof(CommandsManager)} is no active!", gameObject);
         }
     }
 }

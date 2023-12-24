@@ -36,7 +36,7 @@ namespace LineWars.Model
                 isPlayed = false;
                 animation.startPosition = animation.ownerUnit.transform.position;
                 movementProgress = 0f;
-                animation.IsPlaying = true;
+                animation.StartAnimation();
             }
 
             public override void OnLogic()
@@ -65,7 +65,7 @@ namespace LineWars.Model
                 {
                     Debug.LogWarning($"slash effect is null on {animation}");
                     animation.Attacked.Invoke(animation);
-                    animation.IsPlaying = false;
+                    animation.EndAnimation();
                     yield break;
                 }
                 var helper = animation.currentTarget.GetComponent<UnitAnimationHelper>();

@@ -11,7 +11,7 @@ namespace LineWars.Education
 
         public override bool CanSelectNode(Node node)
         {
-            return node.Equals(buyNode);
+            return buyNode.Equals(node);
         }
 
         public override bool CanSelectUnitBuyPreset(UnitBuyPreset preset)

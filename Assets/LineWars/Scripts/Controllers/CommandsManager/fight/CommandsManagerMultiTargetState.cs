@@ -44,6 +44,9 @@ namespace LineWars.Controllers
 
             private void OnSelectedObjectChanged(GameObject before, GameObject after)
             {
+                if (!Manager.ActiveSelf)
+                    return;
+                
                 var allTargets = Selector.SelectedObjects
                     .GetComponentMany<IMonoTarget>()
                     .ToArray();

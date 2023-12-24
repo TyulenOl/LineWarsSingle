@@ -34,8 +34,10 @@ namespace LineWars
 
         private void OnButtonClick()
         {
-            CommandsManager.Instance.SelectCommandsPreset(hash);
-            preset.gameObject.SetActive(false);
+            if (CommandsManager.Instance.SelectCommandsPreset(hash))
+            {
+                preset.gameObject.SetActive(false);
+            }
         }
     }
 }

@@ -6,7 +6,7 @@ using UnityEngine;
 using Random = System.Random;
 
 
-[CustomEditor(typeof(AdvancedUnitCostFunctionEditor))]
+[CustomEditor(typeof(AdvancedUnitCostFunction))]
 public class AdvancedUnitCostFunctionEditor : Editor
 {
     public static Random random = new();
@@ -30,6 +30,7 @@ public class AdvancedUnitCostFunctionEditor : Editor
             {
                 function.Calculate(value, random.Next(0, 100), random.Next(0, 100));
             }
+            Debug.Log("Check success!");
         }
         catch (Exception e)
         {

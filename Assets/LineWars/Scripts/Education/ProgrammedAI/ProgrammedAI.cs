@@ -1,4 +1,4 @@
-﻿using AYellowpaper.SerializedCollections;
+﻿/*using AYellowpaper.SerializedCollections;
 using UnityEngine;
 
 namespace LineWars.Model
@@ -81,4 +81,4 @@ namespace LineWars.Model
             FinishTurn();
         }
     }
-}
+}*/

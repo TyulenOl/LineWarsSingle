@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -7,58 +8,25 @@ namespace LineWars
 {
     public class ChooseCompanyMenu : UIStackElement
     {
-        public static ChooseCompanyMenu Instance { get; private set; }
+        [SerializeField] private List<CompanyElementUI> companyElementUis;
+        private bool initialized;
 
-        [FormerlySerializedAs("companyElementPrefab")] [SerializeField]
-        private CompanyElementUI companyElementUIPrefab;
-
-        [SerializeField] private Transform contentTransform;
-
-        private List<CompanyElementUI> companyElements;
-
-
-        protected override void Awake()
+        private void Start()
         {
-            base.Awake();
-            if (Instance == null)
-                Instance = this;
-            else
+            Initialize();
+        }
+
+        public void Initialize()
+        {
+            if (initialized)
             {
-                Debug.LogError($"Dublicated {nameof(ChooseCompanyMenu)}");
-                Destroy(gameObject);
+                Debug.LogError($"{GetType().Name} is initialized!");
+                return;
             }
-        }
-
-        public void Start()
-        {
-            companyElements = new List<CompanyElementUI>();
-            Redraw();
-        }
-
-        public void Redraw()
-        {
-            var companies = CompaniesDataBase.CurrenCompanyStates;
-
-            foreach (var element in companyElements)
-                Destroy(element.gameObject);
-            companyElements.Clear();
-
-            foreach (var companyState in companies)
-            {
-                var companyElement = Instantiate(companyElementUIPrefab, contentTransform);
-                companyElement.Initialize(companyState, OnCompanyButtonClick);
-                companyElements.Add(companyElement);
-            }
-
-            Instantiate(companyElementUIPrefab, contentTransform);
-            Instantiate(companyElementUIPrefab, contentTransform);
-        }
-
-        private void OnCompanyButtonClick(CompanyState companyState)
-        {
-            UIStack.Instance.PushElement(ChooseMissionMenu.Instance);
-            ChooseMissionMenu.Instance.Initialize(companyState);
-            CompaniesDataBase.ChooseCompany = companyState;
+            initialized = true;
+            
+            foreach (var companyElementUi in companyElementUis)
+                companyElementUi.Initialize();
         }
     }
 }
