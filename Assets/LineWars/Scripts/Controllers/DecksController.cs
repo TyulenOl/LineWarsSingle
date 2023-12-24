@@ -10,21 +10,21 @@ namespace LineWars.Model
     /// <summary>
     /// Класс ответственный за сохранение целостности данных о деках
     /// </summary>
-    public class DecksController: MonoBehaviour
+    public class DecksController : MonoBehaviour, IDisposable
     {
         [SerializeField] private DeckBuilderFactory deckBuilderFactory;
 
         private IProvider<Deck> provider;
-        private List<Deck> allDecks;
+        private Dictionary<int, Deck> allDecks;
         private ExclusionarySequence sequence;
-        
+
         public void Initialize([NotNull] IProvider<Deck> provider)
         {
             this.provider = provider ?? throw new ArgumentNullException(nameof(provider));
-            allDecks = provider.LoadAll().ToList();
-            sequence = new ExclusionarySequence(0, allDecks.Select(x => x.Id));
+            allDecks = provider.LoadAll().ToDictionary(deck => deck.Id, deck => deck);
+            sequence = new ExclusionarySequence(0, allDecks.Select(x => x.Key));
         }
-        
+
         public IDeckBuilder<Deck, DeckCard> StartBuildNewDeck()
         {
             var builder = deckBuilderFactory.CreateNew();
@@ -37,8 +37,12 @@ namespace LineWars.Model
             var deck = deckBuilder.Build();
             provider.Save(deck, deck.Id);
             sequence.Pop();
-            allDecks.Add(deck);
+            allDecks.Add(deck.Id, deck);
             return deck;
+        }
+
+        public void Dispose()
+        {
         }
     }
 }

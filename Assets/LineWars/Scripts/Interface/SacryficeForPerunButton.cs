@@ -1,13 +1,8 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using LineWars.Controllers;
-using LineWars.LineWars.Scripts.Interface;
 using LineWars.Model;
-using UnityEngine;
-using UnityEngine.UI;
 
-namespace LineWars
+
+namespace LineWars.Interface
 {
     public class SacryficeForPerunButton : ActionButtonLogic
     {

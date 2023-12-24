@@ -8,7 +8,7 @@ public class TransformCarousel : MonoBehaviour
 {
     private void Awake()
     {
-        var children = transform.GetChildren().ToArray();
+        var children = transform.EnumerateChildren().ToArray();
         if (!CheckChildren(children))
             return;
         children.GameObjects().SetActiveAll(false);
@@ -27,7 +27,7 @@ public class TransformCarousel : MonoBehaviour
 
     private void Move(Func<int, int> moveFunc)
     {
-        var children = transform.GetChildren().ToArray();
+        var children = transform.EnumerateChildren().ToArray();
         if (!CheckChildren(children))
             return;
 

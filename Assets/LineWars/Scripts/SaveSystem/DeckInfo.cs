@@ -8,6 +8,6 @@ namespace LineWars.Model
     {
         public int Id;
         public string Name;
-        public List<DeckCardInfo> Cards = new();
+        public DeckCardInfo[] Cards;
     }
 }

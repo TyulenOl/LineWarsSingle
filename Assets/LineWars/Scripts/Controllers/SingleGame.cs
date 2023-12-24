@@ -167,8 +167,8 @@ namespace LineWars
             if (!GameVariables.IsNormalStart) return;
             WinLoseUI.isWin = true;
             SceneTransition.LoadScene(SceneName.WinOrLoseScene);
-            CompaniesDataBase.ChooseMission.isCompleted = true;
-            CompaniesDataBase.SaveChooseMission();
+            // CompaniesDataBase.ChooseMission.isCompleted = true;
+            // CompaniesDataBase.SaveChooseMission();
         }
 
         public void LoseGame()

@@ -5,55 +5,74 @@ using UnityEngine;
 
 namespace LineWars.Controllers
 {
-    public class GameRoot: DontDestroyOnLoadSingleton<GameRoot>
+    public class GameRoot : DontDestroyOnLoadSingleton<GameRoot>
     {
         [SerializeField] private ScriptableDeckCardsStorage cardsDatabase;
         [SerializeField] private DecksController decksController;
-        
-        [Header("Providers")]
-        [SerializeField] private DeckProvider deckProvider;
-        [SerializeField] private UserInfoProvider userInfoProvider;
-        [SerializeField] private SettingsProvider settingsProvider;
-        
+        [SerializeField] private CompaniesController companiesController;
+
+        [Header("ProviderSettings")] 
+        [SerializeField] private ProviderType providerType;
+
+        private IProvider<Deck> deckProvider;
+        private IProvider<UserInfo> userInfoProvider;
+        private IProvider<Settings> settingsProvider;
+        private IProvider<MissionInfo> missionInfoProvider;
+
+
         public ScriptableDeckCardsStorage CardsDatabase => cardsDatabase;
-        public DeckProvider DeckProvider => deckProvider;
         public DecksController DecksController => decksController;
-        
+        public CompaniesController CompaniesController => companiesController;
 
         protected override void OnAwake()
         {
             ValidateFields();
-            
+
             InitializeProviders();
-            
+
             DecksController.Initialize(deckProvider);
+            CompaniesController.Initialize(missionInfoProvider);
         }
 
         private void InitializeProviders()
         {
-            switch (deckProvider)
+            switch (providerType)
             {
-                case JsonFileDeckProvider jsonFileDeckProvider:
-                    jsonFileDeckProvider.Initialize(cardsDatabase.IdToCard, cardsDatabase.CardToId);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-            
-            switch (userInfoProvider)
-            {
-                case JsonFileUserInfoProvider jsonProvider:
-                    jsonProvider.Initialize();
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+                case ProviderType.FileJson:
+                {
+                    deckProvider = new Provider<Deck>(
+                        new SaverConvertDecorator<Deck, DeckInfo>(
+                            new JsonFileSaver<DeckInfo>(),
+                            new DeckToInfoConverter(cardsDatabase.CardToId)
+                        ),
+                        new DownloaderConvertDecorator<Deck, DeckInfo>(
+                            new JsonFileLoader<DeckInfo>(),
+                            new DeckInfoToDeckConverter(cardsDatabase.IdToCard)
+                        ),
+                        new AllDownloaderConvertDecorator<Deck, DeckInfo>(
+                            new JsonFileAllDownloader<DeckInfo>(),
+                            new DeckInfoToDeckConverter(cardsDatabase.IdToCard))
+                    );
 
-            switch (settingsProvider)
-            {
-                case JsonFileSettingsProvider jsonProvider:
-                    jsonProvider.Initialize();
+                    userInfoProvider = new Provider<UserInfo>(
+                        new JsonFileSaver<UserInfo>(),
+                        new JsonFileLoader<UserInfo>(),
+                        new JsonFileAllDownloader<UserInfo>()
+                    );
+
+                    settingsProvider = new Provider<Settings>(
+                        new JsonFileSaver<Settings>(),
+                        new JsonFileLoader<Settings>(),
+                        new JsonFileAllDownloader<Settings>()
+                    );
+
+                    missionInfoProvider = new Provider<MissionInfo>(
+                        new JsonFileSaver<MissionInfo>(),
+                        new JsonFileLoader<MissionInfo>(),
+                        new JsonFileAllDownloader<MissionInfo>()
+                    );
                     break;
+                }
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -63,14 +82,13 @@ namespace LineWars.Controllers
         {
             if (cardsDatabase == null)
                 Debug.LogError($"{nameof(cardsDatabase)} is null on {name}!", gameObject);
-            if (deckProvider == null)
-                Debug.LogError($"{nameof(deckProvider)} is null on {name}!", gameObject);
-            if (userInfoProvider == null)
-                Debug.LogError($"{nameof(userInfoProvider)} is null on {name}!", gameObject);
-            if (settingsProvider == null)
-                Debug.LogError($"{nameof(settingsProvider)} is null on {name}!", gameObject);
             if (decksController == null)
                 Debug.LogError($"{nameof(decksController)} is null on {name}!", gameObject);
         }
+    }
+
+    public enum ProviderType
+    {
+        FileJson
     }
 }

@@ -25,7 +25,7 @@ namespace LineWars.Model
                     {
                         CardId = cardToId[e]
                     })
-                    .ToList()
+                    .ToArray()
             };;
         }
     }

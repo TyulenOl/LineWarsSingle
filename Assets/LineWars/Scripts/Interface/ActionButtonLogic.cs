@@ -3,7 +3,7 @@ using LineWars.Controllers;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace LineWars.LineWars.Scripts.Interface
+namespace LineWars.Interface
 {
     public abstract class ActionButtonLogic : MonoBehaviour
     {
