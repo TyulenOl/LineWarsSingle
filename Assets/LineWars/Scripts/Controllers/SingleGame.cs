@@ -164,18 +164,20 @@ namespace LineWars
         public void WinGame()
         {
             Debug.Log("<color=yellow>Вы Победили</color>");
-            if (!GameVariables.IsNormalStart) return;
+            if (!GameVariables.IsNormalStart)
+                return;
             WinLoseUI.isWin = true;
+            GameRoot.Instance.CompaniesController.WinChoseMission();
             SceneTransition.LoadScene(SceneName.WinOrLoseScene);
-            // CompaniesDataBase.ChooseMission.isCompleted = true;
-            // CompaniesDataBase.SaveChooseMission();
         }
 
         public void LoseGame()
         {
             Debug.Log("<color=red>Потрачено</color>");
-            if (!GameVariables.IsNormalStart) return;
+            if (!GameVariables.IsNormalStart)
+                return;
             WinLoseUI.isWin = false;
+            GameRoot.Instance.CompaniesController.DefeatChoseMission();
             SceneTransition.LoadScene(SceneName.WinOrLoseScene);
         }
 

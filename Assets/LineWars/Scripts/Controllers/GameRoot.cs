@@ -7,7 +7,11 @@ namespace LineWars.Controllers
 {
     public class GameRoot : DontDestroyOnLoadSingleton<GameRoot>
     {
-        [SerializeField] private ScriptableDeckCardsStorage cardsDatabase;
+        [Header("Storages")]
+        [SerializeField] private DeckCardsScriptableStorage cardsDatabase;
+        [SerializeField] private MissionsScriptableStorage missionsStorage;
+        
+        [Header("Controllers")]
         [SerializeField] private DecksController decksController;
         [SerializeField] private CompaniesController companiesController;
 
@@ -15,23 +19,27 @@ namespace LineWars.Controllers
         [SerializeField] private ProviderType providerType;
 
         private IProvider<Deck> deckProvider;
+        private IProvider<MissionInfo> missionInfoProvider;
         private IProvider<UserInfo> userInfoProvider;
         private IProvider<Settings> settingsProvider;
-        private IProvider<MissionInfo> missionInfoProvider;
 
 
-        public ScriptableDeckCardsStorage CardsDatabase => cardsDatabase;
+        public DeckCardsScriptableStorage CardsDatabase => cardsDatabase;
+        public MissionsScriptableStorage MissionsStorage => missionsStorage;
+
         public DecksController DecksController => decksController;
         public CompaniesController CompaniesController => companiesController;
 
         protected override void OnAwake()
         {
+            GameVariables.Initialize();
+            
             ValidateFields();
 
             InitializeProviders();
 
             DecksController.Initialize(deckProvider);
-            CompaniesController.Initialize(missionInfoProvider);
+            CompaniesController.Initialize(missionInfoProvider, missionsStorage);
         }
 
         private void InitializeProviders()
@@ -43,15 +51,15 @@ namespace LineWars.Controllers
                     deckProvider = new Provider<Deck>(
                         new SaverConvertDecorator<Deck, DeckInfo>(
                             new JsonFileSaver<DeckInfo>(),
-                            new DeckToInfoConverter(cardsDatabase.CardToId)
+                            new DeckToInfoConverter(cardsDatabase.ValueToId)
                         ),
                         new DownloaderConvertDecorator<Deck, DeckInfo>(
                             new JsonFileLoader<DeckInfo>(),
-                            new DeckInfoToDeckConverter(cardsDatabase.IdToCard)
+                            new DeckInfoToDeckConverter(cardsDatabase.IdToValue)
                         ),
                         new AllDownloaderConvertDecorator<Deck, DeckInfo>(
                             new JsonFileAllDownloader<DeckInfo>(),
-                            new DeckInfoToDeckConverter(cardsDatabase.IdToCard))
+                            new DeckInfoToDeckConverter(cardsDatabase.IdToValue))
                     );
 
                     userInfoProvider = new Provider<UserInfo>(

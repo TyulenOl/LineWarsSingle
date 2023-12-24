@@ -1,4 +1,5 @@
 ﻿using System;
+using LineWars.Controllers;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -8,43 +9,62 @@ namespace LineWars
 {
     public class MissionUI : MonoBehaviour
     {
+        [SerializeField] private bool automaticRedraw = true;
+        [SerializeField] private MissionData missionData;
+        
+        [Header("References")]
         [SerializeField] private TMP_Text missionName;
         [SerializeField] private Image completedImage;
         [SerializeField] private Image uncompletedImage;
         [SerializeField] private Button button;
+        
+        
+        private MissionInfoUI missionInfoUI;
+        private bool initialized;
+        private int id;
+        
+        public MissionInfo MissionInfo { get; private set; }
 
-        private MissionState currentState;
-        private Action<MissionState> clicked;
-
-        private void Awake()
+        public void Initialize(MissionInfoUI infoUI)
         {
-            CheckValid();
+            if (initialized)
+            {
+                Debug.LogError($"{nameof(MissionUI)} is initialized!");
+                return;
+            }
+            initialized = true;
+            
+            if (missionData == null)
+                Debug.LogError($"{nameof(missionData)} is null on {name}", gameObject);
+            id = GameRoot.Instance.MissionsStorage.ValueToId[missionData];
+            
+            missionInfoUI = infoUI;
+            
+            button.onClick.AddListener(OnClick);
+            
+            MissionInfo = GameRoot.Instance.CompaniesController.GetMissionInfo(id);
+            
+            completedImage.gameObject.SetActive(MissionInfo.MissionStatus == MissionStatus.Complete);
+            uncompletedImage.gameObject.SetActive(MissionInfo.MissionStatus != MissionStatus.Complete);
         }
 
-        private void Start()
+        private void OnClick()
         {
-            button.onClick.AddListener(OnClickButton);
+            GameRoot.Instance.CompaniesController.ChoseMissionId = id;
+            missionInfoUI.Redraw(missionData);
         }
 
-        private void OnClickButton()
+        private void RedrawMissionData(MissionData data)
         {
-            clicked?.Invoke(currentState);
+            missionName.text = data.MissionName;
         }
 
-        private void CheckValid()
+        private void OnValidate()
         {
-            if (missionName == null)
-                Debug.LogError($"{nameof(missionName)} is null on {name}");
-        }
-
-        public void Initialize(MissionState state, Action<MissionState> clicked)
-        {
-            var data = state.missionData;
-            missionName.text = $"{data.MissionName}";
-            this.clicked = clicked;
-            this.currentState = state;
-            completedImage.gameObject.SetActive(state.isCompleted);
-            uncompletedImage.gameObject.SetActive(!state.isCompleted);
+            if (automaticRedraw && missionData != null)
+            {
+                RedrawMissionData(missionData);
+            }
         }
     }
 }

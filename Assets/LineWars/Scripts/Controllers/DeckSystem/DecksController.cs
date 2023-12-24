@@ -10,7 +10,7 @@ namespace LineWars.Model
     /// <summary>
     /// Класс ответственный за сохранение целостности данных о деках
     /// </summary>
-    public class DecksController : MonoBehaviour, IDisposable
+    public class DecksController : MonoBehaviour
     {
         [SerializeField] private DeckBuilderFactory deckBuilderFactory;
 
@@ -39,10 +39,6 @@ namespace LineWars.Model
             sequence.Pop();
             allDecks.Add(deck.Id, deck);
             return deck;
-        }
-
-        public void Dispose()
-        {
         }
     }
 }
