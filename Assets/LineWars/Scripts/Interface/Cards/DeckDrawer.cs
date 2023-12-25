@@ -11,16 +11,15 @@ namespace LineWars
     {
         [SerializeField] private CardSlot[] slots;
 
-        private SimpleDeckBuilder simpleDeckBuilder;
-
+      
         private void Awake()
         {
-            simpleDeckBuilder = GameRoot.Instance.DecksController.StartEditDeck(GameRoot.Instance.DecksController.DefaultDeck) as SimpleDeckBuilder;
+
         }
 
         public bool SlotCondition(DeckCard deckCard, CardSlot cardSlot)
         {
-            return simpleDeckBuilder.CanAddCard(deckCard);
+            return false;
         }
     }
 }
