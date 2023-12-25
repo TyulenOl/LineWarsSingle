@@ -8,7 +8,7 @@ namespace LineWars.Controllers
 {
     public class UserController: MonoBehaviour
     {
-        [SerializeField] private DefaultUserInfo defaultUserInfo;
+        [SerializeField] private UserInfoPreset userInfoPreset;
         
         private IProvider<UserInfo> userInfoProvider;
         private IStorage<DeckCard> deckCardStorage;
@@ -26,7 +26,7 @@ namespace LineWars.Controllers
             
             openedCardsSet = currentInfo.unlockCards
                 .Select(x => deckCardStorage.IdToValue[x])
-                .Concat(defaultUserInfo.DefaultCards.Where(storage.ValueToId.ContainsKey))
+                .Concat(userInfoPreset.DefaultCards.Where(storage.ValueToId.ContainsKey))
                 .ToHashSet();
         }
 
@@ -34,8 +34,8 @@ namespace LineWars.Controllers
         {
             return new UserInfo()
             {
-                amountInGameCurrency = defaultUserInfo.DefaultMoney,
-                unlockCards = defaultUserInfo.DefaultCards
+                amountInGameCurrency = userInfoPreset.DefaultMoney,
+                unlockCards = userInfoPreset.DefaultCards
                     .Where(deckCardStorage.ValueToId.ContainsKey)
                     .Select(x => deckCardStorage.ValueToId[x])
                     .ToList()

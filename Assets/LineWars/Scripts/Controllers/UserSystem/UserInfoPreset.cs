@@ -6,7 +6,7 @@ using UnityEngine;
 namespace LineWars.Controllers
 {
     [CreateAssetMenu(menuName = "DeckBuilding/DefaultUserInfo", order = 53)]
-    public class DefaultUserInfo: ScriptableObject
+    public class UserInfoPreset: ScriptableObject
     {
         [SerializeField] private int defaultMoney;
         [SerializeField] private List<DeckCard> defaultCards;

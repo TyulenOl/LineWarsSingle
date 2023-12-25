@@ -4,7 +4,7 @@ using UnityEngine;
 namespace LineWars.Model
 {
     [CreateAssetMenu(menuName = "DeckBuilding/DefaultDeck", order = 53)]
-    public class DefaultDeck : ScriptableObject
+    public class DeckPreset : ScriptableObject
     {
         [SerializeField] private string deckName;
         [SerializeField] private List<DeckCard> cards;

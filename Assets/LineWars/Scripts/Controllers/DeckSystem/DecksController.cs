@@ -12,49 +12,30 @@ namespace LineWars.Model
     /// </summary>
     public class DecksController : MonoBehaviour
     {
-        [SerializeField] private DeckBuilderFactory deckBuilderFactory;
-        [SerializeField] private DefaultDeck defaultDeck;
+        [SerializeField] private DeckPreset defaultDeckPreset;
         
         private IProvider<Deck> deckProvider;
         private Dictionary<int, Deck> allDecks;
-        private ExclusionarySequence sequence;
-        
-        public Deck DefaultDeck => Decks.First(); 
-        private IReadOnlyDictionary<int, Deck> IdToDeck => allDecks;
-        private IEnumerable<Deck> Decks => allDecks.Values;
-        private IEnumerable<int> DeckIds => IdToDeck.Keys;
+
+
+        public DeckPreset DefaultPreset => defaultDeckPreset;
+        public IReadOnlyDictionary<int, Deck> IdToDeck => allDecks;
+        public IEnumerable<Deck> Decks => allDecks.Values;
+        public IEnumerable<int> DeckIds => IdToDeck.Keys;
 
         public void Initialize([NotNull] IProvider<Deck> provider)
         {
             deckProvider = provider ?? throw new ArgumentNullException(nameof(provider));
             allDecks = provider.LoadAll().ToDictionary(deck => deck.Id, deck => deck);
-            sequence = new ExclusionarySequence(0, allDecks.Select(x => x.Key));
-            if (allDecks.Count == 0)
-            {
-                allDecks.Add(0, new Deck(0, defaultDeck.Name, defaultDeck.Cards));
-                sequence.Pop();
-            }
-        }
-        
-        public IDeckBuilder<Deck, DeckCard> StartBuildNewDeck()
-        {
-            var builder = deckBuilderFactory.CreateNew();
-            builder.SetId(sequence.Peek());
-            return builder;
         }
 
-        public IDeckBuilder<Deck, DeckCard> StartEditDeck(Deck deck)
+        /// <summary>
+        /// Сохранение деки и внос ее в базу данных
+        /// </summary>
+        public void ProcessDeck(Deck deck)
         {
-            return deckBuilderFactory.CreateFromOtherDeck(deck);
-        }
-
-        public Deck FinishBuildDeck(IDeckBuilder<Deck, DeckCard> deckBuilder)
-        {
-            var deck = deckBuilder.Build();
+            allDecks[deck.Id] = deck;
             deckProvider.Save(deck, deck.Id);
-            sequence.Pop();
-            allDecks.Add(deck.Id, deck);
-            return deck;
         }
     }
 }
