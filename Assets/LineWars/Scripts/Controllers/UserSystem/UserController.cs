@@ -8,36 +8,55 @@ namespace LineWars.Controllers
 {
     public class UserController: MonoBehaviour
     {
-        [SerializeField] private DefaultOpenedCards defaultOpenedCards;
+        [SerializeField] private DefaultUserInfo defaultUserInfo;
         
         private IProvider<UserInfo> userInfoProvider;
         private IStorage<DeckCard> deckCardStorage;
 
         private UserInfo currentInfo;
         private HashSet<DeckCard> openedCardsSet;
-        
         public IEnumerable<DeckCard> OpenedCards => openedCardsSet;
         
         public void Initialize(IProvider<UserInfo> provider, IStorage<DeckCard> storage)
         {
             userInfoProvider = provider;
             deckCardStorage = storage;
-            
-            
+
+            currentInfo = provider.Load(0) ?? CreateDefaultUserInfo();
             
             openedCardsSet = currentInfo.unlockCards
                 .Select(x => deckCardStorage.IdToValue[x])
-                .Concat(defaultOpenedCards.DefaultCards.Where(storage.ValueToId.ContainsKey))
+                .Concat(defaultUserInfo.DefaultCards.Where(storage.ValueToId.ContainsKey))
                 .ToHashSet();
         }
 
+        private UserInfo CreateDefaultUserInfo()
+        {
+            return new UserInfo()
+            {
+                amountInGameCurrency = defaultUserInfo.DefaultMoney,
+                unlockCards = defaultUserInfo.DefaultCards
+                    .Where(deckCardStorage.ValueToId.ContainsKey)
+                    .Select(x => deckCardStorage.ValueToId[x])
+                    .ToList()
+            };
+        }
 
+        public bool CardIsOpen(DeckCard card) => openedCardsSet.Contains(card);
         public void OpenCard(DeckCard deckCard)
         {
             if (openedCardsSet.Contains(deckCard))
                 return;
             openedCardsSet.Add(deckCard);
             currentInfo.unlockCards.Add(deckCardStorage.ValueToId[deckCard]);
+        }
+        
+        public void CloseCard(DeckCard deckCard)
+        {
+            if (!openedCardsSet.Contains(deckCard))
+                return;
+            openedCardsSet.Remove(deckCard);
+            currentInfo.unlockCards.Remove(deckCardStorage.ValueToId[deckCard]);
         }
         
 
