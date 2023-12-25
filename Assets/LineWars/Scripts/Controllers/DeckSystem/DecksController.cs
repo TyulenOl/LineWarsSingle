@@ -25,11 +25,17 @@ namespace LineWars.Model
             sequence = new ExclusionarySequence(0, allDecks.Select(x => x.Key));
         }
 
+        // чтобы узнать какое количество 
         public IDeckBuilder<Deck, DeckCard> StartBuildNewDeck()
         {
             var builder = deckBuilderFactory.CreateNew();
             builder.SetId(sequence.Peek());
             return builder;
+        }
+
+        public IDeckBuilder<Deck, DeckCard> StartEditDeck(Deck deck)
+        {
+            return deckBuilderFactory.CreateFromOtherDeck(deck);
         }
 
         public Deck FinishBuildDeck(IDeckBuilder<Deck, DeckCard> deckBuilder)

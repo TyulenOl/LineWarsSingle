@@ -14,7 +14,8 @@ namespace LineWars.Controllers
         [Header("Controllers")]
         [SerializeField] private DecksController decksController;
         [SerializeField] private CompaniesController companiesController;
-
+        [SerializeField] private UserController userController;
+ 
         [Header("ProviderSettings")] 
         [SerializeField] private ProviderType providerType;
 
@@ -24,11 +25,12 @@ namespace LineWars.Controllers
         private IProvider<Settings> settingsProvider;
 
 
-        public DeckCardsScriptableStorage CardsDatabase => cardsDatabase;
-        public MissionsScriptableStorage MissionsStorage => missionsStorage;
+        public IStorage<DeckCard> CardsDatabase => cardsDatabase;
+        public IStorage<MissionData> MissionsStorage => missionsStorage;
 
         public DecksController DecksController => decksController;
         public CompaniesController CompaniesController => companiesController;
+        public UserController UserController => userController;
 
         protected override void OnAwake()
         {
@@ -40,6 +42,7 @@ namespace LineWars.Controllers
 
             DecksController.Initialize(deckProvider);
             CompaniesController.Initialize(missionInfoProvider, missionsStorage);
+            UserController.Initialize(userInfoProvider, cardsDatabase);
         }
 
         private void InitializeProviders()
