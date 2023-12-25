@@ -13,19 +13,28 @@ namespace LineWars.Model
     public class DecksController : MonoBehaviour
     {
         [SerializeField] private DeckBuilderFactory deckBuilderFactory;
-
-        private IProvider<Deck> provider;
+        [SerializeField] private DefaultDeck defaultDeck;
+        
+        private IProvider<Deck> deckProvider;
         private Dictionary<int, Deck> allDecks;
         private ExclusionarySequence sequence;
 
+        private IReadOnlyDictionary<int, Deck> IdToDeck => allDecks;
+        private IEnumerable<Deck> Decks => allDecks.Values;
+        private IEnumerable<int> DeckIds => IdToDeck.Keys;
+
         public void Initialize([NotNull] IProvider<Deck> provider)
         {
-            this.provider = provider ?? throw new ArgumentNullException(nameof(provider));
+            deckProvider = provider ?? throw new ArgumentNullException(nameof(provider));
             allDecks = provider.LoadAll().ToDictionary(deck => deck.Id, deck => deck);
             sequence = new ExclusionarySequence(0, allDecks.Select(x => x.Key));
+            if (allDecks.Count == 0)
+            {
+                allDecks.Add(0, new Deck(0, defaultDeck.Name, defaultDeck.Cards));
+                sequence.Pop();
+            }
         }
-
-        // чтобы узнать какое количество 
+        
         public IDeckBuilder<Deck, DeckCard> StartBuildNewDeck()
         {
             var builder = deckBuilderFactory.CreateNew();
@@ -41,7 +50,7 @@ namespace LineWars.Model
         public Deck FinishBuildDeck(IDeckBuilder<Deck, DeckCard> deckBuilder)
         {
             var deck = deckBuilder.Build();
-            provider.Save(deck, deck.Id);
+            deckProvider.Save(deck, deck.Id);
             sequence.Pop();
             allDecks.Add(deck.Id, deck);
             return deck;

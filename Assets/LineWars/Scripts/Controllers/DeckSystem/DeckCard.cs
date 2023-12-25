@@ -3,17 +3,17 @@
 namespace LineWars.Model
 {
     [CreateAssetMenu(menuName = "DeckBuilding/DeckCard", order = 53)]
-    public class DeckCard :
-        ScriptableObject,
+    public class DeckCard : ScriptableObject,
         IDeckCard
     {
-        [SerializeField] private string cardName;
-        [SerializeField] private string description;
+        [SerializeField] private Optional<string> cardName;
+        [SerializeField] private Optional<string> description;
+        [SerializeField] private Optional<Sprite> cardImage;
         [SerializeField] private Unit unit;
 
-        public string Name => cardName;
-        public string Description => description;
-        public Sprite Image { get; }
+        public string Name => cardName.Enabled ? cardName.Value : Unit.UnitName;
+        public string Description => description.Enabled ? description.Value : Unit.UnitDescription;
+        public Sprite Image => cardImage.Enabled ? cardImage.Value : Unit.Sprite;
         public Unit Unit => unit;
     }
 }
