@@ -22,9 +22,8 @@ namespace LineWars.Controllers
         {
             userInfoProvider = provider;
             deckCardStorage = storage;
-            
-            
-            
+            currentInfo = provider.Load(0) ?? new UserInfo(){amountInGameCurrency = 10, unlockCards = storage.Keys.ToList()};
+
             openedCardsSet = currentInfo.unlockCards
                 .Select(x => deckCardStorage.IdToValue[x])
                 .Concat(defaultOpenedCards.DefaultCards.Where(storage.ValueToId.ContainsKey))
