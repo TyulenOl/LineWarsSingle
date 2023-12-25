@@ -18,7 +18,8 @@ namespace LineWars.Model
         private IProvider<Deck> deckProvider;
         private Dictionary<int, Deck> allDecks;
         private ExclusionarySequence sequence;
-
+        
+        public Deck DefaultDeck => Decks.First(); 
         private IReadOnlyDictionary<int, Deck> IdToDeck => allDecks;
         private IEnumerable<Deck> Decks => allDecks.Values;
         private IEnumerable<int> DeckIds => IdToDeck.Keys;
