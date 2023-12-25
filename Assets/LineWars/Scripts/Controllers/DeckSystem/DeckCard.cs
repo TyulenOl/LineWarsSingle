@@ -13,6 +13,7 @@ namespace LineWars.Model
 
         public string Name => cardName;
         public string Description => description;
+        public Sprite Image { get; }
         public Unit Unit => unit;
     }
 }

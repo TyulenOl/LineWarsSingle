@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace LineWars.Model
 {
@@ -19,6 +20,9 @@ namespace LineWars.Model
         private string deckName = "";
         private readonly List<DeckCard> cards = new();
 
+        public int MaxLageUnits => maxLageUnits;
+        public int MaxLittleUnits => maxLittleUnits;
+
         public int DeckId => deckId;
         public string DeckName => deckName;
 
@@ -27,7 +31,7 @@ namespace LineWars.Model
             this.maxLageUnits = maxLageUnits;
             this.maxLittleUnits = maxLittleUnits;
         }
-
+        
         public void SetId(int id)
         {
             deckId = id;
