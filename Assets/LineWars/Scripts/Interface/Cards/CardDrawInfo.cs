@@ -22,15 +22,32 @@ namespace LineWars
         [SerializeField] private TMP_Text apText;
 
         [SerializeField] private Image cardImage;
-
+        [SerializeField] private Image ifInactivePanel;
         [SerializeField] private CardDragablePart cardDragablePartPrefab;
+
+        protected bool isActive;
         
         [field: SerializeField] public Button InfoButton { get; private set; }
 
         public DeckCard DeckCard { get; private set; }
 
+
+        public void ReStoreDefaults()
+        {
+            cardImage.sprite = null;
+            unitName.text = "Нет юнита";
+            DeckCard = null;
+        }
+        
+        
         public void ReDraw(DeckCard deckCard)
         {
+            if(deckCard == null)
+            {
+                ReStoreDefaults();
+                return;
+            }
+            
             unitName.text = deckCard.Name;
             cardImage.sprite = deckCard.Unit.Sprite;
             
@@ -51,7 +68,8 @@ namespace LineWars
 
         public void OnBeginDrag(PointerEventData eventData)
         {
-            Debug.Log(1);
+            if(cardDragablePartPrefab == null || !isActive)
+                return;
             var instance = Instantiate(cardDragablePartPrefab, transform);
             instance.transform.localPosition = Vector3.zero;
             instance.transform.SetParent(MainCanvas.Instance.Canvas.transform);
@@ -60,7 +78,13 @@ namespace LineWars
 
         public void OnDrag(PointerEventData eventData)
         {
-            
+            if(!isActive) return;
+        }
+
+        public void ReDrawAvailability(bool available)
+        {
+            isActive = available;
+            ifInactivePanel.gameObject.SetActive(!available);   
         }
     }
 }
