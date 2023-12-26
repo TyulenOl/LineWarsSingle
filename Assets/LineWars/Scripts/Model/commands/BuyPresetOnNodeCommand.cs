@@ -4,28 +4,28 @@ namespace LineWars.Model
     {
         public BasePlayer Player { get; private set; }
         public Node Node {  get; private set; } 
-        public UnitBuyPreset Preset { get; private set; }
+        public DeckCard DeckCard { get; private set; }
 
-        public BuyPresetOnNodeCommand(BasePlayer basePlayer, Node node, UnitBuyPreset preset)
+        public BuyPresetOnNodeCommand(BasePlayer basePlayer, Node node, DeckCard deckCard)
         {
             Player = basePlayer;
             Node = node;
-            Preset = preset;
+            DeckCard = deckCard;
         }
 
         public bool CanExecute()
         {
-            return Player.CanBuyPreset(Preset, Node);
+            return Player.CanBuyDeckCard(Node, DeckCard);
         }
 
         public void Execute()
         {
-            Player.BuyPreset(Preset, Node);
+            Player.BuyDeckCard(Node, DeckCard);
         }
 
         public string GetLog()
         {
-            return $"Player {Player} buy preset {Preset.Name} in node {Node}";
+            return $"Player {Player} buy preset {DeckCard.Name} in node {Node}";
         }
     }
 }

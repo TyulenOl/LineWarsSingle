@@ -1,3 +1,4 @@
+using System;
 using LineWars.Model;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace LineWars.Controllers
         private class CommandsManagerBuyState : CommandsManagerState
         {
             private Node currentNode;
-            private UnitBuyPreset currentBuyPreset;
+            private DeckCard deckCard;
             public CommandsManagerBuyState(CommandsManager manager) : base(manager)
             {
             }
@@ -22,7 +23,7 @@ namespace LineWars.Controllers
                 Selector.ManySelectedObjectsChanged += OnSelectedObjectsChanged;
                 Manager.SendBuyReDrawMessage(GetNodes());
                 currentNode = null;
-                currentBuyPreset = null;
+                deckCard = null;
             }
 
             private IEnumerable<Node> GetNodes()
@@ -35,7 +36,7 @@ namespace LineWars.Controllers
                 base.OnExit();
                 Selector.ManySelectedObjectsChanged -= OnSelectedObjectsChanged;
                 currentNode = null;
-                currentBuyPreset = null;
+                deckCard = null;
             }
 
             private void OnSelectedObjectsChanged(IEnumerable<GameObject> _, IEnumerable<GameObject> gameObjects)
@@ -43,7 +44,7 @@ namespace LineWars.Controllers
                 if (!Manager.ActiveSelf)
                     return;
                 
-                if(currentBuyPreset == null)
+                if(deckCard == null)
                     return;
                 var node = gameObjects.GetComponentMany<Node>().FirstOrDefault();
                 if (Manager.HaveConstrains && !Manager.Constrains.CanSelectNode(node))
@@ -58,24 +59,25 @@ namespace LineWars.Controllers
                 CheckForCompleteness();
             }
 
-            public void SetUnitPreset(UnitBuyPreset newPreset)
+
+            public void SetDeckCard(DeckCard deckCard)
             {
-                if(newPreset == null)
+                if(deckCard == null)
                 {
-                    currentBuyPreset = null;
+                    this.deckCard = null;
                     return;
                 }
-                currentBuyPreset = newPreset;
+                this.deckCard = deckCard;
                 CheckForCompleteness();
             }
 
             private void CheckForCompleteness()
             {
                 if(currentNode != null
-                    && currentBuyPreset != null
-                    && Manager.Player.CanBuyPreset(currentBuyPreset, currentNode))
+                    && deckCard != null
+                    && Manager.Player.CanBuyDeckCard(currentNode, deckCard))
                 {
-                    var newCommand = new BuyPresetOnNodeCommand(Manager.Player, currentNode, currentBuyPreset);
+                    var newCommand = new BuyPresetOnNodeCommand(Manager.Player, currentNode, deckCard);
                     UnitsController.ExecuteCommand(newCommand);
                     Manager.InvokeAction(() => Manager.CommandIsExecuted?.Invoke(newCommand));
                     currentNode = null;

@@ -89,9 +89,9 @@ namespace LineWars.Education
             return CheckCurrentAction() && currentAction.CanSelectNode(node);
         }
 
-        public override bool CanSelectUnitBuyPreset(UnitBuyPreset preset)
+        public override bool CanSelectDeckCard(DeckCard deckCard)
         {
-            return CheckCurrentAction() && currentAction.CanSelectUnitBuyPreset(preset);
+            return CheckCurrentAction() && currentAction.CanSelectDeckCard(deckCard);
         }
 
         private bool CheckCurrentAction()

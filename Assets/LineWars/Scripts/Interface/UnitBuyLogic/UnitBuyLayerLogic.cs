@@ -12,27 +12,27 @@ public class UnitBuyLayerLogic : MonoBehaviour
 {
     [SerializeField] private RectTransform buyUnitsLayer;
 
-    private UnitBuyPreset currentPreset;
-    public UnitBuyPreset CurrentPreset
+    private DeckCard deckCard;
+    public DeckCard CurrentDeckCard
     {
-        get => currentPreset;
+        get => deckCard;
         set
         {
-            currentPreset = value;
-            CommandsManager.Instance.SetUnitPreset(value);
+            deckCard = value;
+            CommandsManager.Instance.SetDeckCard(value);
         }
     }
     
-    private UnitBuyPresetDrawer chosenUnitPresetDrawer;
+    private CardBuyPresetDrawer chosenCardPresetDrawer;
     
-    public UnitBuyPresetDrawer ChosenUnitPresetDrawer
+    public CardBuyPresetDrawer ChosenCardPresetDrawer
     {
-        get => chosenUnitPresetDrawer;
+        get => chosenCardPresetDrawer;
         set
         {
-            chosenUnitPresetDrawer?.SetChosen(false);
-            chosenUnitPresetDrawer = value;
-            chosenUnitPresetDrawer?.SetChosen(true);
+            chosenCardPresetDrawer?.SetChosen(false);
+            chosenCardPresetDrawer = value;
+            chosenCardPresetDrawer?.SetChosen(true);
         }
     }
 
@@ -44,8 +44,8 @@ public class UnitBuyLayerLogic : MonoBehaviour
     private void OnPhaseStarted(IActor _,PhaseType phaseTypeNew)
     {
         if (phaseTypeNew != PhaseType.Buy) return;
-        CurrentPreset = null;
-        ChosenUnitPresetDrawer = null;
+        CurrentDeckCard = null;
+        ChosenCardPresetDrawer = null;
         buyUnitsLayer.gameObject.SetActive(true);
     }
 }

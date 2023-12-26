@@ -14,9 +14,9 @@ namespace LineWars.Education
             return buyNode.Equals(node);
         }
 
-        public override bool CanSelectUnitBuyPreset(UnitBuyPreset preset)
+        public override bool CanSelectDeckCard(DeckCard deckCard)
         {
-            return preset == null || preset.Name.Equals(presetName);
+            return deckCard == null || deckCard.Name.Equals(presetName);
         }
     }
 }
