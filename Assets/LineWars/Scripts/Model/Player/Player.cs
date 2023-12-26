@@ -159,9 +159,9 @@ namespace LineWars
 
         public bool RemoveVisibleNode(Node node) => additionalVisibleNodes.Remove(node);
 
-        protected override void OnBuyPreset(Node node, IEnumerable<Unit> units)
+        protected override void OnSpawnUnit()
         {
-            base.OnBuyPreset(node, units);
+            base.OnSpawnUnit();
             RecalculateVisibility();
         }
 

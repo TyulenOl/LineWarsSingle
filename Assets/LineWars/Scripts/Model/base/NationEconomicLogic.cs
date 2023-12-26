@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,7 +6,7 @@ using UnityEngine;
 namespace LineWars.Model
 {    
     [CreateAssetMenu(fileName = "new Nation Economic", menuName = "Data/Create Nation Economic", order = 50)]
-    [System.Serializable]
+    [System.Serializable, Obsolete]
     public class NationEconomicLogic : ScriptableObject, IReadOnlyCollection<UnitBuyPreset>
     {
         [SerializeField, NamedArray("name")] private List<UnitBuyPreset> unitBuyPresets;

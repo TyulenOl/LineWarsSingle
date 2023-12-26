@@ -14,7 +14,8 @@ namespace LineWars.Model
     /// </summary>
     public abstract class BasePlayer : MonoBehaviour, IActor, IBasePlayer
     {
-        [field: SerializeField, ReadOnlyInspector] public int Id { get; private set; }
+        [field: SerializeField, ReadOnlyInspector]
+        public int Id { get; private set; }
 
         [SerializeField, ReadOnlyInspector] private int money;
 
@@ -26,8 +27,13 @@ namespace LineWars.Model
         [field: SerializeField] public PhaseExecutorsData PhaseExecutorsData { get; private set; }
         public NationEconomicLogic EconomicLogic => Nation.NationEconomicLogic;
         public List<Node> InitialSpawns { get; private set; }
-        [field: SerializeField, ReadOnlyInspector] public Node Base { get; private set; }
-        [field: SerializeField, ReadOnlyInspector] public PlayerRules Rules { get; private set; }
+
+        [field: SerializeField, ReadOnlyInspector]
+        public Node Base { get; private set; }
+
+        [field: SerializeField, ReadOnlyInspector]
+        public PlayerRules Rules { get; private set; }
+
         public Nation Nation { get; private set; }
 
         public HashSet<PhaseType> PhaseExceptions { get; set; }
@@ -100,12 +106,12 @@ namespace LineWars.Model
             CurrentMoney = Rules.StartMoney;
             Income = Rules.DefaultIncome;
             Nation = spawnInfo.SpawnNode.Nation;
-            
+
             name = $"{GetType().Name}{spawnInfo.PlayerIndex} {spawnInfo.SpawnNode.name}";
 
             InitialSpawns = spawnInfo.SpawnNode.InitialSpawns;
         }
-        
+
         #region SpawnUnit
 
         public bool CanSpawnUnit(Node node, UnitType type)
@@ -116,9 +122,7 @@ namespace LineWars.Model
 
         public bool CanSpawnUnit(Node node, Unit unit)
         {
-            if (unit.Size == UnitSize.Large)
-                return node.AllIsFree;
-            return node.AnyIsFree;
+            return unit.Size == UnitSize.Large ? node.AllIsFree : node.AnyIsFree;
         }
 
         public Unit SpawnUnit(Node node, UnitType unitType)
@@ -130,7 +134,7 @@ namespace LineWars.Model
 
         public Unit SpawnUnit(Node node, Unit unitPrefab)
         {
-            var unitInstance =BasePlayerUtility.CreateUnitForPlayer(this, node, unitPrefab);
+            var unitInstance = BasePlayerUtility.CreateUnitForPlayer(this, node, unitPrefab);
             OnSpawnUnit();
             return unitInstance;
         }
@@ -157,12 +161,13 @@ namespace LineWars.Model
             if (preset.FirstUnitType != UnitType.None && preset.SecondUnitType == UnitType.None)
             {
                 return CanAffordPreset(preset)
-                    && CanSpawnUnit(node, preset.FirstUnitType);
+                       && CanSpawnUnit(node, preset.FirstUnitType);
             }
+
             if (preset.FirstUnitType == UnitType.None && preset.SecondUnitType != UnitType.None)
             {
                 return CanAffordPreset(preset)
-                    && CanSpawnUnit(node, preset.SecondUnitType);
+                       && CanSpawnUnit(node, preset.SecondUnitType);
             }
 
             if (preset.FirstUnitType != UnitType.None && preset.SecondUnitType != UnitType.None)
@@ -170,7 +175,7 @@ namespace LineWars.Model
             Debug.Log("Invalid preset!");
             return false;
         }
-        
+
         private bool CanBuyPresetMultiple(UnitBuyPreset preset, Node node)
         {
             if (GetUnitPrefab(preset.FirstUnitType).Size == UnitSize.Large
@@ -202,10 +207,36 @@ namespace LineWars.Model
             OnBuyPreset(node, unitsList);
         }
 
-        protected virtual void OnBuyPreset(Node node, IEnumerable<Unit> units) { }
-
+        protected virtual void OnBuyPreset(Node node, IEnumerable<Unit> units)
+        {
+        }
+        
         #endregion
 
+        #region BuyDeckCard
+        public bool CanBuyDeckCard(DeckCard deckCard)
+        {
+            return MyNodes.Any(node => CanBuyDeckCard(node, deckCard));
+        }
+
+        public bool CanBuyDeckCard(Node node, DeckCard deckCard)
+        {
+            var cost = GetDeckCardPurchaseInfo(deckCard);
+            return CanAfford(cost) && CanSpawnUnit(node, deckCard.Unit);
+        }
+        
+        public void BuyDeckCard(Node node, DeckCard deckCard)
+        {
+            CurrentMoney -= GetDeckCardPurchaseInfo(deckCard);
+            SpawnUnit(node, deckCard.Unit);
+        }
+        #endregion
+
+        public bool CanAfford(PurchaseInfo purchaseInfo)
+        {
+            return purchaseInfo.CanBuy && CurrentMoney - purchaseInfo.Cost >= 0;
+        }
+        
         public void AddOwned([NotNull] Owned owned)
         {
             if (owned == null) throw new ArgumentNullException(nameof(owned));
@@ -282,7 +313,7 @@ namespace LineWars.Model
         {
             units.Remove(unit);
         }
-        
+
         public Unit GetUnitPrefab(UnitType unitType) => Nation.GetUnitPrefab(unitType);
 
         public virtual bool CanExecuteTurn(PhaseType phaseType)
@@ -307,6 +338,30 @@ namespace LineWars.Model
         protected void InvokeTurnEnded(PhaseType phaseType)
         {
             TurnEnded?.Invoke(this, phaseType);
+        }
+
+        public int GetCountUnitByType(UnitType type)
+        {
+            return MyUnits.Count(x => x.Type == type);
+        }
+
+        [Obsolete]
+        public PurchaseInfo GetPresetPurchaseInfo(UnitBuyPreset preset)
+        {
+            return GetPurchaseInfoForUnit(preset.FirstUnitType, preset.Cost);
+        }
+
+        public PurchaseInfo GetDeckCardPurchaseInfo(DeckCard deckCard)
+        {
+            return GetPurchaseInfoForUnit(deckCard.Unit.Type, deckCard.Cost);
+        }
+
+        public PurchaseInfo GetPurchaseInfoForUnit(UnitType unitType, int cost)
+        {
+            return Rules.CostFunction.Calculate(
+                unitType,
+                cost,
+                GetCountUnitByType(unitType));
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using LineWars.Model;
@@ -5,7 +6,7 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    [System.Serializable]
+    [System.Serializable] [Obsolete]
     public class UnitBuyPreset
     {
         [SerializeField] private string name;

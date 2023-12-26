@@ -30,7 +30,7 @@ namespace LineWars
                 Destroy(drawInfo.transform.parent.gameObject);
             }
             
-            var cards = GameRoot.Instance.CardsDatabase.Values;
+            var cards = GameRoot.Instance.UserController.OpenedCards;
             foreach (var card in cards)
             {
                 var instance = Instantiate(cardDrawInfoPrefab, cardsLayoutGroup.transform);
