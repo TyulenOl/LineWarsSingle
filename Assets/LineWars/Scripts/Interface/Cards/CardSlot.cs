@@ -1,3 +1,4 @@
+using System;
 using LineWars.Model;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -9,25 +10,47 @@ namespace LineWars
         [SerializeField] private CardDrawInfo cardDrawInfo;
         [SerializeField] private RectTransform ifUnavailablePanel;
         [SerializeField] private RectTransform ifAvailablePanel;
-
         [SerializeField] private bool isForBigUnits;
 
         private DeckDrawer deckDrawer;
+        
+        public event Action CardChanged;
+        
+        public DeckCard DeckCard => cardDrawInfo.DeckCard;
+
+        public bool IsForBigUnits => isForBigUnits;
 
         public void Init(DeckDrawer deckDrawer)
         {
             this.deckDrawer = deckDrawer;
         }
+
+
+        public void Clear()
+        {
+            cardDrawInfo.ReDraw(null);
+            CardChanged?.Invoke();
+        }
+        
+
+        public void DrawCard(DeckCard deckCard)
+        {
+            if(deckCard == null)
+                return;
+            if(!CardCondition(deckCard))
+                return;
+            cardDrawInfo.ReDraw(deckCard);
+            ifAvailablePanel.gameObject.SetActive(false);
+            ifUnavailablePanel.gameObject.SetActive(false);
+        }
         
         
         public void OnDrop(PointerEventData eventData)
         {
-            
             var dragableItem = eventData.pointerDrag.GetComponent<CardDragablePart>();
             if(dragableItem == null) return;
-            if(!CardCondition(dragableItem.DeckCard))
-                return;
-            cardDrawInfo.ReDraw(dragableItem.DeckCard);
+            DrawCard(dragableItem.DeckCard);
+            CardChanged?.Invoke();
         }
 
         public void OnPointerEnter(PointerEventData eventData)
@@ -42,7 +65,7 @@ namespace LineWars
 
         private bool CardCondition(DeckCard deckCard)
         {
-            return deckCard.Unit.Size == UnitSize.Large && isForBigUnits || deckCard.Unit.Size == UnitSize.Little && !isForBigUnits;
+            return deckDrawer.SlotCondition(deckCard, isForBigUnits);
         }
         
         private void ShowAvailability(bool isAvailable)

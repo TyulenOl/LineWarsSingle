@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using LineWars.Controllers;
 using LineWars.Model;
 using UnityEngine;
@@ -12,20 +13,21 @@ namespace LineWars
     {
         [SerializeField] private LayoutGroup cardsLayoutGroup;
         [SerializeField] private RectTransform cardDrawInfoPrefab;
-       
         [SerializeField] private CardDrawInfo bigCardInfo;
+        [SerializeField] private DeckDrawer deckDrawer;
         
 
         private void Awake()
         {
             ReDrawAllCards();
+            deckDrawer.DeckChanged += ReDrawAllCards;
         }
 
         private void ReDrawAllCards()
         {
             foreach (var drawInfo in cardsLayoutGroup.GetComponentsInChildren<CardDrawInfo>())
             {
-                Destroy(drawInfo.gameObject);
+                Destroy(drawInfo.transform.parent.gameObject);
             }
             
             var cards = GameRoot.Instance.CardsDatabase.Values;
@@ -39,6 +41,7 @@ namespace LineWars
                     bigCardInfo.ReDraw(card);
                     bigCardInfo.gameObject.SetActive(true);
                 });
+                cardInstance.ReDrawAvailability(!deckDrawer.Slots.Select(x=> x.DeckCard).Contains(cardInstance.DeckCard));
             }
         }
     }

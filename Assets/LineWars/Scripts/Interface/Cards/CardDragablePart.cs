@@ -22,17 +22,21 @@ namespace LineWars
 
         public void OnDrag(PointerEventData eventData)
         {
+            if(!isActive) return;
             rectTransform.anchoredPosition += eventData.delta / MainCanvas.Instance.Canvas.scaleFactor;
         }
 
         public void OnEndDrag(PointerEventData eventData)
         {
+            if(!isActive) return;
             Destroy(gameObject);
             canvasGroup.blocksRaycasts = true;
         }
         
         public void OnBeginDrag(PointerEventData eventData)
         {
+            if(!isActive)
+                return;
             var instance = Instantiate(this, rectTransformToGenerateCard);
             instance.transform.localPosition = Vector3.zero;
             instance.ReDraw(DeckCard);
