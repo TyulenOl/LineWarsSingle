@@ -224,7 +224,7 @@ namespace LineWars.Model
             var cost = GetDeckCardPurchaseInfo(deckCard);
             return CanAfford(cost) && CanSpawnUnit(node, deckCard.Unit);
         }
-        
+
         public void BuyDeckCard(Node node, DeckCard deckCard)
         {
             CurrentMoney -= GetDeckCardPurchaseInfo(deckCard);

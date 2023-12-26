@@ -206,28 +206,27 @@ namespace LineWars.Controllers
             }
         }
 
-
-        public void SetUnitPreset(UnitBuyPreset preset)
+        public void SetDeckCard(DeckCard deckCard)
         {
             if (!ActiveSelf)
             {
-                ActiveSelfLog(nameof(SetUnitPreset));
+                ActiveSelfLog(nameof(SetDeckCard));
                 return;
             }
             
-            if (HaveConstrains && !Constrains.CanSelectUnitBuyPreset(preset))
+            if (HaveConstrains && !Constrains.CanSelectDeckCard(deckCard))
             {
-                ConstrainsLog(nameof(SetUnitPreset));
+                ConstrainsLog(nameof(SetDeckCard));
                 return;
             }
 
             if (stateMachine.CurrentState != buyState)
             {
-                InvalidStateLog(nameof(SetUnitPreset));
+                InvalidStateLog(nameof(SetDeckCard));
                 return;
             }
             
-            buyState.SetUnitPreset(preset);
+            buyState.SetDeckCard(deckCard);
         }
 
         public bool SelectCommandsPreset(CommandPreset preset)

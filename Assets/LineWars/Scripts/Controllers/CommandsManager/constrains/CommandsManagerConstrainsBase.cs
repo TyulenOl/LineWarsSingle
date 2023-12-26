@@ -22,6 +22,6 @@ namespace LineWars.Controllers
         public abstract bool CanSelectCurrentCommand();
 
         public abstract bool CanSelectNode(Node node);
-        public abstract bool CanSelectUnitBuyPreset(UnitBuyPreset preset);
+        public abstract bool CanSelectDeckCard(DeckCard deckCard);
     }
 }

@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace LineWars.Interface
 {
-    public class UnitBuyPresetDrawer : MonoBehaviour
+    public class CardBuyPresetDrawer : MonoBehaviour
     {
         [SerializeField] private TMP_Text cost;
         [SerializeField] private Image image;
@@ -21,16 +21,16 @@ namespace LineWars.Interface
 
         public Button Button => button;
 
-        private UnitBuyPreset unitBuyPreset;
+        private DeckCard deckCard;
 
         public bool IsAvailable => isAvailable;
 
-        public UnitBuyPreset UnitBuyPreset
+        public DeckCard DeckCard
         {
-            get => unitBuyPreset;
+            get => deckCard;
             set
             {
-                unitBuyPreset = value;
+                deckCard = value;
                 Init();
             }
         }
@@ -49,8 +49,8 @@ namespace LineWars.Interface
 
         private void Init()
         {
-            image.sprite = unitBuyPreset.Image;
-            cost.text = unitBuyPreset.Cost.ToString();
+            image.sprite = deckCard.Image;
+            cost.text = Player.LocalPlayer.GetDeckCardPurchaseInfo(deckCard).Cost.ToString();
             SetAvailable();
         }
 
@@ -65,9 +65,9 @@ namespace LineWars.Interface
 
         private void SetAvailable()
         {
-            var purchaseInfo = Player.LocalPlayer.GetPresetPurchaseInfo(unitBuyPreset);
-            ifCannotBuyImage.gameObject.SetActive(!purchaseInfo.CanBuy);
-            isAvailable = purchaseInfo.CanBuy && Player.LocalPlayer.CanBuyPreset(unitBuyPreset);
+            var canBuy = Player.LocalPlayer.CanBuyDeckCard(deckCard);
+            ifCannotBuyImage.gameObject.SetActive(!canBuy);
+            isAvailable = canBuy;
             button.interactable = isAvailable;
             var color = isAvailable ? Color.white : new Color(226 / 255f, 43 / 255f, 18 / 255f, 255 / 255f);
             cost.color = color;
@@ -75,7 +75,7 @@ namespace LineWars.Interface
             ifChosenPanel.gameObject.SetActive(false);
             backgroundImage.color = !isAvailable ? Color.gray : new Color(226 / 255f, 43 / 255f, 18 / 255f, 255 / 255f);
             image.color = isAvailable ? Color.white : Color.gray;
-            cost.text = purchaseInfo.Cost.ToString();
+            cost.text = Player.LocalPlayer.GetDeckCardPurchaseInfo(deckCard).Cost.ToString();
         }
     }
 }
