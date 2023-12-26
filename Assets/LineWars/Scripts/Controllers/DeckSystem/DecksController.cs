@@ -12,13 +12,10 @@ namespace LineWars.Model
     /// </summary>
     public class DecksController : MonoBehaviour
     {
-        [SerializeField] private DeckPreset defaultDeckPreset;
-        
         private IProvider<Deck> deckProvider;
         private Dictionary<int, Deck> allDecks;
 
-
-        public DeckPreset DefaultPreset => defaultDeckPreset;
+        public Deck DeckToGame => IdToDeck[0];
         public IReadOnlyDictionary<int, Deck> IdToDeck => allDecks;
         public IEnumerable<Deck> Decks => allDecks.Values;
         public IEnumerable<int> DeckIds => IdToDeck.Keys;

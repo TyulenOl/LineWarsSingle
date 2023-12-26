@@ -11,11 +11,14 @@ namespace LineWars.Model
         [SerializeField] private Optional<Sprite> cardImage;
         [SerializeField] private CardRarity cardRarity;
         [SerializeField] private Unit unit;
+        [SerializeField] private int cost; 
 
+        
         public string Name => cardName.Enabled ? cardName.Value : Unit.UnitName;
         public string Description => description.Enabled ? description.Value : Unit.UnitDescription;
         public Sprite Image => cardImage.Enabled ? cardImage.Value : Unit.Sprite;
         public Unit Unit => unit;
         public CardRarity Rarity => cardRarity;
+        public int Cost => cost;
     }
 }

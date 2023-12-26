@@ -6,7 +6,6 @@ namespace LineWars.Model
     {
         public static bool IsQualifiedForSpawn(this Node node, BasePlayer player)
         {
-
             var x = KnyazCondition(node, player);
             var y = InitialSpawnCondition(node, player);
             var c = node.AnyIsFree;
