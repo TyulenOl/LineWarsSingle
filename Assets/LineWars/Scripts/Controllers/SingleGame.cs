@@ -39,8 +39,7 @@ namespace LineWars
 
         private Stack<SpawnInfo> spawnInfosStack;
         private SpawnInfo playerSpawnInfo;
-
-        public Deck Deck => GameRoot.Instance?.DecksController.DeckToGame; 
+        
         public SceneName MyScene => (SceneName) SceneManager.GetActiveScene().buildIndex;
         private bool HasSpawnPoint() => spawnInfosStack.Count > 0;
         private SpawnInfo GetSpawnPoint() => spawnInfosStack.Pop();

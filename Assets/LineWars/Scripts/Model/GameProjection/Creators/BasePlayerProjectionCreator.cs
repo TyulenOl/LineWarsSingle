@@ -18,7 +18,6 @@ namespace LineWars.Model
                 Income = original.Income,
                 CurrentMoney = original.CurrentMoney,
                 PhaseExecutorsData = original.PhaseExecutorsData,
-                EconomicLogic = original.EconomicLogic,
                 Game = gameProjection
             };
 
@@ -44,7 +43,6 @@ namespace LineWars.Model
                 Income = playerProjection.Income,
                 CurrentMoney = playerProjection.CurrentMoney,
                 PhaseExecutorsData = playerProjection.PhaseExecutorsData,
-                EconomicLogic = playerProjection.EconomicLogic,
                 Game = gameProjection
             };
 

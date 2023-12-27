@@ -14,8 +14,7 @@ namespace LineWars.Model
     /// </summary>
     public abstract class BasePlayer : MonoBehaviour, IActor, IBasePlayer
     {
-        [field: SerializeField, ReadOnlyInspector]
-        public int Id { get; private set; }
+        [field: SerializeField, ReadOnlyInspector] public int Id { get; private set; }
 
         [SerializeField, ReadOnlyInspector] private int money;
 
@@ -25,14 +24,11 @@ namespace LineWars.Model
         [SerializeField, ReadOnlyInspector] private int income;
 
         [field: SerializeField] public PhaseExecutorsData PhaseExecutorsData { get; private set; }
-        public NationEconomicLogic EconomicLogic => Nation.NationEconomicLogic;
         public List<Node> InitialSpawns { get; private set; }
 
-        [field: SerializeField, ReadOnlyInspector]
-        public Node Base { get; private set; }
+        [field: SerializeField, ReadOnlyInspector] public Node Base { get; private set; }
 
-        [field: SerializeField, ReadOnlyInspector]
-        public PlayerRules Rules { get; private set; }
+        [field: SerializeField, ReadOnlyInspector] public PlayerRules Rules { get; private set; }
 
         public Nation Nation { get; private set; }
 
@@ -101,7 +97,7 @@ namespace LineWars.Model
         {
             Id = spawnInfo.PlayerIndex;
             Base = spawnInfo.SpawnNode.Node;
-            Rules = spawnInfo.SpawnNode.Rules ? spawnInfo.SpawnNode.Rules : PlayerRules.DefaultRules;
+            Rules = spawnInfo.SpawnNode.Rules;
 
             CurrentMoney = Rules.StartMoney;
             Income = Rules.DefaultIncome;
@@ -144,75 +140,7 @@ namespace LineWars.Model
         }
 
         #endregion
-
-        #region BuyPreset
-
-        public bool CanBuyPreset(UnitBuyPreset preset)
-        {
-            var nodes = MonoGraph.Instance.Nodes.Where(x => x.Owner == this);
-            var c = nodes.Select(x => CanBuyPreset(preset, x));
-            var b = c.Any(x => x);
-
-            return b;
-        }
-
-        public bool CanBuyPreset(UnitBuyPreset preset, Node node)
-        {
-            if (preset.FirstUnitType != UnitType.None && preset.SecondUnitType == UnitType.None)
-            {
-                return CanAffordPreset(preset)
-                       && CanSpawnUnit(node, preset.FirstUnitType);
-            }
-
-            if (preset.FirstUnitType == UnitType.None && preset.SecondUnitType != UnitType.None)
-            {
-                return CanAffordPreset(preset)
-                       && CanSpawnUnit(node, preset.SecondUnitType);
-            }
-
-            if (preset.FirstUnitType != UnitType.None && preset.SecondUnitType != UnitType.None)
-                return CanBuyPresetMultiple(preset, node);
-            Debug.Log("Invalid preset!");
-            return false;
-        }
-
-        private bool CanBuyPresetMultiple(UnitBuyPreset preset, Node node)
-        {
-            if (GetUnitPrefab(preset.FirstUnitType).Size == UnitSize.Large
-                || GetUnitPrefab(preset.SecondUnitType).Size == UnitSize.Large)
-                Debug.LogError("Invalid Preset!");
-            return CanAffordPreset(preset)
-                   && (node.AllIsFree);
-        }
-
-        private bool CanAffordPreset(UnitBuyPreset preset)
-        {
-            var purchaseInfo = this.GetPresetPurchaseInfo(preset);
-            return purchaseInfo.CanBuy && CurrentMoney - purchaseInfo.Cost >= 0;
-        }
-
-        public void BuyPreset(UnitBuyPreset unitPreset)
-        {
-            BuyPreset(unitPreset, Base);
-        }
-
-        public void BuyPreset(UnitBuyPreset preset, Node node)
-        {
-            CurrentMoney -= this.GetPresetPurchaseInfo(preset).Cost;
-            var unitsList = new List<Unit>
-            {
-                SpawnUnit(node, preset.FirstUnitType),
-                SpawnUnit(node, preset.SecondUnitType)
-            }.Where(x => x != null);
-            OnBuyPreset(node, unitsList);
-        }
-
-        protected virtual void OnBuyPreset(Node node, IEnumerable<Unit> units)
-        {
-        }
         
-        #endregion
-
         #region BuyDeckCard
         public bool CanBuyDeckCard(DeckCard deckCard)
         {
@@ -344,13 +272,7 @@ namespace LineWars.Model
         {
             return MyUnits.Count(x => x.Type == type);
         }
-
-        [Obsolete]
-        public PurchaseInfo GetPresetPurchaseInfo(UnitBuyPreset preset)
-        {
-            return GetPurchaseInfoForUnit(preset.FirstUnitType, preset.Cost);
-        }
-
+        
         public PurchaseInfo GetDeckCardPurchaseInfo(DeckCard deckCard)
         {
             return GetPurchaseInfoForUnit(deckCard.Unit.Type, deckCard.Cost);

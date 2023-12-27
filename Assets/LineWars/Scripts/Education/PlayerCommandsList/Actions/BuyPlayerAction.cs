@@ -5,7 +5,7 @@ namespace LineWars.Education
 {
     public class BuyPlayerAction: PlayerAction
     {
-        [Header("")]
+        [Space]
         [SerializeField] private Node buyNode;
         [SerializeField] private string presetName;
 

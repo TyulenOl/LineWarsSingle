@@ -9,7 +9,7 @@ using LineWars.Controllers;
 
 namespace LineWars
 {
-    public partial class Player : BasePlayer
+    public class Player : BasePlayer
     {
         public static Player LocalPlayer { get; private set; }
         [SerializeField] private float pauseAfterTurn;
@@ -65,7 +65,7 @@ namespace LineWars
         {
             RecalculateVisibility();
             if (CurrentPhase != null 
-                && (object)CommandsManager.Instance.Executor != diedUnit) //Из-за этого случался баг с ShotUnit? ХЗ
+                && (object)CommandsManager.Instance.Executor != diedUnit) //Из-за этого случался баг с ShotUnit? Возможно
             {
                 FinishTurn();
             }

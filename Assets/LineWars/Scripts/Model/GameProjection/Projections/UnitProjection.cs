@@ -44,13 +44,13 @@ namespace LineWars.Model
                 if (value <= 0)
                 {
                     Died?.Invoke(this);
+                    ExecutorDestroyed?.Invoke();
                     RemoveFromNode();
                     RemoveFromOwner();
                 }
             }
         }
-
-        public event Action AnyActionCompleted;
+        public event Action ExecutorDestroyed;
         IEnumerable<IExecutorAction> IExecutor.Actions => actionsDictionary.Values;
 
         public event Action<UnitProjection> Died;

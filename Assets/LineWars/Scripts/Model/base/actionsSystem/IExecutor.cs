@@ -8,9 +8,8 @@ namespace LineWars.Model
         public int MaxActionPoints { get; set; }
         public int CurrentActionPoints { get; set; }
         public IEnumerable<IExecutorAction> Actions { get; }
-        public event Action AnyActionCompleted;
-
         public bool CanDoAnyAction => CurrentActionPoints > 0;
+        public event Action ExecutorDestroyed;
     }
 
     public interface IExecutor<TExecutor, in TAction> : IExecutor

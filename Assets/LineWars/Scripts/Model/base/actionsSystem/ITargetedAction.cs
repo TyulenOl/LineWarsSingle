@@ -32,14 +32,4 @@ namespace LineWars.Model
             return GenerateCommand((TTarget) target);
         }
     }
-
-    // public interface IFreeTargetedAction<in TTarget> :
-    //     ITargetedAction<TTarget>
-    //     where TTarget : ITarget
-    // {
-    //     IActionCommand ITargetedAction<TTarget>.GenerateCommand(TTarget target)
-    //     {
-    //         return new FreeTargetActionCommand<>()
-    //     }
-    // }
 }

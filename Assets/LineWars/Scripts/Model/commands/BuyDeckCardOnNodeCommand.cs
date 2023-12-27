@@ -1,12 +1,12 @@
 namespace LineWars.Model
 {
-    public class BuyPresetOnNodeCommand : ICommand
+    public class BuyDeckCardOnNodeCommand : ICommand
     {
-        public BasePlayer Player { get; private set; }
-        public Node Node {  get; private set; } 
-        public DeckCard DeckCard { get; private set; }
+        public BasePlayer Player { get; }
+        public Node Node {  get; } 
+        public DeckCard DeckCard { get; }
 
-        public BuyPresetOnNodeCommand(BasePlayer basePlayer, Node node, DeckCard deckCard)
+        public BuyDeckCardOnNodeCommand(BasePlayer basePlayer, Node node, DeckCard deckCard)
         {
             Player = basePlayer;
             Node = node;

@@ -60,14 +60,14 @@ namespace LineWars.Controllers
             }
 
 
-            public void SetDeckCard(DeckCard deckCard)
+            public void SetDeckCard(DeckCard card)
             {
-                if(deckCard == null)
+                if(card == null)
                 {
-                    this.deckCard = null;
+                    deckCard = null;
                     return;
                 }
-                this.deckCard = deckCard;
+                deckCard = card;
                 CheckForCompleteness();
             }
 
@@ -77,7 +77,7 @@ namespace LineWars.Controllers
                     && deckCard != null
                     && Manager.Player.CanBuyDeckCard(currentNode, deckCard))
                 {
-                    var newCommand = new BuyPresetOnNodeCommand(Manager.Player, currentNode, deckCard);
+                    var newCommand = new BuyDeckCardOnNodeCommand(Manager.Player, currentNode, deckCard);
                     UnitsController.ExecuteCommand(newCommand);
                     Manager.InvokeAction(() => Manager.CommandIsExecuted?.Invoke(newCommand));
                     currentNode = null;

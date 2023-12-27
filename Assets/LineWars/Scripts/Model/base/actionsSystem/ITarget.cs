@@ -2,6 +2,6 @@
 {
     public interface ITarget
     {
-        //public CommandPriorityData CommandPriorityData { get; }
+        
     }
 }

@@ -23,7 +23,7 @@ namespace LineWars.Model
 
         public override void ExecuteTurn(PhaseType phaseType)
         {
-            Debug.Log($"TestActor {Id} is starting {phaseType} Turn");
+            //Debug.Log($"TestActor {Id} is starting {phaseType} Turn");
             InvokeTurnStarted(phaseType);
             switch(phaseType)
             {
@@ -43,7 +43,7 @@ namespace LineWars.Model
                     ExecuteReplenish();
                     break;
             }
-            Debug.Log($"TestActor is ending {phaseType} Turn");
+            //Debug.Log($"TestActor is ending {phaseType} Turn");
             InvokeTurnEnded(phaseType);
         }
 
