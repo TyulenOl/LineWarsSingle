@@ -7,14 +7,14 @@ namespace LineWars.Model
 {
     public class BasePlayerProjection : IBasePlayer, IReadOnlyBasePlayerProjection
     {
+        public int Id { get; set; }
+        
         private NodeProjection baseProjection;
         public HashSet<OwnedProjection> OwnedObjects { get; set; }
-        public int Id { get; set; }
         public BasePlayer Original { get; set; }
         public GameProjection Game { get; set; }
         public PlayerRules Rules { get; set; }
         public PhaseExecutorsData PhaseExecutorsData { get; set; }
-        public NationEconomicLogic EconomicLogic { get; set; } 
         public int Income { get; set; }
         public int CurrentMoney { get; set; }
 
@@ -62,23 +62,13 @@ namespace LineWars.Model
                 }
             }
         }
-
-        public bool CanBuyPreset(UnitBuyPreset preset)
-        {
-            return false; //TODO: Сделать шота
-        }
-
+        
         public void RemoveOwned([NotNull] OwnedProjection owned)
         {
             if (owned == null) throw new ArgumentNullException(nameof(owned));
             if (!OwnedObjects.Contains(owned)) return;
 
             OwnedObjects.Remove(owned);
-        }
-
-        public void BuyPreset(UnitBuyPreset preset)
-        {
-            var leftUnit = preset.FirstUnitType; // СПРОСИТЬ У ПАШИ
         }
     }
 
@@ -87,7 +77,6 @@ namespace LineWars.Model
         public BasePlayer Original { get; }
         public PlayerRules Rules { get; }
         public PhaseExecutorsData PhaseExecutorsData { get; }  
-        public NationEconomicLogic EconomicLogic { get; }
         public IReadOnlyCollection<OwnedProjection> OwnedObjects { get; }
         public int Income { get; }
         public int CurrentMoney { get; }

@@ -55,6 +55,8 @@ namespace LineWars.Model
         [field: SerializeField] public UnityEvent<int, int> ActionPointsChanged { get; private set; }
 
         public event Action AnyActionCompleted;
+        public event Action ExecutorDestroyed;
+
 
         private UnitMovementLogic movementLogic;
         
@@ -113,6 +115,7 @@ namespace LineWars.Model
                 {
                     OnDied();
                     Died.Invoke(this);
+                    ExecutorDestroyed?.Invoke();
                 }
             }
         }

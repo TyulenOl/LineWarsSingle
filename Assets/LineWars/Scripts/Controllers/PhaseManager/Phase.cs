@@ -21,12 +21,12 @@ namespace LineWars
 
             public override void OnEnter()
             {
-                Debug.Log($"STARTED {Type}");
+                //Debug.Log($"STARTED {Type}");
             }
 
             public override void OnExit()
             {
-                Debug.Log($"ENDED {Type}");
+                //Debug.Log($"ENDED {Type}");
             }
         }
     }

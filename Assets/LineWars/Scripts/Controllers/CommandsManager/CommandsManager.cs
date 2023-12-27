@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -11,14 +12,19 @@ namespace LineWars.Controllers
         public static CommandsManager Instance { get; private set; }
         [field:SerializeField, ReadOnlyInspector] public bool ActiveSelf { get; private set; } = true;
         
-        
         [field: SerializeField] private CommandsManagerConstrainsBase Constrains { get; set; }
+
+        [SerializeField] private float maxActionDelayInSeconds = 5;
+        
         public bool HaveConstrains => Constrains != null;
         public bool NotHaveConstraints => Constrains == null;
 
         private IMonoTarget target;
         private IMonoExecutor executor;
         private bool canCancelExecutor = true;
+        
+        private IActionCommand currentExecutedCommand;
+        private Coroutine delayActionCoroutine;
 
         private StateMachine stateMachine;
         private CommandsManagerIdleState idleState;
@@ -104,6 +110,15 @@ namespace LineWars.Controllers
                 executor = value;
                 if (previousExecutor != value)
                     InvokeAction(() => ExecutorChanged?.Invoke(previousExecutor, value));
+                if (previousExecutor != null)
+                {
+                    previousExecutor.ExecutorDestroyed -= OnExecutorDestroy;
+                }
+
+                if (executor != null)
+                {
+                    executor.ExecutorDestroyed += OnExecutorDestroy;
+                }
             }
         }
 
@@ -184,26 +199,61 @@ namespace LineWars.Controllers
 
         private void ExecuteCommandButIgnoreConstrains(IActionCommand command)
         {
+            currentExecutedCommand = command;
             canCancelExecutor = false;
             stateMachine.SetState(waitingExecuteCommandState);
-            var action = command.Action;
-            action.ActionCompleted += OnActionCompleted;
+            
+            command.Action.ActionCompleted += OnActionCompleted;
+            delayActionCoroutine = StartCoroutine(DelayActionCoroutine());
+            
             UnitsController.ExecuteCommand(command);
-
-            void OnActionCompleted()
+        }
+        
+        void OnActionCompleted()
+        {
+            currentExecutedCommand.Action.ActionCompleted -= OnActionCompleted;
+            StopCoroutine(delayActionCoroutine);
+            delayActionCoroutine = null;
+            currentExecutedCommand = null;
+            
+            InvokeAction(() => CommandIsExecuted?.Invoke(currentExecutedCommand));
+            if (Executor as MonoBehaviour == null)
             {
-                action.ActionCompleted -= OnActionCompleted;
-                InvokeAction(() => CommandIsExecuted?.Invoke(command));
-                if (Executor as MonoBehaviour == null || !Executor.CanDoAnyAction)
-                {
-                    Player.FinishTurn();
-                }
-                else
-                {
-                    SendFightRedrawMessage();
-                    stateMachine.SetState(findTargetState);
-                }
+                Debug.LogError("Impossible behavior!");
+                return;
             }
+            if (!Executor.CanDoAnyAction)
+            {
+                Player.FinishTurn();
+            }
+            else
+            {
+                SendFightRedrawMessage();
+                stateMachine.SetState(findTargetState);
+            }
+        }
+
+        IEnumerator DelayActionCoroutine()
+        {
+            yield return new WaitForSeconds(maxActionDelayInSeconds);
+            Debug.LogWarning($"The action didn't stop after {maxActionDelayInSeconds} seconds!");
+            OnActionCompleted();
+        }
+
+        private void OnExecutorDestroy()
+        {
+            Debug.Log("EXECUTOR DESTROY");
+            if (delayActionCoroutine != null)
+                StopCoroutine(delayActionCoroutine);
+            if (currentExecutedCommand != null)
+            {
+                currentExecutedCommand.Action.ActionCompleted -= OnActionCompleted;
+                InvokeAction(() => CommandIsExecuted?.Invoke(currentExecutedCommand));
+            }
+            delayActionCoroutine = null;
+            currentExecutedCommand = null;
+            
+            Player.FinishTurn();
         }
 
         public void SetDeckCard(DeckCard deckCard)
@@ -333,7 +383,7 @@ namespace LineWars.Controllers
 
         private void OnTurnEnded(IActor _, PhaseType phaseType)
         {
-            if (Executor is {CanDoAnyAction: true})
+            if (Executor != null && Executor as MonoBehaviour != null && Executor.CanDoAnyAction)
             {
                 Debug.LogWarning("You somehow ended a turn even though the current executor still has action points", gameObject);
             }
