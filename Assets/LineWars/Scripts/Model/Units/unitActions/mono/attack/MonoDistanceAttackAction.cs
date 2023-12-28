@@ -18,7 +18,6 @@ namespace LineWars.Model
         {
             return new DistanceAttackAction<Node, Edge, Unit>(
                 Executor,
-                InitialDamage,
                 InitialIsPenetratingDamage,
                 (uint)InitialDistance,
                 MonoGraph.Instance);

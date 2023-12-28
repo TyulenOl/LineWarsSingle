@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using LineWars.Model;
 
@@ -9,6 +10,7 @@ namespace LineWars
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
+        [Obsolete]
         public static int GetMaxDamage(TUnit unit)
         {
             var actions = GetDamages(unit)
@@ -18,6 +20,7 @@ namespace LineWars
                 : 0;
         }
 
+        [Obsolete]
         public static IEnumerable<(CommandType, int)> GetDamages(TUnit unit)
         {
             var actions = unit.Actions
@@ -31,7 +34,6 @@ namespace LineWars
                 }
             }
         }
-
 
         public static bool CanMoveTo(TUnit unit, TNode targetNode)
         {

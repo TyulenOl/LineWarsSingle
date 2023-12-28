@@ -27,7 +27,9 @@ namespace LineWars.Model
                 Original = oldUnit.Original,
                 UnitActions = oldUnit.ActionsDictionary.Values,
                 HasId = oldUnit.HasId,
-                Id = oldUnit.Id
+                Id = oldUnit.Id,
+                InitialPower = oldUnit.InitialPower,
+                CurrentPower = oldUnit.CurrentPower
             };
 
             return newUnit;
@@ -56,7 +58,9 @@ namespace LineWars.Model
                 Original = original,
                 MonoActions = original.MonoActions,
                 HasId = true,
-                Id = original.Id
+                Id = original.Id,
+                InitialPower = original.InitialPower,
+                CurrentPower = original.CurrentPower
             };
 
             return newUnit;

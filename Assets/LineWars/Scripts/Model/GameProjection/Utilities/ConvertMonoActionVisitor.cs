@@ -44,21 +44,21 @@ namespace LineWars.Model
         public void Visit(MonoDistanceAttackAction action)
         {
             Result = new DistanceAttackAction<NodeProjection, EdgeProjection, UnitProjection>
-                (Unit, action.Damage, action.IsPenetratingDamage, action.Distance, Graph);
+                (Unit, action.IsPenetratingDamage, action.Distance, Graph);
             Result.ActionModifier = action.Action.ActionModifier;
         }
 
         public void Visit(MonoArtilleryAttackAction action)
         {
             Result = new ArtilleryAttackAction<NodeProjection, EdgeProjection, UnitProjection>
-                (Unit, action.Damage, action.IsPenetratingDamage, action.Distance, Graph);
+                (Unit, action.IsPenetratingDamage, action.Distance, Graph);
             Result.ActionModifier = action.Action.ActionModifier;
         }
 
         public void Visit(MonoMeleeAttackAction action)
         {
             Result = new MeleeAttackAction<NodeProjection, EdgeProjection, UnitProjection>
-                (Unit, action.Damage, action.IsPenetratingDamage, action.Onslaught, action.BlockerSelector);
+                (Unit, action.IsPenetratingDamage, action.Onslaught, action.BlockerSelector);
             Result.ActionModifier = action.Action.ActionModifier;
         }
 
@@ -76,13 +76,13 @@ namespace LineWars.Model
 
         public void Visit(MonoRamAction action)
         {
-            Result = new RamAction<NodeProjection, EdgeProjection, UnitProjection>(Unit, action.Damage);
+            Result = new RamAction<NodeProjection, EdgeProjection, UnitProjection>(Unit);
             Result.ActionModifier = action.Action.ActionModifier;
         }
 
         public void Visit(MonoBlowWithSwingAction action)
         {
-            Result = new BlowWithSwingAction<NodeProjection, EdgeProjection, UnitProjection>(Unit, action.Damage);
+            Result = new BlowWithSwingAction<NodeProjection, EdgeProjection, UnitProjection>(Unit);
             Result.ActionModifier = action.Action.ActionModifier;
         }
 

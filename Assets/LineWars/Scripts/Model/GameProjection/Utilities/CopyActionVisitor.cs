@@ -45,19 +45,19 @@ namespace LineWars.Model
         public void Visit(DistanceAttackAction<TNode, TEdge, TUnit> action)
         {
             Result = new DistanceAttackAction
-                <TNode, TEdge, TUnit>(Unit, action.Damage, action.IsPenetratingDamage, action.Distance, Graph);
+                <TNode, TEdge, TUnit>(Unit,action.IsPenetratingDamage, action.Distance, Graph);
             Result.ActionModifier = action.ActionModifier;
         }
 
         public void Visit(ArtilleryAttackAction<TNode, TEdge, TUnit> action)
         {
-            Result = new ArtilleryAttackAction<TNode, TEdge, TUnit>(Unit, action.Damage, action.IsPenetratingDamage, action.Distance, Graph);
+            Result = new ArtilleryAttackAction<TNode, TEdge, TUnit>(Unit, action.IsPenetratingDamage, action.Distance, Graph);
             Result.ActionModifier = action.ActionModifier;
         }
 
         public void Visit(MeleeAttackAction<TNode, TEdge, TUnit> action)
         {
-            Result = new MeleeAttackAction<TNode, TEdge, TUnit>(Unit, action.Damage, action.IsPenetratingDamage, action.Onslaught, action.BlockerSelector);
+            Result = new MeleeAttackAction<TNode, TEdge, TUnit>(Unit,action.IsPenetratingDamage, action.Onslaught, action.BlockerSelector);
             Result.ActionModifier = action.ActionModifier;
         }
 
@@ -75,13 +75,13 @@ namespace LineWars.Model
 
         public void Visit(RamAction<TNode, TEdge, TUnit> action)
         {
-            Result = new RamAction<TNode, TEdge, TUnit>(Unit, action.Damage);
+            Result = new RamAction<TNode, TEdge, TUnit>(Unit);
             Result.ActionModifier = action.ActionModifier;
         }
 
         public void Visit(BlowWithSwingAction<TNode, TEdge, TUnit> action)
         {
-            Result = new BlowWithSwingAction<TNode, TEdge, TUnit>(Unit, action.Damage);
+            Result = new BlowWithSwingAction<TNode, TEdge, TUnit>(Unit);
             Result.ActionModifier = action.ActionModifier;
         }
 

@@ -92,7 +92,6 @@ namespace LineWars.Model
         {
             return new MeleeAttackAction<Node, Edge, Unit>(
                 Executor,
-                InitialDamage,
                 InitialIsPenetratingDamage,
                 InitialOnslaught,
                 InitialBlockerSelector);
