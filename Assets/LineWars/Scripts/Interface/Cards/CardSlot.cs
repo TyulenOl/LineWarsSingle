@@ -10,6 +10,7 @@ namespace LineWars
         [SerializeField] private CardDrawInfo cardDrawInfo;
         [SerializeField] private RectTransform ifUnavailablePanel;
         [SerializeField] private RectTransform ifAvailablePanel;
+        [SerializeField] private RectTransform emptySlotTransform;
         [SerializeField] private bool isForBigUnits;
 
         private DeckDrawer deckDrawer;
@@ -28,7 +29,9 @@ namespace LineWars
 
         public void Clear()
         {
-            cardDrawInfo.ReDraw(null);
+            cardDrawInfo.gameObject.SetActive(false);
+            emptySlotTransform.gameObject.SetActive(true);
+            cardDrawInfo.ReStoreDefaults();
             CardChanged?.Invoke();
         }
         
@@ -39,7 +42,10 @@ namespace LineWars
                 return;
             if(!CardCondition(deckCard))
                 return;
+            cardDrawInfo.gameObject.SetActive(true);
+            emptySlotTransform.gameObject.SetActive(false);
             cardDrawInfo.ReDraw(deckCard);
+            cardDrawInfo.ReDrawAvailability(true);
             ifAvailablePanel.gameObject.SetActive(false);
             ifUnavailablePanel.gameObject.SetActive(false);
         }

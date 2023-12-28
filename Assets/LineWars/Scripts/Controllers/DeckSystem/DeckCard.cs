@@ -9,6 +9,10 @@ namespace LineWars.Model
         [SerializeField] private Optional<string> cardName;
         [SerializeField] private Optional<string> description;
         [SerializeField] private Optional<Sprite> cardImage;
+
+        [SerializeField] private Sprite cardActiveBagLine;
+        [SerializeField] private Sprite cardInactiveBagLine;
+        
         [SerializeField] private CardRarity cardRarity;
         [SerializeField] private Unit unit;
         [SerializeField] private int cost; 
@@ -20,5 +24,9 @@ namespace LineWars.Model
         public Unit Unit => unit;
         public CardRarity Rarity => cardRarity;
         public int Cost => cost;
+
+        public Sprite CardActiveBagLine => cardActiveBagLine;
+
+        public Sprite CardInactiveBagLine => cardInactiveBagLine;
     }
 }
