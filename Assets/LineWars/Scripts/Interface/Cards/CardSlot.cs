@@ -7,7 +7,7 @@ namespace LineWars
 {
     public class CardSlot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerExitHandler
     {
-        [SerializeField] private CardDrawInfo cardDrawInfo;
+        [SerializeField] private CardDragablePart cardDrawInfo;
         [SerializeField] private RectTransform ifUnavailablePanel;
         [SerializeField] private RectTransform ifAvailablePanel;
         [SerializeField] private RectTransform emptySlotTransform;
@@ -24,6 +24,7 @@ namespace LineWars
         public void Init(DeckDrawer deckDrawer)
         {
             this.deckDrawer = deckDrawer;
+            cardDrawInfo.StartDragging += CardStartDragging;
         }
 
 
@@ -49,8 +50,16 @@ namespace LineWars
             ifAvailablePanel.gameObject.SetActive(false);
             ifUnavailablePanel.gameObject.SetActive(false);
         }
-        
-        
+
+        private void CardStartDragging(CardDragablePart cardDragablePart)
+        {
+            cardDrawInfo.StartDragging -= CardStartDragging;
+            cardDrawInfo = cardDragablePart;
+            cardDrawInfo.StartDragging += CardStartDragging;
+            Clear();
+        }
+
+
         public void OnDrop(PointerEventData eventData)
         {
             var dragableItem = eventData.pointerDrag.GetComponent<CardDragablePart>();

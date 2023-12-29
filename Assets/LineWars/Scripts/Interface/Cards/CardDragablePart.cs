@@ -13,6 +13,7 @@ namespace LineWars
         private CanvasGroup canvasGroup;
         
         [SerializeField] private RectTransform rectTransformToGenerateCard;
+        public event Action<CardDragablePart> StartDragging;
 
         private void Awake()
         {
@@ -47,6 +48,7 @@ namespace LineWars
             instance.InfoButton.onClick.AddListener(onInfoButtonClickAction);
             transform.SetParent(MainCanvas.Instance.Canvas.transform);
             canvasGroup.blocksRaycasts = false;
+            StartDragging?.Invoke(instance);
         }
     }
 }
