@@ -36,6 +36,7 @@ namespace LineWars.Model
 
         private readonly HashSet<Owned> myOwned = new();
         private readonly List<Node> nodes = new();
+        
         private readonly List<Unit> units = new();
 
         public IEnumerable<Node> MyNodes => nodes;

@@ -7,7 +7,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UnitBuyPresetInfoDrawer : MonoBehaviour
+public class UnitInfoDrawer : MonoBehaviour
 {
     [SerializeField] private TMP_Text unitName;
     [SerializeField] private TMP_Text unitDescription;
@@ -21,8 +21,10 @@ public class UnitBuyPresetInfoDrawer : MonoBehaviour
 
     public void Init(Unit unit)
     {
-        unitName.text = unit.UnitName;
-        unitDescription.text = unit.UnitDescription;
+        if(unitName != null)
+            unitName.text = unit.UnitName;
+        if(unitDescription != null)
+            unitDescription.text = unit.UnitDescription;
 
         armorAmount.text = unit.MaxArmor.ToString();
         hpAmount.text = unit.MaxHp.ToString();
