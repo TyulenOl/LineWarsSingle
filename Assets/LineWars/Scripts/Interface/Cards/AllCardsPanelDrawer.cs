@@ -36,11 +36,12 @@ namespace LineWars
                 var instance = Instantiate(cardDrawInfoPrefab, cardsLayoutGroup.transform);
                 var cardInstance = instance.GetComponentInChildren<CardDrawInfo>();
                 cardInstance.ReDraw(card);
-                cardInstance.InfoButton.onClick.AddListener(() =>
+                cardInstance.OnInfoButtonClickAction = () =>
                 {
+                    Debug.Log(11);
                     bigCardInfo.ReDraw(card);
                     bigCardInfo.gameObject.SetActive(true);
-                });
+                };
                 cardInstance.ReDrawAvailability(!deckDrawer.Slots.Select(x=> x.DeckCard).Contains(cardInstance.DeckCard));
             }
         }
