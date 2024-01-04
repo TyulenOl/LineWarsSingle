@@ -35,25 +35,20 @@ namespace LineWars.Model
         [SerializeField] private RenderNodeV3 renderNodeV3;
         [SerializeField] private CommandPriorityData priorityData;
 
-        [field: Header("Sprite Info")] [SerializeField]
-        private SpriteRenderer spriteRenderer;
-
+        [field: Header("Sprite Info")]
+        [SerializeField] private SpriteRenderer spriteRenderer;
+        
         [field: Header("Initial Info")]
-        [field: SerializeField]
-        public PlayerBuilder ReferenceToSpawn { get; set; }
-
         [field: SerializeField] public UnitType LeftUnitType { get; private set; }
         [field: SerializeField] public UnitType RightUnitType { get; private set; }
-
 
         private Camera mainCamera;
 
         /// <summary>
         /// Флаг, который указывает, что нода уже кому-то принадлежала
         /// </summary>
-        public bool IsDirty { get; private set; }
-
-        public bool IsBase => ReferenceToSpawn != null && ReferenceToSpawn.Node == this;
+        public bool IsDirty { get; set; }
+        public bool IsBase { get; set; }
 
         public Vector2 Position => transform.position;
 
@@ -102,7 +97,6 @@ namespace LineWars.Model
         private void Awake()
         {
             mainCamera = Camera.main;
-            IsDirty = ReferenceToSpawn != null;
         }
 
         private void Start()
@@ -157,11 +151,7 @@ namespace LineWars.Model
 
         public bool RemoveEdge(Edge edge) => edges.Remove(edge);
         public bool ContainsEdge(Edge edge) => edges.Contains(edge);
-
-        public void SetActiveOutline(bool value)
-        {
-        }
-
+        
         public IEnumerable<Node> GetNeighbors()
         {
             foreach (var edge in Edges)
@@ -178,7 +168,7 @@ namespace LineWars.Model
             if (!TryGetComponent<PlayerMoveBan>(out var moveBan))
                 return true;
 
-            var banOwners = moveBan.BannedSpawns.Select(spawn => spawn.GetComponent<Node>().OwnerId).ToList();
+            var banOwners = moveBan.BannedNodes.Select(spawn => spawn.OwnerId).ToList();
             return !banOwners.Contains(ownerId);
         }
 
@@ -189,53 +179,47 @@ namespace LineWars.Model
             {
                 GetComponent<NodeInfoDrawer>().Capture();
             }
-
-            ReferenceToSpawn = newPlayer != null ? basePlayer.Base.GetComponent<PlayerBuilder>() : null;
+            
             IsDirty = true;
-            Redraw();
+            if (newPlayer == null)
+                return;
+            Redraw(IsBase, newPlayer.Nation.Name, newPlayer.Nation.NodeSprite);
         }
 
         #region Visualisation
-
-        public void Redraw()
+        
+        public void Redraw(bool isSpawn, string groupName, Sprite sprite)
         {
-            if (ReferenceToSpawn == null)
+            if (isSpawn)
             {
-                DrawToDefault();
-            }
-            else if (IsBase)
-            {
-                gameObject.name = $"Spawn{Id} {ReferenceToSpawn.GroupName}";
-                spriteRenderer.sprite = ReferenceToSpawn.GroupSprite;
+                gameObject.name = $"Spawn{Id} {groupName}";
             }
             else
             {
-                gameObject.name = $"Node{Id} group with {ReferenceToSpawn.GroupName}";
-                spriteRenderer.sprite = ReferenceToSpawn.GroupSprite;
+                gameObject.name = $"Node{Id} group with {groupName}";
             }
+            spriteRenderer.sprite = sprite;
         }
-
-        private void DrawToDefault()
+        
+        public void DrawToDefault()
         {
             gameObject.name = $"Node{Id}";
             spriteRenderer.sprite = defaultSprite;
         }
-
+        
+        public void Redraw()
+        {
+        }
+        
+#if UNITY_EDITOR
         private void OnValidate()
         {
             if (renderNodeV3 == null)
                 renderNodeV3 = GetComponent<RenderNodeV3>();
             if (defaultSprite == null)
                 Debug.LogError("Нет дефолтного спрайта у ноды", gameObject);
-#if UNITY_EDITOR
-            if (!UnityEditor.PrefabUtility.IsPartOfPrefabAsset(this)
-                && !UnityEditor.PrefabUtility.IsPartOfImmutablePrefab(this)
-                && UnityEditor.PrefabUtility.IsPartOfPrefabInstance(this))
-            {
-                UnityEditor.EditorApplication.delayCall += Redraw;
-            }
-#endif
         }
+#endif
 
         #endregion
     }

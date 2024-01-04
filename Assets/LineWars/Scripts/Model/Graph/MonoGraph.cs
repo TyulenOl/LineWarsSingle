@@ -17,12 +17,10 @@ namespace LineWars.Model
         
         private readonly Dictionary<int, Node> idToNode = new();
         private readonly Dictionary<int, Edge> idToEdge = new();
-        private List<SpawnInfo> spawnInfos;
 
         public IReadOnlyList<Node> Nodes => idToNode.Values.ToArray();
         public IReadOnlyList<Edge> Edges => idToEdge.Values.ToArray();
         
-        public IReadOnlyList<SpawnInfo> Spawns => spawnInfos;
 
 
         public IDictionary<int, Node> IdToNode => idToNode;
@@ -43,7 +41,6 @@ namespace LineWars.Model
         {
             var allNodes = FindObjectsOfType<Node>();
             var allEdges = FindObjectsOfType<Edge>();
-            GenerateSpawnInfo();
             modelGraph = new GraphForGame<Node, Edge, Unit>(allNodes, allEdges);
 
             foreach (var node in allNodes)
@@ -51,28 +48,7 @@ namespace LineWars.Model
             foreach (var edge in allEdges)
                 idToEdge.Add(edge.Id, edge);
         }
-
-        private void GenerateSpawnInfo()
-        {
-            var spawns = FindObjectsOfType<PlayerBuilder>();
-
-            var initialInfos = FindObjectsOfType<Node>();
-
-
-            spawnInfos = new List<SpawnInfo>(spawns.Length);
-
-            for (var i = 0; i < spawns.Length; i++)
-            {
-                var spawn = spawns[i];
-                var group = initialInfos
-                    .Where(x => x.ReferenceToSpawn == spawn)
-                    .ToArray();
-                var spawnInfo = new SpawnInfo(i, spawn, group);
-                spawnInfos.Add(spawnInfo);
-            }
-        }
-
-
+        
         public Dictionary<Node, bool> GetVisibilityInfo(BasePlayer player)
             => modelGraph.GetVisibilityInfo(player.MyNodes);
 

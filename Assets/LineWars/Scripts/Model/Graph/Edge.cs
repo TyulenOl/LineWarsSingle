@@ -117,9 +117,7 @@ namespace LineWars.Model
         {
             hp = MaxHp;
 #if UNITY_EDITOR
-            if (!UnityEditor.PrefabUtility.IsPartOfPrefabAsset(this)
-                && !UnityEditor.PrefabUtility.IsPartOfImmutablePrefab(this)
-                && UnityEditor.PrefabUtility.IsPartOfPrefabInstance(this))
+            if (EditorExtensions.CanRedraw(this))
             {
                 UnityEditor.EditorApplication.delayCall += Redraw;
             }

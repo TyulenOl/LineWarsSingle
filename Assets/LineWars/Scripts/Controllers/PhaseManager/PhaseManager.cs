@@ -12,7 +12,7 @@ namespace LineWars
         private List<IActor> actors;
         [field: SerializeField] public PhaseOrderData OrderData { get; protected set; }
         
-        public event Action<IActor, PhaseType, PhaseType> ActorTurnChanged;
+        //public event Action<IActor, PhaseType, PhaseType> ActorTurnChanged;
 
         public UnityEvent<PhaseType> PhaseEntered;
         public UnityEvent<PhaseType> PhaseExited;
@@ -43,7 +43,7 @@ namespace LineWars
                 Debug.LogError("More than two PhaseManagers on the scene!");
             }
             actors = new List<IActor>();
-            IntitializeStateMachine();
+            InitializeStateMachine();
             stateMachine.StateChanged += OnStateChanged;
         }
 
@@ -72,7 +72,7 @@ namespace LineWars
             actors.Add(actor);
         }
 
-        private void IntitializeStateMachine()
+        private void InitializeStateMachine()
         {
             stateMachine = new StateMachine();
             buyState = new PhaseSynchronousState(PhaseType.Buy, this);

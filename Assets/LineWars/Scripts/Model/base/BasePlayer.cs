@@ -14,25 +14,19 @@ namespace LineWars.Model
     /// </summary>
     public abstract class BasePlayer : MonoBehaviour, IActor, IBasePlayer
     {
-        [field: SerializeField, ReadOnlyInspector] public int Id { get; private set; }
-
-        [SerializeField, ReadOnlyInspector] private int money;
-
-        /// <summary>
-        /// Для оптимизации income всегда хешируется
-        /// </summary>
-        [SerializeField, ReadOnlyInspector] private int income;
-
+        [field: SerializeField] public int Id { get; private set; } = -1;
+        
+        [field: Header("Settings")]
         [field: SerializeField] public PhaseExecutorsData PhaseExecutorsData { get; private set; }
+        [field: SerializeField] public PlayerRules Rules { get; private set; }
+        [field: SerializeField] public Nation Nation { get; private set; }
+        
+        [SerializeField, ReadOnlyInspector] private int currentMoney;
+        [SerializeField, ReadOnlyInspector] private int currentIncome;
+        
         public List<Node> InitialSpawns { get; private set; }
-
-        [field: SerializeField, ReadOnlyInspector] public Node Base { get; private set; }
-
-        [field: SerializeField, ReadOnlyInspector] public PlayerRules Rules { get; private set; }
-
-        public Nation Nation { get; private set; }
-
-        public HashSet<PhaseType> PhaseExceptions { get; set; }
+        public Node Base { get; private set; }
+        public HashSet<PhaseType> PhaseExceptions { get; private set; }
 
         private readonly HashSet<Owned> myOwned = new();
         private readonly List<Node> nodes = new();
@@ -54,25 +48,25 @@ namespace LineWars.Model
 
         public int CurrentMoney
         {
-            get => money;
+            get => currentMoney;
             set
             {
-                var before = money;
-                money = Math.Max(0, value);
+                var before = currentMoney;
+                currentMoney = Math.Max(0, value);
 
-                if (before != money)
-                    CurrentMoneyChanged?.Invoke(before, money);
+                if (before != currentMoney)
+                    CurrentMoneyChanged?.Invoke(before, currentMoney);
             }
         }
 
         public int Income
         {
-            get => income;
+            get => currentIncome;
             set
             {
-                var before = income;
-                income = value;
-                IncomeChanged?.Invoke(before, income);
+                var before = currentIncome;
+                currentIncome = value;
+                IncomeChanged?.Invoke(before, currentIncome);
             }
         }
 
@@ -83,7 +77,7 @@ namespace LineWars.Model
 
         protected virtual void Start()
         {
-            PhaseManager.Instance.RegisterActor(this);
+            
         }
 
         protected virtual void OnEnable()
@@ -94,20 +88,25 @@ namespace LineWars.Model
         {
         }
 
-        public virtual void Initialize(SpawnInfo spawnInfo)
+        public void Initialize(SpawnInfo spawnInfo)
         {
-            Id = spawnInfo.PlayerIndex;
-            Base = spawnInfo.SpawnNode.Node;
-            Rules = spawnInfo.SpawnNode.Rules;
+            Id = spawnInfo.PlayerId;
+            Base = spawnInfo.MainBase;
 
             CurrentMoney = Rules.StartMoney;
             Income = Rules.DefaultIncome;
-            Nation = spawnInfo.SpawnNode.Nation;
 
-            name = $"{GetType().Name}{spawnInfo.PlayerIndex} {spawnInfo.SpawnNode.name}";
+            name = $"{GetType().Name}{spawnInfo.PlayerId}";
 
-            InitialSpawns = spawnInfo.SpawnNode.InitialSpawns;
+            InitialSpawns = spawnInfo.InitialSpawns;
+            
+            OnInitialized();
         }
+
+        protected virtual void OnInitialized()
+        {
+            
+        } 
 
         #region SpawnUnit
 

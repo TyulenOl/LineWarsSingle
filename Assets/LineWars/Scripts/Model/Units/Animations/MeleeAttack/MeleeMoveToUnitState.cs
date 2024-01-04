@@ -18,8 +18,8 @@ namespace LineWars.Model
         {
             public readonly UnitMeleeAttackAnimation animation;
 
-            public event Action Started;
-            public event Action Ended;
+            //public event Action Started;
+            //public event Action Ended;
 
             
             private float movementProgress;
