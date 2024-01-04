@@ -13,7 +13,7 @@ namespace LineWars.Interface
         [SerializeField] private LayoutGroup presetsLayoutGroup;
         [SerializeField] private CardBuyPresetDrawer presetDrawerPrefab;
         [SerializeField] private UnitBuyLayerLogic unitBuyLayerLogic;
-        [FormerlySerializedAs("chosenPresetInfoDrawer")] [SerializeField] private UnitBuyPresetInfoDrawer chosenDeckCardInfoDrawer;
+        [FormerlySerializedAs("chosenPresetInfoDrawer")] [SerializeField] private UnitInfoDrawer chosenDeckCardInfoDrawer;
         
         private List<CardBuyPresetDrawer> unitBuyPresetDrawers;
         private Node baseToSpawnUnits;
