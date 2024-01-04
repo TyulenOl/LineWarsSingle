@@ -14,11 +14,11 @@ namespace LineWars.Controllers
         public static CameraController Instance;
 
         [Header("Move to a point options")] 
-        [SerializeField] private float timeToMove = 1;
-        [SerializeField] private float minHeightOnMove = 5;
+        [SerializeField] private float timeToMove = 1f;
+        [SerializeField] private float minHeightOnMove = 7f;
 
         [Header("Drag options")] 
-        [SerializeField] private float speedDampening = 15;
+        [SerializeField] private float speedDampening = 15f;
 
         [Header("Zoom options")] 
         [SerializeField] private float zoomDampening = 6f;
@@ -40,6 +40,7 @@ namespace LineWars.Controllers
         private Vector2 pivotPoint;
         private Vector3 lastPosition;
         private bool isDragging;
+        private bool isMoving;
 
         private Vector2 mapPointMin;
         private Vector2 mapPointMax;
@@ -111,6 +112,7 @@ namespace LineWars.Controllers
 
         public void MoveTo(Vector2 point)
         {
+            StopAllCoroutines();
             StartCoroutine(MoveToPoint(new Vector3(point.x, point.y, cameraTransform.position.z)));
         }
 
@@ -132,7 +134,7 @@ namespace LineWars.Controllers
             var newOrthographicSize = halfCameraSize.y * coefficient;
 
             if (newOrthographicSize < zoomValue)
-                zoomValue = Mathf.Clamp(newOrthographicSize, minHeightOnMove, newOrthographicSize);
+                zoomValue = Mathf.Clamp(newOrthographicSize, minHeightOnMove, mainCamera.orthographicSize);
 
             while (completionPercentage < 1 && !isDragging)
             {
