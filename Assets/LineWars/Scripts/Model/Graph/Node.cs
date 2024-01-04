@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using GraphEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -14,7 +15,8 @@ namespace LineWars.Model
         INodeForGame<Node, Edge, Unit>,
         IPointerClickHandler,
         INumbered,
-        IMonoTarget
+        IMonoTarget,
+        IMonoNode<Node, Edge>
     {
         [SerializeField] private int index;
 
@@ -56,6 +58,7 @@ namespace LineWars.Model
         public Vector2 Position => transform.position;
 
         public IEnumerable<Edge> Edges => edges;
+        public int EdgesCount => edges.Count;
 
         public bool LeftIsFree => LeftUnit is null;
         public bool RightIsFree => RightUnit is null;
@@ -224,7 +227,14 @@ namespace LineWars.Model
                 renderNodeV3 = GetComponent<RenderNodeV3>();
             if (defaultSprite == null)
                 Debug.LogError("Нет дефолтного спрайта у ноды", gameObject);
-            Redraw();
+#if UNITY_EDITOR
+            if (!UnityEditor.PrefabUtility.IsPartOfPrefabAsset(this)
+                && !UnityEditor.PrefabUtility.IsPartOfImmutablePrefab(this)
+                && UnityEditor.PrefabUtility.IsPartOfPrefabInstance(this))
+            {
+                UnityEditor.EditorApplication.delayCall += Redraw;
+            }
+#endif
         }
 
         #endregion

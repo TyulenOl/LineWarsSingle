@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Random = System.Random;
 
 
 public static class EnumerableExtension
@@ -49,5 +50,13 @@ public static class EnumerableExtension
     public static IEnumerable<GameObject> GameObjects(this IEnumerable<Component> components)
     {
         return components.Select(x => x.gameObject);
+    }
+    
+    public static IEnumerable<int> GetRandomIntEnumerable(Random random, int minValue, int maxValue)
+    {
+        while (true)
+        {
+            yield return random.Next(minValue, maxValue);
+        }
     }
 }

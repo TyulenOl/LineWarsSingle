@@ -2,26 +2,31 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using GraphEditor;
 using UnityEngine;
 
 namespace LineWars.Model
 {
-    public class MonoGraph : MonoBehaviour, IGraphForGame<Node, Edge, Unit>
+    public class MonoGraph : MonoBehaviour, IGraphForGame<Node, Edge, Unit>, IMonoGraph<Node, Edge>
     {
         private GraphForGame<Node, Edge, Unit> modelGraph;
         public static MonoGraph Instance { get; private set; }
 
         [field: SerializeField] public GameObject NodesParent { get; set; }
         [field: SerializeField] public GameObject EdgesParent { get; set; }
-
-        private Node[] allNodes;
-        private Edge[] allEdges;
+        
+        private readonly Dictionary<int, Node> idToNode = new();
+        private readonly Dictionary<int, Edge> idToEdge = new();
         private List<SpawnInfo> spawnInfos;
 
-        public IReadOnlyList<Node> Nodes => allNodes;
-        public IReadOnlyList<Edge> Edges => allEdges;
-
+        public IReadOnlyList<Node> Nodes => idToNode.Values.ToArray();
+        public IReadOnlyList<Edge> Edges => idToEdge.Values.ToArray();
+        
         public IReadOnlyList<SpawnInfo> Spawns => spawnInfos;
+
+
+        public IDictionary<int, Node> IdToNode => idToNode;
+        public IDictionary<int, Edge> IdToEdge => idToEdge;
 
         private void Awake()
         {
@@ -36,10 +41,15 @@ namespace LineWars.Model
 
         private void Start()
         {
-            allNodes = FindObjectsOfType<Node>();
-            allEdges = FindObjectsOfType<Edge>();
+            var allNodes = FindObjectsOfType<Node>();
+            var allEdges = FindObjectsOfType<Edge>();
             GenerateSpawnInfo();
             modelGraph = new GraphForGame<Node, Edge, Unit>(allNodes, allEdges);
+
+            foreach (var node in allNodes)
+                idToNode.Add(node.Id, node);
+            foreach (var edge in allEdges)
+                idToEdge.Add(edge.Id, edge);
         }
 
         private void GenerateSpawnInfo()
