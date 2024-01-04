@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    public class MonoGraph : MonoBehaviour, IGraphForGame<Node, Edge, Unit>, IMonoGraph<Node, Edge>
+    public class MonoGraph : MonoBehaviour, IGraphForGame<Node, Edge, Unit>
     {
         private GraphForGame<Node, Edge, Unit> modelGraph;
         public static MonoGraph Instance { get; private set; }

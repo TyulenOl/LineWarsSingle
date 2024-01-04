@@ -8,5 +8,6 @@
     DominationLarge = 5,
     CaptureThePoints = 6,
     SiegeLarge = 7,
-    Education = 8
+    Education = 8,
+    InfinityGame = 9
 }

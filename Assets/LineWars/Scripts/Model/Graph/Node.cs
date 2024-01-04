@@ -15,8 +15,7 @@ namespace LineWars.Model
         INodeForGame<Node, Edge, Unit>,
         IPointerClickHandler,
         INumbered,
-        IMonoTarget,
-        IMonoNode<Node, Edge>
+        IMonoTarget
     {
         [SerializeField] private int index;
 

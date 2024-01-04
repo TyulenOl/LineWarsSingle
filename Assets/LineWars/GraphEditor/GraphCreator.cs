@@ -2,21 +2,20 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using LineWars.Controllers;
+using LineWars.Model;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 
 namespace GraphEditor
 {
-    public abstract class GraphCreatorBase<TNode, TEdge, TGraph> : MonoBehaviour
-        where TNode : MonoBehaviour, IMonoNode<TNode, TEdge>
-        where TEdge : MonoBehaviour, IMonoEdge<TNode, TEdge>
-        where TGraph : MonoBehaviour, IMonoGraph<TNode, TEdge>
+    public class GraphCreator : MonoBehaviour
     {
         [Header("Prefabs")] 
-        [SerializeField] private TGraph graphPrefab;
-        [SerializeField] private TNode monoNodePrefab;
-        [SerializeField] private TEdge monoEdgePrefab;
+        [SerializeField] private MonoGraph graphPrefab;
+        [SerializeField] private Node monoNodePrefab;
+        [SerializeField] private Edge monoEdgePrefab;
 
         [Header("Points settings")]
         [SerializeField] private Vector2 areaSize = new(40, 20);
@@ -31,8 +30,20 @@ namespace GraphEditor
         [SerializeField] private int nodesCount = 10;
         [SerializeField] private Vector2Int edgesRange = new(2, 4);
 
-        private TGraph monoGraph;
+        private MonoGraph monoGraph;
         private UndirectedVertexGraph vertexGraph;
+
+        public void LoadSettings(GraphCreatorSettings settings)
+        {
+            areaSize = settings.AreaSize;
+            paddings = settings.Paddings;
+            powerOfConnection = settings.PowerOfConnection;
+            multiplierOfConnection = settings.MultiplierOfConnection;
+            powerOfRepulsion = settings.PowerOfRepulsion;
+            multiplierOfRepulsion = settings.MultiplierOfRepulsion;
+            nodesCount = settings.NodesCount;
+            edgesRange = settings.EdgesRange;
+        }
         
         public void Restart()
         {
@@ -144,7 +155,7 @@ namespace GraphEditor
         /// </summary>
         public void DeleteIntersectingEdgesByIntersectionsCount()
         {
-            var edgeAndIntersections = new Dictionary<TEdge, List<TEdge>>();
+            var edgeAndIntersections = new Dictionary<Edge, List<Edge>>();
             
             foreach (var monoEdge1 in monoGraph.Edges.ToArray())
             {
@@ -166,12 +177,12 @@ namespace GraphEditor
                     }
 
                     if (!edgeAndIntersections.ContainsKey(monoEdge1))
-                        edgeAndIntersections[monoEdge1] = new List<TEdge>();
+                        edgeAndIntersections[monoEdge1] = new List<Edge>();
                     edgeAndIntersections[monoEdge1].Add(monoEdge2);
                 }
             }
 
-            var deletedEdges = new List<TEdge>();
+            var deletedEdges = new List<Edge>();
             while (edgeAndIntersections.Count != 0)
             {
                 var currentPair = edgeAndIntersections

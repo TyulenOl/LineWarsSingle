@@ -10,10 +10,12 @@ public class MaskRendererV3AutoManagement : MonoBehaviour
 {
     public MaskRendererV3AutoManagement Instance { get; private set; }
 
-    [Header("Settings")] [SerializeField] private SpriteRenderer targetRenderer;
-    [SerializeField, Min(0)] private int numberFramesSkippedBeforeUpdate = 60;
+    [Header("Settings")]
+    [SerializeField] private SpriteRenderer targetRenderer;
+    [SerializeField, Min(0)] private int numberFramesSkippedBeforeUpdate;
 
-    [Header("Map")] [SerializeField] private Texture2D visibilityMap;
+    [Header("Map")] 
+    [SerializeField] private Texture2D visibilityMap;
     [SerializeField] private Transform startPosition;
     [SerializeField] private Transform endPosition;
 
@@ -25,11 +27,13 @@ public class MaskRendererV3AutoManagement : MonoBehaviour
     [SerializeField] private Color fogColor = Color.white;
     [SerializeField] [Range(0, 10)] private int blurRadius = 2;
 
-    [Header("Shaders")] [SerializeField] private ComputeShader maskShader;
+    [Header("Shaders")]
+    [SerializeField] private ComputeShader maskShader;
     [SerializeField] private ComputeShader blurShader;
     private Material fogShader;
 
-    [Header("")] [SerializeField] private bool autoInitialize;
+    [Space]
+    [SerializeField] private bool autoInitialize;
     [SerializeField] private List<RenderNodeV3> nodes;
     private List<RenderNodeV3> availableNodes;
 
@@ -78,6 +82,30 @@ public class MaskRendererV3AutoManagement : MonoBehaviour
 
     private const string FogShaderName = "Custom/FogV3Updated";
 
+    public Texture2D VisibilityMap
+    {
+        get => visibilityMap;
+        set => visibilityMap = value;
+    }
+
+    public Transform StartPosition
+    {
+        get => startPosition;
+        set => startPosition = value;
+    }
+
+    public Transform EndPosition
+    {
+        get => endPosition;
+        set => endPosition = value;
+    }
+
+    public Texture2D FogTexture
+    {
+        get => fogTexture;
+        set => fogTexture = value;
+    }
+
 
     private struct NodesBuffer
     {
@@ -100,9 +128,11 @@ public class MaskRendererV3AutoManagement : MonoBehaviour
 
     public void Start()
     {
-        nodes = FindObjectsOfType<RenderNodeV3>().ToList();
         if (autoInitialize)
+        {
+            nodes = FindObjectsOfType<RenderNodeV3>().ToList();
             Initialise();
+        }
     }
 
     private void Update()

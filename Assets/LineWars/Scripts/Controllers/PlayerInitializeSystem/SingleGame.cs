@@ -12,31 +12,33 @@ namespace LineWars
 {
     public class SingleGame : Singleton<SingleGame>
     {
-        [field: SerializeField] public InitialPlayerInfo PlayerInfo { get; set; }
-        [field: SerializeField] public List<InitialPlayerInfo> EnemiesInfos { get; set; }
+        [SerializeField] private bool autoInitialize = true;
+        
+        [field: SerializeField] public Player Player { get; set; }
+        [field: SerializeField] public List<BasePlayer> Enemies { get; set; }
 
         private int currentPlayerIndex;
         
         public readonly IndexList<BasePlayer> AllPlayers = new();
         public readonly IndexList<Unit> AllUnits = new();
-
         
         public SceneName MyScene => (SceneName) SceneManager.GetActiveScene().buildIndex;
         
         private void Start()
         {
-            StartGame();
+            if (autoInitialize)
+                StartGame();
         }
 
-        private void StartGame()
+        public void StartGame()
         {
-            var player = InitializeBasePlayer<Player>(PlayerInfo);
+            var player = InitializeBasePlayer(Player);
             player.RecalculateVisibility(false);
             AllPlayers.Add(player.Id, player);
 
-            foreach (var enemiesInfo in EnemiesInfos)
+            foreach (var enemiesInfo in Enemies)
             {
-                var enemy = InitializeBasePlayer<BasePlayer>(enemiesInfo);
+                var enemy = InitializeBasePlayer(enemiesInfo);
                 AllPlayers.Add(enemy.Id, enemy);
             }
             
@@ -100,26 +102,24 @@ namespace LineWars
             if (SpeechManager.Instance != null) SpeechManager.Instance.StopAllSounds();
         }
 
-        private T InitializeBasePlayer<T>(InitialPlayerInfo initialPlayerInfo)
+        private T InitializeBasePlayer<T>(T player)
             where T : BasePlayer
         {
-            var player = (T) initialPlayerInfo.Player;
-            InitializeBasePlayer(player, GetSpawnInfo(currentPlayerIndex, initialPlayerInfo));
+            InitializeBasePlayer(currentPlayerIndex, player);
             currentPlayerIndex++;
             return player;
         }
         
-        private static void InitializeBasePlayer(BasePlayer player, SpawnInfo spawnInfo)
+        private static void InitializeBasePlayer(int id, BasePlayer player)
         {
-            player.Initialize(spawnInfo);
+            player.Initialize(id);
 
-            foreach (var spawn in spawnInfo.InitialSpawns)
+            foreach (var spawn in player.InitialSpawns)
             {
-                spawn.IsDirty = true;
                 spawn.IsBase = true;
             }
             
-            foreach (var node in spawnInfo.Nodes)
+            foreach (var node in player.AllInitialNodes)
             {
                 node.IsDirty = true;
                 
@@ -136,45 +136,6 @@ namespace LineWars
                 {
                     BasePlayerUtility.CreateUnitForPlayer(player, node, rightUnitPrefab, UnitDirection.Right);
                 }
-            }
-        }
-
-        private static SpawnInfo GetSpawnInfo(int id, InitialPlayerInfo playerInfo)
-        {
-            return new SpawnInfo(
-                id,
-                playerInfo.MainSpawn,
-                playerInfo.InitialSpawns,
-                playerInfo.InitialNodes
-            );
-        }
-
-#if UNITY_EDITOR
-        private void OnValidate()
-        {
-            if (EditorExtensions.CanRedraw(this))
-            {
-                UnityEditor.EditorApplication.delayCall += DrawSpawns;
-            }
-        }
-#endif
-        private void DrawSpawns()
-        {
-            var initialInfos = new[] {PlayerInfo}.Concat(EnemiesInfos).ToArray();
-            foreach (var initialInfo in initialInfos)
-                initialInfo.Validate();
-            
-            foreach (var node in FindObjectsOfType<Node>())
-                node.DrawToDefault();
-
-            foreach (var initialInfo in initialInfos)
-            {
-                if (initialInfo.Nation == null)
-                    continue;
-                foreach (var spawn in initialInfo.InitialSpawns.Where(x => x != null))
-                    spawn.Redraw(true, initialInfo.Nation.Name, initialInfo.Nation.NodeSprite);
-                foreach (var node in initialInfo.InitialNodes.Where(x => x != null))
-                    node.Redraw(false, initialInfo.Nation.Name, initialInfo.Nation.NodeSprite);
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿// ReSharper disable ParameterHidesMember
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphEditor;
@@ -13,8 +14,7 @@ namespace LineWars.Model
         ISerializationCallbackReceiver,
         IPointerClickHandler,
         INumbered,
-        IMonoTarget,
-        IMonoEdge<Node, Edge>
+        IMonoTarget
     {
         [Header("Graph Settings")]
         [SerializeField] private int index;
@@ -117,7 +117,7 @@ namespace LineWars.Model
         {
             hp = MaxHp;
 #if UNITY_EDITOR
-            if (EditorExtensions.CanRedraw(this))
+            if (EditorExtensions.CanRedraw(gameObject))
             {
                 UnityEditor.EditorApplication.delayCall += Redraw;
             }
