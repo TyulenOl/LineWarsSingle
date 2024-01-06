@@ -9,7 +9,9 @@
     {
         IActionCommand ITargetedAction<TUnit>.GenerateCommand(TUnit target)
         {
-            return new BlowWithSwingCommand<TNode, TEdge, TUnit>(this, target);
+            return new TargetedUniversalCommand
+                <TUnit, IBlowWithSwingAction<TNode, TEdge, TUnit>, TUnit>
+                (this, target);
         }
     }
 }

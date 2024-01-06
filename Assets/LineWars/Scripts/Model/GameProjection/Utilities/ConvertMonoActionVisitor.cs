@@ -111,6 +111,18 @@ namespace LineWars.Model
         {
             return new ConvertMonoActionVisitor(unit, graph);
         }
+
+        public void Visit(MonoStunAttackAction action)
+        {
+            Result = new StunAttackAction<NodeProjection, EdgeProjection, UnitProjection>(Unit);
+            Result.ActionModifier = action.Action.ActionModifier;
+        }
+
+        public void Visit(MonoHealingAttackAction action)
+        {
+            Result = new HealingAttackAction<NodeProjection, EdgeProjection, UnitProjection>(Unit);
+            Result.ActionModifier = action.Action.ActionModifier;
+        }
     }
 
     

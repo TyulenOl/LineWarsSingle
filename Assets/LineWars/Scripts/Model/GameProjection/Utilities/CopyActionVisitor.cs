@@ -1,5 +1,3 @@
-using System;
-
 namespace LineWars.Model
 {
     public class CopyActionVisitor<TNode, TEdge, TUnit> : 
@@ -100,6 +98,18 @@ namespace LineWars.Model
         public void Visit(HealYourselfAction<TNode, TEdge, TUnit> action)
         {
             Result = new HealYourselfAction<TNode, TEdge, TUnit>(Unit, action.HealAmount);
+            Result.ActionModifier = action.ActionModifier;
+        }
+
+        public void Visit(StunAttackAction<TNode, TEdge, TUnit> action)
+        {
+            Result = new StunAttackAction<TNode, TEdge, TUnit>(Unit);
+            Result.ActionModifier = action.ActionModifier;
+        }
+
+        public void Visit(HealingAttackAction<TNode, TEdge, TUnit> action)
+        {
+            Result = new HealingAttackAction<TNode, TEdge, TUnit>(Unit);
             Result.ActionModifier = action.ActionModifier;
         }
     }

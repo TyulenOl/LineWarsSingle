@@ -19,5 +19,7 @@ namespace LineWars.Model
         public void Visit(ShotUnitAction<TNode, TEdge, TUnit> action);
         public void Visit(RLBuildAction<TNode, TEdge, TUnit> action);
         public void Visit(HealYourselfAction<TNode, TEdge, TUnit> action);
+        public void Visit(StunAttackAction<TNode, TEdge, TUnit> action);
+        public void Visit(HealingAttackAction<TNode, TEdge, TUnit> action);
     }
 }
