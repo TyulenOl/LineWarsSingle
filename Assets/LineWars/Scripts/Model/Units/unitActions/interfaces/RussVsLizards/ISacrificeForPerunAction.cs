@@ -17,7 +17,9 @@
 
         IActionCommand ITargetedAction<TNode>.GenerateCommand(TNode target)
         {
-            return new SacrificeForPerunCommand<TNode, TEdge, TUnit>(this, target);
+            return new TargetedUniversalCommand
+                <TUnit, ISacrificeForPerunAction<TNode, TEdge, TUnit>, TNode>
+                (Executor, target);
         }
     }
 }

@@ -21,5 +21,6 @@
         public TResult Visit(IHealYourselfAction<TNode, TEdge, TUnit> action);
         public TResult Visit(IStunAttackAction<TNode, TEdge, TUnit> action);
         public TResult Visit(IHealingAttackAction<TNode, TEdge, TUnit> action);
+        public TResult Visit(ITargetPowerBasedAttackAction<TNode, TEdge, TUnit> action);
     }
 }

@@ -40,7 +40,8 @@ namespace LineWars.Model
         ShotUnit,
         VodaBajkalskaya,
         Stun,
-        HealingAttack
+        HealingAttack,
+        TargetPowerBasedAttack
     }
 }   
 

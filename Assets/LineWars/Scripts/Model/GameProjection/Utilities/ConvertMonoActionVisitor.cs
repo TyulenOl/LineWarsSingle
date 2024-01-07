@@ -123,7 +123,11 @@ namespace LineWars.Model
             Result = new HealingAttackAction<NodeProjection, EdgeProjection, UnitProjection>(Unit);
             Result.ActionModifier = action.Action.ActionModifier;
         }
-    }
 
-    
+        public void Visit(MonoTargetPowerBasedAttackAction action)
+        {
+            Result = new TargetPowerBasedAttackAction<NodeProjection, EdgeProjection, UnitProjection>(Unit);
+            Result.ActionModifier = action.Action.ActionModifier;
+        }
+    }    
 }

@@ -221,6 +221,11 @@ namespace LineWars.Model
         {
             // TODO
         }
+
+        public void Visit(TargetPowerBasedAttackAction<TNode, TEdge, TUnit> action)
+        {
+            // TODO
+        }
     }
 
     public static class ConvertUnitActionToBlueprints

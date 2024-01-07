@@ -112,6 +112,12 @@ namespace LineWars.Model
             Result = new HealingAttackAction<TNode, TEdge, TUnit>(Unit);
             Result.ActionModifier = action.ActionModifier;
         }
+
+        public void Visit(TargetPowerBasedAttackAction<TNode, TEdge, TUnit> action)
+        {
+            Result = new TargetPowerBasedAttackAction<TNode, TEdge, TUnit>(Unit);
+            Result.ActionModifier = action.ActionModifier;
+        }
     }
 
     public static class CopyActionVisitor

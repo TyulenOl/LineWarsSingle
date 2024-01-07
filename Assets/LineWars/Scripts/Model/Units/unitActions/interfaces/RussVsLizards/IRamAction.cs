@@ -15,7 +15,9 @@
         void ITargetedAction<TNode>.Execute(TNode target) => Ram(target);
         IActionCommand ITargetedAction<TNode>.GenerateCommand(TNode target)
         {
-            return new RamCommand<TNode, TEdge, TUnit>(this, target);
+            return new TargetedUniversalCommand
+                <TUnit, IRamAction<TNode, TEdge, TUnit>, TNode>
+                (Executor, target);
         }
     }
 }

@@ -3,6 +3,7 @@ using JetBrains.Annotations;
 
 namespace LineWars.Model
 {
+    [Obsolete]
     public class SacrificeForPerunCommand<TNode, TEdge, TUnit> :
         TargetActionCommand<TUnit, ISacrificeForPerunAction<TNode, TEdge, TUnit>, TNode>
         where TNode : class, INodeForGame<TNode, TEdge, TUnit>
