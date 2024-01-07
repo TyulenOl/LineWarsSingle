@@ -12,8 +12,10 @@ namespace LineWars.Interface
         [SerializeField] private Image BgImage;
         [SerializeField] private Button button;
         [SerializeField] private CanvasGroup canvasGroup;
-        
+
         private Unit unit;
+
+        private bool isActive;
         
         public void Init(Unit unit)
         {
@@ -22,6 +24,42 @@ namespace LineWars.Interface
             unit.ActionPointsChanged.AddListener(OnApChanged);
             unitImage.sprite = unit.Sprite;
             button.onClick.AddListener(OnClick);
+            CommandsManager.Instance.ExecutorChanged += OnExecutorChanged;
+            CommandsManager.Instance.CommandIsExecuted += OnCommandExecuted;
+            isActive = true;
+        }
+
+        private void OnCommandExecuted(ICommand obj)
+        {
+            if(!isActive)
+                return;
+            var inter = false;
+            if (CommandsManager.Instance.Executor == unit)
+                inter = true;
+            else
+            {
+                inter = CommandsManager.Instance.Executor != unit && CommandsManager.Instance.CanSetExecutor();
+            }
+            BgImage.color = inter ? Color.white : Color.gray;
+            button.interactable = inter;
+        }
+
+        private void OnExecutorChanged(IMonoExecutor arg1, IMonoExecutor arg2)
+        {
+            var isSelected = unit.Equals(arg2);
+            if (isSelected)
+            {
+                BgImage.color = Color.green; 
+            }
+            else
+            {
+                if (unit.CurrentActionPoints != 0)
+                {
+                    BgImage.color = Color.white;
+                    button.interactable = true;
+                }
+                    
+            }
         }
 
         private void OnApChanged(int old, int now)
@@ -32,6 +70,7 @@ namespace LineWars.Interface
                 unitImage.color = Color.gray;
                 transform.SetAsLastSibling();
                 button.interactable = false;
+                isActive = false;
             }
             
             if(old == 0)
@@ -39,8 +78,13 @@ namespace LineWars.Interface
                 unitImage.color = Color.white;
                 BgImage.color = Color.white;
                 button.interactable = true;
+                isActive = true;
             }
         }
+        
+        
+        
+        
         
         private void OnClick()
         {
