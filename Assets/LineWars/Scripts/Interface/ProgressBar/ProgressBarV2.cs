@@ -18,9 +18,19 @@ public class ProgressBarV2 : MonoBehaviour
     public void SetValue(float value)
     {
         value = Mathf.Clamp(value, Slider.minValue, Slider.maxValue);
+        gameObject.SetActive(value != 0);
         var difference = -1 * (Slider.value - (Slider.maxValue - value));
         RefreshFrameChange();
-        StartCoroutine(ChangeValue(difference));
+        if (isActiveAndEnabled)
+            StartCoroutine(ChangeValue(difference));
+        else
+            Slider.value += difference;
+    }
+
+    public virtual void SetMaxValue(float value)
+    {
+        Slider.maxValue = value;
+        gameObject.SetActive(value != 0);
     }
 
     public float GetValue()
