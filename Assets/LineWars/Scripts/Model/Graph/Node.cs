@@ -38,8 +38,8 @@ namespace LineWars.Model
         [SerializeField] private SpriteRenderer spriteRenderer;
         
         [field: Header("Initial Info")]
-        [field: SerializeField] public UnitType LeftUnitType { get; private set; }
-        [field: SerializeField] public UnitType RightUnitType { get; private set; }
+        [field: SerializeField] public UnitType LeftUnitType { get; set; }
+        [field: SerializeField] public UnitType RightUnitType { get; set; }
 
         private Camera mainCamera;
 

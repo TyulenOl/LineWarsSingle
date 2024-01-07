@@ -82,6 +82,7 @@ public class MaskRendererV3AutoManagement : MonoBehaviour
 
     private const string FogShaderName = "Custom/FogV3Updated";
 
+    public SpriteRenderer TargetRenderer => targetRenderer;
     public Texture2D VisibilityMap
     {
         get => visibilityMap;

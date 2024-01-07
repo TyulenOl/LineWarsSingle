@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using AYellowpaper.SerializedCollections;
 using DataStructures;
 using GraphEditor;
+using LineWars.Model;
 using UnityEngine;
 
 namespace LineWars.Controllers
@@ -18,11 +21,14 @@ namespace LineWars.Controllers
         
         [Header("References")]
         [SerializeField] private GraphCreator graphCreator;
-        [SerializeField] private MaskRendererV3AutoManagement maskRendererV3AutoManagement;
+        [SerializeField] private MapCreator mapCreator;
+        [SerializeField] private CameraController cameraController;
         [SerializeField] private SingleGame singleGame;
         
         [Header("Debug")]
         [SerializeField] private InfinityGameMode gameMode;
+
+        private MonoGraph monoGraph;
 
         protected override void Awake()
         {
@@ -56,15 +62,105 @@ namespace LineWars.Controllers
 
         public void InitializeBySettings(InfinityGameSettings settings)
         {
-            CreateGraph(settings.InitializeGraphSettings, settings.GraphCreatorSettings);
+            if (settings.PlayersSettings.Players.Count != 2)
+            {
+                Debug.LogError("Бесконечная игра предназначена только для двух игроков!");
+                return;
+            }
+            
+            monoGraph = CreateGraph(settings.InitializeGraphSettings, settings.GraphCreatorSettings);
+            CreatePlayers(settings.PlayersSettings);
+            CreateGameReferee(settings.PlayersSettings.GameRefereeCreator);
+            
+            mapCreator.GenerateMap(monoGraph);
+            cameraController.gameObject.SetActive(true);
+            
+            singleGame.StartGame();
         }
 
-        private void CreateGraph(
+        private void CreateGameReferee(GameRefereeCreator creator)
+        {
+            creator.PrepareNodes(monoGraph.Nodes);
+            creator.Initialize();
+            var referee = creator.CreateGameReferee();
+            referee.transform.SetParent(singleGame.transform);
+        }
+        
+        private void CreatePlayers(PlayersSettings playersSettings)
+        {
+            var players = playersSettings.Players.ToArray();
+            var mostRemoteNodes = monoGraph.FindMostRemoteNodes()
+                // .OrderByDescending(x => x.Item1.EdgesCount + x.Item2.EdgesCount) // большее число ребер
+                // .ThenBy(x => Math.Abs(x.Item1.EdgesCount - x.Item2.EdgesCount)) // но разбос меньше
+                .OrderByDescending(x => (x.Item1.transform.position - x.Item2.transform.position).magnitude)
+                .First();
+
+            var nodes = new[] {mostRemoteNodes.Item1, mostRemoteNodes.Item2}
+                .OrderByDescending(x => x.EdgesCount)
+                .ToArray();
+
+            var instanceOfPlayers = new List<BasePlayer>();
+            visitedNodes = new HashSet<Node>();
+            
+            for (int i = 0; i < players.Length; i++)
+            {
+                var node = nodes[i];
+                var player = players[i];
+                var instanceOfPlayer = Instantiate(player.PlayerPrefab, transform);
+                instanceOfPlayers.Add(instanceOfPlayer);
+                
+                ProcessOwnedInformation(instanceOfPlayer, node, player.InitialOwnerInfo);
+            }
+
+            singleGame.Player = (Player) instanceOfPlayers[0];
+            singleGame.Enemies = instanceOfPlayers.Skip(1).ToList();
+            visitedNodes = null;
+        }
+
+        private HashSet<Node> visitedNodes;
+        private void ProcessOwnedInformation(
+            BasePlayer basePlayer,
+            Node rootNode,
+            InitialOwnerInfo initialOwnerInfo)
+        {
+            basePlayer.InitialSpawns = new List<Node>();
+            basePlayer.InitialNodes = new List<Node>();
+            
+            var orderByRadius = initialOwnerInfo.NodeInfos
+                .OrderBy(x => x.NodeRadius)
+                .ToArray();
+            var nodesAndDistance = monoGraph.FindDistanceToNodes(rootNode);
+            
+            foreach (var nodeInfo in orderByRadius)
+            {
+                foreach (var (node, distance) in nodesAndDistance)
+                {
+                    if (visitedNodes.Contains(node))
+                        continue;
+                    
+                    if (nodeInfo.NodeRadius <= distance)
+                    {
+                        if (nodeInfo.IsSpawn)
+                            basePlayer.InitialSpawns.Add(node);
+                        else
+                            basePlayer.InitialNodes.Add(node);
+
+                        node.LeftUnitType = nodeInfo.LeftUnit;
+                        node.RightUnitType = nodeInfo.RightUnit;
+
+                        visitedNodes.Add(node);
+                        break;
+                    }
+                }
+            }
+        } 
+            
+        private MonoGraph CreateGraph(
             InitializeGraphSettings initializeGraphSettings,
             GraphCreatorSettings graphCreatorSettings)
         {
             graphCreator.LoadSettings(graphCreatorSettings);
-            graphCreator.Restart();
+            var graph = graphCreator.Restart();
             for (var i = 0; i < initializeGraphSettings.IterationCountBeforeDeleteEdges; i++)
                 graphCreator.Iterate();
 
@@ -84,6 +180,7 @@ namespace LineWars.Controllers
                 graphCreator.Iterate();
             
             graphCreator.RedrawAllEdges();
+            return graph;
         }
 
         public static void Load(InfinityGameMode gameMode)

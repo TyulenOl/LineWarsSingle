@@ -9,6 +9,16 @@ namespace LineWars
         [SerializeField] private List<Node> capturePoints;
         public IReadOnlyList<Node> CapturePoints => capturePoints;
 
+        public void AddCapturePoint(Node node)
+        {
+            capturePoints.Add(node);
+        }
+
+        public bool RemoveCapturePoint(Node node)
+        {
+            return capturePoints.Remove(node);
+        }
+
         public override void Initialize(Player me, IEnumerable<BasePlayer> enemies)
         {
             base.Initialize(me, enemies);

@@ -12,7 +12,6 @@ namespace LineWars.Model
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
 
     {
-        public int Id { get; }
         public int Visibility { get; }
         public int ValueOfHidden { get; }
 

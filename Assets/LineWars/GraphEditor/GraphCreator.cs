@@ -24,7 +24,7 @@ namespace GraphEditor
         [SerializeField] private float powerOfConnection = 1;
         [SerializeField, Range(0, 0.1f)] private float multiplierOfConnection = 0.006f;
         [SerializeField] private float powerOfRepulsion = 2;
-        [SerializeField, Range(0, 1)] private float multiplierOfRepulsion = 1;
+        [SerializeField, Range(0, 100)] private float multiplierOfRepulsion = 1;
 
         [Header("Graph settings")] 
         [SerializeField] private int nodesCount = 10;
@@ -45,10 +45,10 @@ namespace GraphEditor
             edgesRange = settings.EdgesRange;
         }
         
-        public void Restart()
+        public MonoGraph Restart()
         {
             var graph = GenerateConnectiveGraph();
-            CreateInstanceOfGraph(graph);
+            return CreateInstanceOfGraph(graph);
         }
 
         public void Iterate()
@@ -233,10 +233,11 @@ namespace GraphEditor
             }
         }
 
-        private void CreateInstanceOfGraph(UndirectedVertexGraph undirectedGraph)
+        private MonoGraph CreateInstanceOfGraph(UndirectedVertexGraph undirectedGraph)
         {
             vertexGraph = undirectedGraph;
             monoGraph = Instantiate(graphPrefab);
+            monoGraph.Initialize();
             foreach (var node in undirectedGraph.Nodes)
             {
                 var monoNode = Instantiate(monoNodePrefab, monoGraph.NodesParent.transform);
@@ -255,6 +256,8 @@ namespace GraphEditor
                 monoGraph.IdToEdge[edgeIndex] = monoEdge;
                 edgeIndex++;
             }
+
+            return monoGraph;
         }
 
         public void RedrawAllEdges()
@@ -303,7 +306,7 @@ namespace GraphEditor
                 DestroyImmediate(monoGraph.IdToNode[nodeId].gameObject);
             else
                 Destroy(monoGraph.IdToNode[nodeId].gameObject);
-            monoGraph.IdToNode.Remove(nodeId);
+            monoGraph.RemoveNode(nodeId);
         }
 
         private void DestroyEdge(int edgeId)
@@ -312,7 +315,7 @@ namespace GraphEditor
                 DestroyImmediate(monoGraph.IdToEdge[edgeId].gameObject);
             else 
                 Destroy(monoGraph.IdToEdge[edgeId].gameObject);
-            monoGraph.IdToEdge.Remove(edgeId);
+            monoGraph.RemoveEdge(edgeId);
         }
     }
 }

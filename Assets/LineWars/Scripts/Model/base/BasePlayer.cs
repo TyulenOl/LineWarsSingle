@@ -25,8 +25,8 @@ namespace LineWars.Model
         [SerializeField, ReadOnlyInspector] private int currentMoney;
         [SerializeField, ReadOnlyInspector] private int currentIncome;
 
-        [field: SerializeField] public List<Node> InitialSpawns { get; private set; }
-        [field: SerializeField] public List<Node> InitialNodes { get; private set; }
+        [field: SerializeField] public List<Node> InitialSpawns { get; set; }
+        [field: SerializeField] public List<Node> InitialNodes { get; set; }
         public IEnumerable<Node> AllInitialNodes => InitialSpawns.Concat(InitialNodes);
         
         
@@ -101,6 +101,11 @@ namespace LineWars.Model
             Income = Rules.DefaultIncome;
 
             name = $"{GetType().Name}{id}";
+            
+            var initialSpawnsSet = InitialSpawns.ToHashSet();
+            InitialNodes = InitialNodes
+                .Where(x => !initialSpawnsSet.Contains(x))
+                .ToList();
             
             OnInitialized();
         }
@@ -294,36 +299,28 @@ namespace LineWars.Model
 
 
 #if UNITY_EDITOR
-        private List<Node> cashedNodes = new ();
         private void OnValidate()
         {
-            var initialSpawnsSet = InitialSpawns.ToHashSet();
-            InitialNodes = InitialNodes
-                .Where(x => !initialSpawnsSet.Contains(x))
-                .ToList();
-            
             if (EditorExtensions.CanRedraw(gameObject))
             {
-                UnityEditor.EditorApplication.delayCall += Redraw;
+                UnityEditor.EditorApplication.delayCall += RedrawAllPlayers;
             }
         }
 #endif
-        private void Redraw()
+        private static void RedrawAllPlayers()
         {
-            if (Nation == null)
-                return;
-
-            foreach (var node in cashedNodes.Where(x => x != null))
+            foreach (var node in FindObjectsOfType<Node>())
                 node.DrawToDefault();
-            
-            foreach (var spawn in InitialSpawns.Where(x => x != null))
-                spawn.Redraw(true, Nation.Name, Nation.NodeSprite);
-            foreach (var node in InitialNodes.Where(x => x != null))
-                node.Redraw(false, Nation.Name, Nation.NodeSprite);
 
-            cashedNodes = InitialSpawns
-                .Concat(InitialNodes)
-                .ToList();
+            foreach (var player in FindObjectsOfType<BasePlayer>())
+            {
+                if (player.Nation == null)
+                    continue;
+                foreach (var spawn in player.InitialSpawns.Where(x => x != null))
+                    spawn.Redraw(true, player.Nation.Name, player.Nation.NodeSprite);
+                foreach (var node in player.InitialNodes.Where(x => x != null))
+                    node.Redraw(false, player.Nation.Name, player.Nation.NodeSprite);
+            }
         }
     }
 }

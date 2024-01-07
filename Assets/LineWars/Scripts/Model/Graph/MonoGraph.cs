@@ -9,22 +9,21 @@ namespace LineWars.Model
 {
     public class MonoGraph : MonoBehaviour, IGraphForGame<Node, Edge, Unit>
     {
-        private GraphForGame<Node, Edge, Unit> modelGraph;
         public static MonoGraph Instance { get; private set; }
 
+        private GraphForGame<Node, Edge, Unit> modelGraph;
         [field: SerializeField] public GameObject NodesParent { get; set; }
         [field: SerializeField] public GameObject EdgesParent { get; set; }
+
+        [SerializeField] private bool autoInitialize = true;
         
-        private readonly Dictionary<int, Node> idToNode = new();
-        private readonly Dictionary<int, Edge> idToEdge = new();
-
-        public IReadOnlyList<Node> Nodes => idToNode.Values.ToArray();
-        public IReadOnlyList<Edge> Edges => idToEdge.Values.ToArray();
+        public IReadOnlyList<Node> Nodes => modelGraph.Nodes;
+        public IReadOnlyList<Edge> Edges => modelGraph.Edges;
         
+        public INodeIndexer<Node, Edge> IdToNode => modelGraph.IdToNode;
+        public IEdgeIndexer<Node, Edge> IdToEdge => modelGraph.IdToEdge;
 
-
-        public IDictionary<int, Node> IdToNode => idToNode;
-        public IDictionary<int, Edge> IdToEdge => idToEdge;
+        private bool initialized;
 
         private void Awake()
         {
@@ -34,21 +33,83 @@ namespace LineWars.Model
             {
                 Debug.LogError("Более одного графа!");
                 Destroy(gameObject);
+                return;
             }
         }
 
         private void Start()
         {
+            if (autoInitialize && !initialized)
+                AutoInitializeInitialize();
+        }
+
+        private void AutoInitializeInitialize()
+        {
+            initialized = true;
             var allNodes = FindObjectsOfType<Node>();
             var allEdges = FindObjectsOfType<Edge>();
+            
             modelGraph = new GraphForGame<Node, Edge, Unit>(allNodes, allEdges);
+        }
 
-            foreach (var node in allNodes)
-                idToNode.Add(node.Id, node);
-            foreach (var edge in allEdges)
-                idToEdge.Add(edge.Id, edge);
+        public void Initialize()
+        {
+            if (initialized)
+                return;
+            initialized = true;
+            modelGraph = new GraphForGame<Node, Edge, Unit>();
         }
         
+        public void AddNode(Node node)
+        {
+            modelGraph.AddNode(node);
+        }
+
+        public bool RemoveNode(Node node)
+        {
+            return modelGraph.RemoveNode(node);
+        }
+
+        public bool RemoveNode(int nodeId)
+        {
+            return modelGraph.RemoveNode(nodeId);
+        }
+
+        public bool ContainsNode(Node node)
+        {
+            return modelGraph.ContainsNode(node);
+        }
+
+        public bool ContainsNode(int nodeId)
+        {
+            return modelGraph.ContainsNode(nodeId);
+        }
+
+        public void AddEdge(Edge edge)
+        {
+            modelGraph.AddEdge(edge);
+        }
+
+        public bool RemoveEdge(Edge edge)
+        {
+            return modelGraph.RemoveEdge(edge);
+        }
+
+        public bool RemoveEdge(int edgeId)
+        {
+            return modelGraph.RemoveEdge(edgeId);
+        }
+
+        public bool ContainsEdge(Edge edge)
+        {
+            return modelGraph.ContainsEdge(edge);
+        }
+
+        public bool ContainsEdge(int edgeId)
+        {
+            return modelGraph.ContainsEdge(edgeId);
+        }
+
         public Dictionary<Node, bool> GetVisibilityInfo(BasePlayer player)
             => modelGraph.GetVisibilityInfo(player.MyNodes);
 
@@ -76,6 +137,16 @@ namespace LineWars.Model
             IReadOnlyDictionary<Node, int> interferingNodes)
         {
             return modelGraph.MultiStartsLimitedBfs(startNodes, interferingNodes);
+        }
+
+        public IEnumerable<(Node, uint)> FindDistanceToNodes(Node rootNode)
+        {
+            return modelGraph.FindDistanceToNodes(rootNode);
+        }
+
+        public HashSet<(Node, Node)> FindMostRemoteNodes()
+        {
+            return modelGraph.FindMostRemoteNodes();
         }
     }
 }

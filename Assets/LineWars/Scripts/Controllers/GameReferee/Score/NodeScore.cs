@@ -7,6 +7,10 @@ namespace LineWars
     public class NodeScore: MonoBehaviour
     {
         [SerializeField, Min(0)] private int score;
-        public int Score => score;
+        public int Score
+        {
+            get => score;
+            set => score = value;
+        }
     }
 }

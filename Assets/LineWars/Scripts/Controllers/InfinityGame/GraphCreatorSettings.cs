@@ -11,7 +11,7 @@ namespace LineWars.Controllers
         [field: SerializeField] public float PowerOfConnection { get; set; } = 1;
         [field: SerializeField, Range(0, 0.1f)] public float MultiplierOfConnection { get; set; } = 0.006f;
         [field: SerializeField] public float PowerOfRepulsion { get; set; } = 2;
-        [field: SerializeField, Range(0,1)] public float MultiplierOfRepulsion { get; set; } = 1;
+        [field: SerializeField, Range(0, 100)] public float MultiplierOfRepulsion { get; set; } = 1;
         [field: SerializeField, Min(0)] public int NodesCount { get; set; } = 10;
         [field: SerializeField] public Vector2Int EdgesRange { get; set; } = new(2, 4);
     }
