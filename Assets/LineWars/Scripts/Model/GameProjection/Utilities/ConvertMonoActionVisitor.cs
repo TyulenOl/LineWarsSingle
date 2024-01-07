@@ -129,5 +129,11 @@ namespace LineWars.Model
             Result = new TargetPowerBasedAttackAction<NodeProjection, EdgeProjection, UnitProjection>(Unit);
             Result.ActionModifier = action.Action.ActionModifier;
         }
+
+        public void Visit(MonoUpArmorAction action)
+        {
+            Result = new UpArmorAction<NodeProjection, EdgeProjection, UnitProjection>(Unit);
+            Result.ActionModifier = action.Action.ActionModifier;
+        }
     }    
 }

@@ -118,6 +118,12 @@ namespace LineWars.Model
             Result = new TargetPowerBasedAttackAction<TNode, TEdge, TUnit>(Unit);
             Result.ActionModifier = action.ActionModifier;
         }
+
+        public void Visit(UpArmorAction<TNode, TEdge, TUnit> action)
+        {
+            Result = new UpArmorAction<TNode, TEdge, TUnit>(Unit);
+            Result.ActionModifier = action.ActionModifier;
+        }
     }
 
     public static class CopyActionVisitor
