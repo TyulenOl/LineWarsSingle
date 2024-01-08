@@ -43,7 +43,7 @@ namespace LineWars.Controllers
 
             InitializeProviders();
 
-            InitializeLootBoxController();
+            //InitializeLootBoxController();
             DecksController.Initialize(deckProvider);
             CompaniesController.Initialize(missionInfoProvider, missionsStorage);
             UserController.Initialize(userInfoProvider, cardsDatabase);
