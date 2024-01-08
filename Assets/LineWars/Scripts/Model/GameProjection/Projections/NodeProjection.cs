@@ -5,19 +5,19 @@ using System.Linq;
 
 namespace LineWars.Model
 {
-    public class NodeProjection
-        : OwnedProjection, INodeForGame<NodeProjection, EdgeProjection, UnitProjection>, 
+    public class NodeProjection : OwnedProjection,
+        INodeForGame<NodeProjection, EdgeProjection, UnitProjection>, 
         IReadOnlyNodeProjection, INumbered
     {
         private UnitProjection leftUnit;
         private UnitProjection rightUnit;
 
+        public int Id { get; set; }
         public int Score { get; set; }
         public Node Original { get; set; } 
         public CommandPriorityData CommandPriorityData { get; set; }
         public List<EdgeProjection> EdgesList { get; set; }
         public bool IsBase { get; set; }
-        public int Id { get; set; }
         public int Visibility { get; set; }
         public int ValueOfHidden { get; set; }
         public List<int> BannedOwnerId { get; set; }

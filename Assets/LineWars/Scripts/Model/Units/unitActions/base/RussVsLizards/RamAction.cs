@@ -12,13 +12,10 @@ namespace LineWars.Model
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
 
     {
-        public int Damage { get; }
-
         public override CommandType CommandType => CommandType.Ram;
 
-        public RamAction(TUnit executor, int damage) : base(executor)
+        public RamAction(TUnit executor) : base(executor)
         {
-            Damage = damage;
         }
 
         public bool CanRam(TNode node)
@@ -43,7 +40,7 @@ namespace LineWars.Model
         {
             var enemies = enemyNode.Units
                 .ToArray();
-            var damage = Damage / enemies.Length;
+            var damage = Executor.CurrentPower / enemies.Length;
             var possibleNodeForRetreat = enemyNode
                 .GetNeighbors()
                 .Where(node => node.OwnerId == enemyNode.OwnerId)

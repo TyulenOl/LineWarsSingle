@@ -1,7 +1,6 @@
 ﻿namespace LineWars.Model
 {
     public interface IAttackAction<TNode, TEdge, TUnit> :
-        IActionWithDamage,
         IUnitAction<TNode, TEdge, TUnit>,
         ITargetedAction<ITargetedAlive>
         where TNode : class, INodeForGame<TNode, TEdge, TUnit>

@@ -12,7 +12,6 @@ namespace LineWars
     public class Player : BasePlayer
     {
         public static Player LocalPlayer { get; private set; }
-        [SerializeField] private float pauseAfterTurn;
 
         private IReadOnlyCollection<UnitType> potentialExecutors;
         private readonly HashSet<Node> additionalVisibleNodes = new();

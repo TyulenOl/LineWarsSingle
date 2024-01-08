@@ -23,9 +23,8 @@ namespace LineWars.Model
         private EnemyAITurnLogic turnLogic;
 
         public int Depth => depthDetailsData.TotalDepth;
-        public override void Initialize(SpawnInfo spawnInfo)
+        protected override void OnInitialized()
         {
-            base.Initialize(spawnInfo);
             buyLogic = buyLogicData.CreateAILogic(this);
             turnLogic = new EnemyAITurnLogic(this);
         }

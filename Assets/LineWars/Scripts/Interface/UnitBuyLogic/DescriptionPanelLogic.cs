@@ -11,16 +11,16 @@ public class DescriptionPanelLogic : MonoBehaviour
     [SerializeField] private TMP_Text unitName;
     [SerializeField] private TMP_Text unitDescription;
 
-    public void ReDrawDescription(UnitBuyPreset unitBuyPreset)
-    {
-        if (unitBuyPreset == null)
-        {
-            unitName.text = "";
-            unitDescription.text = "";
-            return;
-        }
-
-        unitName.text = unitBuyPreset.Name;
-        unitDescription.text = unitBuyPreset.Description;
-    }
+    // public void ReDrawDescription(UnitBuyPreset unitBuyPreset)
+    // {
+    //     if (unitBuyPreset == null)
+    //     {
+    //         unitName.text = "";
+    //         unitDescription.text = "";
+    //         return;
+    //     }
+    //
+    //     unitName.text = unitBuyPreset.Name;
+    //     unitDescription.text = unitBuyPreset.Description;
+    // }
 }

@@ -34,11 +34,11 @@ namespace LineWars.Interface
             if(!isActive)
                 return;
             var inter = false;
-            if (CommandsManager.Instance.Executor == unit)
+            if (CommandsManager.Instance.Executor as Unit == unit)
                 inter = true;
             else
             {
-                inter = CommandsManager.Instance.Executor != unit && CommandsManager.Instance.CanSetExecutor();
+                inter = CommandsManager.Instance.Executor as Unit != unit && CommandsManager.Instance.CanSetExecutor();
             }
             BgImage.color = inter ? Color.white : Color.gray;
             button.interactable = inter;

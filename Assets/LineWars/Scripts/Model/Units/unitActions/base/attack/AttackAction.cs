@@ -9,7 +9,6 @@ namespace LineWars.Model
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
         public bool AttackLocked { get; protected set; }
-        public int Damage { get; protected set; }
         public bool IsPenetratingDamage { get; protected set; }
 
         public bool CanAttack(ITargetedAlive enemy, bool ignoreActionPointsCondition = false) =>
@@ -57,9 +56,8 @@ namespace LineWars.Model
         {
         }
 
-        protected AttackAction(TUnit executor, int damage, bool isPenetratingDamage) : base(executor)
+        protected AttackAction(TUnit executor, bool isPenetratingDamage) : base(executor)
         {
-            Damage = damage;
             IsPenetratingDamage = isPenetratingDamage;
         }
     }

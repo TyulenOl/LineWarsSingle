@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public static class FogExtensions
@@ -34,10 +35,17 @@ public static class FogExtensions
         this Vector2Int pixelCoord,
         Vector2Int textureSizeInPixels)
     {
-        return pixelCoord.x > 0
+        return pixelCoord.x >= 0
                && pixelCoord.x < textureSizeInPixels.x
-               && pixelCoord.y > 0
+               && pixelCoord.y >= 0
                && pixelCoord.y < textureSizeInPixels.y;
+    }
+
+    public static IEnumerable<Vector2Int> GetAllPixels(Vector2Int textureSize)
+    {
+        for (var x = 0; x < textureSize.x; x++)
+        for (var y = 0; y < textureSize.y; y++)
+            yield return new Vector2Int(x, y);
     }
 
     public static Color GetPixelColor(this Vector2Int pixelCoord, Texture2D texture2D)

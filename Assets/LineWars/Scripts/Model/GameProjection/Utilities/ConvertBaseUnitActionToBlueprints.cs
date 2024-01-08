@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace LineWars.Model
 {
@@ -183,12 +184,6 @@ namespace LineWars.Model
             // TODO 
         }
 
-        public void Visit(HealYourselfAction<TNode, TEdge, TUnit> action)
-        {
-            // TODO 
-        }
-
-
         private void ProcessAttackAction(AttackAction<TNode, TEdge, TUnit> action, uint range)
         {
             foreach (var node in Graph.GetNodesInRange(action.Executor.Node, range))
@@ -209,6 +204,32 @@ namespace LineWars.Model
                     BlueprintList.Add(command);
                 }
             }
+        } 
+
+        public void Visit(HealYourselfAction<TNode, TEdge, TUnit> action)
+        {
+            // TODO 
+        }
+
+        public void Visit(StunAttackAction<TNode, TEdge, TUnit> action)
+        {
+            // TODO
+        }
+
+
+        public void Visit(HealingAttackAction<TNode, TEdge, TUnit> action)
+        {
+            // TODO
+        }
+
+        public void Visit(TargetPowerBasedAttackAction<TNode, TEdge, TUnit> action)
+        {
+            // TODO
+        }
+
+        public void Visit(UpArmorAction<TNode, TEdge, TUnit> action)
+        {
+            // TODO
         }
     }
 

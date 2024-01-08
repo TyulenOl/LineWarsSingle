@@ -9,7 +9,6 @@ namespace LineWars.Model
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
-        public int Id { get; }
         public LineType LineType { get; set; }
     }
 }

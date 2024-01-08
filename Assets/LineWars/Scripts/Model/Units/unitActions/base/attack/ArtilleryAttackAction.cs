@@ -13,7 +13,7 @@
             var pathLen1 = Graph.FindShortestPath(node, edge.FirstNode).Count - 1;
             var pathLen2 = Graph.FindShortestPath(node, edge.SecondNode).Count - 1;
             return !AttackLocked
-                   && Damage > 0
+                   && Executor.CurrentPower > 0
                    && edge.LineType >= LineType.CountryRoad
                    && (pathLen1 <= Distance && pathLen2 + 1 <= Distance
                        || pathLen2 <= Distance && pathLen1 + 1 <= Distance)
@@ -23,13 +23,13 @@
 
         public override void Attack(TEdge edge)
         {
-            edge.CurrentHp -= Damage;
+            edge.CurrentHp -= Executor.CurrentPower;
             CompleteAndAutoModify();
         }
 
         public override void Attack(TUnit enemy)
         {
-            var damage = Damage;
+            var damage = Executor.CurrentPower;
             if (enemy.TryGetNeighbour(out var neighbour))
             {
                 damage /= 2;
@@ -49,11 +49,10 @@
 
         public ArtilleryAttackAction(
             TUnit executor,
-            int damage,
             bool isPenetratingDamage,
             uint distance,
             IGraphForGame<TNode, TEdge, TUnit> graph)
-            : base(executor, damage, isPenetratingDamage, distance, graph)
+            : base(executor, isPenetratingDamage, distance, graph)
         {
         }
     }

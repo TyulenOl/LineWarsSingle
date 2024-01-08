@@ -218,6 +218,10 @@ namespace LineWars.Controllers
             }
             
             Executor = executor;
+            SendFightRedrawMessage(
+                Array.Empty<IMonoTarget>(), 
+                action => !hiddenCommandsSet.Contains(action.CommandType)
+            );
         }
 
         public void ExecuteSimpleCommand(IActionCommand command)
