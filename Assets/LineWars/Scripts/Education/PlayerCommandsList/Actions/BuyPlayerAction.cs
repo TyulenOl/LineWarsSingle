@@ -5,18 +5,18 @@ namespace LineWars.Education
 {
     public class BuyPlayerAction: PlayerAction
     {
-        [Header("")]
+        [Space]
         [SerializeField] private Node buyNode;
         [SerializeField] private string presetName;
 
         public override bool CanSelectNode(Node node)
         {
-            return node.Equals(buyNode);
+            return buyNode.Equals(node);
         }
 
-        public override bool CanSelectUnitBuyPreset(UnitBuyPreset preset)
+        public override bool CanSelectDeckCard(DeckCard deckCard)
         {
-            return preset == null || preset.Name.Equals(presetName);
+            return deckCard == null || deckCard.Name.Equals(presetName);
         }
     }
 }

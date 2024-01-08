@@ -28,7 +28,7 @@ namespace LineWars.Model
 
             var line = node.GetLine(enemy.Node);
             return !AttackLocked
-                   && Damage > 0
+                   && Executor.CurrentPower > 0
                    && enemy.OwnerId != Executor.OwnerId
                    && line != null
                    && Executor.CanMoveOnLineWithType(line.LineType)
@@ -73,8 +73,9 @@ namespace LineWars.Model
 
         private void MeleeAttack(TUnit target)
         {
-            var enemyDamage = UnitUtilities<TNode, TEdge, TUnit>.GetMaxDamage(target);
-            target.DealDamageThroughArmor(Damage);
+            var enemyDamage = target.CurrentPower;
+            target.DealDamageThroughArmor(Executor.CurrentPower);
+            Debug.Log(Executor.CurrentPower);
             if (!target.IsDied)
                 Executor.DealDamageThroughArmor(enemyDamage / 2);
             CompleteAndAutoModify();
@@ -82,10 +83,9 @@ namespace LineWars.Model
 
         public MeleeAttackAction(
             TUnit executor,
-            int damage,
             bool isPenetrating,
             bool onslaught,
-            [NotNull] UnitBlockerSelector blockerSelector) : base(executor, damage, isPenetrating)
+            [NotNull] UnitBlockerSelector blockerSelector) : base(executor, isPenetrating)
         {
             if (blockerSelector == null) throw new ArgumentException();
             Onslaught = onslaught;

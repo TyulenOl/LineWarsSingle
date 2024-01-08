@@ -6,7 +6,8 @@ namespace LineWars.Model
     {
         public string Name { get; } 
         public string Description { get; }
+        public Sprite Image { get; }
         public Unit Unit { get; }   
-        public int Cost { get; }
+        public CardRarity Rarity { get; }
     }
 }

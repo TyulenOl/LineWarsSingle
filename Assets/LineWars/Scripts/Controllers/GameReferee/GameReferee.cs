@@ -7,13 +7,13 @@ using UnityEngine;
 
 namespace LineWars
 {
-    public abstract class GameReferee: MonoBehaviour
+    public abstract class GameReferee : MonoBehaviour
     {
         public static GameReferee Instance { get; private set; }
-        
+
         protected Player Me;
         protected List<BasePlayer> Enemies;
-        
+
         public event Action Wined;
         public event Action Losed;
 
@@ -23,7 +23,7 @@ namespace LineWars
                 Instance = this;
             else
             {
-                Debug.LogError($"Больше чем два {nameof(GameReferee)} на сцене");
+                Debug.LogError($"More than two {nameof(GameReferee)} on stage");
                 Destroy(gameObject);
             }
         }

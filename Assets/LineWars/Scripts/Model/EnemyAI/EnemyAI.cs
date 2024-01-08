@@ -2,6 +2,8 @@ using System;
 using System.Linq;
 using UnityEngine;
 using JetBrains.Annotations;
+using LineWars.Interface;
+using UnityEngine.Rendering;
 
 namespace LineWars.Model
 {
@@ -55,7 +57,7 @@ namespace LineWars.Model
 
         public override bool CanExecuteTurn(PhaseType phase)
         {
-            if(!base.CanExecuteTurn(phase)) //плохо? сделать явную проверку на PhaseExceptions?
+            if(!base.CanExecuteTurn(phase)) //пїЅпїЅпїЅпїЅпїЅ? пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ PhaseExceptions?
                 return false;
 
             if (phase == PhaseType.Replenish)
@@ -88,6 +90,8 @@ namespace LineWars.Model
                 InvokeTurnEnded(phaseType);
                 return;
             }
+            
+            GameUI.Instance.SetEnemyTurn(true);
             turnLogic.Ended += OnTurnLogicEnd;
             turnLogic.Start();
 

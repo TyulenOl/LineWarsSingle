@@ -52,37 +52,5 @@ namespace LineWars.Model
             Owned.Connect(player, unit);
             return unit;
         }
-
-        public static PurchaseInfo GetPresetPurchaseInfo(this BasePlayer player, UnitBuyPreset preset)
-        {
-            var result = player.Rules.CostFunction.Calculate(
-                preset.FirstUnitType,
-                preset.Cost,
-                player.GetCountUnitByType(preset.FirstUnitType)
-            );
-            return result;
-        }
-
-        public static UnitSize GetUnitSizeByTypeForPlayer(this UnitType type, BasePlayer player)
-        {
-            return player.GetUnitPrefab(type).Size;
-        }
-
-        public static int GetCountUnitByType(this BasePlayer player, UnitType type)
-        {
-            return player.MyUnits
-                .Count(x => x.Type == type);
-        }
-
-        public static IEnumerable<Unit> GetAllUnits(BasePlayer player, Func<Unit, bool> predicate)
-        {
-            return player.MyUnits
-                .Where(predicate);
-        }
-
-        public static IEnumerable<Unit> GetAllUnits(BasePlayer player)
-        {
-            return GetAllUnits(player, (_) => true);
-        }
     }
 }

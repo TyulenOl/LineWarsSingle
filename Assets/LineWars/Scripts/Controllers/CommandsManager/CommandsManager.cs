@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -11,14 +12,19 @@ namespace LineWars.Controllers
         public static CommandsManager Instance { get; private set; }
         [field:SerializeField, ReadOnlyInspector] public bool ActiveSelf { get; private set; } = true;
         
-        
         [field: SerializeField] private CommandsManagerConstrainsBase Constrains { get; set; }
+
+        [SerializeField] private float maxActionDelayInSeconds = 5;
+        
         public bool HaveConstrains => Constrains != null;
         public bool NotHaveConstraints => Constrains == null;
 
         private IMonoTarget target;
         private IMonoExecutor executor;
         private bool canCancelExecutor = true;
+        
+        private IActionCommand currentExecutedCommand;
+        private Coroutine delayActionCoroutine;
 
         private StateMachine stateMachine;
         private CommandsManagerIdleState idleState;
@@ -104,6 +110,15 @@ namespace LineWars.Controllers
                 executor = value;
                 if (previousExecutor != value)
                     InvokeAction(() => ExecutorChanged?.Invoke(previousExecutor, value));
+                if (previousExecutor != null)
+                {
+                    previousExecutor.ExecutorDestroyed -= OnExecutorDestroy;
+                }
+
+                if (executor != null)
+                {
+                    executor.ExecutorDestroyed += OnExecutorDestroy;
+                }
             }
         }
 
@@ -118,7 +133,7 @@ namespace LineWars.Controllers
             }
             else
             {
-                Debug.LogError("Больше чем два CommandsManager на сцене");
+                Debug.LogError($"More than two {nameof(CommandsManager)} on stage");
             }
 
             stateMachine = new StateMachine();
@@ -159,96 +174,189 @@ namespace LineWars.Controllers
 
         public void ExecuteSimpleCommand(IActionCommand command)
         {
+            if (!ActiveSelf)
+            {
+                ActiveSelfLog(nameof(ExecuteSimpleCommand));
+                return;
+            }
+            
             if (HaveConstrains
                 && (!Constrains.CanExecuteSimpleAction()
                     || !Constrains.IsMyCommandType(command.Action.CommandType)))
             {
-                Debug.LogError($"Нельзя исполнить простую команду введу ограничения");
+                ConstrainsLog(nameof(ExecuteSimpleCommand));
                 return;
             }
 
             if (!CanExecuteAnyCommand())
-                throw new InvalidOperationException(
-                    $"В текущем состоянии командс менеджера {State} нельзя исполнить команду");
+            {
+                InvalidStateLog(nameof(ExecuteSimpleCommand));
+                return;
+            }
+            
             ExecuteCommandButIgnoreConstrains(command);
         }
 
         private void ExecuteCommandButIgnoreConstrains(IActionCommand command)
         {
+            currentExecutedCommand = command;
             canCancelExecutor = false;
             stateMachine.SetState(waitingExecuteCommandState);
-            var action = command.Action;
-            action.ActionCompleted += OnActionCompleted;
+            
+            command.Action.ActionCompleted += OnActionCompleted;
+            delayActionCoroutine = StartCoroutine(DelayActionCoroutine());
+            
             UnitsController.ExecuteCommand(command);
-
-            void OnActionCompleted()
+        }
+        
+        void OnActionCompleted()
+        {
+            currentExecutedCommand.Action.ActionCompleted -= OnActionCompleted;
+            StopCoroutine(delayActionCoroutine);
+            delayActionCoroutine = null;
+            currentExecutedCommand = null;
+            
+            InvokeAction(() => CommandIsExecuted?.Invoke(currentExecutedCommand));
+            if (Executor as MonoBehaviour == null)
             {
-                action.ActionCompleted -= OnActionCompleted;
-                InvokeAction(() => CommandIsExecuted?.Invoke(command));
-                if (Executor as MonoBehaviour == null || !Executor.CanDoAnyAction)
-                {
-                    Player.FinishTurn();
-                }
-                else
-                {
-                    SendFightRedrawMessage();
-                    stateMachine.SetState(findTargetState);
-                }
+                Debug.LogError("Impossible behavior!");
+                return;
+            }
+            if (!Executor.CanDoAnyAction)
+            {
+                Player.FinishTurn();
+            }
+            else
+            {
+                SendFightRedrawMessage();
+                stateMachine.SetState(findTargetState);
             }
         }
 
-
-        public void SetUnitPreset(UnitBuyPreset preset)
+        IEnumerator DelayActionCoroutine()
         {
-            if (HaveConstrains && !Constrains.CanSelectUnitBuyPreset(preset))
+            yield return new WaitForSeconds(maxActionDelayInSeconds);
+            Debug.LogWarning($"The action didn't stop after {maxActionDelayInSeconds} seconds!");
+            OnActionCompleted();
+        }
+
+        private void OnExecutorDestroy()
+        {
+            Debug.Log("EXECUTOR DESTROY");
+            if (delayActionCoroutine != null)
+                StopCoroutine(delayActionCoroutine);
+            if (currentExecutedCommand != null)
             {
-                Debug.LogError("Нельзя выбрать текущий пресет ввиду огрничения");
+                currentExecutedCommand.Action.ActionCompleted -= OnActionCompleted;
+                InvokeAction(() => CommandIsExecuted?.Invoke(currentExecutedCommand));
+            }
+            delayActionCoroutine = null;
+            currentExecutedCommand = null;
+            
+            Player.FinishTurn();
+        }
+
+        public void SetDeckCard(DeckCard deckCard)
+        {
+            if (!ActiveSelf)
+            {
+                ActiveSelfLog(nameof(SetDeckCard));
+                return;
+            }
+            
+            if (HaveConstrains && !Constrains.CanSelectDeckCard(deckCard))
+            {
+                ConstrainsLog(nameof(SetDeckCard));
                 return;
             }
 
             if (stateMachine.CurrentState != buyState)
-                throw new InvalidOperationException("Can't set unit preset while not in buy state!");
-            buyState.SetUnitPreset(preset);
+            {
+                InvalidStateLog(nameof(SetDeckCard));
+                return;
+            }
+            
+            buyState.SetDeckCard(deckCard);
         }
 
-        public void SelectCommandsPreset(CommandPreset preset)
+        public bool SelectCommandsPreset(CommandPreset preset)
         {
+            if (!ActiveSelf)
+            {
+                ActiveSelfLog(nameof(SelectCommandsPreset));
+                return false;
+            }
+            
             if (stateMachine.CurrentState != waitingSelectCommandState)
-                throw new InvalidOperationException();
+            {
+                InvalidStateLog(nameof(SelectCommandsPreset));
+                return false;
+            }
+
             if (!currentOnWaitingCommandMessage.Data.Contains(preset))
-                throw new ArgumentException(nameof(preset));
+            {
+                Debug.LogError($"You cant select this command preset because this command preset in not owned!", gameObject);
+                return false;
+            }
+            
             if (!preset.IsActive)
-                throw new ArgumentException(nameof(preset));
+            {
+                Debug.LogError("You cant select this command preset because this command preset is not active!", gameObject);
+                return false;
+            }
             ProcessCommandPreset(preset);
+            return true;
         }
 
         public void CancelCommandPreset()
         {
+            if (!ActiveSelf)
+            {
+                ActiveSelfLog(nameof(CancelCommandPreset));
+                return;
+            }
+            
             if (stateMachine.CurrentState != waitingSelectCommandState)
             {
-                throw new InvalidOperationException("Is not targeted state to cancelAction");
+                InvalidStateLog(nameof(CancelCommandPreset));
+                return;
             }
 
             stateMachine.SetState(findTargetState);
         }
 
-        public void SelectCurrentCommand(CommandType commandType)
+        public bool SelectCurrentCommand(CommandType commandType)
         {
+            if (!ActiveSelf)
+            {
+                ActiveSelfLog(nameof(SelectCurrentCommand));
+                return false;
+            }
+            
             if (HaveConstrains && !Constrains.CanSelectCurrentCommand())
             {
-                Debug.LogError("Нельзя выбрать конкретную команду ввиду ограничения");
-                return;
+                ConstrainsLog(nameof(SelectCurrentCommand));
+                return false;
             }
 
             if (stateMachine.CurrentState != findTargetState)
-                throw new InvalidOperationException();
+            {
+                InvalidStateLog(nameof(SelectCurrentCommand));
+                return false;
+            }
+
             if (CheckContainsActions(commandType))
-                throw new InvalidOperationException();
+            {
+                Debug.LogError($"You cant {nameof(SelectCurrentCommand)} because {nameof(Executor)} will not be able to perform this");
+                return false;
+            }
             if (Executor.Actions.First(x => x.CommandType == commandType) is not ITargetedAction)
                 throw new NotImplementedException();
             currentCommandState.Prepare(commandType);
             stateMachine.SetState(currentCommandState);
 
+            return true;
+            
             bool CheckContainsActions(CommandType commandType)
             {
                 return !Executor.Actions
@@ -259,27 +367,32 @@ namespace LineWars.Controllers
 
         public void CancelCurrentCommand()
         {
+            if (!ActiveSelf)
+            {
+                ActiveSelfLog(nameof(CancelCurrentCommand));
+                return;
+            }
+            
             if (stateMachine.CurrentState != currentCommandState)
-                throw new InvalidOperationException();
+            {
+                InvalidStateLog(nameof(CancelCurrentCommand));
+                return;
+            }
             stateMachine.SetState(findTargetState);
         }
 
         private void OnTurnEnded(IActor _, PhaseType phaseType)
         {
-            if (Executor is { CanDoAnyAction: true })
+            if (Executor != null && Executor as MonoBehaviour != null && Executor.CanDoAnyAction)
             {
-                Debug.LogWarning("Вы как-то завершили ход, хотя у текущего executora остались очки действия");
+                Debug.LogWarning("You somehow ended a turn even though the current executor still has action points", gameObject);
             }
-
+            
             stateMachine.SetState(idleState);
         }
 
         private void OnTurnStarted(IActor _, PhaseType phaseType)
         {
-            if (!ActiveSelf)
-            {
-                return;
-            }
             ToPhase(phaseType);
         }
 
@@ -368,7 +481,6 @@ namespace LineWars.Controllers
             if (ActiveSelf)
                 return;
             ActiveSelf = true;
-            ToPhase(PhaseManager.CurrentPhase);
         }
         
         public void Deactivate()
@@ -376,7 +488,22 @@ namespace LineWars.Controllers
             if (!ActiveSelf)
                 return;
             ActiveSelf = false;
-            Player.FinishTurn();
+        }
+
+
+        private void ConstrainsLog(string methodName)
+        {
+            Debug.LogError($"Cant invoke {methodName} because you have constrains {Constrains.name}.", gameObject);
+        }
+
+        private void InvalidStateLog(string methodName)
+        {
+            Debug.LogError($"This is invalid state {state} for action {methodName}", gameObject);
+        }
+
+        private void ActiveSelfLog(string methodName)
+        {
+            Debug.LogError($"Cant execute {methodName} because {nameof(CommandsManager)} is no active!", gameObject);
         }
     }
 }

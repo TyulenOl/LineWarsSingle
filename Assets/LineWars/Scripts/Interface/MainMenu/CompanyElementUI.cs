@@ -15,66 +15,48 @@ namespace LineWars
         [SerializeField] private TMP_Text missionsProgress;
         [SerializeField] private Button companyElementButton;
 
-        private Action<CompanyState> clicked;
-        private CompanyState currentState;
+        [SerializeField] private CompanyMenu menuToOpen;
 
-        private void Awake()
-        {
-            CheckValid();
-        }
+        [SerializeField] private bool automaticRedraw = true;
+        [SerializeField] private CompanyData companyData;
+        
+        private bool initialized;
 
-        private void OnEnable()
+        public void Initialize()
         {
-            if (companyElementButton != null)
+            if (initialized)
+            {
+                Debug.LogError($"{GetType().Name} is initialized!");
+                return;
+            }
+            initialized = true;
+            
+            if (menuToOpen != null)
+            {
+                menuToOpen.Initialize();
+                var missionsInfos = menuToOpen.MissionInfos.ToList();
+                var completedMissionsCount = missionsInfos.Count(x => x.MissionStatus == MissionStatus.Complete);
+                missionsProgress.text = $"{completedMissionsCount}/{missionsInfos.Count}";
                 companyElementButton.onClick.AddListener(OnClick);
+            }
         }
 
-        private void OnDisable()
+        private void OnClick()
         {
-            if (companyElementButton != null)
-                companyElementButton.onClick.RemoveListener(OnClick);
+            UIStack.Instance.PushElement(menuToOpen);
         }
 
-        private void OnClick() => clicked?.Invoke(currentState);
-
-
-        private void CheckValid()
+        private void RedrawCompanyData(CompanyData data)
         {
-            if (companyName == null)
-                Debug.LogError($"{nameof(companyName)} is null on {name}");
-
-            if (companyDescription == null)
-                Debug.LogError($"{nameof(companyDescription)} is null on {name}");
-
-            if (companyImage == null)
-                Debug.LogError($"{nameof(companyImage)} is null on {name}");
-
-            if (missionsProgress == null)
-                Debug.LogError($"{nameof(missionsProgress)} is null on {name}");
-
-            //if (companyElementButton == null)
-            //Debug.LogError($"{nameof(companyElementButton)} is null on {name}");
-        }
-
-        public void Initialize(CompanyState companyState, Action<CompanyState> clicked)
-        {
-            if (companyState == null) return;
-
-            this.currentState = companyState;
-
-            var data = companyState.companyData;
-
             companyName.text = data.Name;
             companyDescription.text = data.Description;
             companyImage.sprite = data.Image;
+        }
 
-            var finishMissionsCount = companyState.missionStates
-                .Count(x => x.isCompleted);
-
-            var allMissionCount = companyState.missionStates.Count;
-            missionsProgress.text = $"{finishMissionsCount}/{allMissionCount}";
-
-            this.clicked = clicked;
+        private void OnValidate()
+        {
+            if (automaticRedraw && companyData != null)
+                RedrawCompanyData(companyData);
         }
     }
 }

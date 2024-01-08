@@ -1,32 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using JetBrains.Annotations;
 
 namespace LineWars.Model
 {
-    public class DeckToInfoConverter
-        : IConverter<Deck, DeckInfo>
+    public class DeckToInfoConverter : IConverter<Deck, DeckInfo>
     {
         private readonly IReadOnlyDictionary<DeckCard, int> cardToId;
-        public DeckToInfoConverter(IReadOnlyDictionary<DeckCard, int> cardToId) 
-        { 
-            this.cardToId = cardToId;
+
+        public DeckToInfoConverter([NotNull] IReadOnlyDictionary<DeckCard, int> cardToId)
+        {
+            this.cardToId = cardToId ?? throw new ArgumentNullException(nameof(cardToId));
         }
 
         public DeckInfo Convert(Deck value)
         {
-            var newDeckInfo = new DeckInfo();
-            newDeckInfo.Name = value.Name;
-            foreach(var card in value.Cards)
+            return new DeckInfo
             {
-                var newCardInfo = new DeckCardInfo();
-                newCardInfo.CardId = cardToId[card];
-                newDeckInfo.Cards.Add(newCardInfo);
-            }
-
-            return newDeckInfo;
+                Id = value.Id,
+                Name = value.Name,
+                Cards = value.Cards
+                    .Select(e => new DeckCardInfo()
+                    {
+                        CardId = cardToId[e]
+                    })
+                    .ToArray()
+            };;
         }
     }
 }

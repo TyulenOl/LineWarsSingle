@@ -24,7 +24,7 @@ namespace LineWars.Education
             if (playerActions.ContainsNext())
                 currentAction = playerActions.GetNext();
             else
-                Debug.LogError("у игрока нет ходов");
+                Debug.LogError("The player hasn't any actions");
         }
 
         private void OnEnable()
@@ -89,16 +89,16 @@ namespace LineWars.Education
             return CheckCurrentAction() && currentAction.CanSelectNode(node);
         }
 
-        public override bool CanSelectUnitBuyPreset(UnitBuyPreset preset)
+        public override bool CanSelectDeckCard(DeckCard deckCard)
         {
-            return CheckCurrentAction() && currentAction.CanSelectUnitBuyPreset(preset);
+            return CheckCurrentAction() && currentAction.CanSelectDeckCard(deckCard);
         }
 
         private bool CheckCurrentAction()
         {
             if (currentAction == null)
             {
-                Debug.LogError("Закончились ходы у обучения");
+                Debug.LogError("The training actions are over");
                 return false;
             }
 

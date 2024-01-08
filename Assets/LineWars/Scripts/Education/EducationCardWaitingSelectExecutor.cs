@@ -7,7 +7,8 @@ namespace LineWars.Education
     public class EducationCardWaitingSelectExecutor : EducationCardBase
     {
         private void OnEnable()
-        {
+        {  
+            CommandsManager.Instance.Activate();
             CommandsManager.Instance.ExecutorChanged += OnExecutorChanged;
         }
 

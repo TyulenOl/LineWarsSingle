@@ -3,6 +3,7 @@ using JetBrains.Annotations;
 
 namespace LineWars.Model
 {
+    [Obsolete]
     public class BlowWithSwingCommand<TNode, TEdge, TUnit> :
         TargetActionCommand<TUnit, IBlowWithSwingAction<TNode, TEdge, TUnit>, TUnit>
         where TNode : class, INodeForGame<TNode, TEdge, TUnit>

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace LineWars.Controllers
+namespace LineWars.Model
 { 
     public interface IDownloader<out TValue>
     {

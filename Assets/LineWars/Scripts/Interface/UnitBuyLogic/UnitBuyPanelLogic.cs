@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using LineWars.Controllers;
 using LineWars.Model;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace LineWars.Interface
@@ -9,42 +11,37 @@ namespace LineWars.Interface
     public class UnitBuyPanelLogic : MonoBehaviour
     {
         [SerializeField] private LayoutGroup presetsLayoutGroup;
-        [SerializeField] private UnitBuyPresetDrawer presetDrawerPrefab;
+        [SerializeField] private CardBuyPresetDrawer presetDrawerPrefab;
         [SerializeField] private UnitBuyLayerLogic unitBuyLayerLogic;
-        [SerializeField] private UnitBuyPresetInfoDrawer chosenPresetInfoDrawer;
+        [FormerlySerializedAs("chosenPresetInfoDrawer")] [SerializeField] private UnitBuyPresetInfoDrawer chosenDeckCardInfoDrawer;
         
-        private List<UnitBuyPresetDrawer> unitBuyPresetDrawers;
-        private Dictionary<UnitBuyPreset, UnitBuyPresetDrawer> unitBuyPresetDrawersDictionary;
-
-        private Nation nation;
+        private List<CardBuyPresetDrawer> unitBuyPresetDrawers;
         private Node baseToSpawnUnits;
 
         public void Awake()
         {
-            nation = Player.LocalPlayer.Nation;
             GeneratePresets();
         }
 
-        private void GeneratePresets()
+        private void GeneratePresets()  
         {
-            var presets = nation.NationEconomicLogic;
-            foreach (var preset in presets)
+            foreach (var card in GameRoot.Instance.DecksController.DeckToGame.Cards)
             {
                 var presetDrawer = Instantiate(presetDrawerPrefab.gameObject, presetsLayoutGroup.transform)
-                    .GetComponent<UnitBuyPresetDrawer>();
-                presetDrawer.UnitBuyPreset = preset;
+                    .GetComponent<CardBuyPresetDrawer>();
+                presetDrawer.DeckCard = card;
                 presetDrawer.Button.onClick.AddListener(() =>
                 {
-                    unitBuyLayerLogic.CurrentPreset = presetDrawer.UnitBuyPreset;
-                    unitBuyLayerLogic.ChosenUnitPresetDrawer = presetDrawer;
-                    chosenPresetInfoDrawer.Init(Player.LocalPlayer.Nation.GetUnitPrefab(presetDrawer.UnitBuyPreset.FirstUnitType));
+                    unitBuyLayerLogic.CurrentDeckCard = card;
+                    unitBuyLayerLogic.ChosenCardPresetDrawer = presetDrawer;
+                    chosenDeckCardInfoDrawer.Init(card.Unit);
                 });
             }
         }
 
         private void OnEnable()
         {
-            chosenPresetInfoDrawer.RestoreDefaults();
+            chosenDeckCardInfoDrawer.RestoreDefaults();
         }
     }
 }

@@ -8,7 +8,7 @@ public class TransformCarousel : MonoBehaviour
 {
     private void Awake()
     {
-        var children = transform.GetChildren().ToArray();
+        var children = transform.EnumerateChildren().ToArray();
         if (!CheckChildren(children))
             return;
         children.GameObjects().SetActiveAll(false);
@@ -25,9 +25,9 @@ public class TransformCarousel : MonoBehaviour
         Move(i => i - 1);
     }
 
-    private void Move(Unity.Plastic.Newtonsoft.Json.Serialization.Func<int, int> moveFunc)
+    private void Move(Func<int, int> moveFunc)
     {
-        var children = transform.GetChildren().ToArray();
+        var children = transform.EnumerateChildren().ToArray();
         if (!CheckChildren(children))
             return;
 
@@ -42,7 +42,7 @@ public class TransformCarousel : MonoBehaviour
     {
         if (children.Length == 0)
         {
-            Debug.LogWarning($"Карусель {name} пуста");
+            Debug.LogWarning($"Carousel {name} is empty!");
             return false;
         }
 

@@ -26,6 +26,6 @@ namespace LineWars.Education
         public virtual bool CanSelectCurrentCommand() => false;
 
         public virtual bool CanSelectNode(Node node) => false;
-        public virtual bool CanSelectUnitBuyPreset(UnitBuyPreset preset) => false;
+        public virtual bool CanSelectDeckCard(DeckCard deckCard) => false;
     }
 }

@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    [CreateAssetMenu(menuName = "UnitCostFunctions/Advanced", order = 80)]
+    [CreateAssetMenu(menuName = "UnitCostFunctions/Advanced")]
     public class AdvancedUnitCostFunction : UnitCostFunction
     {
         [SerializeField] private string baseCostParameterName = "x";

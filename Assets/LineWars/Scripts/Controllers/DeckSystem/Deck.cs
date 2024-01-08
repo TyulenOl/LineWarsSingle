@@ -1,21 +1,36 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace LineWars.Model
 {
     public class Deck : IDeck<DeckCard>
     {
-        private List<DeckCard> cards = new();
+        public int Id { get; }
         public string Name { get; set; }
-        public IReadOnlyList<DeckCard> Cards => cards;
 
+        private readonly List<DeckCard> cards = new();
+        public IReadOnlyList<DeckCard> Cards => cards;
+        
         public void AddCard(DeckCard card)
         {
             cards.Add(card);
         }
 
-        public bool RemoveCard(DeckCard card)
+        public void RemoveCard(DeckCard card)
         {
-            return cards.Remove(card);
+            cards.Remove(card);
+        }
+
+        public Deck(int id)
+        {
+            Id = id;
+        }
+
+        public Deck(int id, string name, IEnumerable<DeckCard> cards)
+        {
+            Id = id;
+            Name = name;
+            this.cards = cards.ToList();
         }
     }
 }

@@ -77,7 +77,7 @@ namespace LineWars.Model
                 while (quantity > 0 && AreNodesFree(eligbleNodes, currentUnit))
                 {
                     currentNodeId = currentNodeId % eligbleNodes.Count;
-                    if (data.UnitsLimit != 0 && BasePlayerUtility.GetAllUnits(player).Count() > data.UnitsLimit)
+                    if (data.UnitsLimit != 0 && player.MyUnits.Count() > data.UnitsLimit)
                     {
                         break;
                     }

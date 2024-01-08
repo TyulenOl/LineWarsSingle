@@ -1,5 +1,4 @@
 using LineWars.Controllers;
-using LineWars.LineWars.Scripts.Interface;
 using LineWars.Model;
 using UnityEngine;
 using UnityEngine.UI;

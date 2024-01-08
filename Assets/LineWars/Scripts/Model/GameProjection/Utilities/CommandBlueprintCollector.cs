@@ -37,13 +37,7 @@ namespace LineWars.Model
             IReadOnlyGameProjection gameProjection,
             IReadOnlyCollection<CommandType> availableCommands)
         {
-            var currentPlayer = gameProjection.CurrentPlayer;
-            foreach(var preset in currentPlayer.EconomicLogic)
-            {
-                var newCommand = new SpawnPresetCommandBlueprint(currentPlayer.Id, preset);
-                commands.Add(newCommand);
-            }
-
+            
         }
 
         private static void CollectArtilleryState(

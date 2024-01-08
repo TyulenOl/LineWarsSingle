@@ -15,15 +15,17 @@ namespace LineWars
     public class SingleGame : MonoBehaviour
     {
         public static SingleGame Instance { get; private set; }
+        
+        [Header("Logic")] 
+        [SerializeField] private PlayerBuilder playerSpawn;
 
-        [Header("Logic")] [SerializeField] private PlayerBuilder playerSpawn;
-
-        [Header("Players")] [SerializeField] private Player playerPrefab;
+        [Header("Players")] 
+        [SerializeField] private Player playerPrefab;
         [SerializeField] private List<BasePlayer> enemiesPrefabs;
         [SerializeField] private AIType aiType;
 
-        [Header("AI Options")] [SerializeField]
-        private GameEvaluator gameEvaluator;
+        [Header("AI Options")]
+        [SerializeField] private GameEvaluator gameEvaluator;
 
         [SerializeField] private AIBuyLogicData aiBuyLogicData;
         [SerializeField] private DepthDetailsData depthDetailsData;
@@ -37,7 +39,7 @@ namespace LineWars
 
         private Stack<SpawnInfo> spawnInfosStack;
         private SpawnInfo playerSpawnInfo;
-
+        
         public SceneName MyScene => (SceneName) SceneManager.GetActiveScene().buildIndex;
         private bool HasSpawnPoint() => spawnInfosStack.Count > 0;
         private SpawnInfo GetSpawnPoint() => spawnInfosStack.Pop();
@@ -62,8 +64,8 @@ namespace LineWars
 
             InitializeGameReferee();
             
-            RegisterAllPlayers();
-            //RegisterActors();
+            //RegisterAllPlayers();
+
 
             StartCoroutine(StartGameCoroutine());
 
@@ -162,19 +164,27 @@ namespace LineWars
         public void WinGame()
         {
             Debug.Log("<color=yellow>Вы Победили</color>");
-            if (!GameVariables.IsNormalStart) return;
+            if (!GameVariables.IsNormalStart)
+                return;
             WinLoseUI.isWin = true;
+            GameRoot.Instance.CompaniesController.WinChoseMission();
             SceneTransition.LoadScene(SceneName.WinOrLoseScene);
-            CompaniesDataBase.ChooseMission.isCompleted = true;
-            CompaniesDataBase.SaveChooseMission();
         }
 
         public void LoseGame()
         {
             Debug.Log("<color=red>Потрачено</color>");
-            if (!GameVariables.IsNormalStart) return;
+            if (!GameVariables.IsNormalStart)
+                return;
             WinLoseUI.isWin = false;
+            GameRoot.Instance.CompaniesController.DefeatChoseMission();
             SceneTransition.LoadScene(SceneName.WinOrLoseScene);
+        }
+
+        private void OnDestroy()
+        {
+            SfxManager.Instance?.StopAllSounds();
+            SpeechManager.Instance?.StopAllSounds();
         }
     }
 

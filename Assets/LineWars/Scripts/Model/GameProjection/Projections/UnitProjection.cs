@@ -17,6 +17,8 @@ namespace LineWars.Model
         public IEnumerable<UnitAction<NodeProjection, EdgeProjection, UnitProjection>> UnitActions { get; set; }
         public Unit Original { get; set; }
         public string UnitName { get; set; }
+        public int InitialPower {get; set; }
+        public int CurrentPower {get; set; }
         public int MaxHp { get; set; }
         public int MaxArmor { get; set; }
         public int MaxActionPoints { get; set; }
@@ -44,13 +46,13 @@ namespace LineWars.Model
                 if (value <= 0)
                 {
                     Died?.Invoke(this);
+                    ExecutorDestroyed?.Invoke();
                     RemoveFromNode();
                     RemoveFromOwner();
                 }
             }
         }
-
-        public event Action AnyActionCompleted;
+        public event Action ExecutorDestroyed;
         IEnumerable<IExecutorAction> IExecutor.Actions => actionsDictionary.Values;
 
         public event Action<UnitProjection> Died;
@@ -114,11 +116,6 @@ namespace LineWars.Model
 
         private void RemoveFromOwner()
         {
-            if (Owner == null || this == null)
-            {
-                var vd = 1;
-            }
-
             Owner.RemoveOwned(this);
         }
 
@@ -154,6 +151,8 @@ namespace LineWars.Model
     {
         public Unit Original { get; }
         public string UnitName { get; }
+        public int InitialPower { get; }
+        public int CurrentPower { get; }
         public int MaxHp { get; }
         public int MaxArmor { get; }
         public int MaxActionPoints { get; }

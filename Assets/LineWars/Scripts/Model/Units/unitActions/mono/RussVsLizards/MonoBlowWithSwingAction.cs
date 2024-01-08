@@ -8,15 +8,11 @@ namespace LineWars.Model
         MonoUnitAction<BlowWithSwingAction<Node, Edge, Unit>>,
         IBlowWithSwingAction<Node, Edge, Unit>
     {
-        [field: SerializeField] public int InitialDamage { get; private set; }
-
         [SerializeField] private SFXList attackReactionSounds;
         [SerializeField] private SFXData attackSound;
         [SerializeField] private UnitAnimation swingAnimation;
 
         private IDJ dj;
-        
-        public int Damage => Action.Damage;
 
         private void Awake()
         {
@@ -92,7 +88,7 @@ namespace LineWars.Model
 
         protected override BlowWithSwingAction<Node, Edge, Unit> GetAction()
         {
-            return new BlowWithSwingAction<Node, Edge, Unit>(Executor, InitialDamage);
+            return new BlowWithSwingAction<Node, Edge, Unit>(Executor);
         }
 
         public override void Accept(IMonoUnitActionVisitor visitor) => visitor.Visit(this);

@@ -28,7 +28,7 @@ namespace LineWars.Model
 
         public override string GetLog()
         {
-            return $"Юнит {Executor} переместился из {start} в {Target}";
+            return $"Unit {Executor} moved from {start} to {Target}";
         }
     }
 }
