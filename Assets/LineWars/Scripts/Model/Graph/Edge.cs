@@ -50,8 +50,12 @@ namespace LineWars.Model
         public BoxCollider2D BoxCollider2D => edgeCollider;
 
 
-        public int Id => index;
-        
+        public int Id
+        {
+            get => index;
+            set => index = value;
+        }
+
 
         public int MaxHp
         {

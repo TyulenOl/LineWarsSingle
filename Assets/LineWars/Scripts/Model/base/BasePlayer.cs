@@ -307,7 +307,7 @@ namespace LineWars.Model
             }
         }
 #endif
-        private static void RedrawAllPlayers()
+        public static void RedrawAllPlayers()
         {
             foreach (var node in FindObjectsOfType<Node>())
                 node.DrawToDefault();

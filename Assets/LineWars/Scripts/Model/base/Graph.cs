@@ -17,13 +17,12 @@ namespace LineWars.Model
 
         private readonly Dictionary<int, TNode> idToNode;
         private readonly Dictionary<int, TEdge> idToEdge;
-        
-        
-        public IReadOnlyList<TNode> Nodes => nodes;
-        public IReadOnlyList<TEdge> Edges => edges;
 
         public INodeIndexer<TNode, TEdge> IdToNode => this;
         public IEdgeIndexer<TNode, TEdge> IdToEdge => this;
+        public IReadOnlyList<TNode> Nodes => nodes;
+        public IReadOnlyList<TEdge> Edges => edges;
+        
 
         public Graph()
         {

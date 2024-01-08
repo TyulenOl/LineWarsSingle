@@ -9,6 +9,7 @@ namespace GraphEditor
     {
         private GraphCreator GraphCreator => (GraphCreator) target;
         private bool iterateStarted;
+        private bool hardIterateStarted;
         
         private void OnEnable()
         {
@@ -24,7 +25,12 @@ namespace GraphEditor
         {
             if (iterateStarted)
             {
-                GraphCreator.Iterate();
+                GraphCreator.SimpleIterate();
+                GraphCreator.RedrawAllEdges();
+            }
+            else if (hardIterateStarted)
+            {
+                GraphCreator.HardIterate();
                 GraphCreator.RedrawAllEdges();
             }
         }
@@ -45,22 +51,26 @@ namespace GraphEditor
                 GraphCreator.RedrawAllEdges();
                 GraphCreator.DrawBorder();
                 iterateStarted = false;
+                hardIterateStarted = false;
             }
         
-            if (GUILayout.Button("Start Iterate"))
+            if (GUILayout.Button("Start Simple Iterate"))
             {
                 iterateStarted = true;
+                hardIterateStarted = false;
+            }
+        
+            
+            if (GUILayout.Button("Start Hard Iterate"))
+            {
+                hardIterateStarted = true;
+                iterateStarted = false;
             }
         
             if (GUILayout.Button("Stop Iterate"))
             {
                 iterateStarted = false;
-            }
-            
-            if (GUILayout.Button("Single Iterate"))
-            {
-                GraphCreator.Iterate();
-                GraphCreator.RedrawAllEdges();
+                hardIterateStarted = false;
             }
             
             if (GUILayout.Button("Delete Intersects by Count"))

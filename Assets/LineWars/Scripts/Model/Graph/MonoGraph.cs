@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using GraphEditor;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace LineWars.Model
 {

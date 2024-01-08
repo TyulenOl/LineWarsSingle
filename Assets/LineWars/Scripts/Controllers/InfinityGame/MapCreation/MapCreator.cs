@@ -14,6 +14,7 @@ namespace LineWars.Controllers
         [SerializeField] private SpriteRenderer map;
         [SerializeField] private MaskRendererV3AutoManagement maskRenderer;
         [SerializeField, Min(0)] private int maxVisibilityMapSide = 128;
+        [SerializeField, Range(1, 255)] private int colorStep = 1000;
 
         public void GenerateMap(MonoGraph monoGraph)
         {
@@ -33,18 +34,21 @@ namespace LineWars.Controllers
             var center = minPointOfGraph + graphSize / 2;
             var minPointOfMap = center - mapSize / 2;
             var maxPointOfMap = center + mapSize / 2;
-            
+
             map.sprite = mainSprite;
             map.size = mapSize;
             map.transform.position = center;
 
+            var visibilityMapTextureSize = CustomMath.TransferVector2ByMaxSide(
+                new Vector2Int(fogSprite.texture.width, fogSprite.texture.height),
+                maxVisibilityMapSide);
+
             var visibilityMap = GenerateVisibilityMapTexture(
                 mapSize,
-                fogSprite.texture,
+                visibilityMapTextureSize,
                 monoGraph.Nodes.Select(x => x.Position - minPointOfMap));
-            
-            
-            
+
+
             maskRenderer.StartPosition.transform.position = minPointOfMap;
             maskRenderer.EndPosition.transform.position = maxPointOfMap;
 
@@ -55,93 +59,80 @@ namespace LineWars.Controllers
 
             foreach (var node in monoGraph.Nodes)
                 maskRenderer.AddRenderNode(node.RenderNodeV3);
-            
+
             maskRenderer.Initialise();
         }
 
         private Texture2D GenerateVisibilityMapTexture(
             Vector2 mapSizeInUnits,
-            Texture fogTexture,
+            Vector2Int textureSize,
             IEnumerable<Vector2> nodesPositionsInWorldSpace)
         {
-            var textureSize = CustomMath.TransferVector2ByMaxSide(
-                new Vector2Int(fogTexture.width, fogTexture.height),
-                maxVisibilityMapSide);
             var totalPixelsCount = textureSize.x * textureSize.y;
             var visibilityMap = new Texture2D(textureSize.x, textureSize.y);
-            
-            var nodesPositionsInPixels = nodesPositionsInWorldSpace
+
+            var centers = nodesPositionsInWorldSpace
                 .Select(x => x.GetPixelCoord(mapSizeInUnits, textureSize))
                 .Where(x => x.CheckPixelCoord(textureSize))
                 .Distinct()
                 .ToArray();
-            
-            var colors = nodesPositionsInPixels
-                .Select((x, i) =>
-                {
-                    i += 1;
-                    var r = i % 255;
-                    var g = i / 255 % 255;
-                    var b = i / 65025 % 255;
-                    return new Color(
-                        Convert.ToSingle(r) / 255f,
-                        Convert.ToSingle(g) / 255f,
-                        Convert.ToSingle(b) / 255f);
-                }).ToArray();
-            
-            var nextQueues = new Queue<Vector2Int>[nodesPositionsInPixels.Length];
+
+            var colors = GetColors(centers.Length);
+
+            var nextQueues = new Queue<Vector2Int>[centers.Length];
             for (var i = 0; i < nextQueues.Length; i++)
                 nextQueues[i] = new Queue<Vector2Int>();
             
-            var nextsVisited = new HashSet<Vector2Int>[nodesPositionsInPixels.Length];
-            for (var i = 0; i < nextsVisited.Length; i++)
-                nextsVisited[i] = new HashSet<Vector2Int>();
-            
-            var visitedPixels = new HashSet<Vector2Int>(totalPixelsCount);
-            var currentQueues = new Queue<Vector2Int>[nodesPositionsInPixels.Length];
+            var coloredPixels = new HashSet<Vector2Int>(totalPixelsCount);
+            var currentQueues = new Queue<Vector2Int>[centers.Length];
             for (var i = 0; i < currentQueues.Length; i++)
             {
-                var node = nodesPositionsInPixels[i];
+                var node = centers[i];
                 currentQueues[i] = new Queue<Vector2Int>();
                 currentQueues[i].Enqueue(node);
-                visitedPixels.Add(node);
+                coloredPixels.Add(node);
                 visibilityMap.SetPixel(node.x, node.y, colors[i]);
             }
+
+            var claimedPixels = new HashSet<Vector2Int>(); // занятые
             
             var currentRadius = 1;
-            while (currentQueues.All(x => x.Count != 0))
+            while (currentQueues.Any(x => x.Count != 0))
             {
-                for (var i = 0; i < nodesPositionsInPixels.Length; i++)
+                for (var i = 0; i < centers.Length; i++)
                 {
-                    var center = nodesPositionsInPixels[i];
+                    var center = centers[i];
                     var currentQueue = currentQueues[i];
                     var nextQueue = nextQueues[i];
                     var color = colors[i];
-                    var visitedNext = nextsVisited[i];
 
                     while (currentQueue.Count != 0)
                     {
                         var current = currentQueue.Dequeue();
-                        
+
                         foreach (var neighbour in GetNeighboursPixels(current))
                         {
                             if (!neighbour.CheckPixelCoord(textureSize))
                                 continue;
-                            if (visitedPixels.Contains(neighbour))
+                            if (coloredPixels.Contains(neighbour))
                                 continue;
-                            if (visitedNext.Contains(neighbour))
+                            if (claimedPixels.Contains(neighbour))
                                 continue;
-                            
-                            var inCircle = CustomMath.PointInCircle(neighbour, center, currentRadius);
+
+                            var inCircle = CustomMath.PointInCircle(
+                                neighbour,
+                                center,
+                                currentRadius);
+
                             if (inCircle)
                             {
                                 currentQueue.Enqueue(neighbour);
-                                visitedPixels.Add(neighbour);
+                                coloredPixels.Add(neighbour);
                                 visibilityMap.SetPixel(neighbour.x, neighbour.y, color);
                             }
                             else
                             {
-                                visitedNext.Add(neighbour);
+                                claimedPixels.Add(neighbour);
                                 nextQueue.Enqueue(neighbour);
                             }
                         }
@@ -149,14 +140,54 @@ namespace LineWars.Controllers
 
                     currentQueues[i] = nextQueue;
                     nextQueues[i] = currentQueue;
-                    visitedNext.Clear();
                 }
-
+                
+                claimedPixels.Clear();
                 currentRadius++;
+            }
+
+            var uncoloredPixels = FogExtensions.GetAllPixels(textureSize)
+                .Where(x => !coloredPixels.Contains(x))
+                .ToArray();
+            
+            foreach (var uncoloredPixel in uncoloredPixels)
+            {
+                var minDist = float.MaxValue;
+                var colorToPixel = new Color(); 
+                for (var i = 0; i < centers.Length; i++)
+                {
+                    var dist = (centers[i] - uncoloredPixel).magnitude;
+                    if (dist < minDist)
+                    {
+                        colorToPixel = colors[i];
+                        minDist = dist;
+                    }
+                }
+                
+                visibilityMap.SetPixel(uncoloredPixel.x, uncoloredPixel.y, colorToPixel);
             }
             
             visibilityMap.Apply();
             return visibilityMap;
+        }
+        
+        
+
+        private Color[] GetColors(int colorsCount)
+        {
+            var colors = new Color[colorsCount];
+            for (var i = 0; i < colorsCount; i++)
+            {
+                var colorValue = colorStep * i + 1;
+                var r = colorValue % 255;
+                var g = colorValue / 255 % 255;
+                var b = colorValue / 65025 % 255;
+                colors[i] = new Color(
+                    Convert.ToSingle(r) / 255f,
+                    Convert.ToSingle(g) / 255f,
+                    Convert.ToSingle(b) / 255f);
+            }
+            return colors;
         }
 
         private IEnumerable<Vector2Int> GetNeighboursPixels(Vector2Int vector2)

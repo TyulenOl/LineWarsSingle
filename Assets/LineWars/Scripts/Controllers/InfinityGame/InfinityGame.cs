@@ -162,7 +162,7 @@ namespace LineWars.Controllers
             graphCreator.LoadSettings(graphCreatorSettings);
             var graph = graphCreator.Restart();
             for (var i = 0; i < initializeGraphSettings.IterationCountBeforeDeleteEdges; i++)
-                graphCreator.Iterate();
+                graphCreator.SimpleIterate();
 
             switch (initializeGraphSettings.EdgeRemovalType)
             {
@@ -177,7 +177,7 @@ namespace LineWars.Controllers
             }
             
             for (var i = 0; i < initializeGraphSettings.IterationCountAfterDeleteEdges; i++)
-                graphCreator.Iterate();
+                graphCreator.SimpleIterate();
             
             graphCreator.RedrawAllEdges();
             return graph;

@@ -59,7 +59,11 @@ namespace LineWars.Model
         public bool AnyIsFree => LeftIsFree || RightIsFree;
         public bool AllIsFree => LeftIsFree && RightIsFree;
 
-        public int Id => index;
+        public int Id
+        {
+            get => index;
+            set => index = value;
+        }
 
         public int Visibility =>
             Math.Max(visibility,
@@ -208,6 +212,7 @@ namespace LineWars.Model
         
         public void Redraw()
         {
+            gameObject.name = $"Node{Id}";
         }
         
 #if UNITY_EDITOR

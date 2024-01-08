@@ -11,7 +11,8 @@ using Object = UnityEngine.Object;
 
 namespace GraphEditor
 {
-    public abstract class GraphTool : EditorTool
+    [EditorTool("Create Graph")]
+    public class GraphTool : EditorTool
     {
         private Edge monoEdgePrefab;
         private Node monoNodePrefab;
@@ -19,8 +20,15 @@ namespace GraphEditor
         
         private SelectionListener<Node> nodeListener;
 
-        protected abstract Node GetNodePrefab();
-        protected abstract Edge GetEdgePrefab();
+        private Node GetNodePrefab()
+        {
+            return Resources.Load<Node>("Prefabs/Node");
+        }
+
+        private Edge GetEdgePrefab()
+        {
+            return Resources.Load<Edge>("Prefabs/Edge");
+        }
 
         public override void OnActivated()
         {
