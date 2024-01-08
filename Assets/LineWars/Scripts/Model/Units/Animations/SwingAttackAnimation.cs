@@ -13,11 +13,13 @@ namespace LineWars.Model
             if(slashEffect == null)
             {
                 Debug.LogWarning("Slash Effect is null!");
+                EndAnimation();
                 return;
             }
             if(effectPosition == null)
             {
                 Debug.LogWarning("Effect Position is null!");
+                EndAnimation();
                 return;
             }
             var effect = Instantiate(slashEffect, effectPosition.transform.position, Quaternion.identity);

@@ -17,6 +17,8 @@ namespace LineWars.Model
         public IEnumerable<UnitAction<NodeProjection, EdgeProjection, UnitProjection>> UnitActions { get; set; }
         public Unit Original { get; set; }
         public string UnitName { get; set; }
+        public int InitialPower {get; set; }
+        public int CurrentPower {get; set; }
         public int MaxHp { get; set; }
         public int MaxArmor { get; set; }
         public int MaxActionPoints { get; set; }
@@ -149,6 +151,8 @@ namespace LineWars.Model
     {
         public Unit Original { get; }
         public string UnitName { get; }
+        public int InitialPower { get; }
+        public int CurrentPower { get; }
         public int MaxHp { get; }
         public int MaxArmor { get; }
         public int MaxActionPoints { get; }

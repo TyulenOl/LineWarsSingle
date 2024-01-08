@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using AYellowpaper.SerializedCollections;
+using LineWars.LootBoxes;
 using LineWars.Model;
 using UnityEngine;
 
@@ -8,10 +9,14 @@ namespace LineWars.Controllers
     [CreateAssetMenu(menuName = "DeckBuilding/DefaultUserInfo", order = 53)]
     public class UserInfoPreset: ScriptableObject
     {
-        [SerializeField] private int defaultMoney;
+        [SerializeField] private int defaultGold;
+        [SerializeField] private int defaultDiamond;
         [SerializeField] private List<DeckCard> defaultCards;
+        [SerializeField] private SerializedDictionary<LootBoxRarity, int> defaultBoxesCount;
 
-        public int DefaultMoney => defaultMoney;
+        public int DefaultGold => defaultGold;
+        public int DefaultDiamond => defaultDiamond;
         public IEnumerable<DeckCard> DefaultCards => defaultCards;
+        public IReadOnlyDictionary<LootBoxRarity, int> DefaultBoxesCount => defaultBoxesCount;
     }
 }

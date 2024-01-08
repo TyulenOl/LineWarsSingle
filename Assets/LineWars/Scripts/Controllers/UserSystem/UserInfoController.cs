@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using LineWars.Model;
 using UnityEngine;
 
 namespace LineWars.Controllers
 {
-    public class UserController: MonoBehaviour
+    public class UserInfoController: MonoBehaviour
     {
         [SerializeField] private UserInfoPreset userInfoPreset;
         
@@ -24,7 +23,7 @@ namespace LineWars.Controllers
 
             currentInfo = provider.Load(0) ?? CreateDefaultUserInfo();
             
-            openedCardsSet = currentInfo.unlockCards
+            openedCardsSet = currentInfo.UnlockedCards
                 .Select(x => deckCardStorage.IdToValue[x])
                 .Concat(userInfoPreset.DefaultCards.Where(storage.ValueToId.ContainsKey))
                 .ToHashSet();
@@ -32,33 +31,64 @@ namespace LineWars.Controllers
 
         private UserInfo CreateDefaultUserInfo()
         {
-            return new UserInfo()
+            var newUserInfo = new UserInfo()
             {
-                amountInGameCurrency = userInfoPreset.DefaultMoney,
-                unlockCards = userInfoPreset.DefaultCards
+                Gold = userInfoPreset.DefaultGold,
+                Diamonds = userInfoPreset.DefaultDiamond,
+                UnlockedCards = userInfoPreset.DefaultCards
                     .Where(deckCardStorage.ValueToId.ContainsKey)
                     .Select(x => deckCardStorage.ValueToId[x])
                     .ToList()
             };
+            foreach(var pair in userInfoPreset.DefaultBoxesCount)
+            {
+                newUserInfo.LootBoxes[pair.Key] = pair.Value;
+            }
+            return newUserInfo;
         }
 
         public bool CardIsOpen(DeckCard card) => openedCardsSet.Contains(card);
-        public void OpenCard(DeckCard deckCard)
+
+        public void UnlockCard(int id) //не очень оптимизированно?
+        {
+            UnlockCard(deckCardStorage.IdToValue[id]);
+        }
+
+        public void UnlockCard(DeckCard deckCard)
         {
             if (openedCardsSet.Contains(deckCard))
                 return;
             openedCardsSet.Add(deckCard);
-            currentInfo.unlockCards.Add(deckCardStorage.ValueToId[deckCard]);
+            currentInfo.UnlockedCards.Add(deckCardStorage.ValueToId[deckCard]);
         }
         
-        public void CloseCard(DeckCard deckCard)
+        public void LockCard(int id)
+        {
+            LockCard(deckCardStorage.IdToValue[id]);
+        }
+
+        public void LockCard(DeckCard deckCard)
         {
             if (!openedCardsSet.Contains(deckCard))
                 return;
             openedCardsSet.Remove(deckCard);
-            currentInfo.unlockCards.Remove(deckCardStorage.ValueToId[deckCard]);
+            currentInfo.UnlockedCards.Remove(deckCardStorage.ValueToId[deckCard]);
         }
-        
+
+        public void ChangeGold(int value)
+        {
+            currentInfo.Gold += value;
+        }
+
+        public void ChangeDiamond(int value)
+        {
+            currentInfo.Diamonds += value;
+        }
+
+        public void ChangeUpgradeCards(int value)
+        {
+            currentInfo.UpgradeCards += value;
+        }
 
         private void OnApplicationFocus(bool hasFocus)
         {

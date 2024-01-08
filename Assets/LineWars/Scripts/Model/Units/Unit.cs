@@ -20,6 +20,7 @@ namespace LineWars.Model
         [SerializeField] private string unitName;
         [SerializeField][TextArea] private string unitDescription;
         
+        [SerializeField, Min(0)] private int initialPower;
         [SerializeField, Min(0)] private int maxHp;
         [SerializeField, Min(0)] private int maxArmor;
         [SerializeField, Min(0)] private int visibility;
@@ -45,6 +46,7 @@ namespace LineWars.Model
         [SerializeField, ReadOnlyInspector] private int currentHp;
         [SerializeField, ReadOnlyInspector] private int currentArmor;
         [SerializeField, ReadOnlyInspector] private int currentActionPoints;
+        [SerializeField, ReadOnlyInspector] private int currentPower;
 
 
         [field: Header("Events")]
@@ -68,6 +70,24 @@ namespace LineWars.Model
         #region Properties
         public int Id => index;
         public string UnitName => unitName;
+
+        public int InitialPower
+        {
+            get => initialPower;
+            set
+            {
+                initialPower = Mathf.Max(value, 0);
+            }
+        }
+
+        public int CurrentPower
+        {
+            get => currentPower;
+            set
+            {
+                currentPower = Mathf.Max(value, 0);
+            }
+        }
         
         public int MaxActionPoints
         {
@@ -187,6 +207,7 @@ namespace LineWars.Model
             currentHp = maxHp;
             currentArmor = 0;
             currentActionPoints = maxActionPoints;
+            currentPower = initialPower;
 
             movementLogic = GetComponent<UnitMovementLogic>();
 

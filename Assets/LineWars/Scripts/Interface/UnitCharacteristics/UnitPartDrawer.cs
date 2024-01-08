@@ -47,9 +47,9 @@ namespace LineWars.Interface
             var attackSprite = DrawHelper.GetSpriteByCharacteristicType(CharacteristicType.MeleeAttack);
             var actionPointsSprite = DrawHelper.GetSpriteByCharacteristicType(CharacteristicType.ActionPoints);
 
-            MeleeAttackDrawer = Instantiate(CharacteristicDrawerPrefab.gameObject, CharacteristicsLayoutGroup.transform)
-                .GetComponent<CharacteristicDrawer>();
-            MeleeAttackDrawer.Init(attackSprite, unitToInit.GetMaxDamage().ToString());
+        MeleeAttackDrawer = Instantiate(CharacteristicDrawerPrefab.gameObject, CharacteristicsLayoutGroup.transform)
+            .GetComponent<CharacteristicDrawer>();
+        MeleeAttackDrawer.Init(attackSprite, unitToInit.CurrentPower.ToString());
 
             ArmorDrawer = Instantiate(CharacteristicDrawerPrefab.gameObject, CharacteristicsLayoutGroup.transform)
                 .GetComponent<CharacteristicDrawer>();
@@ -91,12 +91,12 @@ namespace LineWars.Interface
             canBlockSprite.gameObject.SetActive(canBlock);
         }
 
-        public void ReDrawCharacteristics()
+    public void ReDrawCharacteristics()
+    {
+        if (MeleeAttackDrawer != null)
         {
-            if (MeleeAttackDrawer != null)
-            {
-                MeleeAttackDrawer.ReDraw(currentUnit.GetMaxDamage().ToString());
-            }
+            MeleeAttackDrawer.ReDraw(currentUnit.CurrentPower.ToString());
+        }
 
             //TODO Добавить проверку на то, что юнит стреляющий. Если он стреляющий - выводить дальнюю атаку
             // if( FarAttackDrawer != null)

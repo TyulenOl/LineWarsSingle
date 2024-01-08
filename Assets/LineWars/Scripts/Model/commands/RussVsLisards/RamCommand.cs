@@ -3,6 +3,7 @@ using JetBrains.Annotations;
 
 namespace LineWars.Model
 {
+    [Obsolete]
     public class RamCommand<TNode, TEdge, TUnit> :
         TargetActionCommand<TUnit, IRamAction<TNode, TEdge, TUnit>, TNode>
         where TNode : class, INodeForGame<TNode, TEdge, TUnit>

@@ -1,7 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 namespace LineWars.Model
 {
     public class RamCommandBlueprint : ICommandBlueprint
@@ -20,7 +16,8 @@ namespace LineWars.Model
             var executor = projection.UnitsIndexList[ExecutorId];
             var node = projection.NodesIndexList[NodeId];
 
-            return new RamCommand<NodeProjection, EdgeProjection, UnitProjection>
+            return new TargetedUniversalCommand
+                <UnitProjection, IRamAction<NodeProjection, EdgeProjection, UnitProjection>, NodeProjection>
                 (executor, node);
         }
 
@@ -29,9 +26,9 @@ namespace LineWars.Model
             var executor = projection.UnitsIndexList[ExecutorId].Original;
             var node = projection.NodesIndexList[NodeId].Original;
 
-            return new RamCommand<Node, Edge, Unit>
+            return new TargetedUniversalCommand
+                <Unit, MonoRamAction, Node>
                 (executor, node);
         }
     }
-
 }

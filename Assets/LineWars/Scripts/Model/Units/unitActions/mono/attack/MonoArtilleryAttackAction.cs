@@ -24,7 +24,6 @@ namespace LineWars.Model
         protected override ArtilleryAttackAction<Node, Edge, Unit> GetAction()
         {
             return new ArtilleryAttackAction<Node, Edge, Unit>(Executor,
-                InitialDamage,
                 InitialIsPenetratingDamage,
                 (uint) InitialDistance,
                 MonoGraph.Instance);

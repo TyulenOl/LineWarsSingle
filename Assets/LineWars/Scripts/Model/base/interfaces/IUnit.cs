@@ -16,6 +16,8 @@ namespace LineWars.Model
 
     {
         public int Id { get; }
+        public int InitialPower {get; set;}
+        public int CurrentPower {get; set; }
         public int MaxArmor { get; set; }
         public int CurrentArmor { get; set; }
         public int Visibility { get; set; }

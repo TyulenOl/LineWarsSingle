@@ -7,7 +7,6 @@
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
-        public int Damage { get; }
         public override CommandType CommandType => CommandType.BlowWithSwing;
 
 
@@ -28,16 +27,15 @@
                     continue;
                 foreach (var unit in neighbor.Units)
                 {
-                    unit.DealDamageThroughArmor(Damage);
+                    unit.DealDamageThroughArmor(Executor.CurrentPower);
                 }
             }
 
             CompleteAndAutoModify();
         }
 
-        public BlowWithSwingAction(TUnit executor, int damage) : base(executor)
+        public BlowWithSwingAction(TUnit executor) : base(executor)
         {
-            Damage = damage;
         }
 
         public override void Accept(IBaseUnitActionVisitor<TNode, TEdge, TUnit> visitor)
