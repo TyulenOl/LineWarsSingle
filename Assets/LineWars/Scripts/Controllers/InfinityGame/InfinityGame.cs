@@ -177,7 +177,7 @@ namespace LineWars.Controllers
             }
             
             for (var i = 0; i < initializeGraphSettings.IterationCountAfterDeleteEdges; i++)
-                graphCreator.SimpleIterate();
+                graphCreator.HardIterate();
             
             graphCreator.RedrawAllEdges();
             return graph;

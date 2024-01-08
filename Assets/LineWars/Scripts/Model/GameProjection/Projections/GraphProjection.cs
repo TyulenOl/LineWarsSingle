@@ -30,7 +30,7 @@ namespace LineWars.Model
                 unit.InitializeActions(this);
         }
 
-        private void AddNode(NodeProjection node)
+        private new void AddNode(NodeProjection node)
         {
             NodesIndexList.Add(node.Id, node);
             if (node.LeftUnit != null)
@@ -41,7 +41,7 @@ namespace LineWars.Model
             node.Game = Game;
         }
 
-        private void AddEdge(EdgeProjection edge)
+        private new void AddEdge(EdgeProjection edge)
         {
             EdgesIndexList.Add(edge.Id, edge);
         }
