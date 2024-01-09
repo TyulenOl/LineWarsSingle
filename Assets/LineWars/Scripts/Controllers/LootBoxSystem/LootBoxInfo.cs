@@ -7,10 +7,19 @@ namespace LineWars.LootBoxes
     [CreateAssetMenu(fileName = "New Loot Box Info", menuName = "Loot Boxes/Info")]
     public class LootBoxInfo : ScriptableObject
     {
-        [SerializeField] private LootBoxRarity rarity;
+        [SerializeField] private string boxName;
+        [SerializeField] private Sprite sprite;
+        [SerializeField] private LootBoxType boxType;
         [SerializeField] private List<LootInfo> allLoot;
+        [Header("Cost Settings")]
+        [SerializeField] private CostType costType;
+        [SerializeField] private int cost;
 
-        public LootBoxRarity Rarity => rarity;
+        public string Name => boxName;
+        public Sprite Sprite => sprite;
+        public CostType CostType => costType;
+        public int Cost => cost;
+        public LootBoxType BoxType => boxType;
         public IReadOnlyList<LootInfo> AllLoot => allLoot;
     }
 

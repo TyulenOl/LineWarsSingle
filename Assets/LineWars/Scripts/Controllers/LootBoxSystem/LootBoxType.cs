@@ -1,6 +1,6 @@
 namespace LineWars.LootBoxes
 {
-    public enum LootBoxRarity
+    public enum LootBoxType
     {
         Usual,
         Legendary

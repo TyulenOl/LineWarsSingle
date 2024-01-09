@@ -2,7 +2,7 @@ using LineWars.Model;
 
 namespace LineWars.LootBoxes
 {
-    public interface LootBoxOpener
+    public interface ILootBoxOpener
     {
         public LootBoxInfo BoxInfo { get; }
         public  bool CanOpen(UserInfo info);

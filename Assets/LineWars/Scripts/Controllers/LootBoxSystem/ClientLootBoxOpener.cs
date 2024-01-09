@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace LineWars.LootBoxes
 {
-    public class ClientLootBoxOpener : LootBoxOpener
+    public class ClientLootBoxOpener : ILootBoxOpener
     {
         private IStorage<DeckCard> cardStorage;
         public LootBoxInfo BoxInfo {get; private set;}
@@ -19,7 +19,7 @@ namespace LineWars.LootBoxes
 
         public bool CanOpen(UserInfo info)
         {
-            return info.LootBoxes.ContainsKey(BoxInfo.Rarity);
+            return info.LootBoxes.ContainsKey(BoxInfo.BoxType);
         }
 
         public DropInfo Open(UserInfo info)
