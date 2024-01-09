@@ -271,6 +271,7 @@ namespace GraphEditor
             }
 
             var deletedEdges = new List<Edge>();
+            var idToNode = vertexGraph.AsReadOnlyNodesDictionary;
             while (edgeAndIntersections.Count != 0)
             {
                 var currentPair = edgeAndIntersections
@@ -285,7 +286,10 @@ namespace GraphEditor
                 vertexGraph.DisconnectNodes(edgeToDelete.FirstNode.Id, edgeToDelete.SecondNode.Id);
                 edgeAndIntersections.Remove(edgeToDelete);
                 
-                if (vertexGraph.IsConnectedGraph())
+                
+                if (vertexGraph.IsConnectedGraph() 
+                    && idToNode[edgeToDelete.FirstNode.Id].NeighboursVertex.Count != 1
+                    && idToNode[edgeToDelete.SecondNode.Id].NeighboursVertex.Count != 1)
                 {
                     deletedEdges.Add(edgeToDelete);
                     foreach (var intersectionEdge in currentPair.Value)
