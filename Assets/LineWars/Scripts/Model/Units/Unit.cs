@@ -22,7 +22,7 @@ namespace LineWars.Model
         
         [SerializeField, Min(0)] private int initialPower;
         [SerializeField, Min(0)] private int maxHp;
-        [SerializeField, Min(0)] private int maxArmor;
+        [SerializeField, Min(0)] private int maxArmor = 100;
         [SerializeField, Min(0)] private int visibility;
         [field: SerializeField] public Sprite Sprite { get; private set; }
         
@@ -152,7 +152,7 @@ namespace LineWars.Model
             set
             {
                 var before = currentArmor;
-                currentArmor = Mathf.Max(0, value);
+                currentArmor = Mathf.Clamp(currentArmor, 0, maxArmor);
                 if(before == currentArmor) return;
                 ArmorChanged.Invoke(before, currentArmor);
             }

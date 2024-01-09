@@ -2,6 +2,8 @@
 using System.Linq;
 using LineWars.Model;
 using UnityEngine;
+using System;
+using LineWars.LootBoxes;
 
 namespace LineWars.Controllers
 {
@@ -75,19 +77,50 @@ namespace LineWars.Controllers
             currentInfo.UnlockedCards.Remove(deckCardStorage.ValueToId[deckCard]);
         }
 
-        public void ChangeGold(int value)
+        public int UserGold
         {
-            currentInfo.Gold += value;
+            get => currentInfo.Gold;
+            set
+            {
+                if (value < 0)
+                    throw new ArgumentException("Gold can't be less than zero!");
+                currentInfo.Gold = value;
+            }
+        }
+        
+        public int UserDiamond
+        {
+            get => currentInfo.Diamonds;
+            set
+            {
+                if (value < 0)
+                    throw new ArgumentException("Diamonds can't be less than zero!");
+                currentInfo.Diamonds = value;
+            }
         }
 
-        public void ChangeDiamond(int value)
+        public int UserUpgradeCards
         {
-            currentInfo.Diamonds += value;
+            get => currentInfo.Diamonds;
+            set
+            {
+                if (value < 0)
+                    throw new ArgumentException("UgradeCards can't be less than zero!");
+                currentInfo.UpgradeCards = value;
+            }
         }
 
-        public void ChangeUpgradeCards(int value)
+        public int GetBoxes(LootBoxType boxType)
         {
-            currentInfo.UpgradeCards += value;
+            return currentInfo.LootBoxes[boxType];
+        }
+
+        public void SetBoxes(LootBoxType boxType, int value)
+        {
+            if (value < 0)
+                throw new ArgumentException("Loot Box can't be less than zero!");
+            currentInfo.LootBoxes[boxType] = value;
+
         }
 
         private void OnApplicationFocus(bool hasFocus)

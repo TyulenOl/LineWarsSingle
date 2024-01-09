@@ -16,11 +16,11 @@ namespace LineWars.Controllers
         [SerializeField] private DecksController decksController;
         [SerializeField] private CompaniesController companiesController;
         [SerializeField] private UserInfoController userController;
+        [SerializeField] private LootBoxController lootBoxController;
 
         [Header("ProviderSettings")]
         [SerializeField] private ProviderType providerType;
 
-        private LootBoxController lootBoxController;
 
         private IProvider<Deck> deckProvider;
         private IProvider<MissionInfo> missionInfoProvider;

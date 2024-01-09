@@ -2,6 +2,6 @@
 {
     public interface ILootBoxOpenerFabric
     {
-        public LootBoxOpener Create(LootBoxInfo info);
+        public ILootBoxOpener Create(LootBoxInfo info);
     }
 }
