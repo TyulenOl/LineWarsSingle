@@ -12,6 +12,6 @@ namespace LineWars.Model
         public int Gold;
         public List<int> UnlockedCards;
         public int UpgradeCards;
-        public SerializedDictionary<LootBoxRarity, int> LootBoxes = new();
+        public SerializedDictionary<LootBoxType, int> LootBoxes = new();
     }
 }

@@ -12,11 +12,11 @@ namespace LineWars.Controllers
         [SerializeField] private int defaultGold;
         [SerializeField] private int defaultDiamond;
         [SerializeField] private List<DeckCard> defaultCards;
-        [SerializeField] private SerializedDictionary<LootBoxRarity, int> defaultBoxesCount;
+        [SerializeField] private SerializedDictionary<LootBoxType, int> defaultBoxesCount;
 
         public int DefaultGold => defaultGold;
         public int DefaultDiamond => defaultDiamond;
         public IEnumerable<DeckCard> DefaultCards => defaultCards;
-        public IReadOnlyDictionary<LootBoxRarity, int> DefaultBoxesCount => defaultBoxesCount;
+        public IReadOnlyDictionary<LootBoxType, int> DefaultBoxesCount => defaultBoxesCount;
     }
 }
