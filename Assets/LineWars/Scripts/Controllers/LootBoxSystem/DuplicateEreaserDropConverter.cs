@@ -31,6 +31,7 @@ namespace LineWars.LootBoxes
                 {
                     var newDrop = new ContextedDrop(drop);
                     contextedDrops.Add(newDrop);
+                    continue;
                 }
 
                 var card = cardStorage.IdToValue[drop.Value];
@@ -39,7 +40,7 @@ namespace LineWars.LootBoxes
                     addedUpgrades = upgradeForLegendary;
 
                 var revisedDrop = new Drop(LootType.UpgradeCard, addedUpgrades);
-                var newDrop1 = new ContextedDrop(drop, revisedDrop);
+                var newDrop1 = new ContextedDrop(revisedDrop,drop);
                 contextedDrops.Add(newDrop1);  
             }
 

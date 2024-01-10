@@ -17,13 +17,19 @@ namespace LineWars.Controllers
         private UserInfo currentInfo;
         private HashSet<DeckCard> openedCardsSet;
         public IEnumerable<DeckCard> OpenedCards => openedCardsSet;
+
+        public event Action<int> GoldChanged;
         
+        public event Action<int> DiamondsChanged;
         public void Initialize(IProvider<UserInfo> provider, IStorage<DeckCard> storage)
         {
             userInfoProvider = provider;
             deckCardStorage = storage;
 
             currentInfo = provider.Load(0) ?? CreateDefaultUserInfo();
+
+            UserGold = 100;
+            UserDiamond = 100;
             
             openedCardsSet = currentInfo.UnlockedCards
                 .Select(x => deckCardStorage.IdToValue[x])
@@ -85,6 +91,7 @@ namespace LineWars.Controllers
                 if (value < 0)
                     throw new ArgumentException("Gold can't be less than zero!");
                 currentInfo.Gold = value;
+                GoldChanged?.Invoke(value);
             }
         }
         
@@ -96,6 +103,7 @@ namespace LineWars.Controllers
                 if (value < 0)
                     throw new ArgumentException("Diamonds can't be less than zero!");
                 currentInfo.Diamonds = value;
+                DiamondsChanged?.Invoke(value);
             }
         }
 
