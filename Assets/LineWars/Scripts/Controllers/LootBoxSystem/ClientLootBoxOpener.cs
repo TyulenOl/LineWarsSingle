@@ -66,15 +66,15 @@ namespace LineWars.LootBoxes
         private Drop HandleCard(LootInfo info)
         {
             var chanceList = new RandomChanceList<CardRarity>();
-            foreach(var cardChance in info.CardChances)
+            foreach (var cardChance in info.CardChances)
             {
                 chanceList.Add(cardChance.Rarity, cardChance.Chance);
             }
             var rarity = chanceList.PickRandomObject();
 
-            var elligbleCards = FindAllElligbleCards(rarity);
-            var randomCard = Random.Range(0, elligbleCards.Count());
-            return new Drop(LootType.Card, randomCard);
+            var elligbleCards = FindAllElligbleCards(rarity).ToArray();
+            var randomCard = Random.Range(0, elligbleCards.Length);
+            return new Drop(LootType.Card, elligbleCards[randomCard]);
         }
 
         private IEnumerable<int> FindAllElligbleCards(CardRarity rarity)
