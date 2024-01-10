@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using LineWars.Controllers;
 using LineWars.LootBoxes;
 using TMPro;
 using UnityEngine;
@@ -19,7 +20,10 @@ namespace LineWars
         [SerializeField] private TMP_Text boxName;
         [SerializeField] private TMP_Text boxDescription;
         [SerializeField] private Button button;
-        
+
+        private LootBoxInfo lootBoxInfo;
+
+        public LootBoxInfo LootBoxInfo => lootBoxInfo;
 
         private readonly Color coinsColor = new (251, 184, 13);
         private readonly Color diamondsColor = new (254, 57, 59);
@@ -38,7 +42,7 @@ namespace LineWars
                 bgImage.sprite = lootBoxInfo.BgSprite;
             if(onButtonClickAction != null)
                 button.onClick.AddListener(onButtonClickAction);
+            this.lootBoxInfo = lootBoxInfo;
         }
-
     }
 }

@@ -9,7 +9,7 @@ namespace LineWars.LootBoxes
     public class LootBoxController : MonoBehaviour
     {
         [SerializeField] private LootBoxInfo[] infos;
-        private Dictionary<LootBoxType, LootBoxInfo> typeToInfos;
+        private Dictionary<LootBoxType, LootBoxInfo> typeToInfos = new();
         private Dictionary<LootBoxType, ILootBoxOpener> openers;
         private UserInfoController userInfoController;
         private IProvider<UserInfo> provider;

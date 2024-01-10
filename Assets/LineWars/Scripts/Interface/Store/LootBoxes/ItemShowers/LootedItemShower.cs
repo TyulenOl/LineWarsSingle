@@ -7,6 +7,11 @@ namespace LineWars
     {
         private Animator animator;
 
+        private void Awake()
+        {
+            animator = GetComponent<Animator>();
+        }
+
         private void OnEnable()
         {
             animator.SetTrigger("Showing");

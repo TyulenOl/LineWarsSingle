@@ -18,6 +18,8 @@ namespace LineWars
         [SerializeField] private DiamondsShower diamondsShowerPrefab;
         
         [SerializeField] private List<Transform> transformsToInstantiateShowers;
+
+        [SerializeField] private float delayInSeconds;
         
         private List<LootedItemShower> activeShowers = new ();
     
@@ -28,6 +30,11 @@ namespace LineWars
         }
     
         public void ShowItems(IEnumerable<ContextedDrop> drops)
+        {
+            StartCoroutine(ShowItemsCoroutine(drops));
+        }
+
+        private IEnumerator ShowItemsCoroutine(IEnumerable<ContextedDrop> drops)
         {
             var orderedDrops = drops.OrderBy(x => x.Drop.DropType).ToArray();
             if (orderedDrops.Length > 5)
@@ -52,9 +59,10 @@ namespace LineWars
                         break;
                 }
                 lastTransformIndex--;
+                yield return new WaitForSeconds(delayInSeconds);
             }
         }
-    
+
         private void ShowDiamonds(Transform parentTransform, int amount)
         {
             var instance = Instantiate(diamondsShowerPrefab, parentTransform);
@@ -87,8 +95,10 @@ namespace LineWars
         {
             foreach (var activeShower in activeShowers)
             {
-                Destroy(activeShower.gameObject);
+                if(activeShower != null)
+                    Destroy(activeShower.gameObject);
             }
+            activeShowers.Clear();
         }
         
         private void OnDisable()

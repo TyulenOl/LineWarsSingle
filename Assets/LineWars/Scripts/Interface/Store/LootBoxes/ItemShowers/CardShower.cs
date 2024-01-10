@@ -3,14 +3,14 @@ using UnityEngine;
 
 namespace LineWars
 {
-    public class UpgradeCardShower : ItemWithAmountShower
+    public class CardShower : LootedItemShower
     {
         [SerializeField] private CardDrawInfo cardDrawInfo;
 
-        public void ShowItem(DeckCard deckCard,int amount)
+        public void ShowItem(DeckCard deckCard)
         {
             cardDrawInfo.ReDraw(deckCard);
-            base.ShowItem(amount);
+            cardDrawInfo.ReDrawAvailability(true);
         }
     }
 }

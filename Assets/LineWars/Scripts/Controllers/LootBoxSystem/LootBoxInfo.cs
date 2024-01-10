@@ -1,5 +1,7 @@
+using System;
 using LineWars.Model;
 using System.Collections.Generic;
+using LineWars.Controllers;
 using UnityEngine;
 
 namespace LineWars.LootBoxes
@@ -26,6 +28,7 @@ namespace LineWars.LootBoxes
         public IReadOnlyList<LootInfo> AllLoot => allLoot;
 
         public string Description => boxDescription;
+        
     }
 
     [System.Serializable]
@@ -53,10 +56,11 @@ namespace LineWars.LootBoxes
         public int MinDiamondChances => minDiamondChances;
         public int MaxDiamondChances => maxDiamondChances;
         public int MinUpgradeCardChances => minUpgradeCardChances;
-        public int MaxUpgradeCardChances => maxUpgradeCardChances; 
-        public IReadOnlyList<CardChances> CardChances;
+        public int MaxUpgradeCardChances => maxUpgradeCardChances;
+        public IReadOnlyList<CardChances> CardChances => cardChances;
     }
 
+    [System.Serializable]
     public class CardChances
     {
         [SerializeField] private CardRarity rarity;
