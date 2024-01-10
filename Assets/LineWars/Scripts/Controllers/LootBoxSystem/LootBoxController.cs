@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using LineWars.Controllers;
 using LineWars.Model;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace LineWars.LootBoxes
 {
