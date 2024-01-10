@@ -22,11 +22,11 @@ namespace LineWars
         private void ReDrawBoxes()
         {
             var boxes = GameRoot.Instance.LootBoxController.lootBoxes;
-            foreach (var box in boxes)
-            {
-                var instance = Instantiate(lootBoxDrawerPrefab, boxesLayout.transform);
-                instance.Init(box, () => buyBoxPanel.OpenWindow(box));
-            }
+             foreach (var box in boxes)
+             {
+                 var instance = Instantiate(lootBoxDrawerPrefab, boxesLayout.transform);
+                 instance.Init(box, () => buyBoxPanel.OpenWindow(box));
+             }
         }
     }
 }

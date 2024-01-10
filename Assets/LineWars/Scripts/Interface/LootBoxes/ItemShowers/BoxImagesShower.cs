@@ -18,15 +18,15 @@ namespace LineWars
         [SerializeField] private DiamondsShower diamondsShowerPrefab;
         
         [SerializeField] private List<Transform> transformsToInstantiateShowers;
-
+        
         private List<LootedItemShower> activeShowers = new ();
-
+    
         private void Awake()
         {
             if (transformsToInstantiateShowers.Count != 5)
                 throw new InvalidDataException("BoxImagesShower have to have List<Transform> length only 5");
         }
-
+    
         public void ShowItems(IEnumerable<ContextedDrop> drops)
         {
             var orderedDrops = drops.OrderBy(x => x.Drop.DropType).ToArray();
@@ -54,7 +54,7 @@ namespace LineWars
                 lastTransformIndex--;
             }
         }
-
+    
         private void ShowDiamonds(Transform parentTransform, int amount)
         {
             var instance = Instantiate(diamondsShowerPrefab, parentTransform);
@@ -90,7 +90,7 @@ namespace LineWars
                 Destroy(activeShower.gameObject);
             }
         }
-
+        
         private void OnDisable()
         {
             DestroyAllShowers();

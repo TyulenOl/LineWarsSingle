@@ -14,6 +14,7 @@ namespace LineWars.LootBoxes
         private UserInfoController userInfoController;
         private IProvider<UserInfo> provider;
         private IConverter<DropInfo, ContextedDropInfo> dropConverter;
+        public IEnumerable<LootBoxInfo> lootBoxes => typeToInfos.Values;
 
         public void Initialize(
             IProvider<UserInfo> provider,

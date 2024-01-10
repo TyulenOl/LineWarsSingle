@@ -8,7 +8,9 @@ namespace LineWars.LootBoxes
     public class LootBoxInfo : ScriptableObject
     {
         [SerializeField] private string boxName;
-        [SerializeField] private Sprite sprite;
+        [SerializeField] private string boxDescription;
+        [SerializeField] private Sprite boxSprite;
+        [SerializeField] private Sprite bgSprite;
         [SerializeField] private LootBoxType boxType;
         [SerializeField] private List<LootInfo> allLoot;
         [Header("Cost Settings")]
@@ -16,11 +18,14 @@ namespace LineWars.LootBoxes
         [SerializeField] private int cost;
 
         public string Name => boxName;
-        public Sprite Sprite => sprite;
+        public Sprite BoxSprite => boxSprite;
+        public Sprite BgSprite => bgSprite;
         public CostType CostType => costType;
         public int Cost => cost;
         public LootBoxType BoxType => boxType;
         public IReadOnlyList<LootInfo> AllLoot => allLoot;
+
+        public string Description => boxDescription;
     }
 
     [System.Serializable]

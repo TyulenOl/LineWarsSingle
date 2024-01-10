@@ -48,7 +48,7 @@ namespace LineWars
                 Debug.Log(drop.Drop.DropType);
             }
             boxImagesShower.gameObject.SetActive(true);
-            boxImagesShower.ShowItems(dropInfo.Drops);
+            //boxImagesShower.ShowItems(dropInfo.Drops);
         }
     }
 }
