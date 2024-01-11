@@ -28,8 +28,11 @@ namespace LineWars.Controllers
 
             currentInfo = provider.Load(0) ?? CreateDefaultUserInfo();
 
+            //TODO: Убрать перед релизом!
             currentInfo.UnlockedCards = new List<int>();
-            
+            UserDiamond = 100;
+            UserGold = 100;
+            //TODO: Убрать перед релизом!
             openedCardsSet = currentInfo.UnlockedCards
                 .Select(x => deckCardStorage.IdToValue[x])
                 .Concat(userInfoPreset.DefaultCards.Where(storage.ValueToId.ContainsKey))

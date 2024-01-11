@@ -57,7 +57,7 @@ namespace LineWars.Controllers
 
         private void InitializeProviders()
         {
-            timeGetter = new GetWorldTime();
+            timeGetter = gameObject.AddComponent<GetWorldTime>();
             switch (providerType)
             {
                 case ProviderType.FileJson:
