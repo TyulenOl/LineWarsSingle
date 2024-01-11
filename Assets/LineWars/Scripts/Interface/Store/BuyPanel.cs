@@ -13,18 +13,16 @@ namespace LineWars
     {
         [SerializeField] private Button buyAndOpenButton;
         [SerializeField] private CanvasGroup inactiveCanvasGroup;
-
-        [SerializeField] private TMP_Text costText;
+        
         [SerializeField] private Image lootBoxImage;
-        [SerializeField] private Image coinsImage;
-        [SerializeField] private Image diamondsImage;
         [SerializeField] private TMP_Text boxName;
         [SerializeField] private TMP_Text boxDescription;
+        [SerializeField] private CostDrawer costDrawer;
 
         private readonly Color coinsColor = new (251, 184, 13);
         private readonly Color diamondsColor = new (254, 57, 59);
         
-        public void NewOpenWindow(BuyPanelReDrawInfo buyPanelReDrawInfo)
+        public void OpenWindow(BuyPanelReDrawInfo buyPanelReDrawInfo)
         {
             var canBuy = buyPanelReDrawInfo.ButtonInteractivityBool.Invoke();
             buyAndOpenButton.interactable = canBuy;
@@ -32,10 +30,7 @@ namespace LineWars
             buyAndOpenButton.onClick.RemoveAllListeners();
             buyAndOpenButton.onClick.AddListener(buyPanelReDrawInfo.OnButtonClickAction);
 
-            costText.text = buyPanelReDrawInfo.Cost.ToString();
-            costText.color = buyPanelReDrawInfo.CostType == CostType.Gold ? coinsColor : diamondsColor;
-            coinsImage.gameObject.SetActive(buyPanelReDrawInfo.CostType == CostType.Gold);
-            diamondsImage.gameObject.SetActive(buyPanelReDrawInfo.CostType == CostType.Diamond);
+            costDrawer.DrawCost(buyPanelReDrawInfo.Cost, buyPanelReDrawInfo.CostType);
             boxName.text = buyPanelReDrawInfo.PanelName;
             if (boxDescription != null) 
                 boxDescription.text = buyPanelReDrawInfo.PanelDescription;

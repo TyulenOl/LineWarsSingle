@@ -68,13 +68,13 @@ namespace LineWars.Store
             var card = cardStorage.IdToValue[cardId];
             var cardOpen = userInfoController.CardIsOpen(card);
             bool canAfford;
-            switch (card.CostType)
+            switch (card.ShopCostType)
             {
                 case CostType.Gold:
-                    canAfford = userInfoController.UserGold >= card.Cost;
+                    canAfford = userInfoController.UserGold >= card.ShopCost;
                     break;
                 case CostType.Diamond:
-                    canAfford = userInfoController.UserDiamond >= card.Cost;
+                    canAfford = userInfoController.UserDiamond >= card.ShopCost;
                     break;
                 default:
                     throw new NotImplementedException();
@@ -88,13 +88,13 @@ namespace LineWars.Store
             if (!cardsForPurchase.Contains(cardId))
                 Debug.LogWarning("You are buying card that is not present in store!");
             var card = cardStorage.IdToValue[cardId];
-            switch (card.CostType)
+            switch (card.ShopCostType)
             {
                 case CostType.Gold:
-                    userInfoController.UserGold -= card.Cost;
+                    userInfoController.UserGold -= card.ShopCost;
                     break;
                 case CostType.Diamond:
-                    userInfoController.UserDiamond -= card.Cost;
+                    userInfoController.UserDiamond -= card.ShopCost;
                     break;
                 default:
                     throw new NotImplementedException();
