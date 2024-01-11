@@ -27,9 +27,6 @@ namespace LineWars.Controllers
             deckCardStorage = storage;
 
             currentInfo = provider.Load(0) ?? CreateDefaultUserInfo();
-
-            UserGold = 100;
-            UserDiamond = 100;
             
             openedCardsSet = currentInfo.UnlockedCards
                 .Select(x => deckCardStorage.IdToValue[x])
@@ -48,6 +45,7 @@ namespace LineWars.Controllers
                     .Select(x => deckCardStorage.ValueToId[x])
                     .ToList()
             };
+
             foreach(var pair in userInfoPreset.DefaultBoxesCount)
             {
                 newUserInfo.LootBoxes[pair.Key] = pair.Value;

@@ -3,6 +3,7 @@ using DataStructures;
 using LineWars.Model;
 using LineWars.LootBoxes;
 using UnityEngine;
+using LineWars.Store;
 
 namespace LineWars.Controllers
 {
@@ -17,6 +18,7 @@ namespace LineWars.Controllers
         [SerializeField] private CompaniesController companiesController;
         [SerializeField] private UserInfoController userController;
         [SerializeField] private LootBoxController lootBoxController;
+        [SerializeField] private CardStore cardStore;
 
         [Header("ProviderSettings")]
         [SerializeField] private ProviderType providerType;
@@ -26,6 +28,7 @@ namespace LineWars.Controllers
         private IProvider<MissionInfo> missionInfoProvider;
         private IProvider<UserInfo> userInfoProvider;
         private IProvider<Settings> settingsProvider;
+        private IGetter<DateTime> timeGetter;
 
         public IStorage<DeckCard> CardsDatabase => cardsDatabase;
         public IStorage<MissionData> MissionsStorage => missionsStorage;
@@ -34,6 +37,7 @@ namespace LineWars.Controllers
         public CompaniesController CompaniesController => companiesController;
         public UserInfoController UserController => userController;
         public LootBoxController LootBoxController => lootBoxController;
+        public CardStore CardStore => cardStore;
 
         protected override void OnAwake()
         {
@@ -47,10 +51,13 @@ namespace LineWars.Controllers
             DecksController.Initialize(deckProvider);
             CompaniesController.Initialize(missionInfoProvider, missionsStorage);
             UserController.Initialize(userInfoProvider, cardsDatabase);
+            CardStore.Initialize(timeGetter, CardsDatabase, UserController);
+
         }
 
         private void InitializeProviders()
         {
+            timeGetter = new GetWorldTime();
             switch (providerType)
             {
                 case ProviderType.FileJson:

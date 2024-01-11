@@ -25,6 +25,7 @@ namespace LineWars.Model
         public void Execute(TUnit target)
         {
             target.CurrentHp -= target.CurrentPower;
+            CompleteAndAutoModify();
         }
 
         public IActionCommand GenerateCommand(TUnit target)

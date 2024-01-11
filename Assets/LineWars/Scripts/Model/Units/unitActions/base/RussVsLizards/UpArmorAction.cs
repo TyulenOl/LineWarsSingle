@@ -23,6 +23,7 @@ namespace LineWars.Model
         public void Execute(TUnit target)
         {
             target.CurrentArmor += Executor.CurrentPower;
+            CompleteAndAutoModify();
         }
 
         public IActionCommand GenerateCommand(TUnit target)
