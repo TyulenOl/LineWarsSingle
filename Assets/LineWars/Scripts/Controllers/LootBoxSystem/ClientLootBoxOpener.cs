@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using DataStructures;
+using LineWars.Controllers;
 using LineWars.Model;
 using UnityEngine;
 
@@ -72,7 +73,7 @@ namespace LineWars.LootBoxes
             }
             var rarity = chanceList.PickRandomObject();
 
-            var elligbleCards = FindAllElligbleCards(rarity).ToArray();
+            var elligbleCards = cardStorage.FindCardsByType(rarity).ToArray();
             var randomCard = Random.Range(0, elligbleCards.Length);
             return new Drop(LootType.Card, elligbleCards[randomCard]);
         }
