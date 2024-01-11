@@ -56,9 +56,22 @@ namespace LineWars.Store
                 }    
 
                 var elligbleCards = cardsByType[cardType];
-                var cardIndex = random.Next(0, elligbleCards.Count);
-                cardsForPurchase.Add(elligbleCards[cardIndex]);
+                if(elligbleCards.Count == 0)
+                {
+                    Debug.LogWarning($"Store couldn't find DeckCard of rarity: {cardType}");
+                    continue;
+                }
+                while(true)
+                {
+                    var cardIndex = random.Next(0, elligbleCards.Count);
+                    var card = elligbleCards[cardIndex];
+                    if(cardsForPurchase.Contains(card))
+                        continue;
+                    cardsForPurchase.Add(elligbleCards[cardIndex]);
+                    break;
+                }
             }
+
             isStoreInitialized = true;
         }
         

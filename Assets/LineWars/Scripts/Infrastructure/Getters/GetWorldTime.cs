@@ -13,7 +13,7 @@ namespace LineWars.Model
         private DateTime loadedTime;
         private readonly string apiUrl = "https://worldtimeapi.org/api/timezone/Europe/Moscow";
         
-        public void Initialize()
+        public void Start()
         {
             StartCoroutine(LoadTimeCoroutine());
         }
@@ -39,7 +39,9 @@ namespace LineWars.Model
 
                 if(request.result != UnityWebRequest.Result.Success)
                 {
-                    Debug.LogError($"Couldn't load time: {request.error}");
+                    Debug.LogError($"Couldn't load time: {request.error}. Loading \"Special Sliva's Day\"");
+                    loadedTime = new DateTime(2003, 7, 19);
+                    isLoaded = true;
                     yield break;
                 }
 
