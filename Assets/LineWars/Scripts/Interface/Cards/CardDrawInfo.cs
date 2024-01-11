@@ -109,7 +109,8 @@ namespace LineWars
         {
             IsActive = available;
             borderImage.sprite = available ? DeckCard.CardActiveBagLine : DeckCard.CardInactiveBagLine;   
-            ifInactivePanel.gameObject.SetActive(!available);
+            if(ifInactivePanel != null)
+                ifInactivePanel.gameObject.SetActive(!available);
         }
     }
 }

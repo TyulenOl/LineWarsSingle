@@ -27,6 +27,8 @@ namespace LineWars.Controllers
             deckCardStorage = storage;
 
             currentInfo = provider.Load(0) ?? CreateDefaultUserInfo();
+
+            currentInfo.UnlockedCards = new List<int>();
             
             openedCardsSet = currentInfo.UnlockedCards
                 .Select(x => deckCardStorage.IdToValue[x])

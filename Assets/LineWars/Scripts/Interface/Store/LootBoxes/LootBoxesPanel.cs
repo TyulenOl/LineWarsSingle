@@ -26,7 +26,7 @@ namespace LineWars
              foreach (var box in boxes)
              {
                  var instance = Instantiate(lootBoxDrawerPrefab, boxesLayout.transform);
-                 instance.Init(box, () => buyPanel.NewOpenWindow(GetBuyPanelReDrawInfo(instance.LootBoxInfo)));
+                 instance.Init(box, () => buyPanel.OpenWindow(GetBuyPanelReDrawInfo(instance.LootBoxInfo)));
              }
         }
         

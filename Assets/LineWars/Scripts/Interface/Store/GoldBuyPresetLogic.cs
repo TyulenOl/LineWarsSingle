@@ -27,7 +27,7 @@ namespace LineWars
 
         private void OnButtonClick()
         {
-            buyPanel.NewOpenWindow(GetBuyPanelReDrawInfo());
+            buyPanel.OpenWindow(GetBuyPanelReDrawInfo());
         }
 
         private BuyPanelReDrawInfo GetBuyPanelReDrawInfo()
