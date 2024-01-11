@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using LineWars.LootBoxes;
+using UnityEngine;
 
 namespace LineWars.Model
 {
@@ -15,6 +16,7 @@ namespace LineWars.Model
         
         [SerializeField] private CardRarity cardRarity;
         [SerializeField] private Unit unit;
+        [SerializeField] private CostType costType;
         [SerializeField] private int cost; 
 
         
@@ -24,6 +26,7 @@ namespace LineWars.Model
         public Unit Unit => unit;
         public CardRarity Rarity => cardRarity;
         public int Cost => cost;
+        public CostType CostType => costType;
 
         public Sprite CardActiveBagLine => cardActiveBagLine;
 
