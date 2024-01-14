@@ -288,7 +288,7 @@ namespace LineWars.Controllers
         IEnumerator DelayActionCoroutine()
         {
             yield return new WaitForSeconds(maxActionDelayInSeconds);
-            Debug.LogWarning($"The action didn't stop after {maxActionDelayInSeconds} seconds!");
+            Debug.LogError($"The action didn't stop after {maxActionDelayInSeconds} seconds!");
             OnActionCompleted();
         }
 

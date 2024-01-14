@@ -69,6 +69,7 @@ namespace LineWars.Model
 
         #region Properties
         public int Id => index;
+        public bool IsVisible => Node.IsVisible;
         public string UnitName => unitName;
 
         public int InitialPower
@@ -217,7 +218,7 @@ namespace LineWars.Model
             {
                 var serializeActions = gameObject.GetComponents<Component>()
                     .OfType<IMonoUnitAction<UnitAction<Node, Edge, Unit>>>()
-                    .OrderByDescending(x => x.Priority)
+                    .OrderByDescending(x => x.InitializePriority)
                     .ToArray();
 
                 monoActionsDictionary = new Dictionary<CommandType, IMonoUnitAction<UnitAction<Node, Edge, Unit>>>(serializeActions.Length);
@@ -240,6 +241,8 @@ namespace LineWars.Model
             Node = node;
             UnitDirection = direction;
         }
+
+
 
         public IEnumerable<IUnitAction<Node, Edge, Unit>> Actions => MonoActions;
         IEnumerable<IExecutorAction> IExecutor.Actions => Actions;

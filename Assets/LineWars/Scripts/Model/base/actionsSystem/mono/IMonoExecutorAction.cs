@@ -5,7 +5,7 @@
         where TExecutor : class, IExecutor
         where TAction : ExecutorAction<TExecutor>
     {
-        public int Priority { get; }
+        public int InitializePriority { get; }
         public TAction Action { get; }
 
         public void Initialize();

@@ -36,7 +36,6 @@ namespace LineWars
         
         public new void OnBeginDrag(PointerEventData eventData)
         {
-            Debug.Log(IsActive);
             if(!IsActive)
                 return;
             var instance = Instantiate(this, rectTransformToGenerateCard);

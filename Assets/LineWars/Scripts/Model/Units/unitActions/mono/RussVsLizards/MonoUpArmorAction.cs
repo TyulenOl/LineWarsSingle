@@ -25,9 +25,7 @@ namespace LineWars.Model
 
         public IActionCommand GenerateCommand(Unit target)
         {
-            return new TargetedUniversalCommand
-                <Unit, MonoUpArmorAction, Unit>
-                (Executor, target);
+            return new TargetedUniversalCommand<Unit, MonoUpArmorAction, Unit>(Executor, target);
         }
 
         public override void Accept(IMonoUnitActionVisitor visitor)
