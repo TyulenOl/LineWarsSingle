@@ -1,7 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace LineWars.Model
 {
@@ -228,6 +225,11 @@ namespace LineWars.Model
         }
 
         public void Visit(UpArmorAction<TNode, TEdge, TUnit> action)
+        {
+            // TODO
+        }
+
+        public void Visit(PowerBasedHealAction<TNode, TEdge, TUnit> action)
         {
             // TODO
         }

@@ -89,7 +89,6 @@ namespace LineWars.Interface
         private void OnClick()
         {
             if (!CommandsManager.Instance.CanSetExecutor()) return;
-            Debug.Log(unit.UnitName);
             CameraController.Instance.MoveTo(unit.Node.Position);
             CommandsManager.Instance.SetExecutor(unit);
         }

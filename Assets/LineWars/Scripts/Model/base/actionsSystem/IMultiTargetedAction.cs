@@ -13,7 +13,7 @@ namespace LineWars.Model
         }
     }
 
-    public interface IMultiTargetedActionGenerator
+    public interface IMultiTargetedActionGenerator: IExecutorAction
     {
         public IActionCommand GenerateCommand(params ITarget[] targets);
     }

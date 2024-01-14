@@ -24,6 +24,7 @@ namespace LineWars.Model
         public void Execute(TUnit target)
         {
             Attack(target);
+            CompleteAndAutoModify();
         }
 
         private void Attack(TUnit target)

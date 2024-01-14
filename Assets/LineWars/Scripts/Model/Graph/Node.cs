@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using GraphEditor;
+using PlasticPipe.PlasticProtocol.Messages;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -43,6 +44,9 @@ namespace LineWars.Model
 
         private Camera mainCamera;
 
+        public event Action<Node, Unit> UnitAdded;
+        public event Action<Node, Unit> UnitLeft;
+
         /// <summary>
         /// Флаг, который указывает, что нода уже кому-то принадлежала
         /// </summary>
@@ -82,13 +86,38 @@ namespace LineWars.Model
         public Unit LeftUnit
         {
             get => leftUnit;
-            set => leftUnit = value;
+            set
+            {
+                var prevUnit = leftUnit;
+                leftUnit = value;
+                if(leftUnit == null && prevUnit != null)
+                {
+                    UnitLeft?.Invoke(this, prevUnit);
+                }
+                if(leftUnit != null && prevUnit != leftUnit)
+                {
+                    UnitAdded?.Invoke(this, leftUnit);
+                }
+            }
+
         }
 
         public Unit RightUnit
         {
             get => rightUnit;
-            set => rightUnit = value;
+            set
+            {
+                var prevUnit = rightUnit;
+                rightUnit = value;
+                if (rightUnit == null && prevUnit != null)
+                {
+                    UnitLeft?.Invoke(this, prevUnit);
+                }
+                if (rightUnit != null && prevUnit != rightUnit)
+                {
+                    UnitAdded?.Invoke(this, rightUnit);
+                }
+            }
         }
 
         public IBuilding Building { get; set; }
