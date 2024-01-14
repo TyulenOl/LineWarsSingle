@@ -19,27 +19,22 @@ namespace LineWars.Model
 
         public override void ExecuteOnEnter()
         {
-            UnitOwner.UnitPowerChanged += OnUnitPowerChanged;
-            UnitOwner.UnitNodeChanged += OnUnitNodeChanged;
+            TargetUnit.UnitPowerChanged += OnUnitPowerChanged;
+            TargetUnit.UnitNodeChanged += OnUnitNodeChanged;
             BuffNewUnits();
         }
 
         public override void ExecuteOnExit()
         {
-            UnitOwner.UnitPowerChanged -= OnUnitPowerChanged;
-            UnitOwner.UnitNodeChanged -= OnUnitNodeChanged;
+            TargetUnit.UnitPowerChanged -= OnUnitPowerChanged;
+            TargetUnit.UnitNodeChanged -= OnUnitNodeChanged;
             ClearSubscribedNodes();
             DebuffAllUnits();
         }
 
-        public override void ExecuteOnReplenish()
-        {
-            
-        }
-
         private void BuffUnit(TUnit unit) 
         {
-            var effect = new PowerBuffEffect<TNode, TEdge, TUnit>(unit, UnitOwner.CurrentPower);
+            var effect = new PowerBuffEffect<TNode, TEdge, TUnit>(unit, TargetUnit.CurrentPower);
             unit.AddEffect(effect);
             if (unitEffects.ContainsKey(unit))
                 Debug.LogError($"Buffing the same unit twice! {unit}");
@@ -87,7 +82,7 @@ namespace LineWars.Model
 
         private void BuffNewUnits()
         {
-            var neighbors = UnitOwner.Node.GetNeighbors();
+            var neighbors = TargetUnit.Node.GetNeighbors();
             foreach (var neighbor in neighbors)
             {
                 if (neighbor.LeftUnit != null)

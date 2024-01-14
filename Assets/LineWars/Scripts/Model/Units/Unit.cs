@@ -75,16 +75,13 @@ namespace LineWars.Model
 
         #region Properties
         public int Id => index;
+        public bool IsVisible => Node.IsVisible;
         public string UnitName => unitName;
 
         public int InitialPower
         {
             get => initialPower;
-            set
-            {
-                initialPower = Mathf.Max(value, 0);
-                
-            }
+            set => initialPower = Mathf.Max(value, 0);
         }
 
         public int CurrentPower
@@ -232,7 +229,7 @@ namespace LineWars.Model
             {
                 var serializeActions = gameObject.GetComponents<Component>()
                     .OfType<IMonoUnitAction<UnitAction<Node, Edge, Unit>>>()
-                    .OrderByDescending(x => x.Priority)
+                    .OrderByDescending(x => x.InitializePriority)
                     .ToArray();
 
                 monoActionsDictionary = new Dictionary<CommandType, IMonoUnitAction<UnitAction<Node, Edge, Unit>>>(serializeActions.Length);
@@ -255,6 +252,8 @@ namespace LineWars.Model
             Node = node;
             UnitDirection = direction;
         }
+
+
 
         private void InitializeAllEffects()
         {
@@ -327,7 +326,7 @@ namespace LineWars.Model
         }
         public void AddEffect(Effect<Node, Edge, Unit> effect)
         {
-            if(effect.UnitOwner != this)
+            if(effect.TargetUnit != this)
             {
                 Debug.LogError("Adding effect with other owner!");
                 return;

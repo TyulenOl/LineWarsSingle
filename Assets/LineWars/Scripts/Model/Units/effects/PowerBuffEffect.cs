@@ -6,7 +6,7 @@
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
         private readonly int addedPower;
-        public PowerBuffEffect(TUnit unit, int addedPower) : base(unit)
+        public PowerBuffEffect(TUnit targetUnit, int addedPower) : base(targetUnit)
         {
             this.addedPower = addedPower;
         }
@@ -15,17 +15,12 @@
 
         public override void ExecuteOnEnter()
         {
-            UnitOwner.CurrentPower += addedPower;
+            TargetUnit.CurrentPower += addedPower;
         }
 
         public override void ExecuteOnExit()
         {
-            UnitOwner.CurrentPower -= addedPower;
-        }
-
-        public override void ExecuteOnReplenish()
-        {
-            
+            TargetUnit.CurrentPower -= addedPower;
         }
     }
 }

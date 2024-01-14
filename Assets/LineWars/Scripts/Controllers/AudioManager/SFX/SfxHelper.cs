@@ -6,7 +6,7 @@ namespace LineWars.Controllers
     {
         public static void PlaySfx(this Unit unit, SFXData data)
         {
-            if (unit.IsVisible())
+            if (unit.IsVisible)
             {
                 SfxManager.Instance.Play(data);
             }
