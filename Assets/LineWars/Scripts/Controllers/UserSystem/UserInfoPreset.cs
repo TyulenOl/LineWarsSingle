@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace LineWars.Controllers
 {
-    [CreateAssetMenu(menuName = "DeckBuilding/DefaultUserInfo", order = 53)]
+    [CreateAssetMenu(menuName = "DeckBuilding/UserInfoPreset", order = 53)]
     public class UserInfoPreset: ScriptableObject
     {
         [SerializeField] private int defaultGold;

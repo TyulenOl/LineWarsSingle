@@ -19,8 +19,9 @@ namespace LineWars.Controllers
         public IEnumerable<DeckCard> OpenedCards => openedCardsSet;
 
         public event Action<int> GoldChanged;
-        
         public event Action<int> DiamondsChanged;
+        public event Action<int> UserUpgradeCardsChanged;
+        
         public void Initialize(IProvider<UserInfo> provider, IStorage<DeckCard> storage)
         {
             userInfoProvider = provider;
@@ -28,11 +29,12 @@ namespace LineWars.Controllers
 
             currentInfo = provider.Load(0) ?? CreateDefaultUserInfo();
 
-            //TODO: Убрать перед релизом!
-            currentInfo.UnlockedCards = new List<int>();
-            UserDiamond = 100;
-            UserGold = 100;
-            //TODO: Убрать перед релизом!
+            // //TODO: Убрать перед релизом!
+            // currentInfo.UnlockedCards = new List<int>();
+            // UserDiamond = 100;
+            // UserGold = 100;
+            // //TODO: Убрать перед релизом!
+            
             openedCardsSet = currentInfo.UnlockedCards
                 .Select(x => deckCardStorage.IdToValue[x])
                 .Concat(userInfoPreset.DefaultCards.Where(storage.ValueToId.ContainsKey))
@@ -112,12 +114,13 @@ namespace LineWars.Controllers
 
         public int UserUpgradeCards
         {
-            get => currentInfo.Diamonds;
+            get => currentInfo.UpgradeCards;
             set
             {
                 if (value < 0)
-                    throw new ArgumentException("UgradeCards can't be less than zero!");
+                    throw new ArgumentException("UpgradeCards can't be less than zero!");
                 currentInfo.UpgradeCards = value;
+                UserUpgradeCardsChanged?.Invoke(value);
             }
         }
 

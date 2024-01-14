@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-
+﻿
 namespace LineWars.Model
 {
     public interface IGetter<T>
