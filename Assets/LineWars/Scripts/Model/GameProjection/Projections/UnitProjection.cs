@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 
-
 namespace LineWars.Model
 {
     public class UnitProjection :
@@ -18,7 +17,18 @@ namespace LineWars.Model
         public Unit Original { get; set; }
         public string UnitName { get; set; }
         public int InitialPower {get; set; }
-        public int CurrentPower {get; set; }
+
+        private int currentPower;
+        public int CurrentPower 
+        {
+            get => currentPower; 
+            set
+            {
+                var prevValue = currentPower;
+                currentPower = value;
+                UnitPowerChanged?.Invoke(this, prevValue, currentPower);
+            }
+        }
         public int MaxHp { get; set; }
         public int MaxArmor { get; set; }
         public int MaxActionPoints { get; set; }
@@ -42,7 +52,9 @@ namespace LineWars.Model
             get => currentHp;
             set
             {
+                var prevValue = currentHp;
                 currentHp = value;
+                UnitHPChanged.Invoke(this, prevValue, value);
                 if (value <= 0)
                 {
                     Died?.Invoke(this);
