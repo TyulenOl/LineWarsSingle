@@ -38,6 +38,7 @@ namespace LineWars.Model
         
         [Header("Actions Settings")] 
         [SerializeField] [Min(0)] private int maxActionPoints;
+        [SerializeField] private List<EffectInitializer> effectInitializers;
 
         [Header("DEBUG")] 
         [SerializeField, ReadOnlyInspector] private Node myNode;
@@ -255,6 +256,15 @@ namespace LineWars.Model
             UnitDirection = direction;
         }
 
+        private void InitializeAllEffects()
+        {
+            foreach (var effectInit in effectInitializers)
+            {
+                var newEffect = effectInit.GetEffect(this);
+                AddEffect(newEffect);
+            }
+        }
+
         public IEnumerable<IUnitAction<Node, Edge, Unit>> Actions => MonoActions;
         IEnumerable<IExecutorAction> IExecutor.Actions => Actions;
 
@@ -317,6 +327,11 @@ namespace LineWars.Model
         }
         public void AddEffect(Effect<Node, Edge, Unit> effect)
         {
+            if(effect.UnitOwner != this)
+            {
+                Debug.LogError("Adding effect with other owner!");
+                return;
+            }
             effect.ExecuteOnEnter();
             effects.Add(effect);
         }

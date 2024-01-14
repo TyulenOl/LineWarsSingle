@@ -11,6 +11,8 @@
             this.addedPower = addedPower;
         }
 
+        public override EffectType EffectType => EffectType.PowerBuff;
+
         public override void ExecuteOnEnter()
         {
             UnitOwner.CurrentPower += addedPower;

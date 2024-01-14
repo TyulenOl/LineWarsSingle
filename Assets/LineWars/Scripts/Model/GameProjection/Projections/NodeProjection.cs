@@ -28,7 +28,7 @@ namespace LineWars.Model
             set
             { 
                 leftUnit = value;
-                UnitAdded?.Invoke(value);          
+                UnitAdded?.Invoke(this, value);          
             } 
         }
         public UnitProjection RightUnit
@@ -37,7 +37,7 @@ namespace LineWars.Model
             set
             {
                 rightUnit = value;
-                UnitAdded?.Invoke(value);
+                UnitAdded?.Invoke(this, value);
             }
         }
 
@@ -48,8 +48,9 @@ namespace LineWars.Model
             .Where(x => x != null)
             .Distinct();
 
-        public Action<UnitProjection> UnitAdded;
-        
+        public event Action<NodeProjection, UnitProjection> UnitLeft;
+        public event Action<NodeProjection, UnitProjection> UnitAdded;
+
         public void AddEdge(EdgeProjection edge)
         {
             if (edge.FirstNode != this && edge.SecondNode != this)

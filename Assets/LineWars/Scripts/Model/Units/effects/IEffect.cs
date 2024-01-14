@@ -6,7 +6,7 @@
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
         public TUnit UnitOwner { get; private set; }
-        public EffectType EffectType { get; }
+        public abstract EffectType EffectType { get; }
         public Effect(TUnit unit)
         {
             UnitOwner = unit;
