@@ -56,6 +56,12 @@ namespace LineWars.Model
         IEnumerable<IExecutorAction> IExecutor.Actions => actionsDictionary.Values;
 
         public event Action<UnitProjection> Died;
+        public event Action<UnitProjection, NodeProjection, NodeProjection> UnitNodeChanged;
+        public event Action<UnitProjection, int, int> UnitHPChanged;
+        public event Action<UnitProjection, int, int> UnitActionPointsChanged;
+        public event Action<UnitProjection, int, int> UnitPowerChanged;
+        public event Action<UnitProjection, int, int> UnitArmorChanged;
+        public event Action<UnitProjection> UnitReplenished;
 
         public IReadOnlyDictionary<CommandType, UnitAction<NodeProjection, EdgeProjection, UnitProjection>>
             ActionsDictionary => actionsDictionary;
@@ -122,6 +128,9 @@ namespace LineWars.Model
         public IEnumerable<IUnitAction<NodeProjection, EdgeProjection, UnitProjection>> Actions =>
             actionsDictionary.Values;
 
+        public IReadOnlyList<Effect<NodeProjection, EdgeProjection, UnitProjection>> Effects => 
+            new List<Effect<NodeProjection, EdgeProjection, UnitProjection>>(); //TODO
+
         public T GetAction<T>()
             where T : IUnitAction<NodeProjection, EdgeProjection, UnitProjection>
         {
@@ -144,6 +153,16 @@ namespace LineWars.Model
             }
 
             CurrentActionPoints = MaxActionPoints;
+        }
+
+        public void AddEffect(Effect<NodeProjection, EdgeProjection, UnitProjection> effect)
+        {
+            //TODO
+        }
+
+        public void DeleteEffect(Effect<NodeProjection, EdgeProjection, UnitProjection> effect)
+        {
+            //TODO
         }
     }
 

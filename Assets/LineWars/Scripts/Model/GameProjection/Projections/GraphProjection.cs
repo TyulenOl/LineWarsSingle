@@ -58,7 +58,7 @@ namespace LineWars.Model
             UnitsIndexList.Remove(unit.Id);
         }
 
-        private void OnUnitAdded(UnitProjection unit)
+        private void OnUnitAdded(NodeProjection node, UnitProjection unit)
         {
             if (unit == null) return;
             if (UnitsIndexList.ContainsKey(unit.Id)) return;
