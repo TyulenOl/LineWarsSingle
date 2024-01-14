@@ -11,6 +11,7 @@ namespace LineWars.Store
 {
     public class CardStore : MonoBehaviour
     {
+        [SerializeField, Min(1)] private int changeIntervalInDays = 1;
         [SerializeField] private List<CardRarity> cards;
         
         private IGetter<DateTime> timeGetter;
@@ -40,7 +41,7 @@ namespace LineWars.Store
                 yield return null;
             }
             var currentTime = timeGetter.Get();
-            var random = new System.Random(currentTime.DayOfYear);
+            var random = new System.Random(currentTime.DayOfYear / changeIntervalInDays);
             FillStore(random);
         }
 

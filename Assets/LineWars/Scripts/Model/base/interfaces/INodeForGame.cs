@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using System;
 
 namespace LineWars.Model
 {
@@ -29,5 +29,7 @@ namespace LineWars.Model
         public bool IsBase { get; }
 
         public bool CanOwnerMove(int ownerId);
+        public event Action<TNode, TUnit> UnitAdded;
+        public event Action<TNode, TUnit> UnitLeft;
     }
 }

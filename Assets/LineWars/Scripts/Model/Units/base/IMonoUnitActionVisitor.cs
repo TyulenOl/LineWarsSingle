@@ -20,5 +20,6 @@ namespace LineWars.Model
         public void Visit(MonoHealingAttackAction action);
         public void Visit(MonoTargetPowerBasedAttackAction action);
         public void Visit(MonoUpArmorAction action);
+        public void Visit(MonoPowerBasedHealAction action);
     }
 }
