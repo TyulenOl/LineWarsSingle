@@ -109,6 +109,8 @@ namespace LineWars.Model
 
             if (ramResponsesPlayingCount == 0)
                 Complete();
+
+            Player.LocalPlayer.RecalculateVisibility();
         }
 
         private void OnRespondRamEnded(UnitAnimation animation)
