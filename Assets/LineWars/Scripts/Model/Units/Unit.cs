@@ -81,11 +81,7 @@ namespace LineWars.Model
         public int InitialPower
         {
             get => initialPower;
-            set
-            {
-                initialPower = Mathf.Max(value, 0);
-                
-            }
+            set => initialPower = Mathf.Max(value, 0);
         }
 
         public int CurrentPower
@@ -330,7 +326,7 @@ namespace LineWars.Model
         }
         public void AddEffect(Effect<Node, Edge, Unit> effect)
         {
-            if(effect.UnitOwner != this)
+            if(effect.TargetUnit != this)
             {
                 Debug.LogError("Adding effect with other owner!");
                 return;
