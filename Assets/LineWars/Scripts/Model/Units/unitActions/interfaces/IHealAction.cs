@@ -10,7 +10,6 @@ namespace LineWars.Model
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
         bool IsMassHeal { get; }
-        int HealingAmount { get; }
         bool CanHeal([NotNull] TUnit target, bool ignoreActionPointsCondition = false);
         void Heal([NotNull] TUnit target);
         

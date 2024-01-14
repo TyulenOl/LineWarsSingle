@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using LineWars.Controllers;
 using UnityEngine;
 using UnityEngine.Events;
@@ -22,7 +21,7 @@ namespace LineWars.Model
         
         [SerializeField, Min(0)] private int initialPower;
         [SerializeField, Min(0)] private int maxHp;
-        [SerializeField, Min(0)] private int maxArmor = 100;
+        private int maxArmor = 100;
         [SerializeField, Min(0)] private int visibility;
         [field: SerializeField] public Sprite Sprite { get; private set; }
         
@@ -227,6 +226,7 @@ namespace LineWars.Model
             movementLogic = GetComponent<UnitMovementLogic>();
 
             InitialiseAllActions();
+            InitializeAllEffects();
             index = SingleGame.Instance.AllUnits.Add(this);
             void InitialiseAllActions()
             {
