@@ -20,6 +20,9 @@ namespace LineWars.Model
         IlyaMuromec,
         KvasBarrel,
         Koldun,
-        Shaman
+        Shaman,
+        Stunman,
+        Stavrislav,
+        Squire
     }
 }
