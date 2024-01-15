@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using LineWars.Interface;
 using LineWars.Model;
 using LineWars.Controllers;
 using UnityEngine;
@@ -13,7 +12,6 @@ namespace LineWars
     public class SingleGame : Singleton<SingleGame>
     {
         [SerializeField] private bool autoInitialize = true;
-        
         [field: SerializeField] public Player Player { get; set; }
         [field: SerializeField] public List<BasePlayer> Enemies { get; set; }
 
@@ -80,9 +78,9 @@ namespace LineWars
             Debug.Log("<color=yellow>Вы Победили</color>");
             if (!GameVariables.IsNormalStart)
                 return;
-            WinLoseUI.isWin = true;
             GameRoot.Instance.CompaniesController.WinChoseMission();
-            SceneTransition.LoadScene(SceneName.WinOrLoseScene);
+            GameRoot.Instance.CompaniesController.UnlockNextMission();
+            WinOrLoseScene.Load(true);
         }
 
         public void LoseGame()
@@ -90,9 +88,8 @@ namespace LineWars
             Debug.Log("<color=red>Потрачено</color>");
             if (!GameVariables.IsNormalStart)
                 return;
-            WinLoseUI.isWin = false;
             GameRoot.Instance.CompaniesController.DefeatChoseMission();
-            SceneTransition.LoadScene(SceneName.WinOrLoseScene);
+            WinOrLoseScene.Load(false);
         }
 
         protected override void OnDestroy()

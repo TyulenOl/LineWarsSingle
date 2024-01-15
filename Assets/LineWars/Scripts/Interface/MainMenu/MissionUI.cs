@@ -44,8 +44,8 @@ namespace LineWars
             
             MissionInfo = GameRoot.Instance.CompaniesController.GetMissionInfo(id);
             
-            completedImage.gameObject.SetActive(MissionInfo.MissionStatus == MissionStatus.Complete);
-            uncompletedImage.gameObject.SetActive(MissionInfo.MissionStatus != MissionStatus.Complete);
+            completedImage.gameObject.SetActive(MissionInfo.MissionStatus == MissionStatus.Completed);
+            uncompletedImage.gameObject.SetActive(MissionInfo.MissionStatus != MissionStatus.Completed);
         }
 
         private void OnClick()

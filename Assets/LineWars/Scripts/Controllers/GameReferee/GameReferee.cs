@@ -33,6 +33,7 @@ namespace LineWars
             Me = me ? me : throw new ArgumentNullException(nameof(me));
             Enemies = enemies
                 .Where(x => x != null)
+                .Where(x => x != Me)
                 .ToList();
         }
 
