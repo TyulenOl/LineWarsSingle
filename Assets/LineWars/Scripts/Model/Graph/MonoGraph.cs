@@ -146,5 +146,11 @@ namespace LineWars.Model
         {
             return modelGraph.FindMostRemoteNodes();
         }
+
+        private void OnDestroy()
+        {
+            if (Instance == this)
+                Instance = null;
+        }
     }
 }
