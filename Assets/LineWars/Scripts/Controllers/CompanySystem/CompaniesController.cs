@@ -8,6 +8,11 @@ namespace LineWars.Controllers
 {
     public class CompaniesController : MonoBehaviour
     {
+        [SerializeField] private List<int> defaultUnlockMissionIds;
+        
+        [Header("Debug")]
+        [SerializeField] private bool godMode;
+        
         private IProvider<MissionInfo> companiesProvider;
         private IStorage<MissionData> missionStorage;
         
@@ -16,6 +21,7 @@ namespace LineWars.Controllers
         private readonly HashSet<MissionInfo> missionsToSave = new ();
         
         public int ChoseMissionId { get; set; }
+        public event Action AnyMissionInfoChanged;
 
         public void Initialize(IProvider<MissionInfo> provider, IStorage<MissionData> storage)
         {
@@ -27,6 +33,13 @@ namespace LineWars.Controllers
 
             foreach (var storageKey in missionStorage.Keys)
                 TryAddNewMission(storageKey);
+
+            // открытие изначальных миссий
+            foreach (var id in defaultUnlockMissionIds)
+            {
+                if (missionInfos.ContainsKey(id))
+                    UnlockMission(id);
+            }
         }
 
         public void DefeatChoseMission()
@@ -39,7 +52,7 @@ namespace LineWars.Controllers
         public void WinChoseMission()
         {
             var missionInfo = missionInfos[ChoseMissionId];
-            missionInfo.MissionStatus = MissionStatus.Complete;
+            missionInfo.MissionStatus = MissionStatus.Completed;
             missionsToSave.Add(missionInfo);
         }
         
@@ -48,16 +61,39 @@ namespace LineWars.Controllers
             missionInfos.TryAdd(missionId, new MissionInfo()
             {
                 MissionId = missionId,
-                MissionStatus = MissionStatus.NotVisited,
-                MissionProgress = 0f
+                MissionStatus = MissionStatus.Locked
             });
         }
 
         public MissionInfo GetMissionInfo(int missionId)
         {
-            return missionInfos[missionId];
+            return missionInfos[missionId].GetCopy();
+        }
+
+        public void UnlockMission(int missionId)
+        {
+            if (missionInfos[missionId].MissionStatus == MissionStatus.Locked)
+            {
+                missionInfos[missionId].MissionStatus = MissionStatus.Unlocked;
+                missionsToSave.Add(missionInfos[missionId]);
+            }
         }
         
+        public void UnlockNextMission()
+        {
+            if (missionInfos.ContainsKey(ChoseMissionId + 1))
+                UnlockMission(ChoseMissionId + 1);
+        }
+
+        public bool MissionIsLocked(int missionId)
+        {
+            return !godMode || missionInfos[missionId].MissionStatus == MissionStatus.Locked;
+        }
+
+        public bool CompanyIsLocked(IEnumerable<int> companyMissions)
+        {
+            return companyMissions.All(MissionIsLocked);
+        }
         
         public void OnApplicationFocus(bool hasFocus)
         {
@@ -69,6 +105,12 @@ namespace LineWars.Controllers
                 }
                 missionsToSave.Clear();
             }
+        }
+
+        private void OnValidate()
+        {
+            if (Application.isPlaying)
+                AnyMissionInfoChanged?.Invoke();
         }
     }
 }
