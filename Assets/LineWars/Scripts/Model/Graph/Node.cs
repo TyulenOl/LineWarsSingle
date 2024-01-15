@@ -46,6 +46,7 @@ namespace LineWars.Model
 
         public event Action<Node, Unit> UnitAdded;
         public event Action<Node, Unit> UnitLeft;
+        public event Action<Node, int> NodeBaseIncomeChanged;
 
         /// <summary>
         /// Флаг, который указывает, что нода уже кому-то принадлежала
@@ -81,7 +82,15 @@ namespace LineWars.Model
 
         public bool IsVisible => RenderNodeV3.Visibility > 0;
 
-        public int BaseIncome => baseIncome;
+        public int BaseIncome
+        {
+            get => baseIncome;
+            set
+            {
+                baseIncome = Mathf.Max(0, value);
+                NodeBaseIncomeChanged?.Invoke(this, baseIncome);
+            }
+        }
 
         public Unit LeftUnit
         {
