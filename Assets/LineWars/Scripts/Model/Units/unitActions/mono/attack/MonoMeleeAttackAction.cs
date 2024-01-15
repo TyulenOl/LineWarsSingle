@@ -16,6 +16,7 @@ namespace LineWars.Model
         [field: SerializeField] public bool InitialOnslaught { get; private set; }
 
         [SerializeField] private UnitMeleeAttackAnimation attackAnimation;
+        [SerializeField] private UnitAnimation moveAnimation;
         
         public bool Onslaught => Action.Onslaught;
         public UnitBlockerSelector BlockerSelector => Action.BlockerSelector;
@@ -27,7 +28,16 @@ namespace LineWars.Model
             Action.Moved += node =>
             {
                 Player.LocalPlayer.RecalculateVisibility();
-                Executor.MovementLogic.MoveTo(node.transform.position);
+                if(moveAnimation == null)
+                {
+                    Executor.transform.position = node.transform.position;
+                    return;
+                }     
+                var animContext = new AnimationContext()
+                {
+                    TargetNode = node
+                };
+                moveAnimation.Execute(animContext);
             };
         }
 

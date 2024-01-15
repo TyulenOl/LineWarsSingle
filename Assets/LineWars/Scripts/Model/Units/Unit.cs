@@ -7,7 +7,6 @@ using UnityEngine.Events;
 
 namespace LineWars.Model
 {
-    [RequireComponent(typeof(UnitMovementLogic))]
     public sealed class Unit : Owned,
         IUnit<Node, Edge, Unit>, 
         IMonoExecutor,
@@ -65,7 +64,6 @@ namespace LineWars.Model
         public event Action<Unit, int, int> UnitArmorChanged; //++
         public event Action<Unit> UnitReplenished; //++
 
-        private UnitMovementLogic movementLogic;
         private List<Effect<Node, Edge, Unit>> effects; 
 
         private Dictionary<CommandType, IMonoUnitAction<UnitAction<Node, Edge, Unit>>> monoActionsDictionary;
@@ -205,8 +203,6 @@ namespace LineWars.Model
         public CommandPriorityData CommandPriorityData => priorityData;
         public bool CanDoAnyAction => currentActionPoints > 0;
 
-        public UnitMovementLogic MovementLogic => movementLogic;
-
         public bool IsDied => CurrentHp <= 0;
 
         #endregion
@@ -219,8 +215,6 @@ namespace LineWars.Model
             currentArmor = 0;
             currentActionPoints = maxActionPoints;
             currentPower = initialPower;
-
-            movementLogic = GetComponent<UnitMovementLogic>();
 
             InitialiseAllActions();
             InitializeAllEffects();
