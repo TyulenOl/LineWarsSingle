@@ -8,14 +8,13 @@ namespace LineWars.Controllers
         public override void OnWin()
         {
             if (!GameVariables.IsNormalStart) return;
-            GameRoot.Instance.CompaniesController.WinChoseMission();
+            GameRoot.Instance.UserController.PassingGameModes += 1;
             WinOrLoseScene.Load(true);
         }
 
         public override void OnLose()
         {
             if (!GameVariables.IsNormalStart) return;
-            GameRoot.Instance.CompaniesController.DefeatChoseMission();
             WinOrLoseScene.Load(false);
         }
     }

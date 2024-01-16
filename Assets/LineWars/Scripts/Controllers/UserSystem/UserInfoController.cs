@@ -10,6 +10,11 @@ namespace LineWars.Controllers
     public class UserInfoController: MonoBehaviour
     {
         [SerializeField] private UserInfoPreset userInfoPreset;
+
+#if UNITY_EDITOR
+        [Header("Debug")] 
+        [SerializeField] private bool debugMode;
+#endif
         
         private IProvider<UserInfo> userInfoProvider;
         private IStorage<DeckCard> deckCardStorage;
@@ -21,24 +26,33 @@ namespace LineWars.Controllers
         public event Action<int> GoldChanged;
         public event Action<int> DiamondsChanged;
         public event Action<int> UserUpgradeCardsChanged;
+        public event Action<int> PassingGameModesChanged; 
         
         public void Initialize(IProvider<UserInfo> provider, IStorage<DeckCard> storage)
         {
             userInfoProvider = provider;
             deckCardStorage = storage;
 
-            currentInfo = provider.Load(0) ?? CreateDefaultUserInfo();
-
-            // //TODO: Убрать перед релизом!
-            // currentInfo.UnlockedCards = new List<int>();
-            // UserDiamond = 100;
-            // UserGold = 100;
-            // //TODO: Убрать перед релизом!
-            
+            currentInfo = AssignUserInfo(provider.Load(0) ?? CreateDefaultUserInfo());
+#if UNITY_EDITOR
+            if (debugMode)
+            {
+                currentInfo.UnlockedCards = new List<int>();
+                UserDiamond = 100;
+                UserGold = 100;
+            }    
+#endif
             openedCardsSet = currentInfo.UnlockedCards
                 .Select(x => deckCardStorage.IdToValue[x])
                 .Concat(userInfoPreset.DefaultCards.Where(storage.ValueToId.ContainsKey))
                 .ToHashSet();
+        }
+
+        private UserInfo AssignUserInfo(UserInfo userInfo)
+        {
+            foreach (LootBoxType boxType in Enum.GetValues(typeof(LootBoxType)))
+                userInfo.LootBoxes.TryAdd(boxType, 0);
+            return userInfo;
         }
 
         private UserInfo CreateDefaultUserInfo()
@@ -50,7 +64,9 @@ namespace LineWars.Controllers
                 UnlockedCards = userInfoPreset.DefaultCards
                     .Where(deckCardStorage.ValueToId.ContainsKey)
                     .Select(x => deckCardStorage.ValueToId[x])
-                    .ToList()
+                    .ToList(),
+                LootBoxes = Enum.GetValues(typeof(LootBoxType)).OfType<LootBoxType>()
+                    .ToSerializedDictionary(x => x, x=> 0)
             };
 
             foreach(var pair in userInfoPreset.DefaultBoxesCount)
@@ -66,7 +82,7 @@ namespace LineWars.Controllers
         {
             UnlockCard(deckCardStorage.IdToValue[id]);
         }
-
+        
         public void UnlockCard(DeckCard deckCard)
         {
             if (openedCardsSet.Contains(deckCard))
@@ -121,6 +137,18 @@ namespace LineWars.Controllers
                     throw new ArgumentException("UpgradeCards can't be less than zero!");
                 currentInfo.UpgradeCards = value;
                 UserUpgradeCardsChanged?.Invoke(value);
+            }
+        }
+
+        public int PassingGameModes
+        {
+            get => currentInfo.PassingGameModes;
+            set
+            {
+                if (value < 0)
+                    throw new ArgumentException("NumberSuccessfullyCompletedEndlessMode can't be less than zero!");
+                currentInfo.PassingGameModes = value;
+                PassingGameModesChanged?.Invoke(value);
             }
         }
 
