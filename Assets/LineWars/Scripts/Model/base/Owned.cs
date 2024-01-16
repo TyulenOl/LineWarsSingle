@@ -9,8 +9,8 @@ namespace LineWars.Model
     /// </summary>
     public abstract class Owned : MonoBehaviour, IOwned
     {
-        [Header("Accessory settings")] [SerializeField, ReadOnlyInspector]
-        protected BasePlayer basePlayer;
+        [Header("Accessory settings")] 
+        [SerializeField, ReadOnlyInspector] protected BasePlayer basePlayer;
 
         public event Action<BasePlayer, BasePlayer> OwnerChanged;
         public event Action Replenished;
@@ -33,7 +33,7 @@ namespace LineWars.Model
 
         public void ConnectTo(int basePlayerID)
         {
-            var player = basePlayerID != -1 ? SingleGame.Instance.AllPlayers[basePlayerID] : null;
+            var player = basePlayerID != -1 ? SingleGameRoot.Instance.AllPlayers[basePlayerID] : null;
             Connect(player, this);
         }
 

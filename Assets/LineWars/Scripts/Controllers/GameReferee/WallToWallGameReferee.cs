@@ -6,21 +6,21 @@ namespace LineWars.Model
 {
     public class WallToWallGameReferee : GameReferee
     {
-        public override void Initialize([NotNull] Player me, IEnumerable<BasePlayer> enemies)
+        public override void Initialize([NotNull] Player player, IEnumerable<BasePlayer> enemies)
         {
-            base.Initialize(me, enemies);
-            me.PhaseExceptions.Add(PhaseType.Buy);
+            base.Initialize(player, enemies);
+            player.PhaseExceptions.Add(PhaseType.Buy);
             foreach(var enemy in enemies)
             {
                 enemy.PhaseExceptions.Add(PhaseType.Buy);
                 enemy.OwnedRemoved += Enemy_OwnerRemoved;
             }
-            me.OwnedRemoved += Me_OwnedRemoved;
+            player.OwnedRemoved += Me_OwnedRemoved;
         }
 
         private void Me_OwnedRemoved(Owned obj)
         {
-            if (Me.MyUnits.Count() == 0)
+            if (Player.MyUnits.Count() == 0)
                 Lose();
         }
 

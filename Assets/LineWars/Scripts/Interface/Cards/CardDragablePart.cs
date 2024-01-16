@@ -21,7 +21,7 @@ namespace LineWars
             canvasGroup = GetComponent<CanvasGroup>();
         }
 
-        public void OnDrag(PointerEventData eventData)
+        public new void OnDrag(PointerEventData eventData)
         {
             if(!IsActive) return;
             rectTransform.anchoredPosition += eventData.delta / MainCanvas.Instance.Canvas.scaleFactor;
@@ -34,9 +34,8 @@ namespace LineWars
             canvasGroup.blocksRaycasts = true;
         }
         
-        public void OnBeginDrag(PointerEventData eventData)
+        public new void OnBeginDrag(PointerEventData eventData)
         {
-            Debug.Log(IsActive);
             if(!IsActive)
                 return;
             var instance = Instantiate(this, rectTransformToGenerateCard);

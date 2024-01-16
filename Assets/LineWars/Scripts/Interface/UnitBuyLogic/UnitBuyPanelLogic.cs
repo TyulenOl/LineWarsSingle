@@ -25,6 +25,8 @@ namespace LineWars.Interface
 
         private void GeneratePresets()  
         {
+            if (GameRoot.Instance == null)
+                return;
             foreach (var card in GameRoot.Instance.DecksController.DeckToGame.Cards)
             {
                 var presetDrawer = Instantiate(presetDrawerPrefab.gameObject, presetsLayoutGroup.transform)

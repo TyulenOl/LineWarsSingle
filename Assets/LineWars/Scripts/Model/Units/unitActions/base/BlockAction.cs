@@ -11,9 +11,7 @@ namespace LineWars.Model
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit> 
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
         #endregion 
-    {
-        private readonly IAttackAction<TNode, TEdge, TUnit> attackAction;
-        
+    {        
         private bool isBlocked;
         public IntModifier ContrAttackDamageModifier { get; set; }
         public bool Protection { get;  set; }
@@ -31,7 +29,6 @@ namespace LineWars.Model
         {
             ContrAttackDamageModifier = contrAttackDamageModifier;
             Protection = protection;
-            attackAction = Executor.GetAction<IAttackAction<TNode, TEdge, TUnit>>();
         }
         
         public bool CanBlock()
@@ -49,14 +46,13 @@ namespace LineWars.Model
         {
             if (enemy == null) throw new ArgumentNullException(nameof(enemy));
             return (IsBlocked)
-                && ContrAttackDamageModifier.Modify(attackAction.Damage) > 0
-                && attackAction.CanAttack(enemy, true);
+                && ContrAttackDamageModifier.Modify(Executor.CurrentPower) > 0;
         }
 
         public void ContrAttack([NotNull] TUnit enemy)
         {
             if (enemy == null) throw new ArgumentNullException(nameof(enemy));
-            var contrAttackDamage = ContrAttackDamageModifier.Modify(attackAction.Damage);
+            var contrAttackDamage = ContrAttackDamageModifier.Modify(Executor.CurrentPower);
 
             enemy.CurrentHp -= contrAttackDamage;
             SetBlock(false);

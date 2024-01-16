@@ -1,7 +1,9 @@
 ﻿using System;
 using DataStructures;
 using LineWars.Model;
+using LineWars.LootBoxes;
 using UnityEngine;
+using LineWars.Store;
 
 namespace LineWars.Controllers
 {
@@ -10,83 +12,109 @@ namespace LineWars.Controllers
         [Header("Storages")]
         [SerializeField] private DeckCardsScriptableStorage cardsDatabase;
         [SerializeField] private MissionsScriptableStorage missionsStorage;
-        
+
         [Header("Controllers")]
         [SerializeField] private DecksController decksController;
         [SerializeField] private CompaniesController companiesController;
-        [SerializeField] private UserController userController;
- 
-        [Header("ProviderSettings")] 
+        [SerializeField] private UserInfoController userController;
+        [SerializeField] private LootBoxController lootBoxController;
+        [SerializeField] private CardStore cardStore;
+
+        [Header("ProviderSettings")]
         [SerializeField] private ProviderType providerType;
+
 
         private IProvider<Deck> deckProvider;
         private IProvider<MissionInfo> missionInfoProvider;
         private IProvider<UserInfo> userInfoProvider;
         private IProvider<Settings> settingsProvider;
-
+        private IGetter<DateTime> timeGetter;
 
         public IStorage<DeckCard> CardsDatabase => cardsDatabase;
         public IStorage<MissionData> MissionsStorage => missionsStorage;
 
         public DecksController DecksController => decksController;
         public CompaniesController CompaniesController => companiesController;
-        public UserController UserController => userController;
+        public UserInfoController UserController => userController;
+        public LootBoxController LootBoxController => lootBoxController;
+        public CardStore CardStore => cardStore;
 
         protected override void OnAwake()
         {
             GameVariables.Initialize();
-            
+
             ValidateFields();
 
             InitializeProviders();
 
-            DecksController.Initialize(deckProvider);
+            InitializeLootBoxController();
             CompaniesController.Initialize(missionInfoProvider, missionsStorage);
             UserController.Initialize(userInfoProvider, cardsDatabase);
+            DecksController.Initialize(deckProvider, UserController);
+            CardStore.Initialize(timeGetter, CardsDatabase, UserController);
+
         }
 
         private void InitializeProviders()
         {
+            timeGetter = gameObject.AddComponent<GetWorldTime>();
             switch (providerType)
             {
                 case ProviderType.FileJson:
-                {
-                    deckProvider = new Provider<Deck>(
-                        new SaverConvertDecorator<Deck, DeckInfo>(
-                            new JsonFileSaver<DeckInfo>(),
-                            new DeckToInfoConverter(cardsDatabase.ValueToId)
-                        ),
-                        new DownloaderConvertDecorator<Deck, DeckInfo>(
-                            new JsonFileLoader<DeckInfo>(),
-                            new DeckInfoToDeckConverter(cardsDatabase.IdToValue)
-                        ),
-                        new AllDownloaderConvertDecorator<Deck, DeckInfo>(
-                            new JsonFileAllDownloader<DeckInfo>(),
-                            new DeckInfoToDeckConverter(cardsDatabase.IdToValue))
-                    );
-
-                    userInfoProvider = new Provider<UserInfo>(
-                        new JsonFileSaver<UserInfo>(),
-                        new JsonFileLoader<UserInfo>(),
-                        new JsonFileAllDownloader<UserInfo>()
-                    );
-
-                    settingsProvider = new Provider<Settings>(
-                        new JsonFileSaver<Settings>(),
-                        new JsonFileLoader<Settings>(),
-                        new JsonFileAllDownloader<Settings>()
-                    );
-
-                    missionInfoProvider = new Provider<MissionInfo>(
-                        new JsonFileSaver<MissionInfo>(),
-                        new JsonFileLoader<MissionInfo>(),
-                        new JsonFileAllDownloader<MissionInfo>()
-                    );
-                    break;
-                }
+                    {
+                        InitializeJsonProviders();
+                        break;
+                    }
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+
+        private void InitializeJsonProviders()
+        {
+            deckProvider = new Provider<Deck>(
+                new SaverConvertDecorator<Deck, DeckInfo>(
+                    new JsonFileSaver<DeckInfo>(),
+                    new DeckToInfoConverter(cardsDatabase.ValueToId)
+                ),
+                new DownloaderConvertDecorator<Deck, DeckInfo>(
+                    new JsonFileLoader<DeckInfo>(),
+                    new DeckInfoToDeckConverter(cardsDatabase.IdToValue)
+                ),
+                new AllDownloaderConvertDecorator<Deck, DeckInfo>(
+                    new JsonFileAllDownloader<DeckInfo>(),
+                    new DeckInfoToDeckConverter(cardsDatabase.IdToValue))
+            );
+
+            userInfoProvider = new Provider<UserInfo>(
+                new JsonFileSaver<UserInfo>(),
+                new JsonFileLoader<UserInfo>(),
+                new JsonFileAllDownloader<UserInfo>()
+            );
+
+            settingsProvider = new Provider<Settings>(
+                new JsonFileSaver<Settings>(),
+                new JsonFileLoader<Settings>(),
+                new JsonFileAllDownloader<Settings>()
+            );
+
+            missionInfoProvider = new Provider<MissionInfo>(
+                new JsonFileSaver<MissionInfo>(),
+                new JsonFileLoader<MissionInfo>(),
+                new JsonFileAllDownloader<MissionInfo>()
+            );
+        }
+
+        private void InitializeLootBoxController()
+        {
+            var lootBoxOpenerFabric = new ClientLootBoxOpenerFabric(cardsDatabase);
+            var dropConverter = new DuplicateEreaserDropConverter(userInfoProvider, cardsDatabase);
+            lootBoxController.Initialize(
+                userInfoProvider, 
+                lootBoxOpenerFabric, 
+                dropConverter, 
+                userController);
+
         }
 
         private void ValidateFields()

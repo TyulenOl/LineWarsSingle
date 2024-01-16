@@ -10,9 +10,9 @@ namespace LineWars
         [SerializeField] private Node mountain;
         public Node MountainNode => mountain;
 
-        public override void Initialize(Player me, IEnumerable<BasePlayer> enemies)
+        public override void Initialize(Player player, IEnumerable<BasePlayer> enemies)
         {
-            base.Initialize(me, enemies);
+            base.Initialize(player, enemies);
 
             if (mountain == null)
             {

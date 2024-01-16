@@ -1,0 +1,16 @@
+{
+    "name": "CustomUtilities.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:403d8ee4abf1e694089c3e8d3edff032"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

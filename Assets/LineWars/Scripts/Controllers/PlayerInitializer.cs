@@ -1,18 +1,58 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using LineWars.Model;
 using UnityEngine;
 
 namespace LineWars.Controllers
 {
-    public class PlayerInitializer
+    public class PlayerInitializer: MonoBehaviour
     {
-        public T Initialize<T>(T player, SpawnInfo spawnInfo) where T : BasePlayer
-        {
-            player = Object.Instantiate(player);
-            player.Initialize(spawnInfo);
+        [field: SerializeField] public Player Player { get; set; }
+        [field: SerializeField] public List<BasePlayer> Enemies { get; set; }
+        
+        private int currentPlayerIndex;
 
-            foreach (var node in spawnInfo.Nodes)
+
+        public IEnumerable<BasePlayer> InitializeAllPlayers()
+        {
+            yield return InitializePlayer();
+            foreach (var enemy in InitializeEnemies())
+                yield return enemy;
+        }
+
+        public Player InitializePlayer()
+        {
+            var player = InitializeBasePlayer(Player);
+            player.RecalculateVisibility(false);
+            return player;
+        }
+
+        public IEnumerable<BasePlayer> InitializeEnemies()
+        {
+            return Enemies.Select(InitializeBasePlayer);
+        }
+        
+        private T InitializeBasePlayer<T>(T player)
+            where T : BasePlayer
+        {
+            InitializeBasePlayer(currentPlayerIndex, player);
+            currentPlayerIndex++;
+            return player;
+        }
+        
+        private static void InitializeBasePlayer(int id, BasePlayer player)
+        {
+            player.Initialize(id);
+
+            foreach (var spawn in player.InitialSpawns)
             {
+                spawn.IsBase = true;
+            }
+            
+            foreach (var node in player.AllInitialNodes)
+            {
+                node.IsDirty = true;
+                
                 Owned.Connect(player, node);
 
                 var leftUnitPrefab = player.GetUnitPrefab(node.LeftUnitType);
@@ -27,8 +67,6 @@ namespace LineWars.Controllers
                     BasePlayerUtility.CreateUnitForPlayer(player, node, rightUnitPrefab, UnitDirection.Right);
                 }
             }
-
-            return player;
         }
     }
 }

@@ -1,27 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using UnityEngine;
 
 namespace LineWars.Model
 {
     public class MonoGraph : MonoBehaviour, IGraphForGame<Node, Edge, Unit>
     {
-        private GraphForGame<Node, Edge, Unit> modelGraph;
         public static MonoGraph Instance { get; private set; }
 
+        private GraphForGame<Node, Edge, Unit> modelGraph;
         [field: SerializeField] public GameObject NodesParent { get; set; }
         [field: SerializeField] public GameObject EdgesParent { get; set; }
 
-        private Node[] allNodes;
-        private Edge[] allEdges;
-        private List<SpawnInfo> spawnInfos;
+        [SerializeField] private bool autoInitialize = true;
+        
+        public IReadOnlyList<Node> Nodes => modelGraph.Nodes;
+        public IReadOnlyList<Edge> Edges => modelGraph.Edges;
+        
+        public INodeIndexer<Node, Edge> IdToNode => modelGraph.IdToNode;
+        public IEdgeIndexer<Node, Edge> IdToEdge => modelGraph.IdToEdge;
 
-        public IReadOnlyList<Node> Nodes => allNodes;
-        public IReadOnlyList<Edge> Edges => allEdges;
-
-        public IReadOnlyList<SpawnInfo> Spawns => spawnInfos;
+        private bool initialized;
 
         private void Awake()
         {
@@ -31,37 +31,82 @@ namespace LineWars.Model
             {
                 Debug.LogError("Более одного графа!");
                 Destroy(gameObject);
+                return;
             }
         }
 
         private void Start()
         {
-            allNodes = FindObjectsOfType<Node>();
-            allEdges = FindObjectsOfType<Edge>();
-            GenerateSpawnInfo();
+            if (autoInitialize && !initialized)
+                AutoInitializeInitialize();
+        }
+
+        private void AutoInitializeInitialize()
+        {
+            initialized = true;
+            var allNodes = FindObjectsOfType<Node>();
+            var allEdges = FindObjectsOfType<Edge>();
+            
             modelGraph = new GraphForGame<Node, Edge, Unit>(allNodes, allEdges);
         }
 
-        private void GenerateSpawnInfo()
+        public void Initialize()
         {
-            var spawns = FindObjectsOfType<PlayerBuilder>();
-
-            var initialInfos = FindObjectsOfType<Node>();
-
-
-            spawnInfos = new List<SpawnInfo>(spawns.Length);
-
-            for (var i = 0; i < spawns.Length; i++)
-            {
-                var spawn = spawns[i];
-                var group = initialInfos
-                    .Where(x => x.ReferenceToSpawn == spawn)
-                    .ToArray();
-                var spawnInfo = new SpawnInfo(i, spawn, group);
-                spawnInfos.Add(spawnInfo);
-            }
+            if (initialized)
+                return;
+            initialized = true;
+            modelGraph = new GraphForGame<Node, Edge, Unit>();
+        }
+        
+        public void AddNode(Node node)
+        {
+            modelGraph.AddNode(node);
         }
 
+        public bool RemoveNode(Node node)
+        {
+            return modelGraph.RemoveNode(node);
+        }
+
+        public bool RemoveNode(int nodeId)
+        {
+            return modelGraph.RemoveNode(nodeId);
+        }
+
+        public bool ContainsNode(Node node)
+        {
+            return modelGraph.ContainsNode(node);
+        }
+
+        public bool ContainsNode(int nodeId)
+        {
+            return modelGraph.ContainsNode(nodeId);
+        }
+
+        public void AddEdge(Edge edge)
+        {
+            modelGraph.AddEdge(edge);
+        }
+
+        public bool RemoveEdge(Edge edge)
+        {
+            return modelGraph.RemoveEdge(edge);
+        }
+
+        public bool RemoveEdge(int edgeId)
+        {
+            return modelGraph.RemoveEdge(edgeId);
+        }
+
+        public bool ContainsEdge(Edge edge)
+        {
+            return modelGraph.ContainsEdge(edge);
+        }
+
+        public bool ContainsEdge(int edgeId)
+        {
+            return modelGraph.ContainsEdge(edgeId);
+        }
 
         public Dictionary<Node, bool> GetVisibilityInfo(BasePlayer player)
             => modelGraph.GetVisibilityInfo(player.MyNodes);
@@ -90,6 +135,22 @@ namespace LineWars.Model
             IReadOnlyDictionary<Node, int> interferingNodes)
         {
             return modelGraph.MultiStartsLimitedBfs(startNodes, interferingNodes);
+        }
+
+        public IEnumerable<(Node, uint)> FindDistanceToNodes(Node rootNode)
+        {
+            return modelGraph.FindDistanceToNodes(rootNode);
+        }
+
+        public HashSet<(Node, Node)> FindMostRemoteNodes()
+        {
+            return modelGraph.FindMostRemoteNodes();
+        }
+
+        private void OnDestroy()
+        {
+            if (Instance == this)
+                Instance = null;
         }
     }
 }

@@ -19,5 +19,10 @@
         public TResult Visit(IShotUnitAction<TNode, TEdge, TUnit> action);
         public TResult Visit(IRLBuildAction<TNode, TEdge, TUnit> action);
         public TResult Visit(IHealYourselfAction<TNode, TEdge, TUnit> action);
+        public TResult Visit(IStunAttackAction<TNode, TEdge, TUnit> action);
+        public TResult Visit(IHealingAttackAction<TNode, TEdge, TUnit> action);
+        public TResult Visit(ITargetPowerBasedAttackAction<TNode, TEdge, TUnit> action);
+        public TResult Visit(IUpArmorAction<TNode, TEdge, TUnit> action);
+        public TResult Visit(IPowerBasedHealAction<TNode, TEdge, TUnit> action);
     }
 }

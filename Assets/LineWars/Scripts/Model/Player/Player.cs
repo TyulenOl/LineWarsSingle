@@ -7,12 +7,11 @@ using LineWars.Model;
 using UnityEngine;
 using LineWars.Controllers;
 
-namespace LineWars
+namespace LineWars.Model
 {
     public class Player : BasePlayer
     {
         public static Player LocalPlayer { get; private set; }
-        [SerializeField] private float pauseAfterTurn;
 
         private IReadOnlyCollection<UnitType> potentialExecutors;
         private readonly HashSet<Node> additionalVisibleNodes = new();

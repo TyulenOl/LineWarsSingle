@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using LineWars.Model;
 
 namespace LineWars.Controllers
@@ -91,6 +90,10 @@ namespace LineWars.Controllers
             return ForSimple(action);
         }
 
+        public IEnumerable<TargetActionInfo> Visit(IStunAttackAction<Node, Edge, Unit> action)
+        {
+            return ForUnit(action, 1);
+        }
 
         private static IEnumerable<TargetActionInfo> ForSimple<TAction>(TAction action)
             where TAction : ISimpleAction, IUnitAction<Node, Edge, Unit>
@@ -119,6 +122,25 @@ namespace LineWars.Controllers
                 .Select(e => new TargetActionInfo(e, action.CommandType));
         }
 
+        public IEnumerable<TargetActionInfo> Visit(IHealingAttackAction<Node, Edge, Unit> action)
+        {
+            return ForUnit(action, 1);
+        }
+
+        public IEnumerable<TargetActionInfo> Visit(ITargetPowerBasedAttackAction<Node, Edge, Unit> action)
+        {
+            return ForUnit(action, 1);
+        }
+
+        public IEnumerable<TargetActionInfo> Visit(IUpArmorAction<Node, Edge, Unit> action)
+        {
+            return ForUnit(action, 1);
+        }
+
+        public IEnumerable<TargetActionInfo> Visit(IPowerBasedHealAction<Node, Edge, Unit> action)
+        {
+            return ForUnit(action, 1);
+        }
 
         public class ForShotUnitAction
         {

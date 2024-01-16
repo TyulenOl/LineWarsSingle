@@ -17,6 +17,8 @@ namespace LineWars.Model
         public IEnumerable<UnitAction<NodeProjection, EdgeProjection, UnitProjection>> UnitActions { get; set; }
         public Unit Original { get; set; }
         public string UnitName { get; set; }
+        public int InitialPower {get; set; }
+        public int CurrentPower {get; set; }
         public int MaxHp { get; set; }
         public int MaxArmor { get; set; }
         public int MaxActionPoints { get; set; }
@@ -54,6 +56,12 @@ namespace LineWars.Model
         IEnumerable<IExecutorAction> IExecutor.Actions => actionsDictionary.Values;
 
         public event Action<UnitProjection> Died;
+        public event Action<UnitProjection, NodeProjection, NodeProjection> UnitNodeChanged;
+        public event Action<UnitProjection, int, int> UnitHPChanged;
+        public event Action<UnitProjection, int, int> UnitActionPointsChanged;
+        public event Action<UnitProjection, int, int> UnitPowerChanged;
+        public event Action<UnitProjection, int, int> UnitArmorChanged;
+        public event Action<UnitProjection> UnitReplenished;
 
         public IReadOnlyDictionary<CommandType, UnitAction<NodeProjection, EdgeProjection, UnitProjection>>
             ActionsDictionary => actionsDictionary;
@@ -114,16 +122,14 @@ namespace LineWars.Model
 
         private void RemoveFromOwner()
         {
-            if (Owner == null || this == null)
-            {
-                var vd = 1;
-            }
-
             Owner.RemoveOwned(this);
         }
 
         public IEnumerable<IUnitAction<NodeProjection, EdgeProjection, UnitProjection>> Actions =>
             actionsDictionary.Values;
+
+        public IReadOnlyList<Effect<NodeProjection, EdgeProjection, UnitProjection>> Effects => 
+            new List<Effect<NodeProjection, EdgeProjection, UnitProjection>>(); //TODO
 
         public T GetAction<T>()
             where T : IUnitAction<NodeProjection, EdgeProjection, UnitProjection>
@@ -148,12 +154,24 @@ namespace LineWars.Model
 
             CurrentActionPoints = MaxActionPoints;
         }
+
+        public void AddEffect(Effect<NodeProjection, EdgeProjection, UnitProjection> effect)
+        {
+            //TODO
+        }
+
+        public void DeleteEffect(Effect<NodeProjection, EdgeProjection, UnitProjection> effect)
+        {
+            //TODO
+        }
     }
 
     public interface IReadOnlyUnitProjection : INumbered
     {
         public Unit Original { get; }
         public string UnitName { get; }
+        public int InitialPower { get; }
+        public int CurrentPower { get; }
         public int MaxHp { get; }
         public int MaxArmor { get; }
         public int MaxActionPoints { get; }

@@ -16,10 +16,9 @@ namespace LineWars.Model
 
         public DistanceAttackAction(
             TUnit executor,
-            int damage,
             bool isPenetratingDamage,
             uint distance,
-            IGraphForGame<TNode, TEdge, TUnit> graph) : base(executor, damage, isPenetratingDamage)
+            IGraphForGame<TNode, TEdge, TUnit> graph) : base(executor, isPenetratingDamage)
         {
             Distance = distance;
             Graph = graph;
@@ -29,7 +28,7 @@ namespace LineWars.Model
         public override bool CanAttackFrom(TNode node, TUnit enemy, bool ignoreActionPointsCondition = false)
         {
             return !AttackLocked
-                   && Damage > 0
+                   && Executor.CurrentPower > 0
                    && enemy.OwnerId != Executor.OwnerId
                    && Graph.FindShortestPath(node, enemy.Node).Count - 1 <= Distance
                    && (ignoreActionPointsCondition || ActionPointsCondition());
@@ -37,7 +36,7 @@ namespace LineWars.Model
 
         public override void Attack(TUnit enemy)
         {
-            enemy.DealDamageThroughArmor(Damage);
+            enemy.DealDamageThroughArmor(Executor.CurrentPower);
             CompleteAndAutoModify();
         }
         

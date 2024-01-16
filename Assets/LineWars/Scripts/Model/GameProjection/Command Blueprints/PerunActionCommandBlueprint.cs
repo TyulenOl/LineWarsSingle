@@ -15,14 +15,18 @@ namespace LineWars.Model
         {
             var unit = projection.UnitsIndexList[ExecutorId];
             var node = projection.NodesIndexList[NodeId];
-            return new SacrificeForPerunCommand<NodeProjection, EdgeProjection, UnitProjection>(unit, node);
+            return new TargetedUniversalCommand
+                <UnitProjection, ISacrificeForPerunAction<NodeProjection, EdgeProjection, UnitProjection>, NodeProjection>
+                (unit, node);
         }
 
         public ICommand GenerateMonoCommand(GameProjection projection)
         {
             var unit = projection.UnitsIndexList[ExecutorId].Original;
             var node = projection.NodesIndexList[NodeId].Original;
-            return new SacrificeForPerunCommand<Node, Edge, Unit>(unit, node);
+            return new TargetedUniversalCommand
+                <Unit, MonoSacrificeForPerunAction, Node>
+                (unit, node);
         }
     }
 }

@@ -27,9 +27,9 @@ namespace LineWars
 
         public event Action RoundsAmountChanged;
         
-        public override void Initialize([NotNull] Player me, IEnumerable<BasePlayer> enemies)
+        public override void Initialize([NotNull] Player player, IEnumerable<BasePlayer> enemies)
         {
-            base.Initialize(me, enemies);
+            base.Initialize(player, enemies);
             PhaseManager.Instance.PhaseEntered.AddListener(OnPhaseEntered);
         }
 
@@ -47,11 +47,11 @@ namespace LineWars
 
         private void CalculateVictory()
         {
-            var winner = SingleGame.Instance.AllPlayers.Values
+            var winner = SingleGameRoot.Instance.AllPlayers.Values
                 .Select(player => (player.MyNodes.Count(), player))
                 .MaxItem((playerPair1, playerPair2) => playerPair1.Item1.CompareTo(playerPair2.Item1))
                 .Item2;
-            if (winner == Me)
+            if (winner == Player)
                 Win();
             else
                 Lose();

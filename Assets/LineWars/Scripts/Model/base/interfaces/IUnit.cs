@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 
-
 namespace LineWars.Model
 {
     public interface IUnit<TNode, TEdge, TUnit> :
@@ -16,6 +15,8 @@ namespace LineWars.Model
 
     {
         public int Id { get; }
+        public int InitialPower {get; set;}
+        public int CurrentPower {get; set; }
         public int MaxArmor { get; set; }
         public int CurrentArmor { get; set; }
         public int Visibility { get; set; }
@@ -24,9 +25,15 @@ namespace LineWars.Model
         public LineType MovementLineType { get; }
         public UnitDirection UnitDirection { get; set; }
         public TNode Node { get; set; }
-
+        public IReadOnlyList<Effect<TNode, TEdge, TUnit>> Effects { get; }
         public new IEnumerable<IUnitAction<TNode, TEdge, TUnit>> Actions { get; }
 
+        public event Action<TUnit, TNode, TNode> UnitNodeChanged;
+        public event Action<TUnit, int, int> UnitHPChanged;
+        public event Action<TUnit, int, int> UnitActionPointsChanged;
+        public event Action<TUnit, int, int> UnitPowerChanged;
+        public event Action<TUnit, int, int> UnitArmorChanged;
+        public event Action<TUnit> UnitReplenished;
         public void DealDamageThroughArmor(int value)
         {
             if (value < 0)
@@ -68,5 +75,8 @@ namespace LineWars.Model
             if (unit == this) return false;
             return Node.LeftUnit == unit || Node.RightUnit == unit;
         }
+
+        public void AddEffect(Effect<TNode, TEdge, TUnit> effect);
+        public void DeleteEffect(Effect<TNode, TEdge, TUnit> effect);
     }
 }

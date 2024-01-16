@@ -10,7 +10,6 @@ namespace LineWars.Model
     {
         private MonoMoveAction moveAction;
         protected override bool NeedAutoComplete => false;
-        [field: SerializeField] public int InitialDamage { get; private set; }
         [SerializeField] private RamAnimation ramAnimation;
 
         private int ramResponsesPlayingCount;
@@ -21,8 +20,6 @@ namespace LineWars.Model
             base.Initialize();
             moveAction = Executor.GetAction<MonoMoveAction>();
         }
-
-        public int Damage => Action.Damage;
 
         public bool CanRam(Node node)
         {
@@ -112,6 +109,8 @@ namespace LineWars.Model
 
             if (ramResponsesPlayingCount == 0)
                 Complete();
+
+            Player.LocalPlayer.RecalculateVisibility();
         }
 
         private void OnRespondRamEnded(UnitAnimation animation)
@@ -124,7 +123,7 @@ namespace LineWars.Model
 
         protected override RamAction<Node, Edge, Unit> GetAction()
         {
-            var action = new RamAction<Node, Edge, Unit>(Executor, InitialDamage);
+            var action = new RamAction<Node, Edge, Unit>(Executor);
             return action;
         }
 

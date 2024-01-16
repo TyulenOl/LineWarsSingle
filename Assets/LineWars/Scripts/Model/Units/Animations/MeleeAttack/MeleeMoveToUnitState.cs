@@ -17,10 +17,6 @@ namespace LineWars.Model
         public class MeleeMoveToUnitState : State
         {
             public readonly UnitMeleeAttackAnimation animation;
-
-            public event Action Started;
-            public event Action Ended;
-
             
             private float movementProgress;
             private bool isPlayed;

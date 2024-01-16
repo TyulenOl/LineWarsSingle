@@ -111,6 +111,8 @@ public class SceneTransition : MonoBehaviour
         set => lerpProgress = Math.Min(1, Math.Max(0, value));
     }
 
+    public static bool Exist() => instance != null;
+
     public static void LoadScene(SceneName sceneName)
     {
         if (instance.isStartLoading) return;

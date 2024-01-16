@@ -29,14 +29,13 @@ namespace LineWars.Model
 
             private async void StartAITurn()
             {
-                var gameProjection =
-                    GameProjectionCreator.FromMono(SingleGame.Instance.AllPlayers.Values, MonoGraph.Instance, PhaseManager.Instance);
-                //DEBUG
-                var stopwatch = new Stopwatch();
-                stopwatch.Start();
+                var gameProjection = GameProjectionCreator.FromMono(SingleGameRoot.Instance.AllPlayers.Values, MonoGraph.Instance, PhaseManager.Instance);
+                // //DEBUG
+                // var stopwatch = new Stopwatch();
+                // stopwatch.Start();
                 var allCommands = await FindAllOutcomes(gameProjection);
-                stopwatch.Stop();
-                UnityEngine.Debug.Log($"{stopwatch.ElapsedMilliseconds} ms");
+                // stopwatch.Stop();
+                // UnityEngine.Debug.Log($"{stopwatch.ElapsedMilliseconds} ms");
 
                 ai.StartCoroutine(ExecuteTurnCoroutine(allCommands, gameProjection));
             }

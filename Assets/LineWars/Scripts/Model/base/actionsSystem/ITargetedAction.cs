@@ -7,11 +7,14 @@ namespace LineWars.Model
         public bool IsAvailable(ITarget target);
     }
 
-    public interface ITargetedActionCommandGenerator
+    public interface ITargetedActionCommandGenerator: IExecutorAction
     {
         public IActionCommand GenerateCommand(ITarget target);
     }
 
+    /// <summary>
+    /// Дженерик класс, который упрощает создание TargetedActions
+    /// </summary>
     public interface ITargetedAction<in TTarget> :
         ITargetedAction,
         ITargetedActionCommandGenerator

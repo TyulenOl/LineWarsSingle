@@ -1,6 +1,8 @@
-﻿namespace LineWars
+﻿using UnityEngine;
+
+namespace LineWars
 {
-    public class MainMenu : UIStackElement
+    public class MainMenu : MonoBehaviour
     {
     }
 }

@@ -38,7 +38,11 @@ namespace LineWars.Model
         Ram,
         BlowWithSwing,
         ShotUnit,
-        VodaBajkalskaya
+        VodaBajkalskaya,
+        Stun,
+        HealingAttack,
+        TargetPowerBasedAttack,
+        PowerBasedHeal
     }
 }   
 

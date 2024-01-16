@@ -17,12 +17,8 @@ namespace LineWars.Model
         [SerializeField] protected SFXList sfxList;
 
         private IDJ DJ;
-
-        [field: SerializeField] public int InitialDamage { get; private set; }
         [field: SerializeField] public bool InitialIsPenetratingDamage { get; private set; }
 
-
-        public int Damage => Action.Damage;
         public bool IsPenetratingDamage => Action.IsPenetratingDamage;
 
 

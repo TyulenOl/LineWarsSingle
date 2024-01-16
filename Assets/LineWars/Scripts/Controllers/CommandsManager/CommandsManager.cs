@@ -218,6 +218,10 @@ namespace LineWars.Controllers
             }
             
             Executor = executor;
+            SendFightRedrawMessage(
+                Array.Empty<IMonoTarget>(), 
+                action => !hiddenCommandsSet.Contains(action.CommandType)
+            );
         }
 
         public void ExecuteSimpleCommand(IActionCommand command)
@@ -284,7 +288,7 @@ namespace LineWars.Controllers
         IEnumerator DelayActionCoroutine()
         {
             yield return new WaitForSeconds(maxActionDelayInSeconds);
-            Debug.LogWarning($"The action didn't stop after {maxActionDelayInSeconds} seconds!");
+            Debug.LogError($"The action didn't stop after {maxActionDelayInSeconds} seconds!");
             OnActionCompleted();
         }
 
