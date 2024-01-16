@@ -8,7 +8,6 @@ namespace LineWars.Model
         MonoUnitAction<ShotUnitAction<Node, Edge, Unit>>,
         IShotUnitAction<Node, Edge, Unit>
     {
-
         [SerializeField] private SFXList ThrowRusSounds;
         [SerializeField] private SFXList ThrowLizardSounds;
         [SerializeField] private SFXList FallSoundsList;

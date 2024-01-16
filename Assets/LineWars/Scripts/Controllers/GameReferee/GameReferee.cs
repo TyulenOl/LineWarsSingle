@@ -1,39 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DataStructures;
 using JetBrains.Annotations;
 using LineWars.Model;
 using UnityEngine;
 
 namespace LineWars
 {
-    public abstract class GameReferee : MonoBehaviour
+    public abstract class GameReferee: MonoBehaviour
     {
-        public static GameReferee Instance { get; private set; }
-
-        protected Player Me;
+        protected Player Player;
         protected List<BasePlayer> Enemies;
-
         public event Action Wined;
         public event Action Losed;
-
-        protected virtual void Awake()
+        
+        public virtual void Initialize(
+            [NotNull] Player player, 
+            IEnumerable<BasePlayer> enemies)
         {
-            if (Instance == null)
-                Instance = this;
-            else
-            {
-                Debug.LogError($"More than two {nameof(GameReferee)} on stage");
-                Destroy(gameObject);
-            }
-        }
-
-        public virtual void Initialize([NotNull] Player me, IEnumerable<BasePlayer> enemies)
-        {
-            Me = me ? me : throw new ArgumentNullException(nameof(me));
+            Player = player ? player : throw new ArgumentNullException(nameof(player));
             Enemies = enemies
                 .Where(x => x != null)
-                .Where(x => x != Me)
+                .Where(x => x != Player)
                 .ToList();
         }
 

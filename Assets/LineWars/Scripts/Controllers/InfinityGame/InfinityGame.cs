@@ -24,7 +24,7 @@ namespace LineWars.Controllers
         [SerializeField] private GraphCreator graphCreator;
         [SerializeField] private MapCreator mapCreator;
         [SerializeField] private CameraController cameraController;
-        [SerializeField] private SingleGame singleGame;
+        [SerializeField] private SingleGameRoot singleGameRoot;
         
         [Header("Debug")]
         [SerializeField] private InfinityGameMode gameMode;
@@ -78,7 +78,7 @@ namespace LineWars.Controllers
             mapCreator.GenerateMap(monoGraph);
             cameraController.gameObject.SetActive(true);
             
-            singleGame.StartGame();
+            singleGameRoot.StartGame();
         }
 
         private void CreateGameReferee(GameRefereeCreator creator)
@@ -86,7 +86,8 @@ namespace LineWars.Controllers
             creator.PrepareNodes(monoGraph.Nodes);
             creator.Initialize();
             var referee = creator.CreateGameReferee();
-            referee.transform.SetParent(singleGame.transform);
+            referee.transform.SetParent(singleGameRoot.transform);
+            singleGameRoot.GameReferee = referee;
         }
         
         private void CreatePlayers(PlayersSettings playersSettings)
@@ -115,8 +116,8 @@ namespace LineWars.Controllers
                 ProcessOwnedInformation(instanceOfPlayer, node, player.InitialOwnerInfo);
             }
 
-            singleGame.Player = (Player) instanceOfPlayers[0];
-            singleGame.Enemies = instanceOfPlayers.Skip(1).ToList();
+            singleGameRoot.PlayerInitializer.Player = (Player) instanceOfPlayers[0];
+            singleGameRoot.PlayerInitializer.Enemies = instanceOfPlayers.Skip(1).ToList();
             visitedNodes = null;
         }
 

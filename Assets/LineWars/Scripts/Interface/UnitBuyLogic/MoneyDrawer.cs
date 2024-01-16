@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using LineWars;
+using LineWars.Model;
 using TMPro;
 using UnityEngine;
 

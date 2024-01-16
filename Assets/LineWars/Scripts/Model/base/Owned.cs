@@ -33,7 +33,7 @@ namespace LineWars.Model
 
         public void ConnectTo(int basePlayerID)
         {
-            var player = basePlayerID != -1 ? SingleGame.Instance.AllPlayers[basePlayerID] : null;
+            var player = basePlayerID != -1 ? SingleGameRoot.Instance.AllPlayers[basePlayerID] : null;
             Connect(player, this);
         }
 

@@ -10,7 +10,7 @@ namespace LineWars
     public class SiegeGameReferee : GameReferee
     {
         [SerializeField] private int roundsToWin;
-        [ReadOnlyInspector] private int currentRounds;
+        [SerializeField, ReadOnlyInspector] private int currentRounds;
         
         public int CurrentRounds
         {
@@ -26,12 +26,12 @@ namespace LineWars
 
         public event Action<int> CurrentRoundsChanged;
         
-        public override void Initialize([NotNull] Player me, IEnumerable<BasePlayer> enemies)
+        public override void Initialize([NotNull] Player player, IEnumerable<BasePlayer> enemies)
         {
-            base.Initialize(me, enemies);
+            base.Initialize(player, enemies);
             PhaseManager.Instance.PhaseEntered.AddListener(OnPhaseEntered);
-            me.OwnedRemoved += OnRemoveOwned;
-            me.PhaseExceptions.Add(PhaseType.Buy);
+            player.OwnedRemoved += OnRemoveOwned;
+            player.PhaseExceptions.Add(PhaseType.Buy);
         }
 
         private void OnPhaseEntered(PhaseType current)
@@ -43,17 +43,17 @@ namespace LineWars
             {
                 Win(); 
                 PhaseManager.Instance.PhaseEntered.RemoveListener(OnPhaseEntered);
-                Me.OwnedRemoved -= OnRemoveOwned;
+                Player.OwnedRemoved -= OnRemoveOwned;
             }
         }
 
         private void OnRemoveOwned(Owned removedOwned)
         {
             if (removedOwned is not Unit unit) return;
-            if (Me.OwnedObjects.OfType<Unit>().Count() <= 0)
+            if (Player.OwnedObjects.OfType<Unit>().Count() <= 0)
             {
                 Lose();
-                Me.OwnedRemoved -= OnRemoveOwned;
+                Player.OwnedRemoved -= OnRemoveOwned;
             }
         }
     }
