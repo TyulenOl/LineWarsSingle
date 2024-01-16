@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace LineWars
 {
-    public class CompanyMenu : UIStackElement
+    public class CompanyMenu : MonoBehaviour
     {
         [SerializeField] private MissionInfoUI missionInfoUI;
         [SerializeField] private List<MissionUI> missionUis;
@@ -27,9 +27,8 @@ namespace LineWars
             }
         }
 
-        public override void OnOpen()
+        public void OnEnable()
         {
-            base.OnOpen();
             missionInfoUI.gameObject.SetActive(false);
         }
     }

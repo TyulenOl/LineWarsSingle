@@ -43,7 +43,7 @@ namespace LineWars
 
         private void OnClick()
         {
-            UIStack.Instance.PushElement(menuToOpen);
+            UIStack.Instance.PushElement(menuToOpen.transform);
         }
 
         private void RedrawCompanyData(CompanyData data)
