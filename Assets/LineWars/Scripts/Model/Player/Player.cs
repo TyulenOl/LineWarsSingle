@@ -63,11 +63,11 @@ namespace LineWars.Model
         private void UnitOnDied(Unit diedUnit)
         {
             RecalculateVisibility();
-            if (CurrentPhase != null 
-                && (object)CommandsManager.Instance.Executor != diedUnit) //Из-за этого случался баг с ShotUnit? Возможно
-            {
-                FinishTurn();
-            }
+            // if (CurrentPhase != null 
+            //     && (object)CommandsManager.Instance.Executor != diedUnit) //Из-за этого случался баг с ShotUnit? Возможно
+            // {
+            //     FinishTurn();
+            // }
         }
 
         public IEnumerable<Unit> GetAllUnitsByPhase(PhaseType phaseType)
