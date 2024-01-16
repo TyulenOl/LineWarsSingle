@@ -13,14 +13,6 @@ namespace LineWars.Model
         public List<int> UnlockedCards;
         public int UpgradeCards;
         public SerializedDictionary<LootBoxType, int> LootBoxes;
-
-        public UserInfo()
-        {
-            LootBoxes = new();
-            foreach (LootBoxType boxType in Enum.GetValues(typeof(LootBoxType)))
-            {
-                LootBoxes[boxType] = 0;
-            }
-        }   
+        public int PassingGameModes;
     }
 }
