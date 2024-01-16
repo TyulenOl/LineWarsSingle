@@ -1,5 +1,4 @@
-﻿using LineWars.Interface;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace LineWars.Model
 {

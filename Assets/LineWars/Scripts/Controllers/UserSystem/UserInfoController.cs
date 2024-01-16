@@ -21,6 +21,8 @@ namespace LineWars.Controllers
         public event Action<int> GoldChanged;
         
         public event Action<int> DiamondsChanged;
+
+        public IReadOnlyUserInfo UserInfo => currentInfo;
         public void Initialize(IProvider<UserInfo> provider, IStorage<DeckCard> storage)
         {
             userInfoProvider = provider;

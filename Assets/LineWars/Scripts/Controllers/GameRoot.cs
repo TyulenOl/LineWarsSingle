@@ -47,12 +47,11 @@ namespace LineWars.Controllers
 
             InitializeProviders();
 
-            InitializeLootBoxController();
             DecksController.Initialize(deckProvider);
             CompaniesController.Initialize(missionInfoProvider, missionsStorage);
             UserController.Initialize(userInfoProvider, cardsDatabase);
             CardStore.Initialize(timeGetter, CardsDatabase, UserController);
-
+            InitializeLootBoxController();
         }
 
         private void InitializeProviders()
@@ -108,9 +107,9 @@ namespace LineWars.Controllers
         private void InitializeLootBoxController()
         {
             var lootBoxOpenerFabric = new ClientLootBoxOpenerFabric(cardsDatabase);
-            var dropConverter = new DuplicateEreaserDropConverter(userInfoProvider, cardsDatabase);
+            var dropConverter = new DuplicateEreaserDropConverter(userController.UserInfo, cardsDatabase);
             lootBoxController.Initialize(
-                userInfoProvider, 
+                userController.UserInfo, 
                 lootBoxOpenerFabric, 
                 dropConverter, 
                 userController);

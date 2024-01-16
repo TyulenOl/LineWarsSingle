@@ -21,7 +21,6 @@ namespace LineWars.Model
         public override void Initialize()
         {
             base.Initialize();
-            //Executor.MovementLogic.MovementIsOver += MovementLogicOnMovementIsOver;
             dj = new RandomDJ(0.5f);
         }
 
@@ -35,7 +34,7 @@ namespace LineWars.Model
             {
                 var animContext = new AnimationContext()
                 {
-                    TargetNode = target
+                    TargetPosition = target.transform.position
                 };
                 moveAnimation.Ended.AddListener(OnMoveEnd);
                 moveAnimation.Execute(animContext);

@@ -12,17 +12,17 @@ namespace LineWars.LootBoxes
         private Dictionary<LootBoxType, LootBoxInfo> typeToInfos = new();
         private Dictionary<LootBoxType, ILootBoxOpener> openers;
         private UserInfoController userInfoController;
-        private IProvider<UserInfo> provider;
+        private IReadOnlyUserInfo userInfo;
         private IConverter<DropInfo, ContextedDropInfo> dropConverter;
         public IEnumerable<LootBoxInfo> lootBoxes => typeToInfos.Values;
 
         public void Initialize(
-            IProvider<UserInfo> provider,
+            IReadOnlyUserInfo userInfo,
             ILootBoxOpenerFabric openerFabric,
             IConverter<DropInfo, ContextedDropInfo> dropConverter,
             UserInfoController userInfoController)
         {
-            this.provider = provider;
+            this.userInfo = userInfo;
             openers = new();
             this.dropConverter = dropConverter;
             this.userInfoController = userInfoController;
@@ -40,15 +40,15 @@ namespace LineWars.LootBoxes
             if (!openers.ContainsKey(boxType))
                 return false;
             var opener = openers[boxType];
-            var userInfo = provider.Load(0);
             return opener.CanOpen(userInfo);
         }
 
         public ContextedDropInfo Open(LootBoxType boxType)
         {
             var opener = openers[boxType];
-            var userInfo = provider.Load(0);
             var dropInfo = opener.Open(userInfo);
+            var currentBoxes = userInfoController.GetBoxes(boxType);
+            userInfoController.SetBoxes(boxType, currentBoxes - 1);
             var result = dropConverter.Convert(dropInfo);
             SaveDrop(result);
             return result;

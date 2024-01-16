@@ -24,7 +24,7 @@ namespace LineWars.Model
 
         public override void Execute(AnimationContext context)
         {
-            targetNode = context.TargetNode.transform.position;
+            targetNode = context.TargetPosition;
             startPosition = ownerUnit.transform.position;
             movementProgress = 0;
             timeToTransition = (startPosition - targetNode).magnitude / speed;
