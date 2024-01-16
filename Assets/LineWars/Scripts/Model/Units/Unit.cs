@@ -131,8 +131,8 @@ namespace LineWars.Model
             set
             {
                 var before = currentHp;
-                currentHp = Mathf.Min(Mathf.Max(0, value), maxHp);
-                if(before == currentHp) return;
+                currentHp = Mathf.Clamp(value, 0, maxHp);
+                if (before == currentHp) return;
                 HpChanged.Invoke(before, currentHp);
                 UnitHPChanged?.Invoke(this, before, currentHp);
                 SfxManager.Instance.Play(before < currentHp ? dj.GetSound(HpHealedSounds) : dj.GetSound(HpDamagedSounds));
@@ -158,7 +158,7 @@ namespace LineWars.Model
             set
             {
                 var before = currentArmor;
-                currentArmor = Mathf.Clamp(currentArmor, 0, maxArmor);
+                currentArmor = Mathf.Clamp(value, 0, maxArmor);
                 if(before == currentArmor) return;
                 ArmorChanged.Invoke(before, currentArmor);
                 UnitArmorChanged?.Invoke(this, before, currentArmor);
