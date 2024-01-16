@@ -23,6 +23,8 @@ namespace LineWars.Controllers
         public int ChoseMissionId { get; set; }
         public event Action AnyMissionInfoChanged;
 
+        public bool IsInfinityGameUnlocked => missionInfos[0].MissionStatus == MissionStatus.Completed;
+
         public void Initialize(IProvider<MissionInfo> provider, IStorage<MissionData> storage)
         {
             companiesProvider = provider;
