@@ -2,6 +2,8 @@
 using System.Linq;
 using LineWars.Model;
 using UnityEngine;
+using System;
+using LineWars.LootBoxes;
 
 namespace LineWars.Controllers
 {
@@ -15,14 +17,24 @@ namespace LineWars.Controllers
         private UserInfo currentInfo;
         private HashSet<DeckCard> openedCardsSet;
         public IEnumerable<DeckCard> OpenedCards => openedCardsSet;
+
+        public event Action<int> GoldChanged;
         
+        public event Action<int> DiamondsChanged;
+
+        public IReadOnlyUserInfo UserInfo => currentInfo;
         public void Initialize(IProvider<UserInfo> provider, IStorage<DeckCard> storage)
         {
             userInfoProvider = provider;
             deckCardStorage = storage;
 
             currentInfo = provider.Load(0) ?? CreateDefaultUserInfo();
-            
+
+            //TODO: Убрать перед релизом!
+            currentInfo.UnlockedCards = new List<int>();
+            UserDiamond = 100;
+            UserGold = 100;
+            //TODO: Убрать перед релизом!
             openedCardsSet = currentInfo.UnlockedCards
                 .Select(x => deckCardStorage.IdToValue[x])
                 .Concat(userInfoPreset.DefaultCards.Where(storage.ValueToId.ContainsKey))
@@ -40,6 +52,7 @@ namespace LineWars.Controllers
                     .Select(x => deckCardStorage.ValueToId[x])
                     .ToList()
             };
+
             foreach(var pair in userInfoPreset.DefaultBoxesCount)
             {
                 newUserInfo.LootBoxes[pair.Key] = pair.Value;
@@ -75,19 +88,52 @@ namespace LineWars.Controllers
             currentInfo.UnlockedCards.Remove(deckCardStorage.ValueToId[deckCard]);
         }
 
-        public void ChangeGold(int value)
+        public int UserGold
         {
-            currentInfo.Gold += value;
+            get => currentInfo.Gold;
+            set
+            {
+                if (value < 0)
+                    throw new ArgumentException("Gold can't be less than zero!");
+                currentInfo.Gold = value;
+                GoldChanged?.Invoke(value);
+            }
+        }
+        
+        public int UserDiamond
+        {
+            get => currentInfo.Diamonds;
+            set
+            {
+                if (value < 0)
+                    throw new ArgumentException("Diamonds can't be less than zero!");
+                currentInfo.Diamonds = value;
+                DiamondsChanged?.Invoke(value);
+            }
         }
 
-        public void ChangeDiamond(int value)
+        public int UserUpgradeCards
         {
-            currentInfo.Diamonds += value;
+            get => currentInfo.Diamonds;
+            set
+            {
+                if (value < 0)
+                    throw new ArgumentException("UgradeCards can't be less than zero!");
+                currentInfo.UpgradeCards = value;
+            }
         }
 
-        public void ChangeUpgradeCards(int value)
+        public int GetBoxes(LootBoxType boxType)
         {
-            currentInfo.UpgradeCards += value;
+            return currentInfo.LootBoxes[boxType];
+        }
+
+        public void SetBoxes(LootBoxType boxType, int value)
+        {
+            if (value < 0)
+                throw new ArgumentException("Loot Box can't be less than zero!");
+            currentInfo.LootBoxes[boxType] = value;
+
         }
 
         private void OnApplicationFocus(bool hasFocus)

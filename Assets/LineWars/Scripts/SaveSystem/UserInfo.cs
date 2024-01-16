@@ -6,12 +6,36 @@ using LineWars.LootBoxes;
 namespace LineWars.Model
 {
     [Serializable]
-    public class UserInfo
+    public class UserInfo : IReadOnlyUserInfo
     {
         public int Diamonds;
         public int Gold;
         public List<int> UnlockedCards;
         public int UpgradeCards;
-        public SerializedDictionary<LootBoxRarity, int> LootBoxes = new();
+        public SerializedDictionary<LootBoxType, int> LootBoxes;
+
+        public UserInfo()
+        {
+            LootBoxes = new();
+            foreach (LootBoxType boxType in Enum.GetValues(typeof(LootBoxType)))
+            {
+                LootBoxes[boxType] = 0;
+            }
+        }
+
+        int IReadOnlyUserInfo.Diamonds => Diamonds;
+        int IReadOnlyUserInfo.Gold => Gold;
+        IReadOnlyList<int> IReadOnlyUserInfo.UnlockedCards => UnlockedCards;
+        int IReadOnlyUserInfo.UpgradeCards => UpgradeCards;
+        IReadOnlyDictionary<LootBoxType, int> IReadOnlyUserInfo.LootBoxes => LootBoxes;
+    }
+
+    public interface IReadOnlyUserInfo
+    {
+        public int Diamonds { get; }
+        public int Gold { get; }
+        public IReadOnlyList<int> UnlockedCards { get; }
+        public int UpgradeCards { get; }
+        public IReadOnlyDictionary<LootBoxType, int> LootBoxes { get; }
     }
 }

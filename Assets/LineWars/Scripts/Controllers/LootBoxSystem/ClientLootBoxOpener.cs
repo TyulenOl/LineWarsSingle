@@ -1,12 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using DataStructures;
+using LineWars.Controllers;
 using LineWars.Model;
 using UnityEngine;
 
 namespace LineWars.LootBoxes
 {
-    public class ClientLootBoxOpener : LootBoxOpener
+    public class ClientLootBoxOpener : ILootBoxOpener
     {
         private IStorage<DeckCard> cardStorage;
         public LootBoxInfo BoxInfo {get; private set;}
@@ -17,12 +18,13 @@ namespace LineWars.LootBoxes
             this.cardStorage = cardStorage;
         }
 
-        public bool CanOpen(UserInfo info)
+        public bool CanOpen(IReadOnlyUserInfo info)
         {
-            return info.LootBoxes.ContainsKey(BoxInfo.Rarity);
+            return info.LootBoxes.ContainsKey(BoxInfo.BoxType)
+                && info.LootBoxes[BoxInfo.BoxType] > 0;
         }
 
-        public DropInfo Open(UserInfo info)
+        public DropInfo Open(IReadOnlyUserInfo info)
         {
             var drops = new List<Drop>();
             foreach(var loot in BoxInfo.AllLoot)
@@ -66,15 +68,15 @@ namespace LineWars.LootBoxes
         private Drop HandleCard(LootInfo info)
         {
             var chanceList = new RandomChanceList<CardRarity>();
-            foreach(var cardChance in info.CardChances)
+            foreach (var cardChance in info.CardChances)
             {
                 chanceList.Add(cardChance.Rarity, cardChance.Chance);
             }
             var rarity = chanceList.PickRandomObject();
 
-            var elligbleCards = FindAllElligbleCards(rarity);
-            var randomCard = Random.Range(0, elligbleCards.Count());
-            return new Drop(LootType.Card, randomCard);
+            var elligbleCards = cardStorage.FindCardsByType(rarity).ToArray();
+            var randomCard = Random.Range(0, elligbleCards.Length);
+            return new Drop(LootType.Card, elligbleCards[randomCard]);
         }
 
         private IEnumerable<int> FindAllElligbleCards(CardRarity rarity)

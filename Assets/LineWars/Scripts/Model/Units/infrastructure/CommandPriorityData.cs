@@ -41,7 +41,8 @@ namespace LineWars.Model
         VodaBajkalskaya,
         Stun,
         HealingAttack,
-        TargetPowerBasedAttack
+        TargetPowerBasedAttack,
+        PowerBasedHeal
     }
 }   
 

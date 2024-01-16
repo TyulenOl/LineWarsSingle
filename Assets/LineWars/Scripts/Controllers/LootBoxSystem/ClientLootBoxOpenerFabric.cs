@@ -11,7 +11,7 @@ namespace LineWars.LootBoxes
             this.cardStorage = cardStorage;
         }
 
-        public LootBoxOpener Create(LootBoxInfo info)
+        public ILootBoxOpener Create(LootBoxInfo info)
         {
             return new ClientLootBoxOpener(info, cardStorage);
         }

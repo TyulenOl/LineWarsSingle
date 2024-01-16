@@ -3,6 +3,7 @@ using DataStructures;
 using LineWars.Model;
 using LineWars.LootBoxes;
 using UnityEngine;
+using LineWars.Store;
 
 namespace LineWars.Controllers
 {
@@ -16,16 +17,18 @@ namespace LineWars.Controllers
         [SerializeField] private DecksController decksController;
         [SerializeField] private CompaniesController companiesController;
         [SerializeField] private UserInfoController userController;
+        [SerializeField] private LootBoxController lootBoxController;
+        [SerializeField] private CardStore cardStore;
 
         [Header("ProviderSettings")]
         [SerializeField] private ProviderType providerType;
 
-        private LootBoxController lootBoxController;
 
         private IProvider<Deck> deckProvider;
         private IProvider<MissionInfo> missionInfoProvider;
         private IProvider<UserInfo> userInfoProvider;
         private IProvider<Settings> settingsProvider;
+        private IGetter<DateTime> timeGetter;
 
         public IStorage<DeckCard> CardsDatabase => cardsDatabase;
         public IStorage<MissionData> MissionsStorage => missionsStorage;
@@ -34,6 +37,7 @@ namespace LineWars.Controllers
         public CompaniesController CompaniesController => companiesController;
         public UserInfoController UserController => userController;
         public LootBoxController LootBoxController => lootBoxController;
+        public CardStore CardStore => cardStore;
 
         protected override void OnAwake()
         {
@@ -43,14 +47,16 @@ namespace LineWars.Controllers
 
             InitializeProviders();
 
-            InitializeLootBoxController();
             DecksController.Initialize(deckProvider);
             CompaniesController.Initialize(missionInfoProvider, missionsStorage);
             UserController.Initialize(userInfoProvider, cardsDatabase);
+            CardStore.Initialize(timeGetter, CardsDatabase, UserController);
+            InitializeLootBoxController();
         }
 
         private void InitializeProviders()
         {
+            timeGetter = gameObject.AddComponent<GetWorldTime>();
             switch (providerType)
             {
                 case ProviderType.FileJson:
@@ -101,9 +107,9 @@ namespace LineWars.Controllers
         private void InitializeLootBoxController()
         {
             var lootBoxOpenerFabric = new ClientLootBoxOpenerFabric(cardsDatabase);
-            var dropConverter = new DuplicateEreaserDropConverter(userInfoProvider, cardsDatabase);
+            var dropConverter = new DuplicateEreaserDropConverter(userController.UserInfo, cardsDatabase);
             lootBoxController.Initialize(
-                userInfoProvider, 
+                userController.UserInfo, 
                 lootBoxOpenerFabric, 
                 dropConverter, 
                 userController);

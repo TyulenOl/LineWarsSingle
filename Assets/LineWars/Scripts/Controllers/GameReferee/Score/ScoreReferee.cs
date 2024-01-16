@@ -14,7 +14,11 @@ namespace LineWars
         private Dictionary<BasePlayer, int> playersScore;
 
         public event Action<BasePlayer, int, int> ScoreChanged;
-        public int ScoreForWin => scoreForWin;
+        public int ScoreForWin
+        {
+            get => scoreForWin;
+            set => scoreForWin = Mathf.Max(0, value);
+        }
 
         public override void Initialize(Player me, IEnumerable<BasePlayer> enemies)
         {

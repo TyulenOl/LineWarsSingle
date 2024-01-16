@@ -24,6 +24,7 @@ namespace LineWars.Model
         public void Execute(TUnit target)
         {
             Stun(target);
+            CompleteAndAutoModify();
         }
 
         private void Stun(TUnit target)

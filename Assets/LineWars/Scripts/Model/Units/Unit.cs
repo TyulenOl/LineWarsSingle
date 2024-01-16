@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using LineWars.Controllers;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace LineWars.Model
 {
-    [RequireComponent(typeof(UnitMovementLogic))]
     public sealed class Unit : Owned,
         IUnit<Node, Edge, Unit>, 
         IMonoExecutor,
@@ -22,7 +20,7 @@ namespace LineWars.Model
         
         [SerializeField, Min(0)] private int initialPower;
         [SerializeField, Min(0)] private int maxHp;
-        [SerializeField, Min(0)] private int maxArmor;
+        private int maxArmor = 100;
         [SerializeField, Min(0)] private int visibility;
         [field: SerializeField] public Sprite Sprite { get; private set; }
         
@@ -38,6 +36,7 @@ namespace LineWars.Model
         
         [Header("Actions Settings")] 
         [SerializeField] [Min(0)] private int maxActionPoints;
+        [SerializeField] private List<EffectInitializer> effectInitializers;
 
         [Header("DEBUG")] 
         [SerializeField, ReadOnlyInspector] private Node myNode;
@@ -58,26 +57,29 @@ namespace LineWars.Model
 
         public event Action AnyActionCompleted;
         public event Action ExecutorDestroyed;
+        public event Action<Unit, Node, Node> UnitNodeChanged; //++
+        public event Action<Unit, int, int> UnitHPChanged; //++
+        public event Action<Unit, int, int> UnitActionPointsChanged; //++
+        public event Action<Unit, int, int> UnitPowerChanged; //++
+        public event Action<Unit, int, int> UnitArmorChanged; //++
+        public event Action<Unit> UnitReplenished; //++
 
+        private List<Effect<Node, Edge, Unit>> effects; 
 
-        private UnitMovementLogic movementLogic;
-        
-        
         private Dictionary<CommandType, IMonoUnitAction<UnitAction<Node, Edge, Unit>>> monoActionsDictionary;
         public IEnumerable<IMonoUnitAction<UnitAction<Node, Edge, Unit>>> MonoActions => monoActionsDictionary.Values;
+        public IReadOnlyList<Effect<Node, Edge, Unit>> Effects => effects;
         public uint MaxPossibleActionRadius { get; private set; }
 
         #region Properties
         public int Id => index;
+        public bool IsVisible => Node.IsVisible;
         public string UnitName => unitName;
 
         public int InitialPower
         {
             get => initialPower;
-            set
-            {
-                initialPower = Mathf.Max(value, 0);
-            }
+            set => initialPower = Mathf.Max(value, 0);
         }
 
         public int CurrentPower
@@ -85,7 +87,9 @@ namespace LineWars.Model
             get => currentPower;
             set
             {
+                var prevPower = currentPower;
                 currentPower = Mathf.Max(value, 0);
+                UnitPowerChanged?.Invoke(this, prevPower, currentPower);
             }
         }
         
@@ -106,6 +110,7 @@ namespace LineWars.Model
             {
                 var previousValue = currentActionPoints;
                 currentActionPoints = Mathf.Clamp(value, 0, MaxActionPoints);
+                UnitActionPointsChanged?.Invoke(this, previousValue, currentActionPoints);
                 ActionPointsChanged.Invoke(previousValue, currentActionPoints);
             }
         }
@@ -129,6 +134,7 @@ namespace LineWars.Model
                 currentHp = Mathf.Min(Mathf.Max(0, value), maxHp);
                 if(before == currentHp) return;
                 HpChanged.Invoke(before, currentHp);
+                UnitHPChanged?.Invoke(this, before, currentHp);
                 SfxManager.Instance.Play(before < currentHp ? dj.GetSound(HpHealedSounds) : dj.GetSound(HpDamagedSounds));
 
                 if (currentHp == 0)
@@ -152,9 +158,10 @@ namespace LineWars.Model
             set
             {
                 var before = currentArmor;
-                currentArmor = Mathf.Max(0, value);
+                currentArmor = Mathf.Clamp(currentArmor, 0, maxArmor);
                 if(before == currentArmor) return;
                 ArmorChanged.Invoke(before, currentArmor);
+                UnitArmorChanged?.Invoke(this, before, currentArmor);
             }
         }
 
@@ -187,14 +194,14 @@ namespace LineWars.Model
             {
                 if (value == null)
                     throw new ArgumentException();
+                var prevNode = myNode;
                 myNode = value;
+                UnitNodeChanged?.Invoke(this, prevNode, myNode);
             }
         }
 
         public CommandPriorityData CommandPriorityData => priorityData;
         public bool CanDoAnyAction => currentActionPoints > 0;
-
-        public UnitMovementLogic MovementLogic => movementLogic;
 
         public bool IsDied => CurrentHp <= 0;
 
@@ -209,15 +216,14 @@ namespace LineWars.Model
             currentActionPoints = maxActionPoints;
             currentPower = initialPower;
 
-            movementLogic = GetComponent<UnitMovementLogic>();
-
             InitialiseAllActions();
+            InitializeAllEffects();
             index = SingleGame.Instance.AllUnits.Add(this);
             void InitialiseAllActions()
             {
                 var serializeActions = gameObject.GetComponents<Component>()
                     .OfType<IMonoUnitAction<UnitAction<Node, Edge, Unit>>>()
-                    .OrderByDescending(x => x.Priority)
+                    .OrderByDescending(x => x.InitializePriority)
                     .ToArray();
 
                 monoActionsDictionary = new Dictionary<CommandType, IMonoUnitAction<UnitAction<Node, Edge, Unit>>>(serializeActions.Length);
@@ -239,6 +245,17 @@ namespace LineWars.Model
         {
             Node = node;
             UnitDirection = direction;
+        }
+
+
+
+        private void InitializeAllEffects()
+        {
+            foreach (var effectInit in effectInitializers)
+            {
+                var newEffect = effectInit.GetEffect(this);
+                AddEffect(newEffect);
+            }
         }
 
         public IEnumerable<IUnitAction<Node, Edge, Unit>> Actions => MonoActions;
@@ -298,11 +315,30 @@ namespace LineWars.Model
             
             foreach (var unitAction in MonoActions)
                 unitAction.OnReplenish();
+
+            UnitReplenished?.Invoke(this);
+        }
+        public void AddEffect(Effect<Node, Edge, Unit> effect)
+        {
+            if(effect.TargetUnit != this)
+            {
+                Debug.LogError("Adding effect with other owner!");
+                return;
+            }
+            effect.ExecuteOnEnter();
+            effects.Add(effect);
+        }
+
+        public void DeleteEffect(Effect<Node, Edge, Unit> effect)
+        {
+            effect.ExecuteOnExit();
+            effects.Remove(effect);
         }
 
         public T Accept<T>(IMonoExecutorVisitor<T> visitor)
         {
             return visitor.Visit(this);
         }
+
     }
 }

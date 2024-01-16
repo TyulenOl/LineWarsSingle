@@ -6,6 +6,8 @@ namespace LineWars.Model
         where TEdge : IEdge<TNode, TEdge> 
         where TNode : INode<TNode, TEdge>
     {
+        public int Id { get; }
+        
         TNode FirstNode { get; }
         TNode SecondNode { get; }
         

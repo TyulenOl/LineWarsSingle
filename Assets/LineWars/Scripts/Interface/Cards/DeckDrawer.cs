@@ -12,7 +12,6 @@ namespace LineWars
     public class DeckDrawer : MonoBehaviour
     {
         [SerializeField] private CardSlot[] slots;
-        [SerializeField] private Button SaveDeckButton;
         [SerializeField] private Button LoadDeckButton;
 
         public event Action DeckChanged;
@@ -23,8 +22,6 @@ namespace LineWars
 
         private void Awake()
         {
-            if(SaveDeckButton != null)
-                SaveDeckButton.onClick.AddListener(SaveDeck);
             if(LoadDeckButton != null)
                 LoadDeckButton.onClick.AddListener(LoadDeck);
             foreach (var slot in slots)
@@ -85,7 +82,12 @@ namespace LineWars
             }
             DeckChanged?.Invoke();
         }
-        
+
+        private void OnDisable()
+        {
+            SaveDeck();
+        }
+
         private Deck GetDeck()
         {
             return new Deck(0, "default", slots.Where(x => x.DeckCard != null).Select(x => x.DeckCard));

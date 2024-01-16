@@ -5,6 +5,8 @@ namespace LineWars.Model
     public interface IExecutorAction
     {
         public CommandType CommandType { get; }
+        public IExecutor Executor { get; }
+        
         public void OnReplenish();
         public int GetActionPointsCost();
         public event Action ActionCompleted;
@@ -15,6 +17,7 @@ namespace LineWars.Model
         IExecutorAction
         where TExecutor : IExecutor
     {
-        public TExecutor Executor { get; }
+        public new TExecutor Executor { get; }
+        IExecutor IExecutorAction.Executor => Executor;
     }
 }

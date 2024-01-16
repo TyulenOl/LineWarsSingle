@@ -129,7 +129,7 @@ namespace LineWars.Model
 
         private void ExecuteInstant(Unit unitTarget, Node nodeTarget)
         {
-            unitTarget.MovementLogic.MoveTo(nodeTarget.transform.position);
+            unitTarget.transform.position = nodeTarget.transform.position;
             Action.Execute(unitTarget, nodeTarget);
             Player.LocalPlayer.RecalculateVisibility();
             Complete();

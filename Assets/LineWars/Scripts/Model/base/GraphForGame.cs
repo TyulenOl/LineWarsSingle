@@ -12,6 +12,11 @@ namespace LineWars.Model
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
+
+        public GraphForGame():base()
+        {
+            
+        }
         public GraphForGame(IEnumerable<TNode> nodes, IEnumerable<TEdge> edges) : base(nodes, edges)
         {
         }
@@ -34,33 +39,6 @@ namespace LineWars.Model
                 .Where(x => !startNodes.ContainsKey(x))
                 .ToDictionary(x => x, x => x.ValueOfHidden);
             return MultiStartsLimitedBfs(startNodes, hiddenNodes);
-
-
-            // var startNodes = ownedNodes.ToArray();
-            // if (startNodes.Length == 0) throw new ArgumentException();
-            // if (startNodes.Any(x => !Nodes.Contains(x))) throw new InvalidOperationException();
-            //
-            // var closedNodes = new HashSet<TNode>();
-            // var priorityQueue = new PriorityQueue<TNode, int>(0);
-            // foreach (var ownedNode in startNodes)
-            //     priorityQueue.Enqueue(ownedNode, -ownedNode.Visibility);
-            //
-            // while (priorityQueue.Count != 0)
-            // {
-            //     var (node, currentVisibility) = priorityQueue.Dequeue();
-            //     if (closedNodes.Contains(node)) continue;
-            //
-            //     closedNodes.Add(node);
-            //     yield return node;
-            //     if (currentVisibility == 0) continue;
-            //     foreach (var neighbor in node.GetNeighbors())
-            //     {
-            //         if (closedNodes.Contains(neighbor)) continue;
-            //         var nextVisibility = currentVisibility + 1 + neighbor.ValueOfHidden;
-            //         if (nextVisibility > 0) continue;
-            //         priorityQueue.Enqueue(neighbor, nextVisibility);
-            //     }
-            // }
         }
     }
 }

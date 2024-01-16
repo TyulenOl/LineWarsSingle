@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 public class UnitsInfoPanel : MonoBehaviour
 {
-    [SerializeField] private UnitBuyPresetInfoDrawer PresetInfoDrawerPrefab;
+    [SerializeField] private UnitInfoDrawer PresetInfoDrawerPrefab;
     [SerializeField] private LayoutGroup presetsDrawingLayoutGroup;
 
     private void Awake()
@@ -15,7 +15,7 @@ public class UnitsInfoPanel : MonoBehaviour
         foreach (var unit in Player.LocalPlayer.Nation.UnitTypeUnitPairs.Values)
         {
             var instance = Instantiate(PresetInfoDrawerPrefab, presetsDrawingLayoutGroup.transform).gameObject;
-            instance.GetComponent<UnitBuyPresetInfoDrawer>().Init(unit);
+            instance.GetComponent<UnitInfoDrawer>().Init(unit);
         }
     }
 }

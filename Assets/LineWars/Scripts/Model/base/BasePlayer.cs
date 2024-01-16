@@ -14,29 +14,29 @@ namespace LineWars.Model
     /// </summary>
     public abstract class BasePlayer : MonoBehaviour, IActor, IBasePlayer
     {
-        [field: SerializeField, ReadOnlyInspector] public int Id { get; private set; }
+        [field: SerializeField] public int Id { get; private set; } = -1;
 
-        [SerializeField, ReadOnlyInspector] private int money;
-
-        /// <summary>
-        /// Для оптимизации income всегда хешируется
-        /// </summary>
-        [SerializeField, ReadOnlyInspector] private int income;
-
+        [field: Header("Settings")]
         [field: SerializeField] public PhaseExecutorsData PhaseExecutorsData { get; private set; }
-        public List<Node> InitialSpawns { get; private set; }
 
-        [field: SerializeField, ReadOnlyInspector] public Node Base { get; private set; }
+        [field: SerializeField] public PlayerRules Rules { get; private set; }
+        [field: SerializeField] public Nation Nation { get; private set; }
 
-        [field: SerializeField, ReadOnlyInspector] public PlayerRules Rules { get; private set; }
+        [SerializeField, ReadOnlyInspector] private int currentMoney;
+        [SerializeField, ReadOnlyInspector] private int currentIncome;
 
-        public Nation Nation { get; private set; }
-
-        public HashSet<PhaseType> PhaseExceptions { get; set; }
+        [field: SerializeField] public List<Node> InitialSpawns { get; set; }
+        [field: SerializeField] public List<Node> InitialNodes { get; set; }
+        public IEnumerable<Node> AllInitialNodes => InitialSpawns.Concat(InitialNodes);
+        
+        
+        public Node Base { get; private set; }
+        public HashSet<PhaseType> PhaseExceptions { get; private set; }
 
         private readonly HashSet<Owned> myOwned = new();
-        private readonly List<Node> nodes = new();
-        private readonly List<Unit> units = new();
+        private readonly HashSet<Node> nodes = new();
+
+        private readonly HashSet<Unit> units = new();
 
         public IEnumerable<Node> MyNodes => nodes;
         public IEnumerable<Unit> MyUnits => units;
@@ -53,25 +53,25 @@ namespace LineWars.Model
 
         public int CurrentMoney
         {
-            get => money;
+            get => currentMoney;
             set
             {
-                var before = money;
-                money = Math.Max(0, value);
+                var before = currentMoney;
+                currentMoney = Math.Max(0, value);
 
-                if (before != money)
-                    CurrentMoneyChanged?.Invoke(before, money);
+                if (before != currentMoney)
+                    CurrentMoneyChanged?.Invoke(before, currentMoney);
             }
         }
 
         public int Income
         {
-            get => income;
+            get => currentIncome;
             set
             {
-                var before = income;
-                income = value;
-                IncomeChanged?.Invoke(before, income);
+                var before = currentIncome;
+                currentIncome = value;
+                IncomeChanged?.Invoke(before, currentIncome);
             }
         }
 
@@ -82,7 +82,6 @@ namespace LineWars.Model
 
         protected virtual void Start()
         {
-            PhaseManager.Instance.RegisterActor(this);
         }
 
         protected virtual void OnEnable()
@@ -93,19 +92,26 @@ namespace LineWars.Model
         {
         }
 
-        public virtual void Initialize(SpawnInfo spawnInfo)
+        public void Initialize(int id)
         {
-            Id = spawnInfo.PlayerIndex;
-            Base = spawnInfo.SpawnNode.Node;
-            Rules = spawnInfo.SpawnNode.Rules;
+            Id = id;
+            Base = InitialSpawns.First();
 
             CurrentMoney = Rules.StartMoney;
             Income = Rules.DefaultIncome;
-            Nation = spawnInfo.SpawnNode.Nation;
 
-            name = $"{GetType().Name}{spawnInfo.PlayerIndex} {spawnInfo.SpawnNode.name}";
+            name = $"{GetType().Name}{id}";
+            
+            var initialSpawnsSet = InitialSpawns.ToHashSet();
+            InitialNodes = InitialNodes
+                .Where(x => !initialSpawnsSet.Contains(x))
+                .ToList();
+            
+            OnInitialized();
+        }
 
-            InitialSpawns = spawnInfo.SpawnNode.InitialSpawns;
+        protected virtual void OnInitialized()
+        {
         }
 
         #region SpawnUnit
@@ -140,8 +146,9 @@ namespace LineWars.Model
         }
 
         #endregion
-        
+
         #region BuyDeckCard
+
         public bool CanBuyDeckCard(DeckCard deckCard)
         {
             return MyNodes.Any(node => CanBuyDeckCard(node, deckCard));
@@ -158,13 +165,14 @@ namespace LineWars.Model
             CurrentMoney -= GetDeckCardPurchaseInfo(deckCard);
             SpawnUnit(node, deckCard.Unit);
         }
+
         #endregion
 
         public bool CanAfford(PurchaseInfo purchaseInfo)
         {
             return purchaseInfo.CanBuy && CurrentMoney - purchaseInfo.Cost >= 0;
         }
-        
+
         public void AddOwned([NotNull] Owned owned)
         {
             if (owned == null) throw new ArgumentNullException(nameof(owned));
@@ -173,6 +181,9 @@ namespace LineWars.Model
             {
                 throw new InvalidOperationException();
             }
+
+            if (myOwned.Contains(owned))
+                throw new InvalidOperationException();
 
             switch (owned)
             {
@@ -272,7 +283,7 @@ namespace LineWars.Model
         {
             return MyUnits.Count(x => x.Type == type);
         }
-        
+
         public PurchaseInfo GetDeckCardPurchaseInfo(DeckCard deckCard)
         {
             return GetPurchaseInfoForUnit(deckCard.Unit.Type, deckCard.Cost);
@@ -284,6 +295,32 @@ namespace LineWars.Model
                 unitType,
                 cost,
                 GetCountUnitByType(unitType));
+        }
+
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            if (EditorExtensions.CanRedraw(gameObject))
+            {
+                UnityEditor.EditorApplication.delayCall += RedrawAllPlayers;
+            }
+        }
+#endif
+        public static void RedrawAllPlayers()
+        {
+            foreach (var node in FindObjectsOfType<Node>())
+                node.DrawToDefault();
+
+            foreach (var player in FindObjectsOfType<BasePlayer>())
+            {
+                if (player.Nation == null)
+                    continue;
+                foreach (var spawn in player.InitialSpawns.Where(x => x != null))
+                    spawn.Redraw(true, player.Nation.Name, player.Nation.NodeSprite);
+                foreach (var node in player.InitialNodes.Where(x => x != null))
+                    node.Redraw(false, player.Nation.Name, player.Nation.NodeSprite);
+            }
         }
     }
 }

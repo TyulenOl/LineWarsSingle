@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using LineWars.LootBoxes;
+using UnityEngine;
 
 namespace LineWars.Model
 {
@@ -9,10 +10,15 @@ namespace LineWars.Model
         [SerializeField] private Optional<string> cardName;
         [SerializeField] private Optional<string> description;
         [SerializeField] private Optional<Sprite> cardImage;
+
+        [SerializeField] private Sprite cardActiveBagLine;
+        [SerializeField] private Sprite cardInactiveBagLine;
+        
         [SerializeField] private CardRarity cardRarity;
         [SerializeField] private Unit unit;
+        [SerializeField] private CostType shopCostType;
         [SerializeField] private int cost; 
-
+        [SerializeField] private int shopCost;
         
         public string Name => cardName.Enabled ? cardName.Value : Unit.UnitName;
         public string Description => description.Enabled ? description.Value : Unit.UnitDescription;
@@ -20,5 +26,11 @@ namespace LineWars.Model
         public Unit Unit => unit;
         public CardRarity Rarity => cardRarity;
         public int Cost => cost;
+        public int ShopCost => shopCost;
+        public CostType ShopCostType => shopCostType;
+
+        public Sprite CardActiveBagLine => cardActiveBagLine;
+
+        public Sprite CardInactiveBagLine => cardInactiveBagLine;
     }
 }

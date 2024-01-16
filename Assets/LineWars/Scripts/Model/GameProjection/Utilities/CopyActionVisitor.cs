@@ -124,6 +124,12 @@ namespace LineWars.Model
             Result = new UpArmorAction<TNode, TEdge, TUnit>(Unit);
             Result.ActionModifier = action.ActionModifier;
         }
+
+        public void Visit(PowerBasedHealAction<TNode, TEdge, TUnit> action)
+        {
+            Result = new PowerBasedHealAction<TNode, TEdge, TUnit>(Unit);
+            Result.ActionModifier = action.ActionModifier;
+        }
     }
 
     public static class CopyActionVisitor

@@ -18,7 +18,7 @@ public static class DrawHelper
             case CharacteristicType.Hp:
                 return Resources.Load<Sprite>("UI/Sorokin/Icons/Heal");
             case CharacteristicType.ActionPoints:
-                return Resources.Load<Sprite>("UI/Sorokin/Icons/Move");
+                return Resources.Load<Sprite>("UI/Sorokin/Icons/AP");
             default: return Resources.Load<Sprite>("UI/Sorokin/Icons/Heal");
         }
     }

@@ -4,110 +4,69 @@ using UnityEngine;
 using UnityEngine.UI;
 using LineWars;
 
-public class UnitPartDrawer : MonoBehaviour
+namespace LineWars.Interface
 {
-    [SerializeField] private CharacteristicDrawer CharacteristicDrawerPrefab;
-    [SerializeField] private LayoutGroup CharacteristicsLayoutGroup;
-    [SerializeField] private TMP_Text UnitName;
-    [SerializeField] private SpriteRenderer ifInactivePanel;
-    [SerializeField] private SpriteRenderer ifAvailablePanel;
-    [SerializeField] private SpriteRenderer unitIsExecutorImage;
-    [SerializeField] private SpriteRenderer canBlockSprite;
-    [field: SerializeField] public SpriteRenderer targetSprite { get; private set; }
-
-    private CharacteristicDrawer MeleeAttackDrawer;
-    private CharacteristicDrawer FarAttackDrawer;
-    private CharacteristicDrawer ArmorDrawer;
-    private CharacteristicDrawer HPDrawer;
-    private CharacteristicDrawer ActionPointsDrawer;
-
-    private Unit currentUnit;
-
-    public Unit CurrentUnit
+    public class UnitPartDrawer : MonoBehaviour
     {
-        get => currentUnit;
-        set
+        [SerializeField] private TMP_Text UnitName;
+        [SerializeField] private SpriteRenderer ifInactivePanel;
+        [SerializeField] private SpriteRenderer ifAvailablePanel;
+        [SerializeField] private SpriteRenderer unitIsExecutorImage;
+        [SerializeField] private SpriteRenderer canBlockSprite;
+        [field: SerializeField] public SpriteRenderer targetSprite { get; private set; }
+
+        [SerializeField] private ProgressBarV2 healthProgressBar;
+        [SerializeField] private ProgressBarV2 armorProgressBar;
+
+        private Unit currentUnit;
+
+        public Unit CurrentUnit
         {
-            currentUnit = value;
-            Init(currentUnit);
-        }
-    }
-
-    private void Init(Unit unitToInit)
-    {
-        var hpSprite = DrawHelper.GetSpriteByCharacteristicType(CharacteristicType.Hp);
-        var armorSprite = DrawHelper.GetSpriteByCharacteristicType(CharacteristicType.Armor);
-        var attackSprite = DrawHelper.GetSpriteByCharacteristicType(CharacteristicType.MeleeAttack);
-        var actionPointsSprite = DrawHelper.GetSpriteByCharacteristicType(CharacteristicType.ActionPoints);
-
-        MeleeAttackDrawer = Instantiate(CharacteristicDrawerPrefab.gameObject, CharacteristicsLayoutGroup.transform)
-            .GetComponent<CharacteristicDrawer>();
-        MeleeAttackDrawer.Init(attackSprite, unitToInit.CurrentPower.ToString());
-
-        ArmorDrawer = Instantiate(CharacteristicDrawerPrefab.gameObject, CharacteristicsLayoutGroup.transform)
-            .GetComponent<CharacteristicDrawer>();
-        ArmorDrawer.Init(armorSprite, unitToInit.ArmorChanged.ToString());
-
-        HPDrawer = Instantiate(CharacteristicDrawerPrefab.gameObject, CharacteristicsLayoutGroup.transform)
-            .GetComponent<CharacteristicDrawer>();
-        HPDrawer.Init(hpSprite, unitToInit.CurrentHp.ToString());
-
-        ActionPointsDrawer = Instantiate(CharacteristicDrawerPrefab.gameObject, CharacteristicsLayoutGroup.transform)
-            .GetComponent<CharacteristicDrawer>();
-        ActionPointsDrawer.Init(actionPointsSprite, unitToInit.CurrentActionPoints.ToString());
-
-        UnitName.text = unitToInit.UnitName;
-    }
-
-    public void SetUnitAsExecutor(bool isExecutor)
-    {
-        unitIsExecutorImage.gameObject.SetActive(isExecutor);
-    }
-
-    public void ReDrawAvailability(bool available)
-    {
-        ifAvailablePanel.gameObject.SetActive(available);
-    }
-
-    public void ReDrawActivity(bool isActive)
-    {
-        ifInactivePanel.gameObject.SetActive(!isActive);
-        if (!isActive)
-        {
-            SetUnitAsExecutor(false);
-        }
-    }
-
-    public void ReDrawCanBlock(bool canBlock)
-    {
-        canBlockSprite.gameObject.SetActive(canBlock);
-    }
-
-    public void ReDrawCharacteristics()
-    {
-        if (MeleeAttackDrawer != null)
-        {
-            MeleeAttackDrawer.ReDraw(currentUnit.CurrentPower.ToString());
+            get => currentUnit;
+            set
+            {
+                currentUnit = value;
+                Init(currentUnit);
+            }
         }
 
-        //TODO Добавить проверку на то, что юнит стреляющий. Если он стреляющий - выводить дальнюю атаку
-        // if( FarAttackDrawer != null)
-        // {
-        //     FarAttackDrawer.ReDraw(currentUnit.MeleeDamage.ToString());
-        // }
-        if (ArmorDrawer != null)
+        private void Init(Unit unitToInit)
         {
-            ArmorDrawer.ReDraw(currentUnit.CurrentArmor.ToString());
+            UnitName.text = unitToInit.UnitName;
+            healthProgressBar.SetMaxValue(unitToInit.MaxHp);
+            armorProgressBar.SetMaxValue(unitToInit.MaxArmor);
+            healthProgressBar.SetValue(unitToInit.CurrentHp);
+            armorProgressBar.SetValue(unitToInit.CurrentArmor);
         }
 
-        if (HPDrawer != null)
+        public void SetUnitAsExecutor(bool isExecutor)
         {
-            HPDrawer.ReDraw(currentUnit.CurrentHp.ToString());
+            unitIsExecutorImage.gameObject.SetActive(isExecutor);
         }
 
-        if (ActionPointsDrawer != null)
+        public void ReDrawAvailability(bool available)
         {
-            ActionPointsDrawer.ReDraw(currentUnit.CurrentActionPoints.ToString());
+            ifAvailablePanel.gameObject.SetActive(available);
+        }
+
+        public void ReDrawActivity(bool isActive)
+        {
+            ifInactivePanel.gameObject.SetActive(!isActive);
+            if (!isActive)
+            {
+                SetUnitAsExecutor(false);
+            }
+        }
+
+        public void ReDrawCanBlock(bool canBlock)
+        {
+            canBlockSprite.gameObject.SetActive(canBlock);
+        }
+
+        public void ReDrawCharacteristics()
+        {
+            healthProgressBar.SetValue(currentUnit.CurrentHp);
+            armorProgressBar.SetValue(currentUnit.CurrentArmor);
         }
     }
 }

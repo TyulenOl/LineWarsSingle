@@ -9,19 +9,22 @@ namespace LineWars.Model
     {
         public T Executor { get; }
         public IntModifier ActionModifier { get; set; }
-        public event Action ActionCompleted;
         public abstract CommandType CommandType { get; }
+        public event Action ActionCompleted;
 
-        protected ExecutorAction(T executor)
+        protected ExecutorAction([NotNull] T executor)
         {
-            Executor = executor;
+            Executor = executor ?? throw new ArgumentNullException(nameof(executor));
         }
 
         public virtual void OnReplenish()
         {
         }
 
-        protected void Complete() => ActionCompleted?.Invoke();
+        protected void Complete()
+        {
+            ActionCompleted?.Invoke();
+        }
 
         protected void CompleteAndAutoModify()
         {

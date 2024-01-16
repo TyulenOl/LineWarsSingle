@@ -1,19 +1,32 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using LineWars.Interface;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
 namespace LineWars.Controllers
 {
     public class CameraController : MonoBehaviour
     {
-        [SerializeField] private float speedDampening = 15;
+        public static CameraController Instance;
+
+        [Header("Move to a point options")] 
+        [SerializeField] private float timeToMove = 1f;
+        [SerializeField] private float minHeightOnMove = 7f;
+
+        [Header("Drag options")] 
+        [SerializeField] private float speedDampening = 15f;
+
+        [Header("Zoom options")] 
         [SerializeField] private float zoomDampening = 6f;
         [SerializeField] private float zoomStepSize = 2f;
         [SerializeField] private float minHeight = 3f;
 
-        [Header("Paddings")] [SerializeField] private float paddingsTop;
+        [Header("Paddings")] 
+        [SerializeField] private float paddingsTop;
         [SerializeField] private float paddingsRight;
         [SerializeField] private float paddingsBottom;
         [SerializeField] private float paddingsLeft;
@@ -27,13 +40,25 @@ namespace LineWars.Controllers
         private Vector2 pivotPoint;
         private Vector3 lastPosition;
         private bool isDragging;
-        private float zoomValue;
+        private bool isMoving;
 
         private Vector2 mapPointMin;
         private Vector2 mapPointMax;
 
+        private float zoomValue;
+
         private void Awake()
         {
+            if (Instance == null)
+            {
+                Instance = this;
+            }
+            else
+            {
+                Debug.LogError($"Больше чем два {nameof(CameraController)} на сцене");
+                Destroy(gameObject);
+            }
+
             mainCamera = Camera.main;
             if (mainCamera != null)
                 cameraTransform = mainCamera.GetComponent<Transform>();
@@ -85,6 +110,41 @@ namespace LineWars.Controllers
             UpdateVelocity();
         }
 
+        public void MoveTo(Vector2 point)
+        {
+            StopAllCoroutines();
+            StartCoroutine(MoveToPoint(new Vector3(point.x, point.y, cameraTransform.position.z)));
+        }
+
+        private IEnumerator MoveToPoint(Vector3 targetPoint)
+        {
+            var startPoint = cameraTransform.position;
+            float completionPercentage = 0;
+
+            var halfCameraSize = GetCameraSize() / 2;
+            var aspect = mainCamera.aspect;
+
+            var leftBottomCorner = (Vector2)targetPoint - mapPointMin;
+            var rightTopCorner = mapPointMax - leftBottomCorner;
+
+            var minDistanceToBorder = Mathf.Min(leftBottomCorner.x / aspect, rightTopCorner.x / aspect,
+                leftBottomCorner.y, rightTopCorner.y);
+
+            var coefficient = 1 / (halfCameraSize.y / minDistanceToBorder);
+            var newOrthographicSize = halfCameraSize.y * coefficient;
+
+            if (newOrthographicSize < zoomValue)
+                zoomValue = Mathf.Clamp(newOrthographicSize, minHeightOnMove, mainCamera.orthographicSize);
+
+            while (completionPercentage < 1 && !isDragging)
+            {
+                completionPercentage += Time.deltaTime / timeToMove;
+                var easeOutQuart = 1 - Mathf.Pow(1 - completionPercentage, 4);
+                cameraTransform.position = ClampCameraPosition(Vector3.Lerp(startPoint, targetPoint, easeOutQuart));
+                yield return null;
+            }
+        }
+
         private bool PointerIsOverUI()
         {
             var results = new List<RaycastResult>();
@@ -126,19 +186,11 @@ namespace LineWars.Controllers
             }
         }
 
-        private void UpdateOrthographicSize()
-        {
-            mainCamera.orthographicSize = Mathf.Lerp(mainCamera.orthographicSize, zoomValue,
-                zoomDampening * Time.deltaTime);
-            cameraTransform.position = ClampCameraPosition(cameraTransform.position);
-        }
-
         private void MouseZoom()
         {
             var inputValue = Input.mouseScrollDelta.y;
             if (Mathf.Abs(inputValue) > 0f)
-                zoomValue = Mathf.Clamp(mainCamera.orthographicSize - (inputValue * zoomStepSize), minHeight,
-                    maxHeight);
+                zoomValue = mainCamera.orthographicSize - inputValue * zoomStepSize;
         }
 
         private void TouchZoom()
@@ -153,27 +205,43 @@ namespace LineWars.Controllers
 
                 var difference = currentMagnitude - previousMagnitude;
 
-                zoomValue = Mathf.Clamp(mainCamera.orthographicSize - (difference * 0.1f), minHeight, maxHeight);
+                zoomValue = mainCamera.orthographicSize - difference * 0.1f;
             }
+        }
+
+        private void UpdateOrthographicSize()
+        {
+            zoomValue = Mathf.Clamp(zoomValue, minHeight, maxHeight);
+
+            if (Mathf.Abs(zoomValue - mainCamera.orthographicSize) < 0.01)
+                return;
+
+            mainCamera.orthographicSize = Mathf.Lerp(mainCamera.orthographicSize, zoomValue,
+                zoomDampening * Time.deltaTime);
+            cameraTransform.position = ClampCameraPosition(cameraTransform.position);
         }
 
         private Vector3 ClampCameraPosition(Vector3 position)
         {
-            var camHalfHeight = mainCamera.orthographicSize;
-            float camHalfWidth = mainCamera.aspect * camHalfHeight;
-
             var maxPaddingCorner = new Vector2(FromScreenToWorld(paddingsRight), FromScreenToWorld(paddingsTop)) *
                                    canvas.scaleFactor;
             var minPaddingCorner = new Vector2(FromScreenToWorld(paddingsLeft), FromScreenToWorld(paddingsBottom)) *
                                    canvas.scaleFactor;
 
-            var halfSizeCamera = new Vector2(camHalfWidth, camHalfHeight);
-            var maxLimitPoint = mapPointMax - halfSizeCamera + maxPaddingCorner;
-            var minLimitPoint = mapPointMin + halfSizeCamera - minPaddingCorner;
+            var halfCameraSize = GetCameraSize() / 2;
+            var maxLimitPoint = mapPointMax - halfCameraSize + maxPaddingCorner;
+            var minLimitPoint = mapPointMin + halfCameraSize - minPaddingCorner;
 
             return new Vector3(Mathf.Clamp(position.x, minLimitPoint.x, maxLimitPoint.x),
                 Mathf.Clamp(position.y, minLimitPoint.y, maxLimitPoint.y),
                 cameraTransform.position.z);
+        }
+
+        private Vector2 GetCameraSize()
+        {
+            var height = mainCamera.orthographicSize * 2;
+            var width = height * mainCamera.aspect;
+            return new Vector2(width, height);
         }
 
         private float FromScreenToWorld(float value)

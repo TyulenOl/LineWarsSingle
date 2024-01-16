@@ -172,6 +172,58 @@ namespace LineWars.Controllers
             return stateMachine.CurrentState == findTargetState && Executor.CanDoAnyAction;
         }
 
+        public bool CanSetExecutor()
+        {
+            return ActiveSelf &&
+                   (stateMachine.CurrentState == findExecutorState || stateMachine.CurrentState == findTargetState) &&
+                   (!HaveConstrains || Constrains.CanCancelExecutor) &&
+                   canCancelExecutor;
+        }
+        
+
+        public void SetExecutor(IMonoExecutor executor)
+        {
+            if (executor == null)
+                throw new ArgumentNullException(nameof(executor));
+            
+            if (!ActiveSelf)
+            {
+                ActiveSelfLog(nameof(SetExecutor));
+                return;
+            }
+
+            if (stateMachine.CurrentState != findExecutorState && stateMachine.CurrentState != findTargetState)
+            {
+                InvalidStateLog(nameof(SetExecutor));
+                return;
+            }
+
+            if (stateMachine.CurrentState == findTargetState && HaveConstrains && !Constrains.CanCancelExecutor)
+            {
+                ConstrainsLog(nameof(SetExecutor));
+                return;
+            }
+
+            if (!canCancelExecutor)
+            {
+                Debug.LogError("You cannot change the executor");
+                return;
+            }
+
+            if (stateMachine.CurrentState == findExecutorState)
+            {
+                Executor = executor;
+                stateMachine.SetState(findTargetState);
+                return;
+            }
+            
+            Executor = executor;
+            SendFightRedrawMessage(
+                Array.Empty<IMonoTarget>(), 
+                action => !hiddenCommandsSet.Contains(action.CommandType)
+            );
+        }
+
         public void ExecuteSimpleCommand(IActionCommand command)
         {
             if (!ActiveSelf)
@@ -236,7 +288,7 @@ namespace LineWars.Controllers
         IEnumerator DelayActionCoroutine()
         {
             yield return new WaitForSeconds(maxActionDelayInSeconds);
-            Debug.LogWarning($"The action didn't stop after {maxActionDelayInSeconds} seconds!");
+            Debug.LogError($"The action didn't stop after {maxActionDelayInSeconds} seconds!");
             OnActionCompleted();
         }
 

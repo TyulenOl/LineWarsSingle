@@ -1,23 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Linq;
 
 namespace LineWars.Model
 {
-    public class NodeProjection
-        : OwnedProjection, INodeForGame<NodeProjection, EdgeProjection, UnitProjection>, 
+    public class NodeProjection : OwnedProjection,
+        INodeForGame<NodeProjection, EdgeProjection, UnitProjection>, 
         IReadOnlyNodeProjection, INumbered
     {
         private UnitProjection leftUnit;
         private UnitProjection rightUnit;
 
+        public int Id { get; set; }
         public int Score { get; set; }
         public Node Original { get; set; } 
         public CommandPriorityData CommandPriorityData { get; set; }
         public List<EdgeProjection> EdgesList { get; set; }
         public bool IsBase { get; set; }
-        public int Id { get; set; }
         public int Visibility { get; set; }
         public int ValueOfHidden { get; set; }
         public List<int> BannedOwnerId { get; set; }
@@ -27,8 +26,12 @@ namespace LineWars.Model
             get => leftUnit;
             set
             { 
+                var prevUnit = leftUnit;
                 leftUnit = value;
-                UnitAdded?.Invoke(value);          
+                if(prevUnit != null)
+                    UnitLeft?.Invoke(this, prevUnit);
+                if (value != null)
+                    UnitAdded?.Invoke(this, value);
             } 
         }
         public UnitProjection RightUnit
@@ -36,8 +39,12 @@ namespace LineWars.Model
             get => rightUnit;
             set
             {
+                var prevUnit = rightUnit;
                 rightUnit = value;
-                UnitAdded?.Invoke(value);
+                if(prevUnit != null)
+                    UnitLeft?.Invoke(this, prevUnit);
+                if(value != null)
+                    UnitAdded?.Invoke(this, value);
             }
         }
 
@@ -48,8 +55,9 @@ namespace LineWars.Model
             .Where(x => x != null)
             .Distinct();
 
-        public Action<UnitProjection> UnitAdded;
-        
+        public event Action<NodeProjection, UnitProjection> UnitLeft;
+        public event Action<NodeProjection, UnitProjection> UnitAdded;
+
         public void AddEdge(EdgeProjection edge)
         {
             if (edge.FirstNode != this && edge.SecondNode != this)

@@ -5,6 +5,7 @@ using LineWars.Controllers;
 using LineWars.Model;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -23,14 +24,37 @@ namespace LineWars
 
         [SerializeField] private Image cardImage;
         [SerializeField] private Image ifInactivePanel;
+        [SerializeField] private Image borderImage;
         [SerializeField] private CardDragablePart cardDragablePartPrefab;
+        
 
         protected bool isActive;
+
+        public bool IsActive
+        {
+            get => isActive;
+
+            set
+            {
+                isActive = value;
+            }
+        }
         
         [field: SerializeField] public Button InfoButton { get; private set; }
 
         public DeckCard DeckCard { get; private set; }
 
+        protected UnityAction onInfoButtonClickAction;
+
+        public UnityAction OnInfoButtonClickAction
+        {
+            get => onInfoButtonClickAction;
+            set
+            {
+                onInfoButtonClickAction = value;
+                InfoButton.onClick.AddListener(value);
+            }
+        }
 
         public void ReStoreDefaults()
         {
@@ -68,7 +92,7 @@ namespace LineWars
 
         public void OnBeginDrag(PointerEventData eventData)
         {
-            if(cardDragablePartPrefab == null || !isActive)
+            if(cardDragablePartPrefab == null || !IsActive)
                 return;
             var instance = Instantiate(cardDragablePartPrefab, transform);
             instance.transform.localPosition = Vector3.zero;
@@ -78,13 +102,15 @@ namespace LineWars
 
         public void OnDrag(PointerEventData eventData)
         {
-            if(!isActive) return;
+            if(!IsActive) return;
         }
 
         public void ReDrawAvailability(bool available)
         {
-            isActive = available;
-            ifInactivePanel.gameObject.SetActive(!available);   
+            IsActive = available;
+            borderImage.sprite = available ? DeckCard.CardActiveBagLine : DeckCard.CardInactiveBagLine;   
+            if(ifInactivePanel != null)
+                ifInactivePanel.gameObject.SetActive(!available);
         }
     }
 }

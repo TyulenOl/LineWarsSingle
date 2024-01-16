@@ -13,6 +13,7 @@ namespace LineWars
         private CanvasGroup canvasGroup;
         
         [SerializeField] private RectTransform rectTransformToGenerateCard;
+        public event Action<CardDragablePart> StartDragging;
 
         private void Awake()
         {
@@ -20,28 +21,33 @@ namespace LineWars
             canvasGroup = GetComponent<CanvasGroup>();
         }
 
-        public void OnDrag(PointerEventData eventData)
+        public new void OnDrag(PointerEventData eventData)
         {
-            if(!isActive) return;
+            if(!IsActive) return;
             rectTransform.anchoredPosition += eventData.delta / MainCanvas.Instance.Canvas.scaleFactor;
         }
 
         public void OnEndDrag(PointerEventData eventData)
         {
-            if(!isActive) return;
+            if(!IsActive) return;
             Destroy(gameObject);
             canvasGroup.blocksRaycasts = true;
         }
         
-        public void OnBeginDrag(PointerEventData eventData)
+        public new void OnBeginDrag(PointerEventData eventData)
         {
-            if(!isActive)
+            if(!IsActive)
                 return;
             var instance = Instantiate(this, rectTransformToGenerateCard);
             instance.transform.localPosition = Vector3.zero;
             instance.ReDraw(DeckCard);
+            instance.rectTransformToGenerateCard = rectTransformToGenerateCard;
+            instance.canvasGroup.blocksRaycasts = true;
+            instance.isActive = true;
+            instance.InfoButton.onClick.AddListener(onInfoButtonClickAction);
             transform.SetParent(MainCanvas.Instance.Canvas.transform);
             canvasGroup.blocksRaycasts = false;
+            StartDragging?.Invoke(instance);
         }
     }
 }
