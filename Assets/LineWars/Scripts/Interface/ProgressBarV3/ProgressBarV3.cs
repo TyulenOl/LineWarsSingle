@@ -11,8 +11,6 @@ public class ProgressBarV3 : MonoBehaviour
 
     [SerializeField] private GameObject prefabElement;
 
-    [SerializeField] private int maxHp;
-
     [SerializeField] private RectTransform areaElements;
 
     [SerializeField] private int hpCount;
@@ -35,17 +33,9 @@ public class ProgressBarV3 : MonoBehaviour
 
     public void SetBar(int countHp, int countArmor) => SetValue(countHp, countArmor, Segment.All);
 
-    
-
-    private void Awake()
-    {
-        CreateNewElement(maxHp);
-        SetBar(hpCount, armorCount);
-    }
-
     void SetValue(int valueHp, int valueArmor, Segment typeChange)
     {
-        if (valueHp >= 0 || valueArmor >= 0)
+        if ((valueHp >= 0 || valueArmor >= 0) && gameObject.active)
         {
             int changeValue = typeChange == Segment.Hp ? valueHp : typeChange == Segment.Armor ? valueArmor : valueHp + valueArmor;
             int currentValue = typeChange == Segment.Hp ? hpCount : typeChange == Segment.Armor ? armorCount : hpCount + armorCount;
@@ -63,7 +53,7 @@ public class ProgressBarV3 : MonoBehaviour
 
             if (valueHp + valueArmor > elements.Count)
                 CreateNewElement(valueHp + valueArmor - elements.Count);
-
+            StopAllCoroutines();
             StartCoroutine(ChangeValue(startInterval, endInterval, finalWidth, valueHp, valueArmor, difference > 0));
         }
     }
