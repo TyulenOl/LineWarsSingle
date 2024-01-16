@@ -7,7 +7,7 @@ using LineWars.Model;
 using UnityEngine;
 using LineWars.Controllers;
 
-namespace LineWars
+namespace LineWars.Model
 {
     public class Player : BasePlayer
     {

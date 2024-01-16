@@ -19,9 +19,9 @@ namespace LineWars
             return capturePoints.Remove(node);
         }
 
-        public override void Initialize(Player me, IEnumerable<BasePlayer> enemies)
+        public override void Initialize(Player player, IEnumerable<BasePlayer> enemies)
         {
-            base.Initialize(me, enemies);
+            base.Initialize(player, enemies);
 
             if(capturePoints.Count <= 0)
             {

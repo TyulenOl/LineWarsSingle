@@ -224,7 +224,7 @@ namespace LineWars.Model
 
             InitialiseAllActions();
             InitializeAllEffects();
-            index = SingleGame.Instance.AllUnits.Add(this);
+            index = SingleGameRoot.Instance.AllUnits.Add(this);
             void InitialiseAllActions()
             {
                 var serializeActions = gameObject.GetComponents<Component>()
@@ -293,7 +293,7 @@ namespace LineWars.Model
             }
 
             Owner.RemoveOwned(this);
-            SingleGame.Instance.AllUnits.Remove(this);
+            SingleGameRoot.Instance.AllUnits.Remove(this);
             if(!TryGetComponent(out AnimationResponses responses) || responses.CurrentDeathAnimation == null) 
                 Destroy(gameObject);
             else

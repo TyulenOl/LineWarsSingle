@@ -33,7 +33,7 @@ namespace LineWars.Model
                 newNode.Score = 1;
 
             newNode.BannedOwnerId = new List<int>();
-            foreach(var owner in SingleGame.Instance.AllPlayers)
+            foreach(var owner in SingleGameRoot.Instance.AllPlayers)
             {
                 var ownerId = owner.Value.Id;
                 if(!original.CanOwnerMove(ownerId)) 

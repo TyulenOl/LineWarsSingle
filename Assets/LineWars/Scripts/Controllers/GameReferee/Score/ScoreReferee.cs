@@ -20,12 +20,12 @@ namespace LineWars
             set => scoreForWin = Mathf.Max(0, value);
         }
 
-        public override void Initialize(Player me, IEnumerable<BasePlayer> enemies)
+        public override void Initialize(Player player, IEnumerable<BasePlayer> enemies)
         {
-            base.Initialize(me, enemies);
+            base.Initialize(player, enemies);
             playersScore = new Dictionary<BasePlayer, int>
             (enemies
-                .Concat(new[] {me})
+                .Concat(new[] {player})
                 .Select(x => new KeyValuePair<BasePlayer, int>(x, 0))
             );
         }
@@ -45,7 +45,7 @@ namespace LineWars
 
             if (GetScoreForPlayer(basePlayer) >= scoreForWin)
             {
-                if (basePlayer == Me)
+                if (basePlayer == Player)
                     Win();
                 else
                     Lose();

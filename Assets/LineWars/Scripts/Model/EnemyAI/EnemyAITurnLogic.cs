@@ -29,7 +29,7 @@ namespace LineWars.Model
 
             private async void StartAITurn()
             {
-                var gameProjection = GameProjectionCreator.FromMono(SingleGame.Instance.AllPlayers.Values, MonoGraph.Instance, PhaseManager.Instance);
+                var gameProjection = GameProjectionCreator.FromMono(SingleGameRoot.Instance.AllPlayers.Values, MonoGraph.Instance, PhaseManager.Instance);
                 // //DEBUG
                 // var stopwatch = new Stopwatch();
                 // stopwatch.Start();
