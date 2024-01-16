@@ -36,8 +36,9 @@ namespace LineWars.Interface
             unit.ActionPointsChanged.AddListener((_, newValue) => ExecuteForAllDrawers(drawer =>
             {
                 drawer.ReDrawActivity(newValue != 0);
-                ReDrawCharacteristics();
+                drawer.ReDrawCharacteristics();
             }));
+            
             if (unit.TryGetAction<MonoBlockAction>(out var action))
                 action.CanBlockChanged +=
                     (_, newBool) => ExecuteForAllDrawers(drawer => drawer.ReDrawCanBlock(newBool));
@@ -73,7 +74,6 @@ namespace LineWars.Interface
             unit.UnitDirectionChange.AddListener(OnUnitDirectionChange);
             unit.ArmorChanged.AddListener(OnUnitArmorChange);
             unit.HpChanged.AddListener(OnUnitHpChange);
-            ReDrawCharacteristics();
         }
 
         private void LocalPlayerOnVisibilityRecalculated()
@@ -103,7 +103,8 @@ namespace LineWars.Interface
 
             if (rightPart != null && rightPart.gameObject.activeSelf)
                 rightPart.AnimateDamageText((after - before).ToString(), armorDamageColor);
-            ReDrawCharacteristics();
+            if(before != after)
+                ReDrawCharacteristics();
         }
 
         private void OnUnitHpChange(int before, int after)
@@ -117,8 +118,8 @@ namespace LineWars.Interface
 
             if (rightPart != null && rightPart.gameObject.activeSelf)
                 rightPart.AnimateDamageText((diff).ToString(), color);
-
-            ReDrawCharacteristics();
+            if(before != after)
+                ReDrawCharacteristics();
         }
 
 
