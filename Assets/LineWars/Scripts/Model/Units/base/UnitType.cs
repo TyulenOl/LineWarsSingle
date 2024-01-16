@@ -19,6 +19,10 @@ namespace LineWars.Model
         AlyoshaPopovich,
         IlyaMuromec,
         KvasBarrel,
-        Koldun
+        Koldun,
+        Shaman,
+        Stunman,
+        Stavrislav,
+        Squire
     }
 }

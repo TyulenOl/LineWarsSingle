@@ -11,16 +11,26 @@ namespace LineWars.Model
     /// <summary>
     /// Класс ответственный за сохранение целостности данных о деках
     /// </summary>
-    public class DecksController : MonoBehaviour
+    public class DecksController : MonoBehaviour,
+        IDeckIndexer
     {
         private UserInfoController userInfoController;
         private IProvider<Deck> deckProvider;
         private Dictionary<int, Deck> allDecks;
 
         public Deck DeckToGame => IdToDeck[0];
-        public IReadOnlyDictionary<int, Deck> IdToDeck => allDecks;
+        public IDeckIndexer IdToDeck => this;
         public IEnumerable<Deck> Decks => allDecks.Values;
-        public IEnumerable<int> DeckIds => IdToDeck.Keys;
+        public IEnumerable<int> DeckIds => allDecks.Keys;
+
+        public Deck this[int id]
+        {
+            get
+            {
+                allDecks.TryAdd(id, new Deck(id));
+                return allDecks[id];
+            }
+        }
 
         public void Initialize([NotNull] IProvider<Deck> provider, UserInfoController userInfoController)
         {
@@ -49,6 +59,14 @@ namespace LineWars.Model
             }
 
             return deck;
+        }
+    }
+
+    public interface IDeckIndexer
+    {
+        public Deck this[int id]
+        {
+            get;
         }
     }
 }

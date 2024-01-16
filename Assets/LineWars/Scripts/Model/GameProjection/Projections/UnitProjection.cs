@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using UnityEngine;
 
 namespace LineWars.Model
 {
@@ -18,7 +18,18 @@ namespace LineWars.Model
         public Unit Original { get; set; }
         public string UnitName { get; set; }
         public int InitialPower {get; set; }
-        public int CurrentPower {get; set; }
+
+        private int currentPower;
+        public int CurrentPower 
+        {
+            get => currentPower; 
+            set
+            {
+                var prevValue = currentPower;
+                currentPower = value;
+                UnitPowerChanged?.Invoke(this, prevValue, currentPower);
+            }
+        }
         public int MaxHp { get; set; }
         public int MaxArmor { get; set; }
         public int MaxActionPoints { get; set; }
@@ -30,10 +41,42 @@ namespace LineWars.Model
         public bool HasId { get; set; }
         public CommandPriorityData CommandPriorityData { get; set; }
 
-        public int CurrentArmor { get; set; }
+        private int currentArmor;
+        public int CurrentArmor 
+        {
+            get => currentArmor;
+            set
+            {
+                var prevValue = currentArmor;
+                currentArmor = Mathf.Min(0, value);
+                UnitArmorChanged?.Invoke(this, prevValue, currentArmor);
+            }
+        }
         public UnitDirection UnitDirection { get; set; }
-        public NodeProjection Node { get; set; }
-        public int CurrentActionPoints { get; set; }
+        private NodeProjection node;
+        public NodeProjection Node
+        {
+            get => node;
+            set
+            {
+                var prevNode = node;
+                node = value;
+                UnitNodeChanged?.Invoke(this, prevNode, node);
+            }
+        }
+
+        private int currentActionPoints;
+        public int CurrentActionPoints 
+        {
+            get => currentActionPoints;
+            set
+            {
+
+                var prevValue = currentActionPoints;
+                currentActionPoints = value;
+                UnitActionPointsChanged?.Invoke(this, prevValue, value);
+            }
+        }
 
         private int currentHp;
 
@@ -42,7 +85,9 @@ namespace LineWars.Model
             get => currentHp;
             set
             {
+                var prevValue = currentHp;
                 currentHp = value;
+                UnitHPChanged.Invoke(this, prevValue, value);
                 if (value <= 0)
                 {
                     Died?.Invoke(this);
@@ -153,6 +198,7 @@ namespace LineWars.Model
             }
 
             CurrentActionPoints = MaxActionPoints;
+            UnitReplenished?.Invoke(this);
         }
 
         public void AddEffect(Effect<NodeProjection, EdgeProjection, UnitProjection> effect)

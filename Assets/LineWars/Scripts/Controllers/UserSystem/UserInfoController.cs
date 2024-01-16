@@ -28,6 +28,7 @@ namespace LineWars.Controllers
         public event Action<int> UserUpgradeCardsChanged;
         public event Action<int> PassingGameModesChanged; 
         
+        public IReadOnlyUserInfo UserInfo => currentInfo;
         public void Initialize(IProvider<UserInfo> provider, IStorage<DeckCard> storage)
         {
             userInfoProvider = provider;

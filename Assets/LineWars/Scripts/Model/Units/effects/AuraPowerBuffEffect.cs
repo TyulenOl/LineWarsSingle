@@ -22,6 +22,7 @@ namespace LineWars.Model
             TargetUnit.UnitPowerChanged += OnUnitPowerChanged;
             TargetUnit.UnitNodeChanged += OnUnitNodeChanged;
             BuffNewUnits();
+            SubscribeNodes();
         }
 
         public override void ExecuteOnExit()
@@ -57,6 +58,7 @@ namespace LineWars.Model
         {
             ClearSubscribedNodes();
             DebuffAllUnits();
+            SubscribeNodes();
             BuffNewUnits();
         }
 
@@ -92,9 +94,18 @@ namespace LineWars.Model
                 if (neighbor.RightUnit != null && neighbor.LeftUnit != neighbor.RightUnit)
                 {
                     BuffUnit(neighbor.RightUnit);
-                }
+                }  
+            }
+        }
+
+        private void SubscribeNodes()
+        {
+            var neighbors = TargetUnit.Node.GetNeighbors();
+            foreach (var neighbor in neighbors)
+            {
                 neighbor.UnitLeft += OnUnitLeft;
                 neighbor.UnitAdded += OnUnitAdded;
+                subscribedNodes.Add(neighbor);
             }
         }
 
