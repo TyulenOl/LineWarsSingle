@@ -38,7 +38,6 @@ namespace LineWars
                 cardInstance.ReDraw(card);
                 cardInstance.OnInfoButtonClickAction = () =>
                 {
-                    Debug.Log(11);
                     bigCardInfo.ReDraw(card);
                     bigCardInfo.gameObject.SetActive(true);
                 };

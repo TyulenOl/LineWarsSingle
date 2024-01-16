@@ -6,7 +6,7 @@ using UnityEngine.Serialization;
 
 namespace LineWars
 {
-    public class ChooseCompanyMenu : UIStackElement
+    public class ChooseCompanyMenu : MonoBehaviour
     {
         [SerializeField] private List<CompanyElementUI> companyElementUis;
         private bool initialized;
