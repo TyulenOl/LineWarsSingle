@@ -9,21 +9,20 @@ namespace LineWars.LootBoxes
     {
         private int upgradeForUsual = 1; //ПЕРЕНЕСТИ В ЭДИТОР!!!!!! //ПЕРЕНЕСТИ В ЭДИТОР!!!!!!//ПЕРЕНЕСТИ В ЭДИТОР!!!!!!//ПЕРЕНЕСТИ В ЭДИТОР!!!!!!//ПЕРЕНЕСТИ В ЭДИТОР!!!!!!//ПЕРЕНЕСТИ В ЭДИТОР!!!!!!//ПЕРЕНЕСТИ В ЭДИТОР!!!!!!
         private int upgradeForLegendary = 2; // TODO: ПЕРЕНЕСТИ В ЭДИТОР!!!!!!
-        private IDownloader<UserInfo> userInfoLoader;
+        private IReadOnlyUserInfo userInfo;
         private IStorage<DeckCard> cardStorage;
 
         public DuplicateEreaserDropConverter(
-            IDownloader<UserInfo> userInfoLoader,
+            IReadOnlyUserInfo userInfo,
             IStorage<DeckCard> cardStorage)
         {
-            this.userInfoLoader = userInfoLoader;
+            this.userInfo = userInfo;
             this.cardStorage = cardStorage;
         }
 
         public ContextedDropInfo Convert(DropInfo dropInfo)
         {
             var contextedDrops = new List<ContextedDrop>();
-            var userInfo = userInfoLoader.Load(0);
             foreach(var drop in dropInfo.Drops)
             {
                 if (drop.DropType != LootType.Card ||
@@ -36,7 +35,7 @@ namespace LineWars.LootBoxes
 
                 var card = cardStorage.IdToValue[drop.Value];
                 var addedUpgrades = upgradeForUsual;
-                if (card.Rarity == CardRarity.Legendary)
+                if (card.Rarity == CardRarity.Legendary || card.Rarity == CardRarity.Rare)
                     addedUpgrades = upgradeForLegendary;
 
                 var revisedDrop = new Drop(LootType.UpgradeCard, addedUpgrades);

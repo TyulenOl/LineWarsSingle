@@ -18,12 +18,13 @@ namespace LineWars.LootBoxes
             this.cardStorage = cardStorage;
         }
 
-        public bool CanOpen(UserInfo info)
+        public bool CanOpen(IReadOnlyUserInfo info)
         {
-            return info.LootBoxes.ContainsKey(BoxInfo.BoxType);
+            return info.LootBoxes.ContainsKey(BoxInfo.BoxType)
+                && info.LootBoxes[BoxInfo.BoxType] > 0;
         }
 
-        public DropInfo Open(UserInfo info)
+        public DropInfo Open(IReadOnlyUserInfo info)
         {
             var drops = new List<Drop>();
             foreach(var loot in BoxInfo.AllLoot)

@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
+    [Obsolete]
     public class UnitMovementLogic : MonoBehaviour
     {
         [SerializeField, Min(0.0001f)] private int speed = 1;

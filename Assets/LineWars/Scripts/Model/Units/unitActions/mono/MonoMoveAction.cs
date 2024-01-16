@@ -1,5 +1,4 @@
-﻿using System;
-using LineWars.Controllers;
+﻿using LineWars.Controllers;
 using UnityEngine;
 
 namespace LineWars.Model
@@ -10,10 +9,9 @@ namespace LineWars.Model
     {
         [SerializeField] private SFXData moveSfx;
         [SerializeField] private SFXList reactionsSfx;
+        [SerializeField] private UnitAnimation moveAnimation;
 
         private IDJ dj;
-
-        public event Action MoveAnimationEnded;
 
         protected override bool NeedAutoComplete => false;
 
@@ -23,31 +21,38 @@ namespace LineWars.Model
         public override void Initialize()
         {
             base.Initialize();
-            Executor.MovementLogic.MovementIsOver += MovementLogicOnMovementIsOver;
             dj = new RandomDJ(0.5f);
         }
 
         public void MoveTo(Node target)
         {
-            Action.MoveTo(target);
-            Executor.MovementLogic.MoveTo(target.transform.position);
-            Executor.MovementLogic.MovementIsOver += OnMoveEnd;
+            if(moveAnimation == null)
+            {
+                MoveInstant(target);
+            }
+            else
+            {
+                var animContext = new AnimationContext()
+                {
+                    TargetPosition = target.transform.position
+                };
+                moveAnimation.Ended.AddListener(OnMoveEnd);
+                moveAnimation.Execute(animContext);
+            }
             Executor.PlaySfx(moveSfx);
             Executor.PlaySfx(dj.GetSound(reactionsSfx));
             Player.LocalPlayer.RecalculateVisibility();
+            void OnMoveEnd(UnitAnimation anim)
+            {
+                Action.MoveTo(target);
+                Complete();
+            }
         }
 
-        private void OnMoveEnd()
+        private void MoveInstant(Node target)
         {
-            Executor.MovementLogic.MovementIsOver -= OnMoveEnd;
+            Action.MoveTo(target);
             Complete();
-        }
-
-        private void MovementLogicOnMovementIsOver() => MoveAnimationEnded?.Invoke();
-
-        private void OnDestroy()
-        {
-            Executor.MovementLogic.MovementIsOver -= MovementLogicOnMovementIsOver;
         }
 
         protected override MoveAction<Node, Edge, Unit> GetAction()
