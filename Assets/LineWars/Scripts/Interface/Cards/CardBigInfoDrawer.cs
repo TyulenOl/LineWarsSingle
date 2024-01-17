@@ -33,8 +33,8 @@ namespace LineWars
 
             if(hpText != null)
                 hpText.text = deckCard.Unit.MaxHp.ToString();
-            if(attackText != null)
-                attackText.text = 0.ToString() ;//deckCard.Unit.GetMaxDamage().ToString();
+            if (attackText != null)
+                attackText.text = deckCard.Unit.InitialPower.ToString(); ;//deckCard.Unit.GetMaxDamage().ToString();
             if(apText != null)
                 apText.text = deckCard.Unit.MaxActionPoints.ToString();
             

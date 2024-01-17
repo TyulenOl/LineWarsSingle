@@ -93,8 +93,7 @@ public static class DrawHelper
 
                 var desription = "Рус атакует ящера, нанося ему урон, равный силе духа. После ближней атаки число очков действия руса приравнивается к нулю";
                 
-                var result = new ActionReDrawInfo(sprite, name,desription);
-                return null;
+                return new ActionReDrawInfo(sprite, name,desription);
         }
 
         return null;
