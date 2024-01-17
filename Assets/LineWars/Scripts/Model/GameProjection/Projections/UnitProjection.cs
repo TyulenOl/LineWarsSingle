@@ -87,7 +87,7 @@ namespace LineWars.Model
             {
                 var prevValue = currentHp;
                 currentHp = value;
-                UnitHPChanged.Invoke(this, prevValue, value);
+                UnitHPChanged?.Invoke(this, prevValue, value);
                 if (value <= 0)
                 {
                     Died?.Invoke(this);

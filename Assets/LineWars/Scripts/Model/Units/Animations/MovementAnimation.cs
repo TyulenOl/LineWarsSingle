@@ -4,7 +4,7 @@ namespace LineWars.Model
 {
     public class MovementAnimation : UnitAnimation
     {
-        [SerializeField, Min(0.0001f)] private int speed = 1;
+        [SerializeField, Min(0.0001f)] private int speed = 10;
         [SerializeField] private MovementFunction movementFunction;
 
         private bool isMoving;
@@ -37,7 +37,7 @@ namespace LineWars.Model
             if (!isMoving) return;
             movementProgress += Time.deltaTime / timeToTransition;
             if (movementProgress < 1)
-                transform.position = Vector2.Lerp(
+                ownerUnit.transform.position = Vector2.Lerp(
                     startPosition,
                     targetNode,
                     movementFunction.Calculate(movementProgress)

@@ -1,5 +1,4 @@
-﻿using JetBrains.Annotations;
-using LineWars.Controllers;
+﻿using LineWars.Controllers;
 using UnityEngine;
 
 namespace LineWars.Model
