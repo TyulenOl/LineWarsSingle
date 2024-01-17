@@ -23,6 +23,22 @@ public static class DrawHelper
         }
     }
 
+    public static Sprite GetSpriteByMissionStatus(MissionStatus missionStatus)
+    {
+        switch (missionStatus)
+        {
+            case MissionStatus.Locked:
+                return Resources.Load<Sprite>("UI/Sorokin/Panels/CompanyChoose/LockedMission");
+            case MissionStatus.Completed:
+                return Resources.Load<Sprite>("UI/Sorokin/Panels/CompanyChoose/CompletedMission");
+            case MissionStatus.Unlocked:
+                return Resources.Load<Sprite>("UI/Sorokin/Panels/CompanyChoose/OpenMission");
+            case MissionStatus.Failed:
+                return Resources.Load<Sprite>("UI/Sorokin/Panels/CompanyChoose/DefeatedMission");
+            default: return Resources.Load<Sprite>("UI/Sorokin/Panels/CompanyChoose/LockedMission");
+        }
+    }
+    
     public static Sprite GetSpriteByCommandType(CommandType commandType)
     {
         switch (commandType)
@@ -63,6 +79,21 @@ public static class DrawHelper
             case PhaseType.Scout:
                 return "Разведка";
             default: return "Подготовка";
+        }
+    }
+
+    public static string GetOnMissionButtonTextByMissionStatus(MissionStatus missionStatus)
+    {
+        switch (missionStatus)
+        {
+            case MissionStatus.Failed:
+                return "Реванш";
+            case MissionStatus.Unlocked:
+                return "В бой";
+            case MissionStatus.Completed:
+                return "Заново";
+            default:
+                return "В бой";
         }
     }
 
