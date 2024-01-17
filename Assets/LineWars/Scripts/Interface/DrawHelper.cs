@@ -87,13 +87,42 @@ public static class DrawHelper
         switch (commandType)
         {
             case CommandType.MeleeAttack:
-                var sprite = GetSpriteByCommandType(commandType);
-
-                var name = "Ближний бой";
-
-                var desription = "Рус атакует ящера, нанося ему урон, равный силе духа. После ближней атаки число очков действия руса приравнивается к нулю";
-                
-                return new ActionReDrawInfo(sprite, name,desription);
+                return new ActionReDrawInfo(
+                    GetSpriteByCommandType(commandType),
+                    "Ближний бой",
+                    "Рус атакует ящера, нанося ему урон, равный силе духа, но получая обратный урон, который зависит от силы ящера." +
+                    " После ближней атаки число очков действия руса приравнивается к нулю. Если после ближнего" +
+                    "боя ящер погибает, рус захватывает точку, перемещаясь на нее.");
+            case CommandType.SacrificePerun:
+                return new ActionReDrawInfo(
+                    GetSpriteByCommandType(commandType),
+                    
+                    "Жертва перуну",
+                    
+                    "Рус приносит себя в жертву Перуну. После этого укажите на любую точку на карте - Перун пошлет туда молнию. Если на точке есть ящеры," +
+                    " она нанесет им урон, равный сумме здоровья и брони юнита, принесшего жертву. Если ящеров двое на точке - урон распределится");
+            case CommandType.VodaBajkalskaya:
+                return new ActionReDrawInfo(
+                    GetSpriteByCommandType(commandType),
+                    
+                    "Выпить воды байкальской",
+                    
+                    "Рус пьет водичку байкальскую, тратит все свои очки действия и восстанавливает 2 еденицы здоровья.");
+            case CommandType.Block:
+                return new ActionReDrawInfo(
+                    GetSpriteByCommandType(commandType),
+                    
+                    "Встать в защиту",
+                    
+                    "Рус тратит переводит свои оставшиеся очки действия в броню. Броня пропадает в конце следующего раунда.");
+            case CommandType.Fire:
+                return new ActionReDrawInfo(
+                    GetSpriteByCommandType(commandType),
+                    
+                    "Выстрел",
+                    
+                    "Рус стреляет по ящеру на соседней клетке, нанося урон равный силе юнита, ящер не отвечает на эту атаку. Даже если после выстрела на точке погибли все ящеры -" +
+                    " рус не встает на точку.");
         }
 
         return null;

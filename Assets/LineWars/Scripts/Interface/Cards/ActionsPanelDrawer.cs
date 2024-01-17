@@ -11,7 +11,7 @@ namespace LineWars
     public class ActionsPanelDrawer : MonoBehaviour
     {
         private static readonly List<CommandType> nonDrawableCommandTypes = new () 
-            {CommandType.Block, CommandType.Move};
+            {CommandType.Move};
 
         [SerializeField] private ActionInfoDrawer actionInfoDrawerPrefab;
         [SerializeField] private LayoutGroup actionsLayoutGroup;
@@ -20,7 +20,7 @@ namespace LineWars
         {
             foreach (var drawer in actionsLayoutGroup.GetComponentsInChildren<ActionInfoDrawer>())
             {
-                Destroy(drawer);
+                Destroy(drawer.gameObject);
             }
             
             var types = GetAllActionDrawInfos(deckCard);
