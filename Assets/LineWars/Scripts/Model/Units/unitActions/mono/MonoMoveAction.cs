@@ -44,6 +44,7 @@ namespace LineWars.Model
             Player.LocalPlayer.RecalculateVisibility();
             void OnMoveEnd(UnitAnimation anim)
             {
+                moveAnimation.Ended.RemoveListener(OnMoveEnd);
                 Action.MoveTo(target);
                 Complete();
             }
@@ -52,6 +53,7 @@ namespace LineWars.Model
         private void MoveInstant(Node target)
         {
             Action.MoveTo(target);
+            Executor.transform.position = target.transform.position;
             Complete();
         }
 

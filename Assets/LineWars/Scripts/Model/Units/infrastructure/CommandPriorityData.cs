@@ -42,7 +42,8 @@ namespace LineWars.Model
         Stun,
         HealingAttack,
         TargetPowerBasedAttack,
-        PowerBasedHeal
+        PowerBasedHeal,
+        UpArmor
     }
 }   
 
