@@ -64,7 +64,7 @@ namespace LineWars.Model
         public event Action<Unit, int, int> UnitArmorChanged; //++
         public event Action<Unit> UnitReplenished; //++
 
-        private List<Effect<Node, Edge, Unit>> effects; 
+        private List<Effect<Node, Edge, Unit>> effects = new(); 
 
         private Dictionary<CommandType, IMonoUnitAction<UnitAction<Node, Edge, Unit>>> monoActionsDictionary;
         public IEnumerable<IMonoUnitAction<UnitAction<Node, Edge, Unit>>> MonoActions => monoActionsDictionary.Values;
@@ -217,7 +217,6 @@ namespace LineWars.Model
             currentPower = initialPower;
 
             InitialiseAllActions();
-            InitializeAllEffects();
             index = SingleGameRoot.Instance.AllUnits.Add(this);
             void InitialiseAllActions()
             {
@@ -245,6 +244,7 @@ namespace LineWars.Model
         {
             Node = node;
             UnitDirection = direction;
+            InitializeAllEffects();
         }
 
 

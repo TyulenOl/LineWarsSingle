@@ -8,7 +8,6 @@ namespace LineWars.Model
         MonoUnitAction<RamAction<Node, Edge, Unit>>,
         IRamAction<Node, Edge, Unit>
     {
-        private MonoMoveAction moveAction;
         protected override bool NeedAutoComplete => false;
         [SerializeField] private RamAnimation ramAnimation;
 
@@ -18,7 +17,6 @@ namespace LineWars.Model
         public override void Initialize()
         {
             base.Initialize();
-            moveAction = Executor.GetAction<MonoMoveAction>();
         }
 
         public bool CanRam(Node node)

@@ -1,9 +1,5 @@
-﻿using LineWars.Interface;
-using System;
-using System.Collections;
+﻿
 using UnityEngine;
-using static Codice.CM.WorkspaceServer.WorkspaceTreeDataStore;
-using static UnityEngine.EventSystems.EventTrigger;
 
 namespace LineWars.Model
 {

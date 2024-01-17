@@ -8,8 +8,8 @@ namespace LineWars.Model
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
-        private List<TNode> subscribedNodes;
-        private Dictionary<TUnit, Effect<TNode, TEdge, TUnit>> unitEffects;
+        private List<TNode> subscribedNodes = new();
+        private Dictionary<TUnit, Effect<TNode, TEdge, TUnit>> unitEffects = new();
         public override EffectType EffectType => EffectType.AuraPowerBuff;
 
         public AuraPowerBuffEffect(TUnit unit) : base(unit)
@@ -44,7 +44,7 @@ namespace LineWars.Model
 
         private void DebuffUnit(TUnit unit) 
         { 
-            if(unitEffects.ContainsKey(unit))
+            if(!unitEffects.ContainsKey(unit))
             {
                 Debug.LogError("Can't debuff not buffed unit!");
                 return;
@@ -84,7 +84,7 @@ namespace LineWars.Model
 
         private void BuffNewUnits()
         {
-            var neighbors = TargetUnit.Node.GetNeighbors();
+            var neighbors = TargetUnit.Node.GetNeighbors(); 
             foreach (var neighbor in neighbors)
             {
                 if (neighbor.LeftUnit != null)
