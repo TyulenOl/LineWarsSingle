@@ -39,14 +39,18 @@ namespace LineWars.Controllers
             if (debugMode)
             {
                 currentInfo.UnlockedCards = new List<int>();
-                UserDiamond = 100;
-                UserGold = 100;
+                UserDiamond = 10000;
+                UserGold = 10000;
             }    
 #endif
             openedCardsSet = currentInfo.UnlockedCards
                 .Select(x => deckCardStorage.IdToValue[x])
                 .Concat(userInfoPreset.DefaultCards.Where(storage.ValueToId.ContainsKey))
                 .ToHashSet();
+
+            currentInfo.UnlockedCards = openedCardsSet
+                .Select(x => deckCardStorage.ValueToId[x])
+                .ToList();
         }
 
         private UserInfo AssignUserInfo(UserInfo userInfo)

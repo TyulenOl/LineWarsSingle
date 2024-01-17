@@ -7,7 +7,7 @@ namespace LineWars.Model
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
-        public override CommandType CommandType => throw new System.NotImplementedException();
+        public override CommandType CommandType => CommandType.UpArmor;
         public UpArmorAction(TUnit executor) : base(executor)
         {
         }
@@ -16,7 +16,7 @@ namespace LineWars.Model
         {
             return ActionPointsCondition() &&
                 target != null &&
-                target.OwnerId != Executor.OwnerId &&
+                target.OwnerId == Executor.OwnerId &&
                 Executor.Node.GetLine(target.Node) != null;
         }
 
@@ -28,7 +28,8 @@ namespace LineWars.Model
 
         public IActionCommand GenerateCommand(TUnit target)
         {
-            throw new System.NotImplementedException();
+            return new TargetedUniversalCommand<TUnit,
+                UpArmorAction<TNode, TEdge, TUnit>, TUnit>(this, target);
         }
 
         public override void Accept(IBaseUnitActionVisitor<TNode, TEdge, TUnit> visitor)

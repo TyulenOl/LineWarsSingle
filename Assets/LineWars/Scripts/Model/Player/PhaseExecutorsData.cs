@@ -16,6 +16,7 @@ namespace LineWars
         public IReadOnlyCollection<UnitType> Executors => executors;
     }
 
+    [Obsolete]
     [CreateAssetMenu(fileName = "New Phase Executors", menuName = "Phase Executors Data")]
     public class PhaseExecutorsData : ScriptableObject
     {

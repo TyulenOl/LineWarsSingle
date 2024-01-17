@@ -75,7 +75,6 @@ namespace LineWars.Model
         {
             var enemyDamage = target.CurrentPower;
             target.DealDamageThroughArmor(Executor.CurrentPower);
-            Debug.Log(Executor.CurrentPower);
             if (!target.IsDied)
                 Executor.DealDamageThroughArmor(enemyDamage / 2);
             CompleteAndAutoModify();

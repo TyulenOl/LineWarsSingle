@@ -29,8 +29,16 @@ namespace LineWars.Model
 
         private void Attack(TUnit target)
         {
-            target.CurrentHp -= Executor.CurrentPower;
+            var enemyNode = target.Node;
+            target.DealDamageThroughArmor(Executor.CurrentPower);
             Executor.CurrentArmor += Executor.CurrentPower;
+            if (target.IsDied
+                && enemyNode.AllIsFree
+                && UnitUtilities<TNode, TEdge, TUnit>.CanMoveTo(Executor, enemyNode)
+               )
+            {
+                UnitUtilities<TNode, TEdge, TUnit>.MoveTo(Executor, enemyNode);
+            }
         }
 
         public IActionCommand GenerateCommand(TUnit target)

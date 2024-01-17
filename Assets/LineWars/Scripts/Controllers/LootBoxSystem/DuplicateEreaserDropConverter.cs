@@ -35,7 +35,7 @@ namespace LineWars.LootBoxes
 
                 var card = cardStorage.IdToValue[drop.Value];
                 var addedUpgrades = upgradeForUsual;
-                if (card.Rarity == CardRarity.Legendary || card.Rarity == CardRarity.Rare)
+                if (card.Rarity != CardRarity.Common)
                     addedUpgrades = upgradeForLegendary;
 
                 var revisedDrop = new Drop(LootType.UpgradeCard, addedUpgrades);
