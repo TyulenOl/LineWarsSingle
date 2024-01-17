@@ -82,6 +82,24 @@ public static class DrawHelper
         }
     }
 
+    public static ActionReDrawInfo GetReDrawInfoByCommandType(CommandType commandType)
+    {
+        switch (commandType)
+        {
+            case CommandType.MeleeAttack:
+                var sprite = GetSpriteByCommandType(commandType);
+
+                var name = "Ближний бой";
+
+                var desription = "Рус атакует ящера, нанося ему урон, равный силе духа. После ближней атаки число очков действия руса приравнивается к нулю";
+                
+                var result = new ActionReDrawInfo(sprite, name,desription);
+                return null;
+        }
+
+        return null;
+    }
+
     public static string GetOnMissionButtonTextByMissionStatus(MissionStatus missionStatus)
     {
         switch (missionStatus)
