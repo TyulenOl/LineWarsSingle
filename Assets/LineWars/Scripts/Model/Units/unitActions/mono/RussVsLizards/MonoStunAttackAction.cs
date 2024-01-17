@@ -1,3 +1,6 @@
+using System;
+using UnityEngine;
+
 namespace LineWars.Model
 {
     public class MonoStunAttackAction : 
@@ -5,6 +8,7 @@ namespace LineWars.Model
         ITargetedAction<Unit>,
         IStunAttackAction<Node, Edge, Unit>
     {
+        protected override bool NeedAutoComplete => false;
         protected override StunAttackAction<Node, Edge, Unit> GetAction()
         {
             return new StunAttackAction<Node, Edge, Unit>(Executor);

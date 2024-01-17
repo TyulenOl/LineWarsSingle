@@ -1,4 +1,9 @@
-﻿using UnityEngine;
+﻿using LineWars.Interface;
+using System;
+using System.Collections;
+using UnityEngine;
+using static Codice.CM.WorkspaceServer.WorkspaceTreeDataStore;
+using static UnityEngine.EventSystems.EventTrigger;
 
 namespace LineWars.Model
 {
@@ -14,9 +19,7 @@ namespace LineWars.Model
         /// </summary>
         [field: SerializeField] public bool InitialOnslaught { get; private set; }
 
-        [SerializeField] private UnitMeleeAttackAnimation attackAnimation;
-        [SerializeField] private UnitAnimation moveAnimation;
-        
+        [SerializeField] private ActionUnitAnimation attackAnimation;
         public bool Onslaught => Action.Onslaught;
         public UnitBlockerSelector BlockerSelector => Action.BlockerSelector;
         protected override bool NeedAutoComplete => false;
@@ -24,20 +27,6 @@ namespace LineWars.Model
         public override void Initialize()
         {
             base.Initialize();
-            Action.Moved += node =>
-            {
-                Player.LocalPlayer.RecalculateVisibility();
-                if(moveAnimation == null)
-                {
-                    Executor.transform.position = node.transform.position;
-                    return;
-                }     
-                var animContext = new AnimationContext()
-                {
-                    TargetNode = node
-                };
-                moveAnimation.Execute(animContext);
-            };
         }
 
 
@@ -47,54 +36,33 @@ namespace LineWars.Model
                 AttackWithAnimation(unit);
             else
             {
-                base.Attack(enemy);
-                Complete();
+                InstantAttack(enemy);
             }    
         }
 
-        private void AttackWithAnimation(Unit targetUnit)
+        private void AttackWithAnimation(Unit unit)
         {
-            attackAnimation.Attacked.AddListener(AttackOnEvent);
-            var animContext = new AnimationContext()
+            attackAnimation.SetAction(() => base.Attack(unit));
+            attackAnimation.Ended.AddListener(OnAnimationEnd);
+            var context = new AnimationContext()
             {
-                TargetUnit = targetUnit,
-                TargetNode = targetUnit.Node,
+                TargetUnit = unit
             };
-            attackAnimation.Execute(animContext);
-
-            void AttackOnEvent(UnitMeleeAttackAnimation _)
+            attackAnimation.Execute(context);
+            void OnAnimationEnd(UnitAnimation unitAnimation)
             {
-                if (targetUnit.TryGetComponent(out AnimationResponses responses1))
-                    responses1.TrySetDeathAnimation(AnimationResponseType.MeleeDied);
-
-                base.Attack(targetUnit);
-                attackAnimation.Attacked.RemoveListener(AttackOnEvent);
-                if(targetUnit == null || targetUnit.CurrentHp <= 0)
-                {
-                    Complete();
-                    return;
-                }    
-                if (targetUnit.TryGetComponent(out AnimationResponses responses))
-                {
-                    var animContext = new AnimationContext()
-                    {
-                        TargetNode = Executor.Node,
-                        TargetUnit = Executor
-                    };
-
-                    var response = responses.Respond(AnimationResponseType.MeleeDamaged, animContext);
-                    if (response != null)
-                        response.Ended.AddListener(OnRespondEnd);
-                    else
-                        Complete();
-                }
-            }
-
-            void OnRespondEnd(UnitAnimation animation)
-            {
-                animation.Ended.RemoveListener(OnRespondEnd);
+                attackAnimation.Ended.RemoveListener(OnAnimationEnd);
+                Player.LocalPlayer.RecalculateVisibility();
                 Complete();
             }
+        }
+
+        private void InstantAttack(ITargetedAlive enemy)
+        {
+            base.Attack(enemy);
+            Executor.transform.position = Executor.Node.transform.position;
+            Player.LocalPlayer.RecalculateVisibility();
+            Complete();
         }
 
         protected override MeleeAttackAction<Node, Edge, Unit> GetAction()

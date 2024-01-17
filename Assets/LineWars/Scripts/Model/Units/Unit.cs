@@ -158,7 +158,7 @@ namespace LineWars.Model
             set
             {
                 var before = currentArmor;
-                currentArmor = Mathf.Clamp(currentArmor, 0, maxArmor);
+                currentArmor = Mathf.Clamp(value, 0, maxArmor); 
                 if(before == currentArmor) return;
                 ArmorChanged.Invoke(before, currentArmor);
                 UnitArmorChanged?.Invoke(this, before, currentArmor);
