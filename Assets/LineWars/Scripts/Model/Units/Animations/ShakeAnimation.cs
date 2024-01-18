@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    public class ShakeAnimation : UnitAnimation
+    public class ShakeAnimation : UnitStoppingAnimation
     {
         [SerializeField, Min(0)] private float timeInSeconds = 0.6f;
         [SerializeField, Min(0)] private float shakePauseInSeconds = 0.04f;
@@ -11,9 +11,11 @@ namespace LineWars.Model
 
         private Vector2 startPosition;
         private Coroutine shakesCoroutine;
+        private bool isShaking;
 
         public override void Execute(AnimationContext context)
         {
+            isShaking = true;
             StartCoroutine(StartStopCoroutine());
             StartAnimation();
         }
@@ -25,6 +27,7 @@ namespace LineWars.Model
             yield return new WaitForSeconds(timeInSeconds);
             StopCoroutine(shakesCoroutine);
             ownerUnit.transform.position = startPosition;
+            isShaking = false;
             EndAnimation();
         }
 
@@ -36,6 +39,16 @@ namespace LineWars.Model
                 ownerUnit.transform.position = startPosition + randomDirection;
                 yield return new WaitForSeconds(shakePauseInSeconds);
             }   
+        }
+
+        public override void Stop()
+        {
+            if(!isShaking) return;
+            Debug.Log("STOOOPIIIING");
+            StopCoroutine(shakesCoroutine);
+            ownerUnit.transform.position = startPosition;
+            isShaking = false;
+            EndAnimation();
         }
     }
 }
