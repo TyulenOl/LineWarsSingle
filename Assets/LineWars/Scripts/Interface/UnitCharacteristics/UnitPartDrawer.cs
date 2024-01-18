@@ -64,7 +64,6 @@ namespace LineWars.Interface
         public void ReDrawCharacteristics()
         {
             healthArmorProgressBar.SetBar(currentUnit.CurrentHp, currentUnit.CurrentArmor);
-            Debug.Log(currentUnit.CurrentHp + "   " + currentUnit.CurrentArmor + currentUnit.name);
             apProgressBar.SetHp(currentUnit.CurrentActionPoints);
         }
     }
