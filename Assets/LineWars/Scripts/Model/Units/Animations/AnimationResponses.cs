@@ -20,7 +20,8 @@ namespace LineWars.Model
         ShotBottomDied,
         SwingDied,
         UpArmored,
-        TargetPowerBasedAttacked
+        TargetPowerBasedAttacked,
+        Healed
     }
 
     [DisallowMultipleComponent]

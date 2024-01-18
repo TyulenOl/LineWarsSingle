@@ -29,31 +29,6 @@ namespace LineWars.Model
             turnLogic = new EnemyAITurnLogic(this);
         }
 
-        public void SetNewBuyLogic([NotNull] AIBuyLogicData buyData)
-        {
-            if (buyLogicData == null)
-                Debug.LogError("Buy Logic Data cannot be null!");
-            buyLogicData = buyData;
-            buyLogic = buyData.CreateAILogic(this);
-        }
-
-        public void SetNewGameEvaluator([NotNull] GameEvaluator evaluator)
-        {
-            if (evaluator == null)
-                Debug.LogError("Evaluator cannot be null!");
-            gameEvaluator = evaluator;
-        }
-
-        public void SetNewDepthDetailData([NotNull] DepthDetailsData depthDetailsData)
-        {
-            if (depthDetailsData == null)
-            {
-                Debug.LogError("Depth Detail Data cannot be null!");
-                return;
-            }
-            this.depthDetailsData = depthDetailsData;
-        }
-
         public override bool CanExecuteTurn(PhaseType phase)
         {
             if(!base.CanExecuteTurn(phase)) //�����? ������� ����� �������� �� PhaseExceptions?
