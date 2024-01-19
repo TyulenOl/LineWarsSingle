@@ -14,6 +14,7 @@ namespace LineWars.Interface
         [SerializeField] private SpriteRenderer ifAvailablePanel;
         [SerializeField] private SpriteRenderer unitIsExecutorImage;
         [SerializeField] private SpriteRenderer canBlockSprite;
+        [SerializeField] private TMP_Text powerAmount;
         [field: SerializeField] public SpriteRenderer targetSprite { get; private set; }
 
         [SerializeField] private UnitProgressBar unitProgressBar;
@@ -66,6 +67,7 @@ namespace LineWars.Interface
         {
             unitProgressBar.SetValues(currentUnit.CurrentHp, currentUnit.MaxHp,
                 currentUnit.CurrentArmor, currentUnit.CurrentActionPoints, currentUnit.MaxActionPoints);
+            powerAmount.text = currentUnit.CurrentPower.ToString();
         }
     }
 }
