@@ -13,6 +13,12 @@ public class UnitProgressBar : MonoBehaviour
         actionPointsProgressBar.Init(maxActionPoints);
     }
 
+    public void SetValues(int hp, int maxHp, int armor, int ap, int maxAp)
+    {
+        hpProgressBar.SetAllValues(hp, maxHp, armor);
+        actionPointsProgressBar.SetAllValue(ap, maxAp);
+    }
+
     public void SetHp(int value)
     {
         hpProgressBar.SetOnlyHp(value);
