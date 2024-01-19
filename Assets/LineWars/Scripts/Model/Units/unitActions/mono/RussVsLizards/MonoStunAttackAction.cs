@@ -39,7 +39,7 @@ namespace LineWars.Model
             {
                 TargetUnit = target
             };
-            attackAnimation.SetAction(() => Action.Execute(target));
+            attackAnimation.SetAction(OnAttack);
             attackAnimation.Ended.AddListener(OnAnimationEnd);
             attackAnimation.Execute(context);
             
@@ -47,6 +47,27 @@ namespace LineWars.Model
             {
                 attackAnimation.Ended.RemoveListener(OnAnimationEnd);
                 Complete();
+            }
+
+            void OnAttack()
+            {
+                Action.Execute(target);
+                if(target.TryGetComponent<AnimationResponses>(out var responses))
+                {
+                    RespondToMeleeDamage(responses);
+                }
+            }
+        }
+
+        private void RespondToMeleeDamage(AnimationResponses unitResponses)
+        {
+            if (unitResponses != null)
+            {
+                var respondContext = new AnimationContext()
+                {
+                    TargetUnit = Executor
+                };
+                unitResponses.Respond(AnimationResponseType.MeleeDamaged, respondContext);
             }
         }
 

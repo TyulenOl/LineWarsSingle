@@ -1,10 +1,16 @@
-﻿namespace LineWars.Model
+﻿using UnityEngine;
+
+namespace LineWars.Model
 {
     public class MonoPowerBasedHealAction :
         MonoUnitAction<PowerBasedHealAction<Node, Edge, Unit>>,
         ITargetedAction<Unit>,
         IStunAttackAction<Node, Edge, Unit>
     {
+        [SerializeField] private UnitAnimation unitAnimation;
+
+        protected override bool NeedAutoComplete => false;
+
         protected override PowerBasedHealAction<Node, Edge, Unit> GetAction()
         {
             return new PowerBasedHealAction<Node, Edge, Unit>(Executor);
@@ -12,7 +18,40 @@
 
         public void Execute(Unit target)
         {
-            Action.Execute(target);       
+            if (unitAnimation != null)
+                AnimationExecute(target);
+            else
+                ExecuteInstant(target);
+        }
+
+        private void AnimationExecute(Unit target)
+        {
+            var context = new AnimationContext()
+            {
+                TargetUnit = target
+            };
+            unitAnimation.Ended.AddListener(OnAnimationEnd);
+            unitAnimation.Execute(context);
+
+            void OnAnimationEnd(UnitAnimation _)
+            {
+                unitAnimation.Ended.RemoveListener(OnAnimationEnd);
+                if(target.TryGetComponent<AnimationResponses>(out var responses)) 
+                {
+                    var context2 = new AnimationContext()
+                    {
+                        TargetUnit = Executor
+                    };
+                    responses.Respond(AnimationResponseType.Healed, context2);
+                }
+                Action.Execute(target);
+                Complete();
+            }
+        }
+        private void ExecuteInstant(Unit target)
+        {
+            Action.Execute(target);
+            Complete();
         }
 
         public bool IsAvailable(Unit target)

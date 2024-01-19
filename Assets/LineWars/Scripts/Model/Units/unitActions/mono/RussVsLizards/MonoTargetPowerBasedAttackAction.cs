@@ -47,6 +47,14 @@ namespace LineWars.Model
             void OnAnimationEnd(UnitAnimation _)
             {
                 attackAnimation.Ended.RemoveListener(OnAnimationEnd);
+                if(TryGetComponent<AnimationResponses>(out var responses))
+                {
+                    var context2 = new AnimationContext()
+                    {
+                        TargetUnit = Executor
+                    };
+                    responses.Respond(AnimationResponseType.TargetPowerBasedAttacked, context2);
+                }
                 Action.Execute(target);
                 Complete();
             }

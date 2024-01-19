@@ -41,7 +41,12 @@ namespace LineWars.Model
             {
                 TargetUnit = target
             };
-            attackAnimation.SetAction(() => Action.Execute(target));
+            var responses = target.GetComponent<AnimationResponses>();
+            if (responses != null)
+            {
+                responses.TrySetDeathAnimation(AnimationResponseType.MeleeDied);
+            };
+            attackAnimation.SetAction(OnAttack);
             attackAnimation.Ended.AddListener(OnAnimationEnd);
             attackAnimation.Execute(context);
 
@@ -49,7 +54,24 @@ namespace LineWars.Model
             {
                 attackAnimation.Ended.RemoveListener(OnAnimationEnd);
                 Player.LocalPlayer.RecalculateVisibility();
+                if (responses != null)
+                {
+                    responses.SetDefaultDeathAnimation();
+                };
                 Complete();
+            }
+            void OnAttack()
+            {
+                Action.Execute(target);
+                var context2 = new AnimationContext()
+                {
+                    TargetUnit = Executor,
+                };
+
+                if(responses != null)
+                {
+                    responses.Respond(AnimationResponseType.MeleeDamaged, context);
+                };
             }
         }
 
