@@ -12,11 +12,13 @@ namespace LineWars
         [SerializeField] private bool autoInitialize = true;
         
         [field:SerializeField] public GameReferee GameReferee { get;  set; }
-        [SerializeField] private WinOrLoseAction winOrLoseAction;
+        [field:SerializeField] public WinOrLoseAction WinOrLoseAction { get; set; }
         [field:SerializeField] public PlayerInitializer PlayerInitializer { get;  set; }
+        [field: SerializeField] public DeckGetter DeckGetter { get; set; }
         
         public readonly IndexList<BasePlayer> AllPlayers = new();
         public readonly IndexList<Unit> AllUnits = new();
+        public Deck CurrentDeck { get; private set; }
         
         private void Start()
         {
@@ -26,6 +28,8 @@ namespace LineWars
 
         public void StartGame()
         {
+            InitializeDeck();
+
             InitializeAndRegisterAllPlayers();
             InitializeGameReferee();
             
@@ -37,6 +41,15 @@ namespace LineWars
                 PhaseManager.Instance.StartGame();
             }
         }
+
+        private void InitializeDeck()
+        {
+            if (DeckGetter == null)
+                Debug.LogError("DeckGetter is null");
+            if (DeckGetter.CanGet())
+                CurrentDeck = DeckGetter.Get();
+        }
+
         private void InitializeAndRegisterAllPlayers()
         {
             foreach (var player in PlayerInitializer.InitializeAllPlayers())
@@ -52,16 +65,29 @@ namespace LineWars
         private void InitializeGameReferee()
         {
             if (GameReferee == null)
+            {
                 Debug.LogError($"Нет {nameof(GameReferee)}");
-            if (winOrLoseAction == null)
-                Debug.LogError($"Нет {nameof(WinOrLoseAction)}");
+                return;
+            }
+            if (WinOrLoseAction == null)
+                Debug.LogError($"Нет {nameof(Controllers.WinOrLoseAction)}");
             
             GameReferee.Initialize(Player.LocalPlayer, AllPlayers
                 .Select(x => x.Value)
                 .Where(x => x != Player.LocalPlayer));
             
-            GameReferee.Wined += winOrLoseAction.OnWin;
-            GameReferee.Losed += winOrLoseAction.OnLose;
+            GameReferee.Wined += WinOrLoseAction.OnWin;
+            GameReferee.Losed += WinOrLoseAction.OnLose;
+        }
+
+        public void WinGame()
+        {
+            WinOrLoseAction.OnWin();
+        }
+        
+        public void LoseGame()
+        {
+            WinOrLoseAction.OnLose();
         }
         
         protected override void OnDestroy()
