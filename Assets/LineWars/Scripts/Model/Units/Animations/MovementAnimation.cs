@@ -44,7 +44,7 @@ namespace LineWars.Model
                 );
             else
             {
-                transform.position = targetNode;
+                ownerUnit.transform.position = targetNode;
                 isMoving = false;
                 EndAnimation();
             }
