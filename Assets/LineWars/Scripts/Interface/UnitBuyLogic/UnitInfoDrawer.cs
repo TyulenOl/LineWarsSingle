@@ -11,8 +11,7 @@ public class UnitInfoDrawer : MonoBehaviour
 {
     [SerializeField] private TMP_Text unitName;
     [SerializeField] private TMP_Text unitDescription;
-
-    [SerializeField] private TMP_Text armorAmount;
+    
     [SerializeField] private TMP_Text hpAmount;
     [SerializeField] private TMP_Text actionPointsAmount;
     [SerializeField] private TMP_Text damageAmount;
@@ -25,8 +24,7 @@ public class UnitInfoDrawer : MonoBehaviour
             unitName.text = unit.UnitName;
         if(unitDescription != null)
             unitDescription.text = unit.UnitDescription;
-
-        armorAmount.text = unit.MaxArmor.ToString();
+        
         hpAmount.text = unit.MaxHp.ToString();
         actionPointsAmount.text = unit.MaxActionPoints.ToString();
         damageAmount.text = "?";
@@ -38,17 +36,13 @@ public class UnitInfoDrawer : MonoBehaviour
         
         unitImage.gameObject.SetActive(true);
         unitImage.sprite = unit.Sprite;
-        var rect = unitImage.rectTransform.rect;
-        unitImage.rectTransform.sizeDelta = new Vector2(rect.size.x * unit.Sprite.rect.width / unit.Sprite.rect.height,
-            rect.size.y);
     }
 
     public void RestoreDefaults()
     {
         unitName.text = "Выберите воина";
         unitDescription.text = "";
-
-        armorAmount.text = "?";
+        
         hpAmount.text = "?";
         actionPointsAmount.text = "?";
         damageAmount.text = "?";
