@@ -15,8 +15,8 @@ namespace LineWars.Interface
         [SerializeField] private SpriteRenderer canBlockSprite;
         [field: SerializeField] public SpriteRenderer targetSprite { get; private set; }
 
-        [SerializeField] private ProgressBarV3 healthArmorProgressBar;
-        [SerializeField] private ProgressBarV3 apProgressBar;
+        [SerializeField] private ProgressBarV4 healthArmorProgressBar;
+        [SerializeField] private ProgressBarV4 apProgressBar;
 
         private Unit currentUnit;
 
@@ -33,8 +33,8 @@ namespace LineWars.Interface
         private void Init(Unit unitToInit)
         {
             UnitName.text = unitToInit.UnitName;
-            healthArmorProgressBar.SetBar(currentUnit.CurrentHp, currentUnit.CurrentArmor);
-            apProgressBar.SetHp(currentUnit.CurrentActionPoints);
+            healthArmorProgressBar.Init(3, currentUnit.MaxHp, 0, 0);
+            apProgressBar.Init(2, currentUnit.MaxActionPoints, 0);
         }
 
         public void SetUnitAsExecutor(bool isExecutor)
@@ -63,9 +63,10 @@ namespace LineWars.Interface
 
         public void ReDrawCharacteristics()
         {
-            healthArmorProgressBar.SetBar(currentUnit.CurrentHp, currentUnit.CurrentArmor);
-            Debug.Log(currentUnit.CurrentHp + "   " + currentUnit.CurrentArmor + currentUnit.name);
-            apProgressBar.SetHp(currentUnit.CurrentActionPoints);
+            healthArmorProgressBar.SetValue((0, currentUnit.CurrentHp), (1, currentUnit.MaxHp - currentUnit.CurrentHp), (2, currentUnit.CurrentArmor));
+            apProgressBar.SetValue((0, currentUnit.CurrentActionPoints), (1, currentUnit.MaxActionPoints - currentUnit.CurrentActionPoints));
+            Debug.Log(currentUnit.CurrentHp + "    " + (currentUnit.MaxHp - currentUnit.CurrentHp) + "   " + currentUnit.CurrentArmor);
+            Debug.Log(currentUnit.CurrentActionPoints + "    " + (currentUnit.MaxActionPoints - currentUnit.CurrentActionPoints));
         }
     }
 }
