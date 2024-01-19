@@ -64,9 +64,8 @@ namespace LineWars.Interface
 
         public void ReDrawCharacteristics()
         {
-            unitProgressBar.SetHp(currentUnit.CurrentHp);
-            unitProgressBar.SetArmor(CurrentUnit.CurrentArmor);
-            unitProgressBar.SetActionPoints(currentUnit.CurrentActionPoints);
+            unitProgressBar.SetValues(currentUnit.CurrentHp, currentUnit.MaxHp,
+                currentUnit.CurrentArmor, currentUnit.CurrentActionPoints, currentUnit.MaxActionPoints);
         }
     }
 }

@@ -10,7 +10,7 @@ public class ActionPointsProgressBar : ProgressBar
     
     public void Init(int inMaxActionPoints)
     {
-        base.Init();
+        Initialize();
         maxActionPoints = inMaxActionPoints;
         currentActionPoints = inMaxActionPoints;
         ConfigureValues(currentActionPoints, 0);
@@ -39,6 +39,11 @@ public class ActionPointsProgressBar : ProgressBar
             var newPoints = (pointsPart < 0) ? currentActionPoints + pointsPart : currentActionPoints;
             SetValues(newPoints, newLostActionPoints);
         }
+    }
+
+    public void SetAllValue(int ap, int maxAP)
+    {
+        SetValues(ap, maxAP - ap);
     }
 
     private void SetValues(int actionPoints, int lostPoints)

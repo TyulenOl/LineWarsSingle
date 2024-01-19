@@ -7,6 +7,9 @@ using UnityEngine.Serialization;
 
 public abstract class ProgressBar : MonoBehaviour
 {
+
+    readonly float ANIMATION_STOP_EPS = 0.005f;
+
     [Header("Links")]
     [SerializeField] private RectTransform[] areasRects;
 
@@ -24,30 +27,14 @@ public abstract class ProgressBar : MonoBehaviour
 
     
     private float?[] targetHeights;
-    private float containerOffset;
     private RectTransform container;
     
     private List<RectTransform> borders;
     private int activeBordersCount;
 
     private int animatedRectsCount;
-    
-    private void Awake()
-    {
-        // container = GetComponent<RectTransform>();
-        // targetHeights = new float?[areasRects.Length];
-        // currentValues = new int[areasRects.Length];
-        // for (var i = 0; i < currentValues.Length; i++)
-        //     currentValues[i] = 1;
-        //
-        // containerOffset = container.sizeDelta.y / 2;
-        //
-        // borders = new List<RectTransform>();
-        // SpawnAdditionalBorders(initialMaxCellsCount - 1);
-        //
-        // RedrawValuesImmediately(currentValues);
-    }
-    
+
+
 
     private void FixedUpdate()
     {
@@ -63,39 +50,38 @@ public abstract class ProgressBar : MonoBehaviour
                     offset += targetHeight.Value / 2;
 
                     
-                    var oldSizeDelta = rect.sizeDelta;
-                    var newSizeDelta = new Vector2(oldSizeDelta.x, targetHeight.Value);
+                    var oldSizeDelta = rect.rect;
+                    var newSizeDelta = new Vector2(oldSizeDelta.width, targetHeight.Value);
 
-                    rect.sizeDelta = Vector2.Lerp(oldSizeDelta, newSizeDelta, smoothness);
+                    rect.sizeDelta = Vector2.Lerp(oldSizeDelta.size, newSizeDelta, smoothness);
                     
                     rect.localPosition = Vector2.Lerp(rect.localPosition,
                         new Vector2(rect.localPosition.x,
-                        offset - containerOffset), smoothness);
+                        offset), smoothness);
 
                     
                     offset += targetHeight.Value / 2;
 
-                    if (Mathf.Abs(rect.sizeDelta.y - targetHeight.Value) < 0.01f)
+                    if (Mathf.Abs(rect.rect.height - targetHeight.Value) < ANIMATION_STOP_EPS)
                     {
                         targetHeights[i] = null;
                         animatedRectsCount--;
+                        rect.sizeDelta = newSizeDelta;
                     }
                 }
                 else
-                    offset += rect.sizeDelta.y;
+                    offset += rect.rect.height;
             }
         }
     }
 
-    public void Init()
+    protected void Initialize()
     {
         container = GetComponent<RectTransform>();
         targetHeights = new float?[areasRects.Length];
         currentValues = new int[areasRects.Length];
         for (var i = 0; i < currentValues.Length; i++)
             currentValues[i] = 1;
-        
-        containerOffset = container.sizeDelta.y / 2;
 
         borders = new List<RectTransform>();
         SpawnAdditionalBorders(initialMaxCellsCount - 1);
@@ -133,7 +119,7 @@ public abstract class ProgressBar : MonoBehaviour
         currentValues = newValues;
         for (var i = 0; i < areasRects.Length; i++)
         {
-            targetHeights[i] = (float)newValues[i] / sum * container.sizeDelta.y;
+            targetHeights[i] = (float)newValues[i] / sum * container.rect.height;
             animatedRectsCount++;
         }
         SetBorders(sum);
@@ -148,13 +134,11 @@ public abstract class ProgressBar : MonoBehaviour
         for (var i = 0; i < areasRects.Length; i++)
         {
             var rect = areasRects[i];
-            var targetHeight = (float)newValues[i] / sum * container.sizeDelta.y;;
+            var targetHeight = (float)newValues[i] / sum * container.rect.height;
             offset += targetHeight/ 2;
 
-            var oldSizeDelta = rect.sizeDelta; 
-
-            rect.sizeDelta = new Vector2(oldSizeDelta.x, targetHeight);
-            rect.localPosition = new Vector2(rect.localPosition.x, offset - containerOffset);
+            rect.sizeDelta = new Vector2(rect.rect.width, targetHeight);
+            rect.localPosition = new Vector2(rect.localPosition.x, offset);
                 
             offset += targetHeight / 2;
         }
