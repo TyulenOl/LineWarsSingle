@@ -11,6 +11,7 @@ public class HpProgressBar: ProgressBar
     
     public void Init(int inMaxHp, int inArmor)
     {
+        base.Init();
         maxHp = inMaxHp;
         currentHp = inMaxHp;
         armor = inMaxHp;
@@ -46,7 +47,7 @@ public class HpProgressBar: ProgressBar
         ChangeValue(2, value);
         armor = value;
     }
-    
+
     private void SetValues(int hp, int lostHp, int inArmor)
     {
         ChangeValues((0, hp), (1, lostHp), (2, inArmor));

@@ -10,6 +10,7 @@ public abstract class ProgressBar : MonoBehaviour
     [Header("Links")]
     [SerializeField] private RectTransform[] areasRects;
 
+
     [Space(10f)]
     [Header("Settings")]
     [SerializeField] private float smoothness;
@@ -21,9 +22,10 @@ public abstract class ProgressBar : MonoBehaviour
     [SerializeField] private RectTransform bordersContainer;
     [SerializeField] private GameObject borderPrefab;
 
-    private RectTransform container;
+    
     private float?[] targetHeights;
     private float containerOffset;
+    private RectTransform container;
     
     private List<RectTransform> borders;
     private int activeBordersCount;
@@ -32,18 +34,18 @@ public abstract class ProgressBar : MonoBehaviour
     
     private void Awake()
     {
-        container = GetComponent<RectTransform>();
-        targetHeights = new float?[areasRects.Length];
-        currentValues = new int[areasRects.Length];
-        for (var i = 0; i < currentValues.Length; i++)
-            currentValues[i] = 1;
-        
-        containerOffset = container.sizeDelta.y / 2;
-
-        borders = new List<RectTransform>();
-        SpawnAdditionalBorders(initialMaxCellsCount - 1);
-
-        RedrawValuesImmediately(currentValues);
+        // container = GetComponent<RectTransform>();
+        // targetHeights = new float?[areasRects.Length];
+        // currentValues = new int[areasRects.Length];
+        // for (var i = 0; i < currentValues.Length; i++)
+        //     currentValues[i] = 1;
+        //
+        // containerOffset = container.sizeDelta.y / 2;
+        //
+        // borders = new List<RectTransform>();
+        // SpawnAdditionalBorders(initialMaxCellsCount - 1);
+        //
+        // RedrawValuesImmediately(currentValues);
     }
     
 
@@ -83,6 +85,22 @@ public abstract class ProgressBar : MonoBehaviour
                     offset += rect.sizeDelta.y;
             }
         }
+    }
+
+    public void Init()
+    {
+        container = GetComponent<RectTransform>();
+        targetHeights = new float?[areasRects.Length];
+        currentValues = new int[areasRects.Length];
+        for (var i = 0; i < currentValues.Length; i++)
+            currentValues[i] = 1;
+        
+        containerOffset = container.sizeDelta.y / 2;
+
+        borders = new List<RectTransform>();
+        SpawnAdditionalBorders(initialMaxCellsCount - 1);
+
+        RedrawValuesImmediately(currentValues);
     }
 
     protected void ConfigureValues(params int[] initValues)
