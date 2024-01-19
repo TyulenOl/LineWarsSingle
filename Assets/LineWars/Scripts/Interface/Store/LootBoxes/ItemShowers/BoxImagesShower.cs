@@ -7,6 +7,7 @@ using LineWars.Controllers;
 using LineWars.LootBoxes;
 using LineWars.Model;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace LineWars
 {
@@ -20,6 +21,8 @@ namespace LineWars
         [SerializeField] private List<Transform> transformsToInstantiateShowers;
 
         [SerializeField] private float delayInSeconds;
+
+        public UnityEvent boxOpened;
         
         private List<LootedItemShower> activeShowers = new ();
     
@@ -32,6 +35,7 @@ namespace LineWars
         public void ShowItems(IEnumerable<ContextedDrop> drops)
         {
             StartCoroutine(ShowItemsCoroutine(drops));
+            boxOpened.Invoke();
         }
 
         private IEnumerator ShowItemsCoroutine(IEnumerable<ContextedDrop> drops)
