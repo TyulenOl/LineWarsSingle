@@ -341,6 +341,5 @@ namespace LineWars.Model
         {
             return visitor.Visit(this);
         }
-
     }
 }

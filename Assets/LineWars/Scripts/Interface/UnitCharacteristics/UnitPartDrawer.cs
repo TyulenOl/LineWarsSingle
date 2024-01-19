@@ -3,12 +3,13 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using LineWars;
+using UnityEngine.Serialization;
 
 namespace LineWars.Interface
 {
     public class UnitPartDrawer : MonoBehaviour
     {
-        [SerializeField] private TMP_Text UnitName;
+        [SerializeField, FormerlySerializedAs("UnitName")] private TMP_Text unitName;
         [SerializeField] private SpriteRenderer ifInactivePanel;
         [SerializeField] private SpriteRenderer ifAvailablePanel;
         [SerializeField] private SpriteRenderer unitIsExecutorImage;
@@ -30,9 +31,11 @@ namespace LineWars.Interface
             }
         }
 
+        public TMP_Text UnitName => unitName;
+
         private void Init(Unit unitToInit)
         {
-            UnitName.text = unitToInit.UnitName;
+            unitName.text = unitToInit.UnitName;
             healthArmorProgressBar.SetBar(currentUnit.CurrentHp, currentUnit.CurrentArmor);
             apProgressBar.SetHp(currentUnit.CurrentActionPoints);
         }
