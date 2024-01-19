@@ -90,9 +90,8 @@ public static class DrawHelper
                 return new ActionReDrawInfo(
                     GetSpriteByCommandType(commandType),
                     "Ближний бой",
-                    "Рус атакует ящера, нанося ему урон, равный силе духа, но получая обратный урон, который зависит от силы ящера." +
-                    " После ближней атаки число очков действия руса приравнивается к нулю. Если после ближнего" +
-                    "боя ящер погибает, рус захватывает точку, перемещаясь на нее.");
+                    "Рус атакует выбранного ящера на соседней клетке, нанося ему урон, равный силе духа, но получая обратный урон, который зависит от силы ящера." +
+                    "Если после ближнего sбоя ящер погибает, рус захватывает точку, перемещаясь на нее.");
             case CommandType.SacrificePerun:
                 return new ActionReDrawInfo(
                     GetSpriteByCommandType(commandType),
@@ -121,8 +120,69 @@ public static class DrawHelper
                     
                     "Выстрел",
                     
-                    "Рус стреляет по ящеру на соседней клетке, нанося урон равный силе юнита, ящер не отвечает на эту атаку. Даже если после выстрела на точке погибли все ящеры -" +
+                    "Рус стреляет по выбранному ящеру на соседней клетке, нанося урон равный своей силе духа, ящер не наносит ответный урон. Даже если после выстрела на точке погибли все ящеры -" +
                     " рус не встает на точку.");
+            case CommandType.ShotUnit:
+                return new ActionReDrawInfo(
+                    GetSpriteByCommandType(commandType),
+
+                    "Могучий Бросок",
+
+                    "Рус берет юнита на соседней клетке и кидает его на выбранную клетку. " +
+                    "Если на ней располагаются другие юниты, то и брошенный и стоящий юнит получают урон, равный ХП своего противника." +
+                    "Если на клетке стоят два юнита, урон распределяется пополам.");
+            case CommandType.UpArmor:
+                return new ActionReDrawInfo(
+                    GetSpriteByCommandType(commandType),
+
+                    "Опьяняющая настойка",
+
+                    "Рус поднимает выбранному русу на соседней клетке броню на силу духа юнита.");
+            case CommandType.Ram:
+                return new ActionReDrawInfo(
+                    GetSpriteByCommandType(commandType),
+
+                    "Таран",
+
+                    "Рус наносит ящерам на выбранной соседней клетке урон, равный силе духа юнита, " +
+                    "и выталкивает их в соседнюю клетку ящеров. Если такой нет, то ящеры умирают. ");
+            case CommandType.BlowWithSwing:
+                return new ActionReDrawInfo(
+                    GetSpriteByCommandType(commandType),
+
+                    "Размах топором",
+
+                    "Рус наносит всем ящерам на соседних клетках урон, равный своей силе духа.");
+            case CommandType.Stun:
+                return new ActionReDrawInfo(
+                    GetSpriteByCommandType(commandType),
+
+                    "Оглушение",
+
+                    "Рус понижает выбранному ящеру на соседней клетке очки действия на свою силу");
+            case CommandType.HealingAttack:
+                return new ActionReDrawInfo(
+                    GetSpriteByCommandType(commandType),
+
+                    "Голодный Укус",
+
+                    "Рус наносит урон выбранному ящеру на соседней клетке, равный своей силе духа. " +
+                    "Рус восстанавливает себе броню на свою силу духа.");
+            case CommandType.TargetPowerBasedAttack:
+                return new ActionReDrawInfo(
+                    GetSpriteByCommandType(commandType),
+
+                    "Гипноз Меча",
+
+                    "Рус наносит урон выбранному ящеру на соседней клетке, равный сумме своей силы духа и силы духа ящера.");
+            case CommandType.PowerBasedHeal:
+                return new ActionReDrawInfo(
+                    GetSpriteByCommandType(commandType),
+
+                    "Кваску?",
+
+                    "Рус поднимает выбранному русу на соседней клетке ХП на свою силу духа.");
+
         }
 
         return null;
