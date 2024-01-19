@@ -247,8 +247,6 @@ namespace LineWars.Model
             InitializeAllEffects();
         }
 
-
-
         private void InitializeAllEffects()
         {
             foreach (var effectInit in effectInitializers)
@@ -298,7 +296,7 @@ namespace LineWars.Model
                     TargetNode = myNode,
                     TargetUnit = this
                 };
-                responses.CurrentDeathAnimation.Execute(animContext);
+                responses.PlayDeathAnimation();
             }
         }
 

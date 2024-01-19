@@ -38,14 +38,7 @@ namespace LineWars.Model
 
                 yield return new WaitForSeconds(pauseBeforeAttack);
                 givenMethod();
-                var helper = unit.GetComponent<UnitAnimationHelper>();
-                if (slashEffect != null)
-                {
-                    var slashPosition = unit.UnitDirection == UnitDirection.Left
-                            ? helper.LeftCenter.transform.position
-                            : helper.RightCenter.transform.position;
-                    Instantiate(slashEffect, slashPosition, Quaternion.identity);
-                }
+                CreateSlashEffect(unit);
                 yield return new WaitForSeconds(pauseAfterAttack);
 
                 var context2 = new AnimationContext()
@@ -60,6 +53,18 @@ namespace LineWars.Model
             {
                 moveAnimation.Ended.RemoveListener(OnSecondMoveEnd);
                 EndAnimation();
+            }
+        }
+
+        private void CreateSlashEffect(Unit unit)
+        {
+            var helper = unit.GetComponent<UnitAnimationHelper>();
+            if (slashEffect != null)
+            {
+                var slashPosition = unit.UnitDirection == UnitDirection.Left
+                        ? helper.LeftCenter.transform.position
+                        : helper.RightCenter.transform.position;
+                Instantiate(slashEffect, slashPosition, Quaternion.identity);
             }
         }
     }
