@@ -46,6 +46,8 @@ namespace LineWars.Interface
 
         private void OnExecutorChanged(IMonoExecutor arg1, IMonoExecutor arg2)
         {
+            if(BgImage == null)
+                return;
             var isSelected = unit.Equals(arg2);
             if (isSelected)
             {

@@ -7,7 +7,7 @@ namespace LineWars.Education
     {
         [Space]
         [SerializeField] private Node buyNode;
-        [SerializeField] private string presetName;
+        [SerializeField] private DeckCard deckCard;
 
         public override bool CanSelectNode(Node node)
         {
@@ -16,7 +16,7 @@ namespace LineWars.Education
 
         public override bool CanSelectDeckCard(DeckCard deckCard)
         {
-            return deckCard == null || deckCard.Name.Equals(presetName);
+            return deckCard != null || this.deckCard == deckCard;
         }
     }
 }

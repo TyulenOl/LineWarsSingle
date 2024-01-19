@@ -37,6 +37,7 @@ namespace LineWars.Model
         [Header("Actions Settings")] 
         [SerializeField] [Min(0)] private int maxActionPoints;
         [SerializeField] private List<EffectInitializer> effectInitializers;
+        [SerializeField] private List<CommandType> unitCommands;
 
         [Header("DEBUG")] 
         [SerializeField, ReadOnlyInspector] private Node myNode;
@@ -69,6 +70,9 @@ namespace LineWars.Model
         private Dictionary<CommandType, IMonoUnitAction<UnitAction<Node, Edge, Unit>>> monoActionsDictionary;
         public IEnumerable<IMonoUnitAction<UnitAction<Node, Edge, Unit>>> MonoActions => monoActionsDictionary.Values;
         public IReadOnlyList<Effect<Node, Edge, Unit>> Effects => effects;
+
+        public IEnumerable<CommandType> UnitCommands => unitCommands;
+
         public uint MaxPossibleActionRadius { get; private set; }
 
         #region Properties
@@ -247,8 +251,6 @@ namespace LineWars.Model
             InitializeAllEffects();
         }
 
-
-
         private void InitializeAllEffects()
         {
             foreach (var effectInit in effectInitializers)
@@ -298,7 +300,7 @@ namespace LineWars.Model
                     TargetNode = myNode,
                     TargetUnit = this
                 };
-                responses.CurrentDeathAnimation.Execute(animContext);
+                responses.PlayDeathAnimation();
             }
         }
 
@@ -339,6 +341,5 @@ namespace LineWars.Model
         {
             return visitor.Visit(this);
         }
-
     }
 }

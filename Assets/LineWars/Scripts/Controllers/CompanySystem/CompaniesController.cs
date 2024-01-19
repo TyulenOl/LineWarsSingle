@@ -23,7 +23,7 @@ namespace LineWars.Controllers
         public int ChoseMissionId { get; set; }
         public event Action AnyMissionInfoChanged;
 
-        public bool IsInfinityGameUnlocked => missionInfos[0].MissionStatus == MissionStatus.Completed;
+        public bool IsInfinityGameUnlocked => godMode || missionInfos[0].MissionStatus == MissionStatus.Completed;
 
         public void Initialize(IProvider<MissionInfo> provider, IStorage<MissionData> storage)
         {
@@ -41,6 +41,21 @@ namespace LineWars.Controllers
             {
                 if (missionInfos.ContainsKey(id))
                     UnlockMission(id);
+            }
+            
+            AssignAllMissions();
+        }
+
+        private void AssignAllMissions()
+        {
+            foreach (var (id, missionInfo) in missionInfos)
+            {
+                if (missionInfo.MissionStatus == MissionStatus.Completed
+                    && missionInfos.ContainsKey(id + 1)
+                    && missionInfos[id + 1].MissionStatus == MissionStatus.Locked)
+                {
+                    missionInfos[id + 1].MissionStatus = MissionStatus.Unlocked;
+                }
             }
         }
 
@@ -69,7 +84,10 @@ namespace LineWars.Controllers
 
         public MissionInfo GetMissionInfo(int missionId)
         {
-            return missionInfos[missionId].GetCopy();
+            var copy = missionInfos[missionId].GetCopy();
+            if (godMode && copy.MissionStatus == MissionStatus.Locked)
+                copy.MissionStatus = MissionStatus.Unlocked;
+            return copy;
         }
 
         public void UnlockMission(int missionId)
@@ -87,6 +105,15 @@ namespace LineWars.Controllers
                 UnlockMission(ChoseMissionId + 1);
         }
 
+        public MissionStatus GetMissionStatus(int missionId)
+        {
+            var mission = missionInfos[missionId];
+            if (godMode && mission.MissionStatus == MissionStatus.Locked)
+                return MissionStatus.Unlocked;
+            return mission.MissionStatus;
+
+        }
+        
         public bool MissionIsLocked(int missionId)
         {
             return !godMode || missionInfos[missionId].MissionStatus == MissionStatus.Locked;

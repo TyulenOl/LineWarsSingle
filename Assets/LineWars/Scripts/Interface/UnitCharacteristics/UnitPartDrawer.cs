@@ -3,12 +3,13 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using LineWars;
+using UnityEngine.Serialization;
 
 namespace LineWars.Interface
 {
     public class UnitPartDrawer : MonoBehaviour
     {
-        [SerializeField] private TMP_Text UnitName;
+        [SerializeField, FormerlySerializedAs("UnitName")] private TMP_Text unitName;
         [SerializeField] private SpriteRenderer ifInactivePanel;
         [SerializeField] private SpriteRenderer ifAvailablePanel;
         [SerializeField] private SpriteRenderer unitIsExecutorImage;
@@ -29,6 +30,8 @@ namespace LineWars.Interface
                 Init(currentUnit);
             }
         }
+
+        public TMP_Text UnitName => unitName;
 
         private void Init(Unit unitToInit)
         {

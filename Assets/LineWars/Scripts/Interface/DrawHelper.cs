@@ -23,6 +23,22 @@ public static class DrawHelper
         }
     }
 
+    public static Sprite GetSpriteByMissionStatus(MissionStatus missionStatus)
+    {
+        switch (missionStatus)
+        {
+            case MissionStatus.Locked:
+                return Resources.Load<Sprite>("UI/Sorokin/Panels/CompanyChoose/LockedMission");
+            case MissionStatus.Completed:
+                return Resources.Load<Sprite>("UI/Sorokin/Panels/CompanyChoose/CompletedMission");
+            case MissionStatus.Unlocked:
+                return Resources.Load<Sprite>("UI/Sorokin/Panels/CompanyChoose/OpenMission");
+            case MissionStatus.Failed:
+                return Resources.Load<Sprite>("UI/Sorokin/Panels/CompanyChoose/DefeatedMission");
+            default: return Resources.Load<Sprite>("UI/Sorokin/Panels/CompanyChoose/LockedMission");
+        }
+    }
+    
     public static Sprite GetSpriteByCommandType(CommandType commandType)
     {
         switch (commandType)
@@ -63,6 +79,127 @@ public static class DrawHelper
             case PhaseType.Scout:
                 return "Разведка";
             default: return "Подготовка";
+        }
+    }
+
+    public static ActionReDrawInfo GetReDrawInfoByCommandType(CommandType commandType)
+    {
+        switch (commandType)
+        {
+            case CommandType.MeleeAttack:
+                return new ActionReDrawInfo(
+                    GetSpriteByCommandType(commandType),
+                    "Ближний бой",
+                    "Рус атакует выбранного ящера на соседней клетке, нанося ему урон, равный силе духа, но получая обратный урон, который зависит от силы ящера." +
+                    "Если после ближнего sбоя ящер погибает, рус захватывает точку, перемещаясь на нее.");
+            case CommandType.SacrificePerun:
+                return new ActionReDrawInfo(
+                    GetSpriteByCommandType(commandType),
+                    
+                    "Жертва перуну",
+                    
+                    "Рус приносит себя в жертву Перуну. После этого укажите на любую точку на карте - Перун пошлет туда молнию. Если на точке есть ящеры," +
+                    " она нанесет им урон, равный сумме здоровья и брони юнита, принесшего жертву. Если ящеров двое на точке - урон распределится");
+            case CommandType.VodaBajkalskaya:
+                return new ActionReDrawInfo(
+                    GetSpriteByCommandType(commandType),
+                    
+                    "Выпить воды байкальской",
+                    
+                    "Рус пьет водичку байкальскую, тратит все свои очки действия и восстанавливает 2 еденицы здоровья.");
+            case CommandType.Block:
+                return new ActionReDrawInfo(
+                    GetSpriteByCommandType(commandType),
+                    
+                    "Встать в защиту",
+                    
+                    "Рус тратит переводит свои оставшиеся очки действия в броню. Броня пропадает в конце следующего раунда.");
+            case CommandType.Fire:
+                return new ActionReDrawInfo(
+                    GetSpriteByCommandType(commandType),
+                    
+                    "Выстрел",
+                    
+                    "Рус стреляет по выбранному ящеру на соседней клетке, нанося урон равный своей силе духа, ящер не наносит ответный урон. Даже если после выстрела на точке погибли все ящеры -" +
+                    " рус не встает на точку.");
+            case CommandType.ShotUnit:
+                return new ActionReDrawInfo(
+                    GetSpriteByCommandType(commandType),
+
+                    "Могучий Бросок",
+
+                    "Рус берет юнита на соседней клетке и кидает его на выбранную клетку. " +
+                    "Если на ней располагаются другие юниты, то и брошенный и стоящий юнит получают урон, равный ХП своего противника." +
+                    "Если на клетке стоят два юнита, урон распределяется пополам.");
+            case CommandType.UpArmor:
+                return new ActionReDrawInfo(
+                    GetSpriteByCommandType(commandType),
+
+                    "Опьяняющая настойка",
+
+                    "Рус поднимает выбранному русу на соседней клетке броню на силу духа юнита.");
+            case CommandType.Ram:
+                return new ActionReDrawInfo(
+                    GetSpriteByCommandType(commandType),
+
+                    "Таран",
+
+                    "Рус наносит ящерам на выбранной соседней клетке урон, равный силе духа юнита, " +
+                    "и выталкивает их в соседнюю клетку ящеров. Если такой нет, то ящеры умирают. ");
+            case CommandType.BlowWithSwing:
+                return new ActionReDrawInfo(
+                    GetSpriteByCommandType(commandType),
+
+                    "Размах топором",
+
+                    "Рус наносит всем ящерам на соседних клетках урон, равный своей силе духа.");
+            case CommandType.Stun:
+                return new ActionReDrawInfo(
+                    GetSpriteByCommandType(commandType),
+
+                    "Оглушение",
+
+                    "Рус понижает выбранному ящеру на соседней клетке очки действия на свою силу");
+            case CommandType.HealingAttack:
+                return new ActionReDrawInfo(
+                    GetSpriteByCommandType(commandType),
+
+                    "Голодный Укус",
+
+                    "Рус наносит урон выбранному ящеру на соседней клетке, равный своей силе духа. " +
+                    "Рус восстанавливает себе броню на свою силу духа.");
+            case CommandType.TargetPowerBasedAttack:
+                return new ActionReDrawInfo(
+                    GetSpriteByCommandType(commandType),
+
+                    "Гипноз Меча",
+
+                    "Рус наносит урон выбранному ящеру на соседней клетке, равный сумме своей силы духа и силы духа ящера.");
+            case CommandType.PowerBasedHeal:
+                return new ActionReDrawInfo(
+                    GetSpriteByCommandType(commandType),
+
+                    "Кваску?",
+
+                    "Рус поднимает выбранному русу на соседней клетке ХП на свою силу духа.");
+
+        }
+
+        return null;
+    }
+
+    public static string GetOnMissionButtonTextByMissionStatus(MissionStatus missionStatus)
+    {
+        switch (missionStatus)
+        {
+            case MissionStatus.Failed:
+                return "Реванш";
+            case MissionStatus.Unlocked:
+                return "В бой";
+            case MissionStatus.Completed:
+                return "Заново";
+            default:
+                return "В бой";
         }
     }
 

@@ -39,12 +39,25 @@ namespace LineWars.Model
 
         private void ExecuteWithAnimation(Unit target)
         {
-            unitAnimation.Ended.AddListener(OnMoveEnd);
-            void OnMoveEnd(UnitAnimation unitAnimation)
+            unitAnimation.Ended.AddListener(OnAnimationEnd);
+            var context = new AnimationContext()
             {
-                unitAnimation.Ended.RemoveListener(OnMoveEnd);
+                TargetUnit = target
+            };
+            unitAnimation.Execute(context);
+            void OnAnimationEnd(UnitAnimation unitAnimation)
+            {
+                unitAnimation.Ended.RemoveListener(OnAnimationEnd);
+                if(target.TryGetComponent<AnimationResponses>(out var responses))
+                {
+                    var context2 = new AnimationContext()
+                    {
+                        TargetUnit = Executor
+                    };
+                    responses.Respond(AnimationResponseType.UpArmored, context2);
+                }
                 ExecuteInstant(target);
-            }   
+            }
         }
 
         public IActionCommand GenerateCommand(Unit target)

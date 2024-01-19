@@ -12,17 +12,34 @@ namespace LineWars
     {
         [SerializeField] private Button button;
         [SerializeField] private TMP_Text missionDescription;
-
+        [SerializeField] private Image missionImage;
+        
         [SerializeField] [TextArea] private string simpleDescription;
         [SerializeField] [TextArea] private string mediumDescription;
         [SerializeField] [TextArea] private string hardDescription;
-        
-        
+
+
+        [SerializeField] private Color easyColor;
+        [SerializeField] private Color middleColor;
+        [SerializeField] private Color hardColor;
+
+
+        private Dictionary<InfinityGameMode, (string, Color)> tuplesDict;
+
+
         private InfinityGameMode infinityGameMode;
 
         private void Awake()
         {
             button.onClick.AddListener(OnButtonClick);
+            missionImage.color = Color.white;
+
+            tuplesDict = new Dictionary<InfinityGameMode, (string, Color)>
+            {
+                { InfinityGameMode.Simple, (simpleDescription, easyColor) },
+                { InfinityGameMode.Hard, (hardDescription, hardColor) },
+                { InfinityGameMode.Medium, (mediumDescription, middleColor) }
+            };
         }
 
         private void OnButtonClick()
@@ -30,22 +47,18 @@ namespace LineWars
             InfinityGame.Load(infinityGameMode);
         }
 
-        public void ChooseEasy()
+        public void ChooseEasy() => ChooseMode(InfinityGameMode.Simple);
+
+        public void ChooseMedium() => ChooseMode(InfinityGameMode.Medium);
+
+        public void ChooseHard() => ChooseMode(InfinityGameMode.Hard);
+
+        private void ChooseMode(InfinityGameMode gameMode)
         {
-            infinityGameMode = InfinityGameMode.Simple;
-            missionDescription.text = simpleDescription;
-        }
-        
-        public void ChooseMedium()
-        {
-            infinityGameMode = InfinityGameMode.Medium;
-            missionDescription.text = mediumDescription;
-        }
-        
-        public void ChooseHard()
-        {
-            infinityGameMode = InfinityGameMode.Hard;
-            missionDescription.text = hardDescription;
+            infinityGameMode = gameMode;
+            var tuple = tuplesDict[gameMode];
+            missionDescription.text = tuple.Item1;
+            missionImage.color = tuple.Item2;
         }
     }
 }

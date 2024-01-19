@@ -24,7 +24,7 @@ namespace LineWars.Model
 
         public void Execute(TUnit target)
         {
-            target.DealDamageThroughArmor(Executor.CurrentPower);
+            target.DealDamageThroughArmor(target.CurrentPower + Executor.CurrentPower);
             CompleteAndAutoModify();
         }
 

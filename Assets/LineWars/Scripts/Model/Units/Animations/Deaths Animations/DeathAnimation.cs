@@ -34,7 +34,7 @@ namespace LineWars.Model
             startPosition = ownerUnit.transform.position;
             if(uiElements != null) 
                 foreach(var element in uiElements) 
-                    element.SetActive(false);
+                    element?.SetActive(false);
         }
 
         private void Update()
