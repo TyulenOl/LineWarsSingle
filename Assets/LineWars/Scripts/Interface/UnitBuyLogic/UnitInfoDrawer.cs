@@ -27,13 +27,8 @@ public class UnitInfoDrawer : MonoBehaviour
         
         hpAmount.text = unit.MaxHp.ToString();
         actionPointsAmount.text = unit.MaxActionPoints.ToString();
-        damageAmount.text = "?";
+        damageAmount.text = unit.InitialPower.ToString();
 
-        if (damageAmount != null)
-        {
-            damageAmount.text = "0";
-        }
-        
         unitImage.gameObject.SetActive(true);
         unitImage.sprite = unit.Sprite;
     }
@@ -49,7 +44,7 @@ public class UnitInfoDrawer : MonoBehaviour
 
         if (damageAmount != null)
         {
-            damageAmount.text = "0";
+            damageAmount.text = "?";
         }
         
         unitImage.gameObject.SetActive(false);
