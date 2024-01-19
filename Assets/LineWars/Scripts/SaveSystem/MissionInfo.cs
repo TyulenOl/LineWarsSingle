@@ -20,9 +20,9 @@ namespace LineWars
 
     public enum MissionStatus
     {
-        Failed,
         Completed,
         Unlocked,
-        Locked
+        Locked,
+        Failed
     }
 }

@@ -42,6 +42,21 @@ namespace LineWars.Controllers
                 if (missionInfos.ContainsKey(id))
                     UnlockMission(id);
             }
+            
+            AssignAllMissions();
+        }
+
+        private void AssignAllMissions()
+        {
+            foreach (var (id, missionInfo) in missionInfos)
+            {
+                if (missionInfo.MissionStatus == MissionStatus.Completed
+                    && missionInfos.ContainsKey(id + 1)
+                    && missionInfos[id + 1].MissionStatus == MissionStatus.Locked)
+                {
+                    missionInfos[id + 1].MissionStatus = MissionStatus.Unlocked;
+                }
+            }
         }
 
         public void DefeatChoseMission()
@@ -69,7 +84,10 @@ namespace LineWars.Controllers
 
         public MissionInfo GetMissionInfo(int missionId)
         {
-            return missionInfos[missionId].GetCopy();
+            var copy = missionInfos[missionId].GetCopy();
+            if (godMode && copy.MissionStatus == MissionStatus.Locked)
+                copy.MissionStatus = MissionStatus.Unlocked;
+            return copy;
         }
 
         public void UnlockMission(int missionId)
