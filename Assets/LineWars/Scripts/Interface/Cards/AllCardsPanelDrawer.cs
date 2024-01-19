@@ -13,7 +13,7 @@ namespace LineWars
     {
         [SerializeField] private LayoutGroup cardsLayoutGroup;
         [SerializeField] private RectTransform cardDrawInfoPrefab;
-        [SerializeField] private CardDrawInfo bigCardInfo;
+        [SerializeField] private CardBigInfoDrawer bigCardInfo;
         [SerializeField] private DeckDrawer deckDrawer;
         
 

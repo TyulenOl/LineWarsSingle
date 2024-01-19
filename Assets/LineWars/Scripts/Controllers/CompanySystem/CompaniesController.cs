@@ -87,6 +87,15 @@ namespace LineWars.Controllers
                 UnlockMission(ChoseMissionId + 1);
         }
 
+        public MissionStatus GetMissionStatus(int missionId)
+        {
+            var mission = missionInfos[missionId];
+            if (godMode && mission.MissionStatus == MissionStatus.Locked)
+                return MissionStatus.Unlocked;
+            return mission.MissionStatus;
+
+        }
+        
         public bool MissionIsLocked(int missionId)
         {
             return !godMode || missionInfos[missionId].MissionStatus == MissionStatus.Locked;
