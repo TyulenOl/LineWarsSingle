@@ -171,7 +171,7 @@ public abstract class ProgressBar : MonoBehaviour
         for (var i = 0; i < count; i++)
         {
             var borderTransform = Instantiate(borderPrefab).GetComponent<RectTransform>();
-            borderTransform.parent = bordersContainer;
+            borderTransform.SetParent(bordersContainer);
             borderTransform.gameObject.SetActive(false);
             borders.Add(borderTransform);
         }
