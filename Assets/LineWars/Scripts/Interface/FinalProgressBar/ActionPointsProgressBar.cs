@@ -10,6 +10,7 @@ public class ActionPointsProgressBar : ProgressBar
     
     public void Init(int inMaxActionPoints)
     {
+        base.Init();
         maxActionPoints = inMaxActionPoints;
         currentActionPoints = inMaxActionPoints;
         ConfigureValues(currentActionPoints, 0);
