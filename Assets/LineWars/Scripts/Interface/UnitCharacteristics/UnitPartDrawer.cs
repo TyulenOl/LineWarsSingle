@@ -14,10 +14,10 @@ namespace LineWars.Interface
         [SerializeField] private SpriteRenderer ifAvailablePanel;
         [SerializeField] private SpriteRenderer unitIsExecutorImage;
         [SerializeField] private SpriteRenderer canBlockSprite;
+        [SerializeField] private TMP_Text powerAmount;
         [field: SerializeField] public SpriteRenderer targetSprite { get; private set; }
 
-        [SerializeField] private ProgressBarV3 healthArmorProgressBar;
-        [SerializeField] private ProgressBarV3 apProgressBar;
+        [SerializeField] private UnitProgressBar unitProgressBar;
 
         private Unit currentUnit;
 
@@ -35,9 +35,8 @@ namespace LineWars.Interface
 
         private void Init(Unit unitToInit)
         {
-            unitName.text = unitToInit.UnitName;
-            healthArmorProgressBar.SetBar(currentUnit.CurrentHp, currentUnit.CurrentArmor);
-            apProgressBar.SetHp(currentUnit.CurrentActionPoints);
+            UnitName.text = unitToInit.UnitName;
+            unitProgressBar.Init(currentUnit.MaxHp, currentUnit.CurrentArmor, currentUnit.MaxActionPoints);
         }
 
         public void SetUnitAsExecutor(bool isExecutor)
@@ -66,8 +65,9 @@ namespace LineWars.Interface
 
         public void ReDrawCharacteristics()
         {
-            healthArmorProgressBar.SetBar(currentUnit.CurrentHp, currentUnit.CurrentArmor);
-            apProgressBar.SetHp(currentUnit.CurrentActionPoints);
+            unitProgressBar.SetValues(currentUnit.CurrentHp, currentUnit.MaxHp,
+                currentUnit.CurrentArmor, currentUnit.CurrentActionPoints, currentUnit.MaxActionPoints);
+            powerAmount.text = currentUnit.CurrentPower.ToString();
         }
     }
 }
