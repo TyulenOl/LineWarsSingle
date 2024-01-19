@@ -140,19 +140,19 @@ namespace LineWars.Model
             {
                 if(!node.LeftIsFree && action.IsAvailable(node.LeftUnit))
                 {
-                    ProcessUnit(node);  
+                    ProcessUnit(node.LeftUnit);  
                     return;
                 }
                 if(!node.RightIsFree && action.IsAvailable(node.RightUnit))
                 {
-                    ProcessUnit(node);
+                    ProcessUnit(node.RightUnit);
                     return;
                 }
             }
 
-            void ProcessUnit(TNode node)
+            void ProcessUnit(TUnit unit)
             {
-                var command = new SwingCommandBlueprint(action.Executor.Id, node.LeftUnit.Id);
+                var command = new SwingCommandBlueprint(action.Executor.Id, unit.Id);
                 BlueprintList.Add(command);
             }
         }
