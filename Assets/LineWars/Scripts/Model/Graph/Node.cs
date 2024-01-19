@@ -99,11 +99,14 @@ namespace LineWars.Model
             {
                 var prevUnit = leftUnit;
                 leftUnit = value;
-                if(leftUnit == null && prevUnit != null)
+                if (prevUnit == leftUnit)
+                    return;
+                
+                if(prevUnit != null && prevUnit.Size == UnitSize.Little)
                 {
                     UnitLeft?.Invoke(this, prevUnit);
                 }
-                if(leftUnit != null && prevUnit != leftUnit)
+                if(leftUnit != null && leftUnit.Size == UnitSize.Little)
                 {
                     UnitAdded?.Invoke(this, leftUnit);
                 }
@@ -118,11 +121,14 @@ namespace LineWars.Model
             {
                 var prevUnit = rightUnit;
                 rightUnit = value;
-                if (rightUnit == null && prevUnit != null)
+                if (prevUnit == rightUnit)
+                    return;
+
+                if (prevUnit != null)
                 {
                     UnitLeft?.Invoke(this, prevUnit);
                 }
-                if (rightUnit != null && prevUnit != rightUnit)
+                if (rightUnit != null)
                 {
                     UnitAdded?.Invoke(this, rightUnit);
                 }
