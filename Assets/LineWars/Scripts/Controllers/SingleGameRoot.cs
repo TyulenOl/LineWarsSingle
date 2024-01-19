@@ -17,6 +17,7 @@ namespace LineWars
         
         public readonly IndexList<BasePlayer> AllPlayers = new();
         public readonly IndexList<Unit> AllUnits = new();
+        public WinOrLoseAction WinOrLoseAction => winOrLoseAction;
         
         private void Start()
         {

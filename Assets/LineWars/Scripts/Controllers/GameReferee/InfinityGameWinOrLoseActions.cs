@@ -5,6 +5,10 @@ namespace LineWars.Controllers
     [CreateAssetMenu(menuName = "WinOrLoseActions/InfinityGameWinOrLoseActions")]
     public class InfinityGameWinOrLoseActions: WinOrLoseAction
     {
+        public override int MoneyAfterBattle => Random.Range(50, 100);
+
+        public override int DiamondsAfterBattle => Random.Range(0, 5);
+        
         public override void OnWin()
         {
             if (!GameVariables.IsNormalStart) return;
