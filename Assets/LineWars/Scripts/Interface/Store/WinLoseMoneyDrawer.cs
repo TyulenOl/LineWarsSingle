@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using LineWars.Controllers;
 using TMPro;
 using UnityEngine;
 
@@ -13,8 +14,8 @@ namespace LineWars
 
         private void Awake()
         {
-            diamondsAmount.text = SingleGameRoot.Instance.WinOrLoseAction.DiamondsAfterBattle.ToString();
-            moneyAmount.text = SingleGameRoot.Instance.WinOrLoseAction.MoneyAfterBattle.ToString();
+            diamondsAmount.text = "+ " + WinOrLoseScene.DiamondsAmount;
+            moneyAmount.text = "+ " + WinOrLoseScene.MoneyAmount;
         }
     }
 }

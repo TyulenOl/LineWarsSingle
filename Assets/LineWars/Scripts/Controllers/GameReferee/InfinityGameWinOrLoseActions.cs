@@ -13,13 +13,21 @@ namespace LineWars.Controllers
         {
             if (!GameVariables.IsNormalStart) return;
             GameRoot.Instance.UserController.PassingGameModes += 1;
-            WinOrLoseScene.Load(true);
+            var money = MoneyAfterBattle;
+            var diamonds = DiamondsAfterBattle;
+            GameRoot.Instance.UserController.UserGold += money;
+            GameRoot.Instance.UserController.UserDiamond += diamonds;
+            WinOrLoseScene.Load(true, money, diamonds);
         }
 
         public override void OnLose()
         {
             if (!GameVariables.IsNormalStart) return;
-            WinOrLoseScene.Load(false);
+            var money = MoneyAfterBattle;
+            var diamonds = DiamondsAfterBattle;
+            GameRoot.Instance.UserController.UserGold += money;
+            GameRoot.Instance.UserController.UserDiamond += diamonds;
+            WinOrLoseScene.Load(false, money, diamonds);
         }
     }
 }
