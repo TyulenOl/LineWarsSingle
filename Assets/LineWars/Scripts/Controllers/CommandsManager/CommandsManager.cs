@@ -113,12 +113,12 @@ namespace LineWars.Controllers
                 executor = value;
                 if (previousExecutor != value)
                     InvokeAction(() => ExecutorChanged?.Invoke(previousExecutor, value));
-                if (previousExecutor != null)
+                if (previousExecutor as MonoBehaviour != null)
                 {
                     previousExecutor.ExecutorDestroyed -= OnExecutorDestroy;
                 }
 
-                if (executor != null)
+                if (executor as MonoBehaviour != null)
                 {
                     executor.ExecutorDestroyed += OnExecutorDestroy;
                 }
@@ -175,12 +175,13 @@ namespace LineWars.Controllers
             return stateMachine.CurrentState == findTargetState && Executor.CanDoAnyAction;
         }
 
-        public bool CanSetExecutor()
+        public bool CanSetExecutor(IMonoExecutor monoExecutor)
         {
-            return ActiveSelf &&
-                   (stateMachine.CurrentState == findExecutorState || stateMachine.CurrentState == findTargetState) &&
-                   (!HaveConstrains || Constrains.CanCancelExecutor) &&
-                   canCancelExecutor;
+            return ActiveSelf 
+                   && (stateMachine.CurrentState == findExecutorState || stateMachine.CurrentState == findTargetState)
+                   && (!HaveConstrains || Constrains.CanCancelExecutor) 
+                   && canCancelExecutor
+                   && (monoExecutor == null || monoExecutor.CanDoAnyAction);
         }
         
 
@@ -212,7 +213,13 @@ namespace LineWars.Controllers
                 LogError("You cannot change the executor", gameObject);
                 return;
             }
-
+            
+            if (executor as MonoBehaviour != null && !executor.CanDoAnyAction)
+            {
+                LogError("You cannot change the executor, because he cannot perform any action", gameObject);
+                return;
+            }
+            
             if (stateMachine.CurrentState == findExecutorState)
             {
                 Executor = executor;
@@ -266,12 +273,15 @@ namespace LineWars.Controllers
         
         void OnActionCompleted()
         {
+            //Debug.Log("Complite");
             currentExecutedCommand.Action.ActionCompleted -= OnActionCompleted;
             StopCoroutine(delayActionCoroutine);
+            var command = currentExecutedCommand;
+            InvokeAction(() => CommandIsExecuted?.Invoke(command));
+            
             delayActionCoroutine = null;
             currentExecutedCommand = null;
             
-            InvokeAction(() => CommandIsExecuted?.Invoke(currentExecutedCommand));
             if (Executor as MonoBehaviour == null)
             {
                 LogError("Impossible behavior!", gameObject);
@@ -290,20 +300,33 @@ namespace LineWars.Controllers
 
         IEnumerator DelayActionCoroutine()
         {
+            //Debug.Log($"Start Delay {maxActionDelayInSeconds}");
             yield return new WaitForSeconds(maxActionDelayInSeconds);
             LogError($"The action didn't stop after {maxActionDelayInSeconds} seconds!", gameObject);
-            OnActionCompleted();
+            
+            currentExecutedCommand.Action.ActionCompleted -= OnActionCompleted;
+            StopCoroutine(delayActionCoroutine);
+            var command = currentExecutedCommand;
+            InvokeAction(() => CommandIsExecuted?.Invoke(command));
+            
+            delayActionCoroutine = null;
+            currentExecutedCommand = null;
+
+            Executor.CurrentActionPoints = 0;
+            Player.FinishTurn();
         }
 
         private void OnExecutorDestroy()
         {
-            Debug.Log("EXECUTOR DESTROY");
+            //Debug.Log("EXECUTOR DESTROY");
+            Executor = null;
             if (delayActionCoroutine != null)
                 StopCoroutine(delayActionCoroutine);
             if (currentExecutedCommand != null)
             {
                 currentExecutedCommand.Action.ActionCompleted -= OnActionCompleted;
-                InvokeAction(() => CommandIsExecuted?.Invoke(currentExecutedCommand));
+                var command = currentExecutedCommand;
+                InvokeAction(() => CommandIsExecuted?.Invoke(command));
             }
             delayActionCoroutine = null;
             currentExecutedCommand = null;
