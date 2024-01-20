@@ -34,7 +34,7 @@ namespace LineWars.Interface
             if(!isActive)
                 return;
             var inter = false;
-            if (CommandsManager.Instance.Executor as Unit == unit)
+            if (CommandsManager.Instance.Executor == null || CommandsManager.Instance.Executor as Unit == unit)
                 inter = true;
             else
             {
