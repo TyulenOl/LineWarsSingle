@@ -166,14 +166,14 @@ namespace LineWars.Model
 
             if (relativePosition.x > 0)
             {
-                Selector.SelectedObjects = new[] {rightUnit?.gameObject, gameObject, leftUnit?.gameObject}
+                Selector.SelectedObjects = new[] {rightUnit?.gameObject, gameObject}
                     .Where(x => x != null)
                     .Distinct()
                     .ToArray();
             }
             else
             {
-                Selector.SelectedObjects = new[] {leftUnit?.gameObject, gameObject, rightUnit?.gameObject}
+                Selector.SelectedObjects = new[] {leftUnit?.gameObject, gameObject}
                     .Where(x => x != null)
                     .Distinct()
                     .ToArray();
