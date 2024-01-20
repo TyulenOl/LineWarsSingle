@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using GraphEditor;
-using PlasticPipe.PlasticProtocol.Messages;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
