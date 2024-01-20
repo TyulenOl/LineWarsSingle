@@ -40,6 +40,7 @@ namespace LineWars.Interface
             {
                 inter = CommandsManager.Instance.Executor as Unit != unit && CommandsManager.Instance.CanSetExecutor();
             }
+            if(BgImage == null) return;
             BgImage.color = inter ? Color.white : Color.gray;
             button.interactable = inter;
         }

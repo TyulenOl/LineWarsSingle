@@ -61,8 +61,19 @@ public static class DrawHelper
                 return Resources.Load<Sprite>("UI/Sorokin/Icons/MoveOrder");
             case CommandType.Build:
                 return Resources.Load<Sprite>("UI/Icons/Upgrade");
-
-            default: return Resources.Load<Sprite>("UI/Sorokin/Icons/DistanseAttackOrder");
+            case CommandType.HealingAttack:
+                return Resources.Load<Sprite>("UI/Sorokin/Icons/KusOrder");
+            case CommandType.UpArmor:
+                return Resources.Load<Sprite>("UI/Sorokin/Icons/UpArmorOrder");
+            case CommandType.Stun:
+                return Resources.Load<Sprite>("UI/Sorokin/Icons/BamOrder");
+            case CommandType.Block:
+                return Resources.Load<Sprite>("UI/Sorokin/Icons/BlockOrder");
+            case CommandType.VodaBajkalskaya:
+                return Resources.Load<Sprite>("UI/Sorokin/Icons/WaterOrder");
+            case CommandType.TargetPowerBasedAttack:
+                return Resources.Load<Sprite>("UI/Sorokin/Icons/GuipnosusOrder");
+            default: return Resources.Load<Sprite>("UI/Sorokin/Icons/AttackOrder");
         }
     }
 
