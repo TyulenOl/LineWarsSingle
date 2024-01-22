@@ -2,6 +2,7 @@
 
 namespace LineWars.Model
 {
+    [DisallowMultipleComponent]
     public class MonoHealYourselfAction: MonoUnitAction<HealYourselfAction<Node,Edge,Unit>>,
         IHealYourselfAction<Node, Edge, Unit>
     {

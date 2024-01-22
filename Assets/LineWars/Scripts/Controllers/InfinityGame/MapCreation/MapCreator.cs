@@ -12,7 +12,7 @@ namespace LineWars.Controllers
         [SerializeField] private List<MapSpriteFogSprite> randomTextures;
         [SerializeField] private float mapPaddingsInUnits = 10;
         [SerializeField] private SpriteRenderer map;
-        [SerializeField] private MaskRendererV3AutoManagement maskRenderer;
+        [SerializeField] private GameObject maskRendererObj;
         [SerializeField, Min(0)] private int maxVisibilityMapSide = 128;
         [SerializeField, Range(1, 255)] private int colorStep = 1000;
 
@@ -49,8 +49,9 @@ namespace LineWars.Controllers
                 monoGraph.Nodes.Select(x => x.Position - minPointOfMap));
 
 
-            maskRenderer.StartPosition.transform.position = minPointOfMap;
-            maskRenderer.EndPosition.transform.position = maxPointOfMap;
+            var maskRenderer = maskRendererObj.GetComponent<IMaskRenderer>();
+            Debug.Log(maskRenderer.GetType().Name);
+            maskRenderer.MapRenderer = map;
 
             maskRenderer.VisibilityMap = visibilityMap;
             maskRenderer.FogTexture = fogSprite.texture;
