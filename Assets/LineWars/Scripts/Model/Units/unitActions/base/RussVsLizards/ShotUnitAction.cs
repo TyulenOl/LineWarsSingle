@@ -77,7 +77,8 @@ namespace LineWars.Model
             takenUnit.Node = node;
             takenUnit.UnitDirection = UnitDirection.Left;
             node.LeftUnit = takenUnit;
-            node.ConnectTo(takenUnit.OwnerId);
+            if (node.OwnerId != takenUnit.OwnerId)
+                node.ConnectTo(takenUnit.OwnerId);
         }
 
 

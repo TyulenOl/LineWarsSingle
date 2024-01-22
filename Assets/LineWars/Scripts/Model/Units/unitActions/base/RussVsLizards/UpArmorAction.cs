@@ -14,10 +14,11 @@ namespace LineWars.Model
 
         public bool IsAvailable(TUnit target)
         {
-            return ActionPointsCondition() &&
-                target != null &&
-                target.OwnerId == Executor.OwnerId &&
-                Executor.Node.GetLine(target.Node) != null;
+            return ActionPointsCondition() 
+                   && target != Executor
+                   && target != null 
+                   && target.OwnerId == Executor.OwnerId 
+                   && Executor.Node.GetLine(target.Node) != null;
         }
 
         public void Execute(TUnit target)

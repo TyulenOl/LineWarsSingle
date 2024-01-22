@@ -2,22 +2,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using DataStructures;
 using UnityEngine;
 
-// ReSharper disable Unity.NoNullPropagation
-
-public class MaskRendererV3AutoManagement : MonoBehaviour
+public class MaskRendererV3AutoManagementGPU : Singleton<MaskRendererV3AutoManagementGPU>,
+    IMaskRenderer
 {
-    public MaskRendererV3AutoManagement Instance { get; private set; }
-
     [Header("Settings")]
     [SerializeField] private SpriteRenderer targetRenderer;
+    [SerializeField] private SpriteRenderer mapRenderer;
     [SerializeField, Min(0)] private int numberFramesSkippedBeforeUpdate;
 
     [Header("Map")] 
     [SerializeField] private Texture2D visibilityMap;
-    [SerializeField] private Transform startPosition;
-    [SerializeField] private Transform endPosition;
 
     [SerializeField] private Texture2D fogTexture;
     [SerializeField] private Texture2D fogEffect;
@@ -88,17 +85,11 @@ public class MaskRendererV3AutoManagement : MonoBehaviour
         get => visibilityMap;
         set => visibilityMap = value;
     }
-
-    public Transform StartPosition
+    
+    public SpriteRenderer MapRenderer
     {
-        get => startPosition;
-        set => startPosition = value;
-    }
-
-    public Transform EndPosition
-    {
-        get => endPosition;
-        set => endPosition = value;
+        get => mapRenderer;
+        set => mapRenderer = value;
     }
 
     public Texture2D FogTexture
@@ -113,21 +104,9 @@ public class MaskRendererV3AutoManagement : MonoBehaviour
         public Color NodeColor;
         public float Visibility;
     }
+    
 
-
-    private void Awake()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Debug.LogError($"Too many {nameof(MaskRendererV3)}");
-        }
-    }
-
-    public void Start()
+    private void Start()
     {
         if (autoInitialize)
         {
@@ -146,16 +125,7 @@ public class MaskRendererV3AutoManagement : MonoBehaviour
             StartCoroutine(ApplyChangesCoroutine());
         }
     }
-
-    private void OnDestroy()
-    {
-        buffer?.Dispose();
-        visibilityMask?.Release();
-        horBlurOutput?.Release();
-        verBlurOutput?.Release();
-        shaderInput?.Release();
-    }
-
+    
     public void Initialise()
     {
         if (initialized)
@@ -167,6 +137,7 @@ public class MaskRendererV3AutoManagement : MonoBehaviour
         if (!CheckValid()) return;
 
         initialized = true;
+        //targetRenderer.bounds = mapRenderer.bounds;
 
         blurHorID = blurShader.FindKernel("HorzBlurCs");
         blurVerID = blurShader.FindKernel("VertBlurCs");
@@ -176,6 +147,7 @@ public class MaskRendererV3AutoManagement : MonoBehaviour
         horBlurOutput = CreateTexture();
         verBlurOutput = CreateTexture();
         shaderInput = CreateTexture();
+        
 
         InitializeMaskShader();
         InitializeBlur();
@@ -211,17 +183,17 @@ public class MaskRendererV3AutoManagement : MonoBehaviour
 
     private void InitializeBuffer()
     {
-        var texSizeInWorldCoord = startPosition.position
-            .To2D()
-            .GetSize(endPosition.position.To2D());
+        var bounds = mapRenderer.bounds;
+        var size = bounds.size;
+        var startPosition = bounds.center - size / 2;
 
         nodeBuffers = new List<NodesBuffer>(nodes.Count);
         availableNodes = new List<RenderNodeV3>();
         foreach (var node in nodes)
         {
-            var pixelCoord = (node.transform.position - startPosition.position)
+            var pixelCoord = (node.transform.position - startPosition)
                 .To2D()
-                .GetPixelCoord(texSizeInWorldCoord, visibilityMap.GetTextureSize());
+                .GetPixelCoord(size, visibilityMap.GetTextureSize());
             if (pixelCoord.CheckPixelCoord(visibilityMap.GetTextureSize()))
             {
                 var nodeBuffer = new NodesBuffer()
@@ -352,6 +324,18 @@ public class MaskRendererV3AutoManagement : MonoBehaviour
             Debug.LogError($"{nameof(targetRenderer)} is null!");
             return false;
         }
+        
+        if (mapRenderer == null)
+        {
+            Debug.LogError($"{nameof(mapRenderer)} is null!");
+            return false;
+        }
+
+        if (mapRenderer.sprite == null)
+        {
+            Debug.LogError($"{nameof(mapRenderer.sprite)} is null!");
+            return false;
+        }
 
         if (fogTexture == null)
         {
@@ -413,5 +397,14 @@ public class MaskRendererV3AutoManagement : MonoBehaviour
     private Shader GetFogShader()
     {
         return Shader.Find(FogShaderName);
+    }
+    
+    protected override void OnDestroy()
+    {
+        buffer?.Dispose();
+        visibilityMask?.Release();
+        horBlurOutput?.Release();
+        verBlurOutput?.Release();
+        shaderInput?.Release();
     }
 }

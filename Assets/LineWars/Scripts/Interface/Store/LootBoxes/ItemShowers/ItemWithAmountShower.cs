@@ -10,7 +10,7 @@ namespace LineWars
         public void ShowItem(int amount)
         {
             this.amount.text = amount.ToString();
-            Debug.Log(amount.ToString());
+            //Debug.Log(amount.ToString());
         }
     }
 }

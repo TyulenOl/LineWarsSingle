@@ -4,8 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-// ReSharper disable Unity.NoNullPropagation
-
+[Obsolete("Use MaskRendererV3AutoManagementGPU")]
 public class MaskRendererV3 : MonoBehaviour
 {
     public MaskRendererV3 Instance { get; private set; }
