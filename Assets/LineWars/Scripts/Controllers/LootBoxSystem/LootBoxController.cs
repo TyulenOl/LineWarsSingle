@@ -53,9 +53,9 @@ namespace LineWars.LootBoxes
             SaveDrop(result);
             return result;
         }
-        //Получатель: Артём
-        //Отправитель: Артём
-        //Прошу тебя разобраться с этим ужасом!
+        //РџРѕР»СѓС‡Р°С‚РµР»СЊ: РђСЂС‚С‘Рј
+        //РћС‚РїСЂР°РІРёС‚РµР»СЊ: РђСЂС‚С‘Рј
+        //РџСЂРѕС€Сѓ С‚РµР±СЏ СЂР°Р·РѕР±СЂР°С‚СЊСЃСЏ СЃ СЌС‚РёРј СѓР¶Р°СЃРѕРј!
         private void SaveDrop(ContextedDropInfo dropInfo)
         {
             foreach(var drop in dropInfo.Drops)

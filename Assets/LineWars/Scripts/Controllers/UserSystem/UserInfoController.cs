@@ -3,7 +3,9 @@ using System.Linq;
 using LineWars.Model;
 using UnityEngine;
 using System;
+using System.Collections;
 using LineWars.LootBoxes;
+using Object = System.Object;
 
 namespace LineWars.Controllers
 {
@@ -20,6 +22,7 @@ namespace LineWars.Controllers
         private IStorage<DeckCard> deckCardStorage;
 
         private UserInfo currentInfo;
+        
         private HashSet<DeckCard> openedCardsSet;
         public IEnumerable<DeckCard> OpenedCards => openedCardsSet;
 
@@ -33,7 +36,7 @@ namespace LineWars.Controllers
         {
             userInfoProvider = provider;
             deckCardStorage = storage;
-
+            
             currentInfo = AssignUserInfo(provider.Load(0) ?? CreateDefaultUserInfo());
 #if UNITY_EDITOR
             if (debugMode)
@@ -47,10 +50,12 @@ namespace LineWars.Controllers
                 .Select(x => deckCardStorage.IdToValue[x])
                 .Concat(userInfoPreset.DefaultCards.Where(storage.ValueToId.ContainsKey))
                 .ToHashSet();
-
+            
             currentInfo.UnlockedCards = openedCardsSet
                 .Select(x => deckCardStorage.ValueToId[x])
                 .ToList();
+            
+            SaveCurrentUserInfo();
         }
 
         private UserInfo AssignUserInfo(UserInfo userInfo)
@@ -83,7 +88,7 @@ namespace LineWars.Controllers
 
         public bool CardIsOpen(DeckCard card) => openedCardsSet.Contains(card);
 
-        public void UnlockCard(int id) //не очень оптимизированно?
+        public void UnlockCard(int id)
         {
             UnlockCard(deckCardStorage.IdToValue[id]);
         }
@@ -94,6 +99,7 @@ namespace LineWars.Controllers
                 return;
             openedCardsSet.Add(deckCard);
             currentInfo.UnlockedCards.Add(deckCardStorage.ValueToId[deckCard]);
+            SaveCurrentUserInfo();
         }
         
         public void LockCard(int id)
@@ -107,6 +113,7 @@ namespace LineWars.Controllers
                 return;
             openedCardsSet.Remove(deckCard);
             currentInfo.UnlockedCards.Remove(deckCardStorage.ValueToId[deckCard]);
+            SaveCurrentUserInfo();
         }
 
         public int UserGold
@@ -116,7 +123,11 @@ namespace LineWars.Controllers
             {
                 if (value < 0)
                     throw new ArgumentException("Gold can't be less than zero!");
+                if (currentInfo.Gold == value)
+                    return;
+                
                 currentInfo.Gold = value;
+                SaveCurrentUserInfo();
                 GoldChanged?.Invoke(value);
             }
         }
@@ -128,7 +139,11 @@ namespace LineWars.Controllers
             {
                 if (value < 0)
                     throw new ArgumentException("Diamonds can't be less than zero!");
+                if (currentInfo.Diamonds == value)
+                    return;
+                
                 currentInfo.Diamonds = value;
+                SaveCurrentUserInfo();
                 DiamondsChanged?.Invoke(value);
             }
         }
@@ -140,19 +155,27 @@ namespace LineWars.Controllers
             {
                 if (value < 0)
                     throw new ArgumentException("UpgradeCards can't be less than zero!");
+                if (currentInfo.UpgradeCards == value)
+                    return;
+                
                 currentInfo.UpgradeCards = value;
+                SaveCurrentUserInfo();
                 UserUpgradeCardsChanged?.Invoke(value);
             }
         }
 
-        public int PassingGameModes
+        public int PassingInfinityGameModes
         {
             get => currentInfo.PassingGameModes;
             set
             {
                 if (value < 0)
-                    throw new ArgumentException("NumberSuccessfullyCompletedEndlessMode can't be less than zero!");
+                    throw new ArgumentException($"{nameof(PassingInfinityGameModes)} can't be less than zero!");
+                if (currentInfo.PassingGameModes == value)
+                    return;
+                
                 currentInfo.PassingGameModes = value;
+                SaveCurrentUserInfo();
                 PassingGameModesChanged?.Invoke(value);
             }
         }
@@ -166,16 +189,27 @@ namespace LineWars.Controllers
         {
             if (value < 0)
                 throw new ArgumentException("Loot Box can't be less than zero!");
+            if (currentInfo.LootBoxes[boxType].Equals(value))
+                return;
             currentInfo.LootBoxes[boxType] = value;
-
+            SaveCurrentUserInfo();
         }
 
-        private void OnApplicationFocus(bool hasFocus)
+        private void SaveCurrentUserInfo()
         {
-            if (!hasFocus)
-            {
+            StartCoroutine(SaveCurrentUserInfoCoroutine());
+        }
+
+
+        private IEnumerator SaveCurrentUserInfoCoroutine()
+        {
+            yield return null;
+#if UNITY_EDITOR
+            if (!debugMode)
                 userInfoProvider.Save(currentInfo, 0);
-            }
+#else      
+            userInfoProvider.Save(currentInfo, 0);
+#endif
         }
     }
 }

@@ -27,6 +27,7 @@ namespace LineWars.Controllers
             if (!GameVariables.IsNormalStart)
                 return;
             
+            GameRoot.Instance.CompaniesController.DefeatChoseMissionIfNoWin();
             var money = GetMoneyAfterBattle() / 10;
             GameRoot.Instance.UserController.UserGold += money;
             WinOrLoseScene.Load(false, money, 0);

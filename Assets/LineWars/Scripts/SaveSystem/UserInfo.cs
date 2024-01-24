@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using AYellowpaper.SerializedCollections;
 using LineWars.LootBoxes;
 
 namespace LineWars.Model
 {
     [Serializable]
-    public class UserInfo : IReadOnlyUserInfo
+    public class UserInfo : IReadOnlyUserInfo, IEquatable<UserInfo>
     {
         public int Diamonds;
         public int Gold;
@@ -20,6 +21,20 @@ namespace LineWars.Model
         IReadOnlyList<int> IReadOnlyUserInfo.UnlockedCards => UnlockedCards;
         int IReadOnlyUserInfo.UpgradeCards => UpgradeCards;
         IReadOnlyDictionary<LootBoxType, int> IReadOnlyUserInfo.LootBoxes => LootBoxes;
+
+        public bool Equals(UserInfo other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            
+            
+            return Diamonds == other.Diamonds
+                   && Gold == other.Gold 
+                   && (UnlockedCards.Count == other.UnlockedCards.Count && !UnlockedCards.Except(other.UnlockedCards).Any())
+                   && UpgradeCards == other.UpgradeCards 
+                   && (LootBoxes.Count == other.LootBoxes.Count && !LootBoxes.Except(other.LootBoxes).Any())
+                   && PassingGameModes == other.PassingGameModes;
+        }
     }
 
     public interface IReadOnlyUserInfo
