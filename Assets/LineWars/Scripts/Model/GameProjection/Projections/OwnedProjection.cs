@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 namespace LineWars.Model
 {
@@ -55,6 +56,7 @@ namespace LineWars.Model
 
             owner = Game.PlayersIndexList[basePlayerID];
             owner.AddOwned(this);
+            //Debug.Log($"{owner} Added {this}");
         }
     }
 }
