@@ -9,7 +9,7 @@ namespace LineWars.Controllers
         {
             if (!GameVariables.IsNormalStart) return;
             
-            GameRoot.Instance.UserController.PassingGameModes += 1;
+            GameRoot.Instance.UserController.PassingInfinityGameModes += 1;
             var money = GetMoneyAfterBattle();
             var diamonds = GetDiamondsAfterBattle();
             GameRoot.Instance.UserController.UserGold += money;
