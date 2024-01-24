@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AYellowpaper.SerializedCollections;
 using DataStructures;
 using JetBrains.Annotations;
 using LineWars.Controllers;
@@ -14,6 +15,8 @@ namespace LineWars.Model
     public class DecksController : MonoBehaviour,
         IDeckIndexer
     {
+        [SerializeField] List<DeckCard> defaultDeck;
+        
         private UserInfoController userInfoController;
         private IProvider<Deck> deckProvider;
         private Dictionary<int, Deck> allDecks;
@@ -39,6 +42,7 @@ namespace LineWars.Model
             allDecks = provider.LoadAll()
                 .Select(AssignDeck)
                 .ToDictionary(deck => deck.Id, deck => deck);
+            TryAddDefaultDeck();
         }
 
         /// <summary>
@@ -47,7 +51,7 @@ namespace LineWars.Model
         public void ProcessDeck(Deck deck)
         {
             allDecks[deck.Id] = deck;
-            deckProvider.Save(deck, deck.Id);
+            SaveDeck(deck);
         }
 
         private Deck AssignDeck(Deck deck)
@@ -59,6 +63,25 @@ namespace LineWars.Model
             }
 
             return deck;
+        }
+
+        private void TryAddDefaultDeck()
+        {
+            if (!allDecks.ContainsKey(0))
+            {
+                //Debug.Log("TryAddDefaultDeck");
+                var deck = new Deck(0);
+                foreach (var card in defaultDeck)
+                    deck.AddCard(card);
+                deck = AssignDeck(deck);
+                SaveDeck(deck);
+                allDecks[0] = deck;
+            }
+        }
+
+        private void SaveDeck(Deck deck)
+        {
+            deckProvider.Save(deck, deck.Id);
         }
     }
 

@@ -3,13 +3,11 @@ using System.Linq;
 using LineWars.Model;
 using UnityEditor;
 using UnityEngine;
-using Random = System.Random;
 
 
 [CustomEditor(typeof(AdvancedUnitCostFunction))]
 public class AdvancedUnitCostFunctionEditor : Editor
 {
-    public static Random random = new();
     private AdvancedUnitCostFunction Function => (AdvancedUnitCostFunction) target;
 
     public override void OnInspectorGUI()
@@ -24,17 +22,28 @@ public class AdvancedUnitCostFunctionEditor : Editor
 
     private void ValidateFunction(AdvancedUnitCostFunction function)
     {
-        try
+        foreach (var value in Enum.GetValues(typeof(UnitType)).OfType<UnitType>())
         {
-            foreach (var value in Enum.GetValues(typeof(UnitType)).OfType<UnitType>())
+            try
             {
-                function.Calculate(value, random.Next(0, 100), random.Next(0, 100));
+                var baseCost = 100;
+                var unitsCount = 0;
+
+                var info = function.Calculate(value, baseCost, unitsCount);
+                Debug.Log($"unitType={value} baseCost={baseCost} unitCount={unitsCount} result={info.Cost}");
+
+                unitsCount = 1;
+                info = function.Calculate(value, baseCost, unitsCount);
+                Debug.Log($"unitType={value} baseCost={baseCost} unitCount={unitsCount} result={info.Cost}");
+
+                unitsCount = UnityEngine.Random.Range(0, 100);
+                info = function.Calculate(value, baseCost, unitsCount);
+                Debug.Log($"Random unitType={value} baseCost={baseCost} unitCount={unitsCount} result={info.Cost}");
             }
-            Debug.Log("Check success!");
-        }
-        catch (Exception e)
-        {
-            Debug.LogError(e.Message);
+            catch (Exception e)
+            {
+                Debug.LogError($"{e.Message} {value}");
+            }
         }
     }
 }

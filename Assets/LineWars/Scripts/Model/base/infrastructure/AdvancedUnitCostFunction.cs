@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using AYellowpaper.SerializedCollections;
-using org.mariuszgromada.math.mxparser;
 using UnityEngine;
+using Mathos.Parser;
 
 namespace LineWars.Model
 {
     [CreateAssetMenu(menuName = "UnitCostFunctions/Advanced")]
     public class AdvancedUnitCostFunction : UnitCostFunction
     {
+        private MathParser mathParser;
+        
         [SerializeField] private string baseCostParameterName = "x";
         [SerializeField] private string unitCountParameterName = "y";
 
@@ -16,6 +18,11 @@ namespace LineWars.Model
         private SerializedDictionary<UnitType, string> functions;
 
         private readonly Dictionary<UnitType, (int, int, PurchaseInfo)> cash = new();
+
+        private void OnEnable()
+        {
+            mathParser = new MathParser();
+        }
 
         public override PurchaseInfo Calculate(UnitType unitType, int baseCost, int unitCount)
         {
@@ -28,10 +35,11 @@ namespace LineWars.Model
                 }
                 else
                 {
-                    var x = new Argument($"{baseCostParameterName} = {baseCost}");
-                    var y = new Argument($"{unitCountParameterName} = {unitCount}");
-                    var expression = new Expression(stringExpression, x, y);
-                    var purchaseInfo = new PurchaseInfo((int) expression.calculate());
+                    
+                    mathParser.LocalVariables[baseCostParameterName] = baseCost;
+                    mathParser.LocalVariables[unitCountParameterName] = unitCount;
+                    
+                    var purchaseInfo = new PurchaseInfo((int) mathParser.Parse(stringExpression));
                     cash[unitType] = (baseCost, unitCount, purchaseInfo);
                     return purchaseInfo;
                 }

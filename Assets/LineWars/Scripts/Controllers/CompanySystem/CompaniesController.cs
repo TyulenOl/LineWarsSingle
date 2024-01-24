@@ -11,19 +11,17 @@ namespace LineWars.Controllers
         [SerializeField] private List<int> defaultUnlockMissionIds;
         
         [Header("Debug")]
-        [SerializeField] private bool godMode;
+        [SerializeField] private bool debugMode;
         
         private IProvider<MissionInfo> companiesProvider;
         private IStorage<MissionData> missionStorage;
         
         private Dictionary<int, MissionInfo> missionInfos;
-
-        private readonly HashSet<MissionInfo> missionsToSave = new ();
         
         public int ChoseMissionId { get; set; }
         public event Action AnyMissionInfoChanged;
 
-        public bool IsInfinityGameUnlocked => godMode || missionInfos[0].MissionStatus == MissionStatus.Completed;
+        public bool IsInfinityGameUnlocked => debugMode || missionInfos[0].MissionStatus == MissionStatus.Completed;
 
         public void Initialize(IProvider<MissionInfo> provider, IStorage<MissionData> storage)
         {
@@ -59,18 +57,35 @@ namespace LineWars.Controllers
             }
         }
 
-        public void DefeatChoseMission()
+        public void DefeatChoseMissionIfNoWin()
         {
             var missionInfo = missionInfos[ChoseMissionId];
+            if (missionInfo.MissionStatus 
+                is MissionStatus.Completed 
+                or MissionStatus.Failed)
+                return;
+            
             missionInfo.MissionStatus = MissionStatus.Failed;
-            missionsToSave.Add(missionInfo);
+            SaveMission(missionInfo);
         }
         
         public void WinChoseMission()
         {
             var missionInfo = missionInfos[ChoseMissionId];
+            if (missionInfo.MissionStatus is MissionStatus.Completed) return;
+            
             missionInfo.MissionStatus = MissionStatus.Completed;
-            missionsToSave.Add(missionInfo);
+            SaveMission(missionInfo);
+        }
+        
+        public void UnlockMission(int missionId)
+        {
+            var missionInfo = missionInfos[missionId];
+            if (missionInfo.MissionStatus is not MissionStatus.Locked) return;
+            
+            
+            missionInfo.MissionStatus = MissionStatus.Unlocked;
+            SaveMission(missionInfo);
         }
         
         private void TryAddNewMission(int missionId)
@@ -85,18 +100,9 @@ namespace LineWars.Controllers
         public MissionInfo GetMissionInfo(int missionId)
         {
             var copy = missionInfos[missionId].GetCopy();
-            if (godMode && copy.MissionStatus == MissionStatus.Locked)
+            if (debugMode && copy.MissionStatus == MissionStatus.Locked)
                 copy.MissionStatus = MissionStatus.Unlocked;
             return copy;
-        }
-
-        public void UnlockMission(int missionId)
-        {
-            if (missionInfos[missionId].MissionStatus == MissionStatus.Locked)
-            {
-                missionInfos[missionId].MissionStatus = MissionStatus.Unlocked;
-                missionsToSave.Add(missionInfos[missionId]);
-            }
         }
         
         public void UnlockNextMission()
@@ -108,32 +114,16 @@ namespace LineWars.Controllers
         public MissionStatus GetMissionStatus(int missionId)
         {
             var mission = missionInfos[missionId];
-            if (godMode && mission.MissionStatus == MissionStatus.Locked)
+            if (debugMode && mission.MissionStatus == MissionStatus.Locked)
                 return MissionStatus.Unlocked;
             return mission.MissionStatus;
 
         }
-        
-        public bool MissionIsLocked(int missionId)
-        {
-            return !godMode || missionInfos[missionId].MissionStatus == MissionStatus.Locked;
-        }
 
-        public bool CompanyIsLocked(IEnumerable<int> companyMissions)
+        private void SaveMission(MissionInfo info)
         {
-            return companyMissions.All(MissionIsLocked);
-        }
-        
-        public void OnApplicationFocus(bool hasFocus)
-        {
-            if (!hasFocus)
-            {
-                foreach (var missionInfo in missionsToSave)
-                {
-                    companiesProvider.Save(missionInfo, missionInfo.MissionId);
-                }
-                missionsToSave.Clear();
-            }
+            if (!debugMode) 
+                companiesProvider.Save(info, info.MissionId);
         }
 
         private void OnValidate()
