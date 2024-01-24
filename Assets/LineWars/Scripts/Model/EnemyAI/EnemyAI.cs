@@ -13,6 +13,7 @@ namespace LineWars.Model
         [SerializeField] private DepthDetailsData depthDetailsData;
         [SerializeField] private AIBuyLogicData buyLogicData;
         [SerializeField] private GameEvaluator gameEvaluator;
+        [SerializeField] private AILogicType AiType;
 
         [Header("Timing Options")]
         [SerializeField] private float actionCooldown;
@@ -20,13 +21,23 @@ namespace LineWars.Model
         [SerializeField] private float firstCommandPause;
 
         private AIBuyLogic buyLogic;
-        private EnemyAITurnLogic turnLogic;
+        private BaseEnemyAITurnLogic turnLogic;
 
         public int Depth => depthDetailsData.TotalDepth;
         protected override void OnInitialized()
         {
             buyLogic = buyLogicData.CreateAILogic(this);
-            turnLogic = new EnemyAITurnLogic(this);
+            switch(AiType)
+            {
+                case AILogicType.Async:
+                    turnLogic = new EnemyAITurnLogic(this, gameEvaluator, depthDetailsData);
+                    break;
+                case AILogicType.Sync:
+                    turnLogic = new SyncEnemyAITurnLogic(this, gameEvaluator, depthDetailsData);
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
         }
 
         public override bool CanExecuteTurn(PhaseType phase)
@@ -74,6 +85,12 @@ namespace LineWars.Model
                 turnLogic.Ended -= OnTurnLogicEnd;
                 InvokeTurnEnded(phaseType);
             }
+        }
+
+        public enum AILogicType
+        {
+            Async,
+            Sync
         }
     }
 }

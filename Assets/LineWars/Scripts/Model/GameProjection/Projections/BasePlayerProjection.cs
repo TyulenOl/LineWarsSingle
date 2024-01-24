@@ -31,7 +31,6 @@ namespace LineWars.Model
         public void AddOwned([NotNull] OwnedProjection owned)
         {
             if (owned == null) throw new ArgumentNullException(nameof(owned));
-            if (owned.Owner != null && owned.Owner == this) return;
             if (owned.Owner != null && owned.Owner != this)
                 owned.Owner.RemoveOwned(owned);
 
