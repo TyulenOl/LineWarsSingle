@@ -5,7 +5,7 @@ namespace LineWars.Controllers
 {
     public static class CardHelper
     {
-        public static IEnumerable<int> FindCardsByType(this IStorage<DeckCard> storage, CardRarity rarity)
+        public static IEnumerable<int> FindCardsByType(this IStorage<DeckCard> storage, Rarity rarity)
         {
             foreach (var card in storage.Values)
             {

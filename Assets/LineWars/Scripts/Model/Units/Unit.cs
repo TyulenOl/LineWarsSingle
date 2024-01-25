@@ -341,5 +341,19 @@ namespace LineWars.Model
         {
             return visitor.Visit(this);
         }
+        
+        public void DealDamageThroughArmor(int value)
+        {
+            if (value < 0)
+                throw new ArgumentException();
+            if (value == 0)
+                return;
+
+            var blockedDamage = Mathf.Min(value, CurrentArmor);
+            var notBlockedDamage = value - blockedDamage;
+
+            CurrentArmor -= blockedDamage;
+            CurrentHp -= notBlockedDamage;
+        }
     }
 }

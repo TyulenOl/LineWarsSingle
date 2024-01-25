@@ -298,6 +298,13 @@ namespace LineWars.Model
         }
 
 
+        public IEnumerable<Unit> GetAllEnemiesUnits()
+        {
+            return SingleGameRoot.Instance.AllUnits.Values
+                .Where(x => x.OwnerId != Id);
+        }
+
+
 #if UNITY_EDITOR
         private void OnValidate()
         {

@@ -16,6 +16,10 @@ namespace LineWars
         [field:SerializeField] public PlayerInitializer PlayerInitializer { get;  set; }
         [field: SerializeField] public DeckGetter DeckGetter { get; set; }
         
+        [field: Header("Controllers")]
+        [field: SerializeField] public CommandsManager CommandsManager { get; set; }
+        [field: SerializeField] public BlessingInitialData BlessingInitialData { get; set; }
+        
         public readonly IndexList<BasePlayer> AllPlayers = new();
         public readonly IndexList<Unit> AllUnits = new();
         public Deck CurrentDeck { get; private set; }

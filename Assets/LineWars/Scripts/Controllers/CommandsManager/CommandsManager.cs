@@ -8,9 +8,9 @@ using Object = UnityEngine.Object;
 
 namespace LineWars.Controllers
 {
-    public partial class CommandsManager : MonoBehaviour
+    public sealed partial class CommandsManager : MonoBehaviour
     {
-        private const string CommandsManagerPrefix = "CommandsManagerLog";
+        public const string CommandsManagerPrefix = "CommandsManagerLog";
         public static CommandsManager Instance { get; private set; }
         [field:SerializeField, ReadOnlyInspector] public bool ActiveSelf { get; private set; } = true;
         
@@ -21,6 +21,8 @@ namespace LineWars.Controllers
         
         public bool HaveConstrains => Constrains != null;
         public bool NotHaveConstraints => Constrains == null;
+        public float MaxActionDelayInSeconds => maxActionDelayInSeconds;
+        public bool NeedErrorLog => needErrorLog;
 
         private IMonoTarget target;
         private IMonoExecutor executor;

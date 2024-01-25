@@ -12,7 +12,7 @@ namespace LineWars.Store
     public class CardStore : MonoBehaviour
     {
         [SerializeField, Min(1)] private int changeIntervalInDays = 1;
-        [SerializeField] private List<CardRarity> cards;
+        [SerializeField] private List<Rarity> cards;
         [SerializeField] private List<DeckCard> exceptions;
         
         private IGetter<DateTime> timeGetter;
@@ -48,7 +48,7 @@ namespace LineWars.Store
 
         private void FillStore(System.Random random)
         {
-            var cardsByType = new Dictionary<CardRarity, List<int>>();
+            var cardsByType = new Dictionary<Rarity, List<int>>();
 
             foreach(var cardType in cards)
             {
