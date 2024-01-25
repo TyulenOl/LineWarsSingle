@@ -23,7 +23,7 @@ namespace LineWars.Controllers
         [Header("ProviderSettings")]
         [SerializeField] private ProviderType providerType;
 
-
+        private CardLevelsStorage cardsLevelStorage;
         private IProvider<Deck> deckProvider;
         private IProvider<MissionInfo> missionInfoProvider;
         private IProvider<UserInfo> userInfoProvider;
@@ -31,6 +31,7 @@ namespace LineWars.Controllers
         private IGetter<DateTime> timeGetter;
 
         public IStorage<DeckCard> CardsDatabase => cardsDatabase;
+        public CardLevelsStorage CardsLevelDatabase => cardsLevelStorage;
         public IStorage<MissionData> MissionsStorage => missionsStorage;
 
         public DecksController DecksController => decksController;
@@ -46,11 +47,12 @@ namespace LineWars.Controllers
             ValidateFields();
 
             InitializeProviders();
-            
+
             CompaniesController.Initialize(missionInfoProvider, missionsStorage);
             UserController.Initialize(userInfoProvider, cardsDatabase);
             DecksController.Initialize(deckProvider, UserController);
             CardStore.Initialize(timeGetter, CardsDatabase, UserController);
+            cardsLevelStorage = new CardLevelsStorage(CardsDatabase, UserController.UserInfo);
             InitializeLootBoxController();
         }
 

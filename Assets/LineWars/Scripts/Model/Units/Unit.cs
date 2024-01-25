@@ -58,12 +58,12 @@ namespace LineWars.Model
 
         public event Action AnyActionCompleted;
         public event Action ExecutorDestroyed;
-        public event Action<Unit, Node, Node> UnitNodeChanged; //++
-        public event Action<Unit, int, int> UnitHPChanged; //++
-        public event Action<Unit, int, int> UnitActionPointsChanged; //++
-        public event Action<Unit, int, int> UnitPowerChanged; //++
-        public event Action<Unit, int, int> UnitArmorChanged; //++
-        public event Action<Unit> UnitReplenished; //++
+        public event Action<Unit, Node, Node> UnitNodeChanged;
+        public event Action<Unit, int, int> UnitHPChanged;
+        public event Action<Unit, int, int> UnitActionPointsChanged;
+        public event Action<Unit, int, int> UnitPowerChanged;
+        public event Action<Unit, int, int> UnitArmorChanged; 
+        public event Action<Unit> UnitReplenished; 
 
         private List<Effect<Node, Edge, Unit>> effects = new(); 
 

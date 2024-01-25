@@ -5,13 +5,12 @@ using UnityEngine;
 using System;
 using System.Collections;
 using LineWars.LootBoxes;
-using Object = System.Object;
 
 namespace LineWars.Controllers
 {
     public class UserInfoController: MonoBehaviour
     {
-        [SerializeField] private UserInfoPreset userInfoPreset;
+        [SerializeField] private UserInfoPreset defaultUserInfoPreset;
 
 #if UNITY_EDITOR
         [Header("Debug")] 
@@ -44,18 +43,35 @@ namespace LineWars.Controllers
                 currentInfo.UnlockedCards = new List<int>();
                 UserDiamond = 10000;
                 UserGold = 10000;
-            }    
+            }
 #endif
+            InitializeDefaultCards();
+            
+            
+            SaveCurrentUserInfo();
+        }
+
+        private void InitializeDefaultCards()
+        {
             openedCardsSet = currentInfo.UnlockedCards
                 .Select(x => deckCardStorage.IdToValue[x])
-                .Concat(userInfoPreset.DefaultCards.Where(storage.ValueToId.ContainsKey))
+                .Concat(defaultUserInfoPreset.DefaultCards.Where(deckCardStorage.ValueToId.ContainsKey))
                 .ToHashSet();
-            
+
             currentInfo.UnlockedCards = openedCardsSet
                 .Select(x => deckCardStorage.ValueToId[x])
                 .ToList();
-            
-            SaveCurrentUserInfo();
+
+            foreach(var cardInfo in defaultUserInfoPreset.DefaultCardLevels)
+            {
+                var level = cardInfo.Value;
+                var cardId = cardInfo.Key;
+
+                if(!currentInfo.CardLevels.ContainsKey(cardId))
+                {
+                    currentInfo.CardLevels[cardId] = level;
+                }
+            }
         }
 
         private UserInfo AssignUserInfo(UserInfo userInfo)
@@ -69,9 +85,9 @@ namespace LineWars.Controllers
         {
             var newUserInfo = new UserInfo()
             {
-                Gold = userInfoPreset.DefaultGold,
-                Diamonds = userInfoPreset.DefaultDiamond,
-                UnlockedCards = userInfoPreset.DefaultCards
+                Gold = defaultUserInfoPreset.DefaultGold,
+                Diamonds = defaultUserInfoPreset.DefaultDiamond,
+                UnlockedCards = defaultUserInfoPreset.DefaultCards
                     .Where(deckCardStorage.ValueToId.ContainsKey)
                     .Select(x => deckCardStorage.ValueToId[x])
                     .ToList(),
@@ -79,7 +95,7 @@ namespace LineWars.Controllers
                     .ToSerializedDictionary(x => x, x=> 0)
             };
 
-            foreach(var pair in userInfoPreset.DefaultBoxesCount)
+            foreach(var pair in defaultUserInfoPreset.DefaultBoxesCount)
             {
                 newUserInfo.LootBoxes[pair.Key] = pair.Value;
             }
@@ -114,6 +130,39 @@ namespace LineWars.Controllers
             openedCardsSet.Remove(deckCard);
             currentInfo.UnlockedCards.Remove(deckCardStorage.ValueToId[deckCard]);
             SaveCurrentUserInfo();
+        }
+
+        public int GetCardLevel(DeckCard card)
+        {
+            var cardId = deckCardStorage.ValueToId[card];
+            return GetCardLevel(cardId);
+        }
+
+        public int GetCardLevel(int cardId)
+        {
+            return currentInfo.CardLevels[cardId];
+        }
+
+        public void SetCardLevel(int cardId, int level)
+        {
+            if(!currentInfo.UnlockedCards.Contains(cardId))
+            {
+                Debug.LogError("Can't set level to locked card!");
+                return;
+            }
+            if (level < 1)
+            {
+                Debug.LogError("Level can't be negative");
+                return;
+            }
+
+            currentInfo.CardLevels[cardId] = level;
+        }
+
+        public void SetCardLevel(DeckCard card, int level)
+        {
+            var cardId = deckCardStorage.ValueToId[card];
+            SetCardLevel(cardId, level);
         }
 
         public int UserGold

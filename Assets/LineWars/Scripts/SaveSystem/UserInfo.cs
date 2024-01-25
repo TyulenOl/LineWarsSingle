@@ -14,6 +14,7 @@ namespace LineWars.Model
         public List<int> UnlockedCards;
         public int UpgradeCards;
         public SerializedDictionary<LootBoxType, int> LootBoxes;
+        public SerializedDictionary<int, int> CardLevels;
         public int PassingGameModes;
         
         int IReadOnlyUserInfo.Diamonds => Diamonds;
@@ -21,6 +22,7 @@ namespace LineWars.Model
         IReadOnlyList<int> IReadOnlyUserInfo.UnlockedCards => UnlockedCards;
         int IReadOnlyUserInfo.UpgradeCards => UpgradeCards;
         IReadOnlyDictionary<LootBoxType, int> IReadOnlyUserInfo.LootBoxes => LootBoxes;
+        IReadOnlyDictionary<int, int> IReadOnlyUserInfo.CardLevels => CardLevels;
 
         public bool Equals(UserInfo other)
         {
@@ -44,5 +46,6 @@ namespace LineWars.Model
         public IReadOnlyList<int> UnlockedCards { get; }
         public int UpgradeCards { get; }
         public IReadOnlyDictionary<LootBoxType, int> LootBoxes { get; }
+        public IReadOnlyDictionary<int, int> CardLevels { get; }
     }
 }
