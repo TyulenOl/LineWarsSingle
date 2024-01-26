@@ -6,7 +6,7 @@ namespace LineWars.Controllers
 {
     public interface IBlessingsPull: IEnumerable<(BlessingId, int)>
     {
-        public int this[BlessingId blessingId] { get; set; }
+        public int this[BlessingId id] { get; set; }
         public event Action<BlessingId, int> BlessingCountChanged;
         public bool TryGetValue(BlessingId id, out int count);
     }

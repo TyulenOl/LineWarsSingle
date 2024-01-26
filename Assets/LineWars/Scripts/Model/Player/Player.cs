@@ -156,7 +156,7 @@ namespace LineWars.Model
             additionalVisibleNodes.Add(node);
         }
 
-        public bool RemoveVisibleNode(Node node) => additionalVisibleNodes.Remove(node);
+        public bool RemoveAdditionalVisibleNode(Node node) => additionalVisibleNodes.Remove(node);
 
         protected override void OnSpawnUnit()
         {

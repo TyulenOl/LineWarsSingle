@@ -9,19 +9,17 @@ namespace LineWars.Model
     public class PerunBlessing: BaseBlessing
     {
         [SerializeField] private int damage;
-        private Player player => Player.LocalPlayer;
-        
         public override event Action Completed;
         
         public override bool CanExecute()
         {
-            return player.GetAllEnemiesUnits().Any();
+            return Player.GetAllEnemiesUnits().Any();
         }
 
         public override void Execute()
         {
             // TODO анимации
-            foreach (var enemy in player.GetAllEnemiesUnits())
+            foreach (var enemy in Player.GetAllEnemiesUnits())
             {
                 enemy.DealDamageThroughArmor(damage);
             }

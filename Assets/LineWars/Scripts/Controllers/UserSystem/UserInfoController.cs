@@ -195,35 +195,35 @@ namespace LineWars.Controllers
             }
         }
 
-        int IBlessingsPull.this[BlessingId blessingId]
+        int IBlessingsPull.this[BlessingId id]
         {
-            get => currentInfo.Blessings.TryGetValue(blessingId, out var value) ? value : 0;
+            get => currentInfo.Blessings.TryGetValue(id, out var value) ? value : 0;
             set
             {
                 if (value < 0)
                     throw new ArgumentException($"{nameof(BlessingsCount)} can't be less than zero!");
                     
                 
-                if (currentInfo.Blessings.TryGetValue(blessingId, out var currentCount))
+                if (currentInfo.Blessings.TryGetValue(id, out var currentCount))
                 {
                     if (value == 0 && currentCount == 0)
                     {
-                        currentInfo.Blessings.Remove(blessingId);
+                        currentInfo.Blessings.Remove(id);
                         SaveCurrentUserInfo();
                         return;
                     }
                     if (value == currentCount)
                         return;
-                    currentInfo.Blessings[blessingId] = value;
-                    BlessingCountChanged?.Invoke(blessingId, value);
+                    currentInfo.Blessings[id] = value;
+                    BlessingCountChanged?.Invoke(id, value);
                     SaveCurrentUserInfo();
                 }
                 else
                 {
                     if (value == 0)
                         return;
-                    currentInfo.Blessings[blessingId] = value;
-                    BlessingCountChanged?.Invoke(blessingId, value);
+                    currentInfo.Blessings[id] = value;
+                    BlessingCountChanged?.Invoke(id, value);
                     SaveCurrentUserInfo();
                 }
             }

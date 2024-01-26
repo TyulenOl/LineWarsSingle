@@ -17,7 +17,7 @@ namespace LineWars.Controllers
             return GetEnumerator();
         }
 
-        public int this[BlessingId blessingId]
+        public int this[BlessingId id]
         {
             get => 0;
             set {}
