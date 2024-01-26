@@ -15,10 +15,11 @@ namespace LineWars
         [field:SerializeField] public WinOrLoseAction WinOrLoseAction { get; set; }
         [field:SerializeField] public PlayerInitializer PlayerInitializer { get;  set; }
         [field: SerializeField] public DeckGetter DeckGetter { get; set; }
+        [field: SerializeField] public BlessingPullGetter BlessingPullGetter { get; set; }
+        [field: SerializeField] public BlessingStorageGetter BlessingStorageGetter { get; set; }
         
         [field: Header("Controllers")]
         [field: SerializeField] public CommandsManager CommandsManager { get; set; }
-        [field: SerializeField] public BlessingInitialData BlessingInitialData { get; set; }
         
         public readonly IndexList<BasePlayer> AllPlayers = new();
         public readonly IndexList<Unit> AllUnits = new();
@@ -36,6 +37,7 @@ namespace LineWars
 
             InitializeAndRegisterAllPlayers();
             InitializeGameReferee();
+            CommandsManager.Initialize(BlessingPullGetter.Get(), BlessingStorageGetter.Get());
             
             StartCoroutine(StartGameCoroutine());
 

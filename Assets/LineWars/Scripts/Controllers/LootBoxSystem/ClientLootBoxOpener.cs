@@ -9,10 +9,10 @@ namespace LineWars.LootBoxes
 {
     public class ClientLootBoxOpener : ILootBoxOpener
     {
-        private IStorage<DeckCard> cardStorage;
+        private IStorage<int, DeckCard> cardStorage;
         public LootBoxInfo BoxInfo {get; private set;}
 
-        public ClientLootBoxOpener(LootBoxInfo info, IStorage<DeckCard> cardStorage)
+        public ClientLootBoxOpener(LootBoxInfo info, IStorage<int, DeckCard> cardStorage)
         {
             BoxInfo = info;
             this.cardStorage = cardStorage;

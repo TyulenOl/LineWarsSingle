@@ -5,11 +5,11 @@ using LineWars.Model;
 
 namespace LineWars.Controllers
 {
-    public class ExecutorRedrawMessage
+    public class ExecutorMessage
     {
         public IEnumerable<TargetActionInfo> Data { get; }
 
-        public ExecutorRedrawMessage(IEnumerable<TargetActionInfo> data)
+        public ExecutorMessage(IEnumerable<TargetActionInfo> data)
         {
             Data = data.ToArray();
         }

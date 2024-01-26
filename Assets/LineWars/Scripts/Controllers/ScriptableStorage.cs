@@ -4,27 +4,27 @@ using UnityEngine;
 
 namespace LineWars
 {
-    public interface IStorage<T>
+    public interface IStorage<TKey,TValue>
     {
-        IReadOnlyDictionary<int, T> IdToValue { get; }
-        IReadOnlyDictionary<T, int> ValueToId { get; }
-        IEnumerable<T> Values { get; }
-        IEnumerable<int> Keys { get; }
+        IReadOnlyDictionary<TKey, TValue> IdToValue { get; }
+        IReadOnlyDictionary<TValue, TKey> ValueToId { get; }
+        IEnumerable<TValue> Values { get; }
+        IEnumerable<TKey> Keys { get; }
         int ValuesCount { get; }
     }
 
-    public abstract class ScriptableStorage<T> :
+    public abstract class ScriptableStorage<TKey, TValue> :
         ScriptableObject,
         ISerializationCallbackReceiver, 
-        IStorage<T>
+        IStorage<TKey,TValue>
     {
-        [SerializeField] private SerializedDictionary<int, T> idToValue;
-        private Dictionary<T, int> valueToId;
+        [SerializeField] private SerializedDictionary<TKey, TValue> idToValue;
+        private Dictionary<TValue, TKey> valueToId;
 
-        public IReadOnlyDictionary<int, T> IdToValue => idToValue;
-        public IReadOnlyDictionary<T, int> ValueToId => valueToId;
-        public IEnumerable<int> Keys => idToValue.Keys;
-        public IEnumerable<T> Values => idToValue.Values;
+        public IReadOnlyDictionary<TKey, TValue> IdToValue => idToValue;
+        public IReadOnlyDictionary<TValue, TKey> ValueToId => valueToId;
+        public IEnumerable<TKey> Keys => idToValue.Keys;
+        public IEnumerable<TValue> Values => idToValue.Values;
         public int ValuesCount => idToValue.Count;
 
 
@@ -34,7 +34,7 @@ namespace LineWars
 
         public void OnAfterDeserialize()
         {
-            valueToId = new Dictionary<T, int>();
+            valueToId = new Dictionary<TValue, TKey>();
             foreach (var pair in idToValue)
             {
                 if (pair.Value == null)

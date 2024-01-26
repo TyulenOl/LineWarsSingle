@@ -1,10 +1,9 @@
 ﻿
 namespace LineWars.Model
 {
-    public interface IGetter<T>
+    public interface IGetter<out T>
     {
         public bool CanGet();
-
         public T Get();
     }
 }

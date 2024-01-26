@@ -1,19 +1,25 @@
 ﻿using System;
+using UnityEngine;
 
 namespace LineWars.Model
 {
-    public class BlessingData: IEquatable<BlessingData>
+    [Serializable]
+    public class BlessingId: IEquatable<BlessingId>
     {
-        public BlessingType BlessingType { get; }
-        public Rarity Rarity { get; }
+        [SerializeField] private BlessingType blessingType;
+        [SerializeField] private Rarity rarity;
 
-        public BlessingData(BlessingType blessingType, Rarity rarity)
+
+        public BlessingType BlessingType => blessingType;
+        public Rarity Rarity => rarity;
+
+        public BlessingId(BlessingType blessingType, Rarity rarity)
         {
-            BlessingType = blessingType;
-            Rarity = rarity;
+            this.blessingType = blessingType;
+            this.rarity = rarity;
         }
 
-        public bool Equals(BlessingData other)
+        public bool Equals(BlessingId other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -25,7 +31,7 @@ namespace LineWars.Model
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((BlessingData) obj);
+            return Equals((BlessingId) obj);
         }
 
         public override int GetHashCode()

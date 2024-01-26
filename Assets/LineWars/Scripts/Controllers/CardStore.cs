@@ -16,7 +16,7 @@ namespace LineWars.Store
         [SerializeField] private List<DeckCard> exceptions;
         
         private IGetter<DateTime> timeGetter;
-        private IStorage<DeckCard> cardStorage;
+        private IStorage<int, DeckCard> cardStorage;
         private UserInfoController userInfoController;
 
         private bool isStoreInitialized = false;
@@ -26,7 +26,7 @@ namespace LineWars.Store
 
         public void Initialize(
             IGetter<DateTime> timeGetter, 
-            IStorage<DeckCard> cardStorage,
+            IStorage<int, DeckCard> cardStorage,
             UserInfoController userController)
         {
             this.timeGetter = timeGetter;

@@ -12,6 +12,7 @@ namespace LineWars.Controllers
         [Header("Storages")]
         [SerializeField] private DeckCardsScriptableStorage cardsDatabase;
         [SerializeField] private MissionsScriptableStorage missionsStorage;
+        [SerializeField] private BlessingStorage blessingStorage;
 
         [Header("Controllers")]
         [SerializeField] private DecksController decksController;
@@ -30,8 +31,9 @@ namespace LineWars.Controllers
         private IProvider<Settings> settingsProvider;
         private IGetter<DateTime> timeGetter;
 
-        public IStorage<DeckCard> CardsDatabase => cardsDatabase;
-        public IStorage<MissionData> MissionsStorage => missionsStorage;
+        public IStorage<int, DeckCard> CardsDatabase => cardsDatabase;
+        public IStorage<int, MissionData> MissionsStorage => missionsStorage;
+        public IStorage<BlessingId, BaseBlessing> BlessingStorage => blessingStorage;
 
         public DecksController DecksController => decksController;
         public CompaniesController CompaniesController => companiesController;
