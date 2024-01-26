@@ -19,7 +19,9 @@
         HealingAttack,
         TargetPowerBasedAttack,
         PowerBasedHeal,
-        UpArmor
+        UpArmor,
+        ArmorBasedAttack,
+        ConsumeUnit
     }
 }   
 

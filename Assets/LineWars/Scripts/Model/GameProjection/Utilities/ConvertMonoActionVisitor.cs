@@ -141,5 +141,11 @@ namespace LineWars.Model
             Result = new PowerBasedHealAction<NodeProjection, EdgeProjection, UnitProjection>(Unit);
             Result.ActionModifier = action.Action.ActionModifier;
         }
+
+        public void Visit(MonoArmorBasedAttackAction action)
+        {
+            Result = new ArmorBasedAttackAction<NodeProjection, EdgeProjection, UnitProjection>(Unit);
+            Result.ActionModifier = action.Action.ActionModifier;
+        }
     }    
 }

@@ -24,5 +24,7 @@
         public TResult Visit(ITargetPowerBasedAttackAction<TNode, TEdge, TUnit> action);
         public TResult Visit(IUpArmorAction<TNode, TEdge, TUnit> action);
         public TResult Visit(IPowerBasedHealAction<TNode, TEdge, TUnit> action);
+        public TResult Visit(IArmorBasedAttackAction<TNode, TEdge, TUnit> action);
+        public TResult Visit(IConsumeUnitAction<TNode, TEdge, TUnit> action);
     }
 }

@@ -19,6 +19,7 @@ namespace LineWars.Controllers
         [SerializeField] private UserInfoController userController;
         [SerializeField] private LootBoxController lootBoxController;
         [SerializeField] private CardStore cardStore;
+        [SerializeField] private CardUpgrader cardUpgrader;
 
         [Header("ProviderSettings")]
         [SerializeField] private ProviderType providerType;
@@ -39,6 +40,7 @@ namespace LineWars.Controllers
         public UserInfoController UserController => userController;
         public LootBoxController LootBoxController => lootBoxController;
         public CardStore CardStore => cardStore;
+        public CardUpgrader CardUpgrader => cardUpgrader;
 
         protected override void OnAwake()
         {

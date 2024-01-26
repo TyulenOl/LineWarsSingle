@@ -23,8 +23,13 @@ namespace LineWars.Model
         [SerializeField] private int shopCost;
         [SerializeField] private List<CardLevelInfo> levels;
 
+        private void OnEnable()
+        {
+            foreach (var level in levels)
+                level.Card = this;
+        }
+
         public IReadOnlyList<IReadOnlyCardLevelInfo> Levels => levels.Cast<IReadOnlyCardLevelInfo>().ToList();
-        
         public string Name => cardName.Enabled ? cardName.Value : Unit.UnitName;
         public string Description => description.Enabled ? description.Value : Unit.UnitDescription;
         public Sprite Image => cardImage.Enabled ? cardImage.Value : Unit.Sprite;

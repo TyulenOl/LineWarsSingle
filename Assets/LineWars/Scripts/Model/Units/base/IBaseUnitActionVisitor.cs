@@ -24,5 +24,7 @@ namespace LineWars.Model
         public void Visit(TargetPowerBasedAttackAction<TNode, TEdge, TUnit> action);
         public void Visit(UpArmorAction<TNode, TEdge, TUnit> action);
         public void Visit(PowerBasedHealAction<TNode, TEdge, TUnit> action);
+        public void Visit(ArmorBasedAttackAction<TNode, TEdge, TUnit> action);
+        public void Visit(ConsumeUnitAction<TNode, TEdge, TUnit> action);
     }
 }

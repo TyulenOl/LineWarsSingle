@@ -3,6 +3,7 @@
     public enum EffectType
     {
         AuraPowerBuff,
-        PowerBuff
+        PowerBuff,
+        Armored
     }
 }

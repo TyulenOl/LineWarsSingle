@@ -330,6 +330,16 @@ namespace LineWars.Model
         {
             // TODO 
         }
+
+        public void Visit(ArmorBasedAttackAction<TNode, TEdge, TUnit> action)
+        {
+            // TODO
+        }
+
+        public void Visit(ConsumeUnitAction<TNode, TEdge, TUnit> action)
+        {
+            // TODO
+        }
     }
 
     public static class ConvertUnitActionToBlueprints
