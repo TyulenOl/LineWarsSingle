@@ -1,6 +1,6 @@
 ﻿namespace LineWars.Model
 {
-    public enum CardRarity
+    public enum Rarity
     {
         Common,
         Rare,

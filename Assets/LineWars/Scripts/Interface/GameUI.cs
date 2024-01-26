@@ -127,7 +127,7 @@ namespace LineWars.Interface
             }
         }
 
-        private void ReDrawCurrentTargets(ExecutorRedrawMessage message)
+        private void ReDrawCurrentTargets(ExecutorMessage message)
         {
             foreach (var currentDrawer in currentDrawers)
             {

@@ -77,6 +77,13 @@ namespace LineWars.Interface
             unit.UnitDirectionChange.AddListener(OnUnitDirectionChange);
             unit.ArmorChanged.AddListener(OnUnitArmorChange);
             unit.HpChanged.AddListener(OnUnitHpChange);
+            unit.UnitPowerChanged += UnitOnUnitPowerChanged;
+        }
+
+        private void UnitOnUnitPowerChanged(Unit unit, int before, int after)
+        {
+            if(before != after)
+                ReDrawCharacteristics();
         }
 
         private void LocalPlayerOnVisibilityRecalculated()
@@ -89,6 +96,7 @@ namespace LineWars.Interface
             unit.UnitDirectionChange.RemoveListener(OnUnitDirectionChange);
             unit.ArmorChanged.RemoveListener(OnUnitArmorChange);
             unit.HpChanged.RemoveListener(OnUnitHpChange);
+            unit.UnitPowerChanged -= UnitOnUnitPowerChanged;
         }
 
         private void OnUnitDirectionChange(UnitSize size, UnitDirection direction)

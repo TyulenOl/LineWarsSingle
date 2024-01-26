@@ -2,9 +2,9 @@
 {
     public partial class CommandsManager
     {
-        private class CommandsManagerWaitingExecuteCommandState : CommandsManagerState
+        private class CommandsManagerWaitingExecuteState : CommandsManagerState
         {
-            public CommandsManagerWaitingExecuteCommandState(CommandsManager manager) :
+            public CommandsManagerWaitingExecuteState(CommandsManager manager) :
                 base(manager)
             {
             }

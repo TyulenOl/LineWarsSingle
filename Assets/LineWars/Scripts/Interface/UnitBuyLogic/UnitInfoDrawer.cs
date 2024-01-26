@@ -27,7 +27,7 @@ public class UnitInfoDrawer : MonoBehaviour
         
         hpAmount.text = unit.MaxHp.ToString();
         actionPointsAmount.text = unit.MaxActionPoints.ToString();
-        damageAmount.text = unit.InitialPower.ToString();
+        damageAmount.text = unit.CurrentPower.ToString();
 
         unitImage.gameObject.SetActive(true);
         unitImage.sprite = unit.Sprite;

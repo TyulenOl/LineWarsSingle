@@ -9,7 +9,7 @@ using Object = System.Object;
 
 namespace LineWars.Controllers
 {
-    public class UserInfoController: MonoBehaviour
+    public class UserInfoController: MonoBehaviour, IBlessingsPull
     {
         [SerializeField] private UserInfoPreset userInfoPreset;
 
@@ -19,7 +19,7 @@ namespace LineWars.Controllers
 #endif
         
         private IProvider<UserInfo> userInfoProvider;
-        private IStorage<DeckCard> deckCardStorage;
+        private IStorage<int, DeckCard> deckCardStorage;
 
         private UserInfo currentInfo;
         
@@ -29,10 +29,12 @@ namespace LineWars.Controllers
         public event Action<int> GoldChanged;
         public event Action<int> DiamondsChanged;
         public event Action<int> UserUpgradeCardsChanged;
-        public event Action<int> PassingGameModesChanged; 
-        
+        public event Action<int> PassingGameModesChanged;
+        public event Action<BlessingId, int> BlessingCountChanged;
+
         public IReadOnlyUserInfo UserInfo => currentInfo;
-        public void Initialize(IProvider<UserInfo> provider, IStorage<DeckCard> storage)
+        public IBlessingsPull BlessingsCount => this;
+        public void Initialize(IProvider<UserInfo> provider, IStorage<int, DeckCard> storage)
         {
             userInfoProvider = provider;
             deckCardStorage = storage;
@@ -54,6 +56,16 @@ namespace LineWars.Controllers
             currentInfo.UnlockedCards = openedCardsSet
                 .Select(x => deckCardStorage.ValueToId[x])
                 .ToList();
+
+            if (!currentInfo.DefaultBlessingsIsAdded)
+            {
+                foreach (var (key, value) in userInfoPreset.DefaultBlessingsCount)
+                {
+                    currentInfo.Blessings.TryAdd(key, 0);
+                    currentInfo.Blessings[key] += value;
+                }
+                currentInfo.DefaultBlessingsIsAdded = true;
+            }
             
             SaveCurrentUserInfo();
         }
@@ -76,7 +88,10 @@ namespace LineWars.Controllers
                     .Select(x => deckCardStorage.ValueToId[x])
                     .ToList(),
                 LootBoxes = Enum.GetValues(typeof(LootBoxType)).OfType<LootBoxType>()
-                    .ToSerializedDictionary(x => x, x=> 0)
+                    .ToSerializedDictionary(x => x, x=> 0),
+                DefaultBlessingsIsAdded = true,
+                Blessings = userInfoPreset.DefaultBlessingsCount
+                    .ToSerializedDictionary(x=> x.Key, x => x.Value)
             };
 
             foreach(var pair in userInfoPreset.DefaultBoxesCount)
@@ -178,6 +193,58 @@ namespace LineWars.Controllers
                 SaveCurrentUserInfo();
                 PassingGameModesChanged?.Invoke(value);
             }
+        }
+
+        int IBlessingsPull.this[BlessingId id]
+        {
+            get => currentInfo.Blessings.TryGetValue(id, out var value) ? value : 0;
+            set
+            {
+                if (value < 0)
+                    throw new ArgumentException($"{nameof(BlessingsCount)} can't be less than zero!");
+                    
+                
+                if (currentInfo.Blessings.TryGetValue(id, out var currentCount))
+                {
+                    if (value == 0 && currentCount == 0)
+                    {
+                        currentInfo.Blessings.Remove(id);
+                        SaveCurrentUserInfo();
+                        return;
+                    }
+                    if (value == currentCount)
+                        return;
+                    currentInfo.Blessings[id] = value;
+                    BlessingCountChanged?.Invoke(id, value);
+                    SaveCurrentUserInfo();
+                }
+                else
+                {
+                    if (value == 0)
+                        return;
+                    currentInfo.Blessings[id] = value;
+                    BlessingCountChanged?.Invoke(id, value);
+                    SaveCurrentUserInfo();
+                }
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return BlessingsCount.GetEnumerator();
+        }
+
+        IEnumerator<(BlessingId, int)> IEnumerable<(BlessingId, int)>.GetEnumerator()
+        {
+            foreach (var (key, value) in currentInfo.Blessings)
+            {
+                yield return (key, value);
+            }
+        }
+
+        public bool TryGetValue(BlessingId id, out int count)
+        {
+            return currentInfo.Blessings.TryGetValue(id, out count);
         }
 
         public int GetBoxes(LootBoxType boxType)

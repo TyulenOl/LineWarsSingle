@@ -4,9 +4,9 @@ namespace LineWars.LootBoxes
 {
     public class ClientLootBoxOpenerFabric : ILootBoxOpenerFabric
     {
-        private readonly IStorage<DeckCard> cardStorage;
+        private readonly IStorage<int, DeckCard> cardStorage;
 
-        public ClientLootBoxOpenerFabric(IStorage<DeckCard> cardStorage)
+        public ClientLootBoxOpenerFabric(IStorage<int, DeckCard> cardStorage)
         {
             this.cardStorage = cardStorage;
         }

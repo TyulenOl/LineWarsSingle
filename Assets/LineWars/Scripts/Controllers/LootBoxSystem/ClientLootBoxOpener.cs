@@ -9,10 +9,10 @@ namespace LineWars.LootBoxes
 {
     public class ClientLootBoxOpener : ILootBoxOpener
     {
-        private IStorage<DeckCard> cardStorage;
+        private IStorage<int, DeckCard> cardStorage;
         public LootBoxInfo BoxInfo {get; private set;}
 
-        public ClientLootBoxOpener(LootBoxInfo info, IStorage<DeckCard> cardStorage)
+        public ClientLootBoxOpener(LootBoxInfo info, IStorage<int, DeckCard> cardStorage)
         {
             BoxInfo = info;
             this.cardStorage = cardStorage;
@@ -67,7 +67,7 @@ namespace LineWars.LootBoxes
 
         private Drop HandleCard(LootInfo info)
         {
-            var chanceList = new RandomChanceList<CardRarity>();
+            var chanceList = new RandomChanceList<Rarity>();
             foreach (var cardChance in info.CardChances)
             {
                 chanceList.Add(cardChance.Rarity, cardChance.Chance);
@@ -79,7 +79,7 @@ namespace LineWars.LootBoxes
             return new Drop(LootType.Card, elligbleCards[randomCard]);
         }
 
-        private IEnumerable<int> FindAllElligbleCards(CardRarity rarity)
+        private IEnumerable<int> FindAllElligbleCards(Rarity rarity)
         {
             foreach(var card in cardStorage.Values)
             {

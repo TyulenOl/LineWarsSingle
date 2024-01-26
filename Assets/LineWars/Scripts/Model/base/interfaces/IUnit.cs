@@ -77,6 +77,6 @@ namespace LineWars.Model
         }
 
         public void AddEffect(Effect<TNode, TEdge, TUnit> effect);
-        public void DeleteEffect(Effect<TNode, TEdge, TUnit> effect);
+        public void RemoveEffect(Effect<TNode, TEdge, TUnit> effect);
     }
 }

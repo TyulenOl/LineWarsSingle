@@ -14,14 +14,14 @@ namespace LineWars.Model
         public static Player LocalPlayer { get; private set; }
 
         private IReadOnlyCollection<UnitType> potentialExecutors;
-        private readonly HashSet<Node> additionalVisibleNodes = new();
+        private readonly Dictionary<Node, int> additionalVisibleNodesRound = new();
+        private readonly Dictionary<Node, int> additionalVisibleNodeTurn = new();
 
         public event Action VisibilityRecalculated;
 
         public PhaseType? CurrentPhase { get; protected set; } 
         public IReadOnlyCollection<UnitType> PotentialExecutors => potentialExecutors;
         public IReadOnlyDictionary<Node, bool> VisibilityMap { get; private set; }
-        public IEnumerable<Node> AdditionalVisibleNodes => additionalVisibleNodes;
 
 
         protected override void Awake()
@@ -84,13 +84,25 @@ namespace LineWars.Model
             }
         }
 
-        public void FinishTurn() //Сделать InvokeTurnEnded virtual? // наруштся SRP
+        public void FinishTurn() 
         {
             if(CurrentPhase == null)
             {
                 Debug.LogError("Cannot finish turn: CurrentPhase == null!");
                 return;
             }
+
+            if (additionalVisibleNodeTurn.Count > 0)
+            {
+                foreach (var node in additionalVisibleNodeTurn.Keys.ToArray())
+                {
+                    additionalVisibleNodeTurn[node]--;
+                    if (additionalVisibleNodeTurn[node] <= 0)
+                        additionalVisibleNodeTurn.Remove(node);
+                }
+                RecalculateVisibility();
+            }
+            
             InvokeTurnEnded(CurrentPhase.Value);
             CurrentPhase = null;
         }
@@ -118,9 +130,15 @@ namespace LineWars.Model
         protected override void ExecuteReplenish()
         {
             base.ExecuteReplenish();
-            if (additionalVisibleNodes.Count > 0)
+            if (additionalVisibleNodesRound.Count > 0)
             {
-                additionalVisibleNodes.Clear();
+                foreach (var node in additionalVisibleNodesRound.Keys.ToArray())
+                {
+                    additionalVisibleNodesRound[node]--;
+                    if (additionalVisibleNodesRound[node] <= 0)
+                        additionalVisibleNodesRound.Remove(node);
+                }
+                
                 RecalculateVisibility();
             }
             FinishTurn();
@@ -145,18 +163,29 @@ namespace LineWars.Model
             return false;
         }
         
-        public void AddAdditionalVisibleNode(Node node)
+        /// <summary>
+        /// Добавляет ноды в пулл дополнительно видимых, счет идет по РАУНДАМ 
+        /// </summary>
+        public void SetAdditionalVisibleNodeForRound(Node node, int roundsCount)
         {
             if (!MonoGraph.Instance.Nodes.Contains(node))
                 throw new ArgumentException();
             if (node == null)
                 throw new ArgumentException();
-            if (additionalVisibleNodes.Contains(node))
-                return;
-            additionalVisibleNodes.Add(node);
+            additionalVisibleNodesRound[node] = roundsCount;
         }
-
-        public bool RemoveVisibleNode(Node node) => additionalVisibleNodes.Remove(node);
+        
+        /// <summary>
+        /// Добавляет ноды в пулл дополнительно видимых, счет идет по ХОДАМ 
+        /// </summary>
+        public void SetAdditionalVisibleNodeForTurn(Node node, int turnsCount)
+        {
+            if (!MonoGraph.Instance.Nodes.Contains(node))
+                throw new ArgumentException();
+            if (node == null)
+                throw new ArgumentException();
+            additionalVisibleNodeTurn[node] = turnsCount;
+        }
 
         protected override void OnSpawnUnit()
         {
@@ -167,7 +196,9 @@ namespace LineWars.Model
         public void RecalculateVisibility(bool useLerp = true)
         {
             var visibilityMap = MonoGraph.Instance.GetVisibilityInfo(this);
-            foreach (var node in additionalVisibleNodes)
+            foreach (var node in additionalVisibleNodesRound.Keys)
+                visibilityMap[node] = true;
+            foreach (var node in additionalVisibleNodeTurn.Keys)
                 visibilityMap[node] = true;
             
             foreach (var (node, visibility) in visibilityMap)

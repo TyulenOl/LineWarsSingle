@@ -63,10 +63,10 @@ namespace LineWars.LootBoxes
     [System.Serializable]
     public class CardChances
     {
-        [SerializeField] private CardRarity rarity;
+        [SerializeField] private Rarity rarity;
         [SerializeField] private float chance;
 
-        public CardRarity Rarity => rarity;
+        public Rarity Rarity => rarity;
         public float Chance => chance;
     }
 }
