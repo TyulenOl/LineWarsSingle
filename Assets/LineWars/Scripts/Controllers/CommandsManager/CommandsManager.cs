@@ -180,6 +180,13 @@ namespace LineWars.Controllers
             
             Player.TurnEnded += OnTurnEnded;
             Player.TurnStarted += OnTurnStarted;
+            
+            blessingsPull.BlessingCountChanged += OnBlessingCountChanged;
+        }
+
+        private void OnBlessingCountChanged(BlessingId id, int count)
+        {
+            BlessingCountChanged?.Invoke(id, count);
         }
 
         private void OnDestroy()
@@ -538,7 +545,6 @@ namespace LineWars.Controllers
             currentBlessing.Completed += OnBlissingComplete;
             delayBlessingCoroutine = StartCoroutine(DelayBlissingCoroutine());
             blessingsPull[blessingData]--;
-            BlessingCountChanged?.Invoke(blessingData, blessingsPull[blessingData]);
             stateMachine.SetState(waitingExecuteState);
             BlessingStarted?.Invoke(new BlessingMassage(blessingData));
             currentBlessing.Execute();

@@ -6,7 +6,9 @@ namespace LineWars.Model
     [CreateAssetMenu(menuName = "Blessings/StribogBlessing")]
     public class StribogBlessing: BaseBlessing
     {
-        [SerializeField] private int turnsCount;
+        [Tooltip("Ход - это вся последовательность действий до передачи управления ии")]
+        [SerializeField] private int turnsCount; 
+        
         private MonoGraph Graph => MonoGraph.Instance;
         public override event Action Completed;
         public override bool CanExecute()
@@ -18,20 +20,11 @@ namespace LineWars.Model
         {
             if (turnsCount == 0)
                 return;
-            foreach (var node in Graph.Nodes)
-                Player.AddAdditionalVisibleNode(node);
-            Player.RecalculateVisibility();
-            Player.TurnEnded += PlayerOnTurnEnded;
-        }
-
-        private void PlayerOnTurnEnded(IActor player, PhaseType phaseType)
-        {
             
-        }
-        
-        private class StribogAction
-        {
-            private int counter;
+            foreach (var node in Graph.Nodes)
+                Player.SetAdditionalVisibleNodeForTurn(node, turnsCount);
+            Player.RecalculateVisibility();
+            Completed?.Invoke();
         }
     }
 }

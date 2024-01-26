@@ -11,11 +11,11 @@ public class EnablingCallback : MonoBehaviour
 
     private void OnEnable()
     {
-        Enabled.Invoke();
+        Enabled?.Invoke();
     }
 
     private void OnDisable()
     {
-        Disabled.Invoke();
+        Disabled?.Invoke();
     }
 }

@@ -49,13 +49,16 @@ namespace LineWars.Controllers
                 if (!blessings.Contains(id))
                     throw new ArgumentException("Cant add new blessings after initialize");
                 if (value < 0)
-                    throw new ArgumentException($"BlessingsCount can't be less than zero!");
+                    throw new ArgumentException("BlessingsCount can't be less than zero!");
                 var prevValue = this[id];
                 var diff = value - prevValue;
                 if (diff == 0)
                     return;
                 innerPull[id] += diff;
                 totalCount += diff;
+
+                foreach (var (blessing, count) in this)
+                    BlessingCountChanged?.Invoke(blessing, count);
             }
         }
 

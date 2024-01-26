@@ -26,17 +26,17 @@ namespace LineWars.Model
                         gameProjection,
                         depthDetailsData.GetDepthDetails(1).AvailableCommands);
                 var allOutcomes = new List<PossibleOutcome>();
-                Debug.Log("---------------------");
+                //Debug.Log("---------------------");
                 foreach (var command in possibleCommands)
                 {
                     var commandChain = new List<ICommandBlueprint>();
                     var possibleOutcome = MinMax(gameProjection, command, 1, -1, commandChain, true);
                     allOutcomes.Add(possibleOutcome);
-                    Debug.Log($"{possibleOutcome.Score}, {possibleOutcome.Commands.First()}");
+                    //Debug.Log($"{possibleOutcome.Score}, {possibleOutcome.Commands.First()}");
                 }
 
                 var bestOutcome = allOutcomes.MaxItem((i1, i2) => i1.Score.CompareTo(i2.Score));
-                Debug.Log($"Chosen: {bestOutcome.Score}, {bestOutcome.Commands.First()}");
+                //Debug.Log($"Chosen: {bestOutcome.Score}, {bestOutcome.Commands.First()}");
                 ai.StartCoroutine(PlayOutcome(bestOutcome, gameProjection));
             }
 

@@ -1,20 +1,37 @@
 ﻿using System;
+using System.Linq;
 using UnityEngine;
 
 namespace LineWars.Model
 {
     [CreateAssetMenu(menuName = "Blessings/PowerBlessing")]
-    public class PowerBlessing: BaseBlessing // нужен еффект?
+    public class PowerBlessing : BaseBlessing
     {
+        [SerializeField] private int powerBuff;
+
+        [Tooltip("Раунд - это последовательность вся действий до фазы Replenish")] 
+        [SerializeField] private int roundsCount;
+
         public override event Action Completed;
+
         public override bool CanExecute()
         {
-            throw new NotImplementedException();
+            return Player.MyUnits.Any();
         }
 
         public override void Execute()
         {
-            throw new NotImplementedException();
+            foreach (var unit in Player.MyUnits)
+            {
+                unit.AddEffect(
+                    new RoundsTemporaryEffect<Node, Edge, Unit>(
+                        unit,
+                        new PowerBuffEffect<Node, Edge, Unit>(unit, powerBuff),
+                        roundsCount)
+                );
+            }
+
+            Completed?.Invoke();
         }
     }
 }

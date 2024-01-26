@@ -231,6 +231,12 @@ namespace LineWars.Model
             Redraw(IsBase, newPlayer.Nation.Name, newPlayer.Nation.NodeSprite);
         }
 
+        public bool UnitIsFit(Unit unit)
+        {
+            return unit.Size == UnitSize.Large && AllIsFree 
+                   || unit.Size == UnitSize.Little && AnyIsFree;
+        }
+
         #region Visualisation
         
         public void Redraw(bool isSpawn, string groupName, Sprite sprite)

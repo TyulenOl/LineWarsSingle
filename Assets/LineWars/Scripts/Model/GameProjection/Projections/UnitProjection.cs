@@ -206,7 +206,7 @@ namespace LineWars.Model
             //TODO
         }
 
-        public void DeleteEffect(Effect<NodeProjection, EdgeProjection, UnitProjection> effect)
+        public void RemoveEffect(Effect<NodeProjection, EdgeProjection, UnitProjection> effect)
         {
             //TODO
         }
