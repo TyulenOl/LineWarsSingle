@@ -2,10 +2,10 @@
 {
     public class CardLevelsStorage
     {
-        private IStorage<DeckCard> cardStorage;
+        private IStorage<int, DeckCard> cardStorage;
         private IReadOnlyUserInfo userInfo;
 
-        public CardLevelsStorage(IStorage<DeckCard> cardStorage, IReadOnlyUserInfo userInfo) 
+        public CardLevelsStorage(IStorage<int, DeckCard> cardStorage, IReadOnlyUserInfo userInfo) 
         { 
             this.cardStorage = cardStorage;
             this.userInfo = userInfo;

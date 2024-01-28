@@ -64,27 +64,30 @@ namespace LineWars.Controllers
                 .Select(x => deckCardStorage.ValueToId[x])
                 .ToList();
 
-            if (!currentInfo.DefaultBlessingsIsAdded)
-            {
-                foreach (var (key, value) in userInfoPreset.DefaultBlessingsCount)
-                {
-                    currentInfo.Blessings.TryAdd(key, 0);
-                    currentInfo.Blessings[key] += value;
-                }
-                currentInfo.DefaultBlessingsIsAdded = true;
-            }
+            AddDefaultBlissings();
             
-            SaveCurrentUserInfo();
 
             foreach(var cardInfo in defaultUserInfoPreset.DefaultCardLevels)
             {
                 var level = cardInfo.Value;
                 var cardId = cardInfo.Key;
+                currentInfo.CardLevels.TryAdd(cardId, level);
+            }
+            
+            SaveCurrentUserInfo();
+        }
 
-                if(!currentInfo.CardLevels.ContainsKey(cardId))
+        private void AddDefaultBlissings()
+        {
+            if (!currentInfo.DefaultBlessingsIsAdded)
+            {
+                foreach (var (key, value) in defaultUserInfoPreset.DefaultBlessingsCount)
                 {
-                    currentInfo.CardLevels[cardId] = level;
+                    currentInfo.Blessings.TryAdd(key, 0);
+                    currentInfo.Blessings[key] += value;
                 }
+
+                currentInfo.DefaultBlessingsIsAdded = true;
             }
         }
 
@@ -108,7 +111,7 @@ namespace LineWars.Controllers
                 LootBoxes = Enum.GetValues(typeof(LootBoxType)).OfType<LootBoxType>()
                     .ToSerializedDictionary(x => x, x=> 0),
                 DefaultBlessingsIsAdded = true,
-                Blessings = userInfoPreset.DefaultBlessingsCount
+                Blessings = defaultUserInfoPreset.DefaultBlessingsCount
                     .ToSerializedDictionary(x=> x.Key, x => x.Value)
             };
 

@@ -41,7 +41,7 @@ namespace LineWars.Model
         private void ExecuteInstant(Node target)
         {
             Action.Execute(target);
-            Player.LocalPlayer.AddAdditionalVisibleNode(target);
+            Player.LocalPlayer.SetAdditionalVisibleNodeForRound(target, 1);
             Player.LocalPlayer.RecalculateVisibility();
             Complete();
         }

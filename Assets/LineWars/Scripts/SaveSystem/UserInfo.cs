@@ -18,7 +18,7 @@ namespace LineWars.Model
         public int PassingGameModes;
         
         public SerializedDictionary<BlessingId, int> Blessings;
-        private bool defaultBlessingsIsAdded;
+        public bool DefaultBlessingsIsAdded;
 
         int IReadOnlyUserInfo.Diamonds => Diamonds;
         int IReadOnlyUserInfo.Gold => Gold;
@@ -27,7 +27,7 @@ namespace LineWars.Model
         IReadOnlyDictionary<LootBoxType, int> IReadOnlyUserInfo.LootBoxes => LootBoxes;
         IReadOnlyDictionary<int, int> IReadOnlyUserInfo.CardLevels => CardLevels;
 
-        bool IReadOnlyUserInfo.DefaultBlessingsIsAdded => defaultBlessingsIsAdded;
+        bool IReadOnlyUserInfo.DefaultBlessingsIsAdded => DefaultBlessingsIsAdded;
         IReadOnlyDictionary<BlessingId, int> IReadOnlyUserInfo.Blessings => Blessings;
 
         public bool Equals(UserInfo other)
