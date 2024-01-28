@@ -4,6 +4,7 @@
     {
         AuraPowerBuff,
         PowerBuff,
-        Armored
+        Armored,
+        FightingSpirit
     }
 }

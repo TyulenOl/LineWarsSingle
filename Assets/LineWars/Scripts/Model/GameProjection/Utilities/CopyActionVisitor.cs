@@ -142,6 +142,12 @@ namespace LineWars.Model
             Result = new ConsumeUnitAction<TNode, TEdge, TUnit>(Unit);
             Result.ActionModifier = action.ActionModifier;
         }
+
+        public void Visit(FogEraseAction<TNode, TEdge, TUnit> action)
+        {
+            Result = new FogEraseAction<TNode, TEdge, TUnit>(Unit);
+            Result.ActionModifier = action.ActionModifier;
+        }
     }
 
     public static class CopyActionVisitor

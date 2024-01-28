@@ -21,7 +21,8 @@
         PowerBasedHeal,
         UpArmor,
         ArmorBasedAttack,
-        ConsumeUnit
+        ConsumeUnit,
+        EraseFog
     }
 }   
 

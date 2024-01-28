@@ -21,7 +21,8 @@ namespace LineWars.Model
         SwingDied,
         UpArmored,
         TargetPowerBasedAttacked,
-        Healed
+        Healed,
+        Sacrificed
     }
 
     [DisallowMultipleComponent]

@@ -152,6 +152,13 @@ namespace LineWars.Controllers
             return ForUnit(action, 1);
         }
 
+        public IEnumerable<TargetActionInfo> Visit(IFogEraseAction<Node, Edge, Unit> action)
+        {
+            return MonoGraph.Instance.Nodes
+                .Where(action.IsAvailable)
+                .Select(x => new TargetActionInfo(x, action.CommandType));
+        }
+
         public class ForShotUnitAction
         {
             private readonly ITarget[] targets;

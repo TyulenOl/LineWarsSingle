@@ -8,6 +8,7 @@ namespace LineWars.Model
         IArmorBasedAttackAction<Node, Edge, Unit>
     {
         [SerializeField] private ActionUnitAnimation attackAnimation;
+        protected override bool NeedAutoComplete => false;
         protected override PowerBasedHealAction<Node, Edge, Unit> GetAction()
         {
             return new PowerBasedHealAction<Node, Edge, Unit>(Executor);
