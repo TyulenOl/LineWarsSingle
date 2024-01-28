@@ -4,8 +4,6 @@ namespace LineWars.Model
 {
     public class TestActor : BasePlayer
     {
-        private StateMachine stateMachine;
-
         [SerializeField] private int artilleryUnits;
         [SerializeField] private int fightUnits;
         [SerializeField] private int scoutUnits;

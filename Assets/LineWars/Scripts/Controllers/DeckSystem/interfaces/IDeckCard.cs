@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 namespace LineWars.Model
 { 
@@ -9,5 +10,7 @@ namespace LineWars.Model
         public Sprite Image { get; }
         public Unit Unit { get; }   
         public Rarity Rarity { get; }
+        public IReadOnlyList<IReadOnlyCardLevelInfo> Levels { get; }
+        public int MaxLevel { get; }
     }
 }
