@@ -32,8 +32,9 @@ namespace LineWars.Model
                 mainSprite = rightSprite;
             StartAnimation();
             startPosition = ownerUnit.transform.position;
-            foreach(var element in uiElements) 
-                element.SetActive(false);
+            if(uiElements != null) 
+                foreach(var element in uiElements) 
+                    element?.SetActive(false);
         }
 
         private void Update()

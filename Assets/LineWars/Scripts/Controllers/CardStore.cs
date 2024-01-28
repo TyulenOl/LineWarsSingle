@@ -13,6 +13,7 @@ namespace LineWars.Store
     {
         [SerializeField, Min(1)] private int changeIntervalInDays = 1;
         [SerializeField] private List<CardRarity> cards;
+        [SerializeField] private List<DeckCard> exceptions;
         
         private IGetter<DateTime> timeGetter;
         private IStorage<DeckCard> cardStorage;
@@ -68,7 +69,9 @@ namespace LineWars.Store
                     var card = elligbleCards[cardIndex];
                     if(cardsForPurchase.Contains(card))
                         continue;
-                    cardsForPurchase.Add(elligbleCards[cardIndex]);
+                    if (exceptions.Contains(cardStorage.IdToValue[card]))
+                        continue;
+                    cardsForPurchase.Add(card);
                     break;
                 }
             }

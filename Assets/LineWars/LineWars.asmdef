@@ -3,10 +3,8 @@
     "rootNamespace": "LineWars",
     "references": [
         "GUID:d525ad6bd40672747bde77962f1c401e",
-        "GUID:626070ea3273cb844a310aa4f53b31fa",
         "GUID:6055be8ebefd69e48b49212b09b47b2f",
-        "GUID:403d8ee4abf1e694089c3e8d3edff032",
-        "GUID:d5360bf8a6102b74484b8f2d6eb3d187"
+        "GUID:403d8ee4abf1e694089c3e8d3edff032"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

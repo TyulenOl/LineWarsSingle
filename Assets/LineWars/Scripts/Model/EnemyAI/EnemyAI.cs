@@ -13,6 +13,7 @@ namespace LineWars.Model
         [SerializeField] private DepthDetailsData depthDetailsData;
         [SerializeField] private AIBuyLogicData buyLogicData;
         [SerializeField] private GameEvaluator gameEvaluator;
+        [SerializeField] private AILogicType AiType;
 
         [Header("Timing Options")]
         [SerializeField] private float actionCooldown;
@@ -20,38 +21,23 @@ namespace LineWars.Model
         [SerializeField] private float firstCommandPause;
 
         private AIBuyLogic buyLogic;
-        private EnemyAITurnLogic turnLogic;
+        private BaseEnemyAITurnLogic turnLogic;
 
         public int Depth => depthDetailsData.TotalDepth;
         protected override void OnInitialized()
         {
             buyLogic = buyLogicData.CreateAILogic(this);
-            turnLogic = new EnemyAITurnLogic(this);
-        }
-
-        public void SetNewBuyLogic([NotNull] AIBuyLogicData buyData)
-        {
-            if (buyLogicData == null)
-                Debug.LogError("Buy Logic Data cannot be null!");
-            buyLogicData = buyData;
-            buyLogic = buyData.CreateAILogic(this);
-        }
-
-        public void SetNewGameEvaluator([NotNull] GameEvaluator evaluator)
-        {
-            if (evaluator == null)
-                Debug.LogError("Evaluator cannot be null!");
-            gameEvaluator = evaluator;
-        }
-
-        public void SetNewDepthDetailData([NotNull] DepthDetailsData depthDetailsData)
-        {
-            if (depthDetailsData == null)
+            switch(AiType)
             {
-                Debug.LogError("Depth Detail Data cannot be null!");
-                return;
+                case AILogicType.Async:
+                    turnLogic = new EnemyAITurnLogic(this, gameEvaluator, depthDetailsData);
+                    break;
+                case AILogicType.Sync:
+                    turnLogic = new SyncEnemyAITurnLogic(this, gameEvaluator, depthDetailsData);
+                    break;
+                default:
+                    throw new NotImplementedException();
             }
-            this.depthDetailsData = depthDetailsData;
         }
 
         public override bool CanExecuteTurn(PhaseType phase)
@@ -99,6 +85,12 @@ namespace LineWars.Model
                 turnLogic.Ended -= OnTurnLogicEnd;
                 InvokeTurnEnded(phaseType);
             }
+        }
+
+        public enum AILogicType
+        {
+            Async,
+            Sync
         }
     }
 }

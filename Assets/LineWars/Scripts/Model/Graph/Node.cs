@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using GraphEditor;
-using PlasticPipe.PlasticProtocol.Messages;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -46,6 +44,7 @@ namespace LineWars.Model
 
         public event Action<Node, Unit> UnitAdded;
         public event Action<Node, Unit> UnitLeft;
+        public event Action<Node, int> NodeBaseIncomeChanged;
 
         /// <summary>
         /// Флаг, который указывает, что нода уже кому-то принадлежала
@@ -81,7 +80,15 @@ namespace LineWars.Model
 
         public bool IsVisible => RenderNodeV3.Visibility > 0;
 
-        public int BaseIncome => baseIncome;
+        public int BaseIncome
+        {
+            get => baseIncome;
+            set
+            {
+                baseIncome = Mathf.Max(0, value);
+                NodeBaseIncomeChanged?.Invoke(this, baseIncome);
+            }
+        }
 
         public Unit LeftUnit
         {
@@ -90,11 +97,14 @@ namespace LineWars.Model
             {
                 var prevUnit = leftUnit;
                 leftUnit = value;
-                if(leftUnit == null && prevUnit != null)
+                if (prevUnit == leftUnit)
+                    return;
+                
+                if(prevUnit != null && prevUnit.Size == UnitSize.Little)
                 {
                     UnitLeft?.Invoke(this, prevUnit);
                 }
-                if(leftUnit != null && prevUnit != leftUnit)
+                if(leftUnit != null && leftUnit.Size == UnitSize.Little)
                 {
                     UnitAdded?.Invoke(this, leftUnit);
                 }
@@ -109,11 +119,14 @@ namespace LineWars.Model
             {
                 var prevUnit = rightUnit;
                 rightUnit = value;
-                if (rightUnit == null && prevUnit != null)
+                if (prevUnit == rightUnit)
+                    return;
+
+                if (prevUnit != null)
                 {
                     UnitLeft?.Invoke(this, prevUnit);
                 }
-                if (rightUnit != null && prevUnit != rightUnit)
+                if (rightUnit != null)
                 {
                     UnitAdded?.Invoke(this, rightUnit);
                 }
@@ -153,14 +166,14 @@ namespace LineWars.Model
 
             if (relativePosition.x > 0)
             {
-                Selector.SelectedObjects = new[] {rightUnit?.gameObject, gameObject, leftUnit?.gameObject}
+                Selector.SelectedObjects = new[] {rightUnit?.gameObject, gameObject}
                     .Where(x => x != null)
                     .Distinct()
                     .ToArray();
             }
             else
             {
-                Selector.SelectedObjects = new[] {leftUnit?.gameObject, gameObject, rightUnit?.gameObject}
+                Selector.SelectedObjects = new[] {leftUnit?.gameObject, gameObject}
                     .Where(x => x != null)
                     .Distinct()
                     .ToArray();

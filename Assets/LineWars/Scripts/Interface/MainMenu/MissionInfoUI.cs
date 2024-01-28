@@ -10,8 +10,8 @@ namespace LineWars
         [SerializeField] private TMP_Text missionName;
         [SerializeField] private TMP_Text missionDescription;
         [SerializeField] private Image missionImage;
-        [SerializeField] private TMP_Text missionStatus;
         [SerializeField] private Button startButton;
+        [SerializeField] private TMP_Text onButtonText;
 
         private SceneName sceneToLoad;
 
@@ -30,16 +30,14 @@ namespace LineWars
             SceneTransition.LoadScene(sceneToLoad);
         }
         
-        public void Redraw(MissionData data)
+        public void Redraw(MissionData data, string onButtonText)
         { 
             gameObject.SetActive(true);
             missionName.text = data.MissionName;
             missionDescription.text = data.MissionDescription;
             missionImage.sprite = data.MissionImage;
-
-            //missionStatus.text = state.isCompleted ? @"<color=green>Завершена</color>" : "Не пройдена";
-
             sceneToLoad = data.SceneToLoad;
+            this.onButtonText.text = onButtonText;
         }
     }
 }

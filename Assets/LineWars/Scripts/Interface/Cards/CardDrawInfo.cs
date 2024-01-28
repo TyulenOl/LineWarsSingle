@@ -18,7 +18,6 @@ namespace LineWars
         [SerializeField] private TMP_Text description;
         
         [SerializeField] private TMP_Text hpText;
-        [SerializeField] private TMP_Text armorText;
         [SerializeField] private TMP_Text attackText;
         [SerializeField] private TMP_Text apText;
 
@@ -80,10 +79,8 @@ namespace LineWars
 
             if(hpText != null)
                 hpText.text = deckCard.Unit.MaxHp.ToString();
-            if(armorText != null)
-                armorText.text = deckCard.Unit.MaxArmor.ToString();
             if(attackText != null)
-                attackText.text = 0.ToString() ;//deckCard.Unit.GetMaxDamage().ToString();
+                attackText.text = deckCard.Unit.InitialPower.ToString();
             if(apText != null)
                 apText.text = deckCard.Unit.MaxActionPoints.ToString();
 

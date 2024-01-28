@@ -1,16 +1,17 @@
+using LineWars.Controllers;
 using UnityEngine;
 
 namespace LineWars.Interface
 {
     public class WinLoseUI : MonoBehaviour
     {
-        public static bool isWin;
+        private static bool IsWin => WinOrLoseScene.IsWin;
         [SerializeField] private GameObject winPanel;
         [SerializeField] private GameObject losePanel;
 
         private void Awake()
         {
-            if (isWin)
+            if (IsWin)
             {
                 winPanel.SetActive(true);
                 losePanel.SetActive(false);

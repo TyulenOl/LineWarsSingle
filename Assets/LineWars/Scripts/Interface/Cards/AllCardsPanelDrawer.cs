@@ -13,7 +13,7 @@ namespace LineWars
     {
         [SerializeField] private LayoutGroup cardsLayoutGroup;
         [SerializeField] private RectTransform cardDrawInfoPrefab;
-        [SerializeField] private CardDrawInfo bigCardInfo;
+        [SerializeField] private CardBigInfoDrawer bigCardInfo;
         [SerializeField] private DeckDrawer deckDrawer;
         
 
@@ -38,7 +38,6 @@ namespace LineWars
                 cardInstance.ReDraw(card);
                 cardInstance.OnInfoButtonClickAction = () =>
                 {
-                    Debug.Log(11);
                     bigCardInfo.ReDraw(card);
                     bigCardInfo.gameObject.SetActive(true);
                 };

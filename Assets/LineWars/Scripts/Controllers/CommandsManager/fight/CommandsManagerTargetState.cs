@@ -42,6 +42,8 @@ namespace LineWars.Controllers
                     return;
                 }
 
+                //Debug.Log(string.Join(", ", Selector.SelectedObjects));
+                
                 var presets = Selector.SelectedObjects
                     .GetComponentMany<IMonoTarget>()
                     .SelectMany(target => GetAllActionsForPair(Manager.executor, target)
@@ -55,9 +57,11 @@ namespace LineWars.Controllers
                                     && Manager.Constrains.IsMyCommandType(action.CommandType)
                                 )
                             )))
-                    .GroupBy(x => x.Action.CommandType)
-                    .Select(x => x.First())
+                    // .GroupBy(x => x.Action.CommandType)
+                    // .Select(x => x.First())
                     .ToArray();
+                
+                //Debug.Log(string.Join(", ", presets.Select(x => $"{x.Action.CommandType} : {x.Target}")));
 
                 switch (presets.Length)
                 {

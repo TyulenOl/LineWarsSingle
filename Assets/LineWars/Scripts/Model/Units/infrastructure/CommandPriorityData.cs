@@ -23,26 +23,5 @@ namespace LineWars.Model
             return commandsPriority.GetEnumerator();
         }
     }
-    
-    public enum CommandType
-    {
-        None,
-        MeleeAttack,
-        Heal,
-        Explosion,
-        Fire,
-        Move,
-        Build,
-        Block,
-        SacrificePerun,
-        Ram,
-        BlowWithSwing,
-        ShotUnit,
-        VodaBajkalskaya,
-        Stun,
-        HealingAttack,
-        TargetPowerBasedAttack,
-        PowerBasedHeal
-    }
 }   
 

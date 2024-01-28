@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace LineWars.Model
 {
     public class MonoTargetPowerBasedAttackAction :
@@ -5,6 +7,9 @@ namespace LineWars.Model
         ITargetedAction<Unit>,
         ITargetPowerBasedAttackAction<Node, Edge, Unit>
     {
+        [SerializeField] private UnitAnimation attackAnimation;
+
+        protected override bool NeedAutoComplete => false;
         protected override TargetPowerBasedAttackAction<Node, Edge, Unit> GetAction()
         {
             return new TargetPowerBasedAttackAction<Node, Edge, Unit>(Executor);
@@ -17,7 +22,42 @@ namespace LineWars.Model
 
         public void Execute(Unit target)
         {
+            if(attackAnimation == null)
+                AttackInstant(target);
+            else
+                AnimationAttack(target);
+        }
+
+        private void AttackInstant(Unit target)
+        {
             Action.Execute(target);
+            Complete();
+        }
+
+        private void AnimationAttack(Unit target)
+        {
+            var context = new AnimationContext()
+            {
+                TargetUnit = target
+            };
+
+            attackAnimation.Ended.AddListener(OnAnimationEnd);
+            attackAnimation.Execute(context);
+
+            void OnAnimationEnd(UnitAnimation _)
+            {
+                attackAnimation.Ended.RemoveListener(OnAnimationEnd);
+                if(TryGetComponent<AnimationResponses>(out var responses))
+                {
+                    var context2 = new AnimationContext()
+                    {
+                        TargetUnit = Executor
+                    };
+                    responses.Respond(AnimationResponseType.TargetPowerBasedAttacked, context2);
+                }
+                Action.Execute(target);
+                Complete();
+            }
         }
 
         public IActionCommand GenerateCommand(Unit target)

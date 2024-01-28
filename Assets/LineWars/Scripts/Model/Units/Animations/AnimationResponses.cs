@@ -18,15 +18,21 @@ namespace LineWars.Model
         RammedDied,
         ShotUpDied,
         ShotBottomDied,
-        SwingDied
+        SwingDied,
+        UpArmored,
+        TargetPowerBasedAttacked,
+        Healed,
+        Sacrificed
     }
 
     [DisallowMultipleComponent]
+    [RequireComponent(typeof(Unit))]
     public class AnimationResponses : MonoBehaviour
     {
         [SerializeField] private UnitAnimation defaultDeathAnimation;
         [SerializeField] private SerializedDictionary<AnimationResponseType, UnitAnimation> animations;
 
+        private bool isDying;
         public UnitAnimation CurrentDeathAnimation { get; private set; }
 
         private void Start()
@@ -36,6 +42,8 @@ namespace LineWars.Model
 
         public UnitAnimation Respond(AnimationResponseType responseType, AnimationContext animationContext)
         {
+            if (isDying)
+                return null;
             if (!animations.ContainsKey(responseType))
                 return null;
             animations[responseType].Execute(animationContext);
@@ -73,6 +81,30 @@ namespace LineWars.Model
         public void SetDefaultDeathAnimation()
         {
             CurrentDeathAnimation = defaultDeathAnimation;
+        }
+
+        public void PlayDeathAnimation()
+        {
+            isDying = true;
+            StopAllAnimations();
+            var unit = GetComponent<Unit>();
+            var context = new AnimationContext()
+            {
+                TargetUnit = unit,
+                TargetNode = unit.Node
+            };
+            CurrentDeathAnimation.Execute(context);
+        }
+
+        private void StopAllAnimations()
+        {
+            foreach(var animation in animations.Values)
+            {
+                if(animation is UnitStoppingAnimation stoppingAnimation)
+                {
+                    stoppingAnimation.Stop();
+                }
+            }
         }
     }
 }

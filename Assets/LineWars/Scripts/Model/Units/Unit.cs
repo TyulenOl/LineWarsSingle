@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using LineWars.Controllers;
@@ -37,6 +37,7 @@ namespace LineWars.Model
         [Header("Actions Settings")] 
         [SerializeField] [Min(0)] private int maxActionPoints;
         [SerializeField] private List<EffectInitializer> effectInitializers;
+        [SerializeField] private List<CommandType> unitCommands;
 
         [Header("DEBUG")] 
         [SerializeField, ReadOnlyInspector] private Node myNode;
@@ -57,18 +58,21 @@ namespace LineWars.Model
 
         public event Action AnyActionCompleted;
         public event Action ExecutorDestroyed;
-        public event Action<Unit, Node, Node> UnitNodeChanged; //++
-        public event Action<Unit, int, int> UnitHPChanged; //++
-        public event Action<Unit, int, int> UnitActionPointsChanged; //++
-        public event Action<Unit, int, int> UnitPowerChanged; //++
-        public event Action<Unit, int, int> UnitArmorChanged; //++
-        public event Action<Unit> UnitReplenished; //++
+        public event Action<Unit, Node, Node> UnitNodeChanged;
+        public event Action<Unit, int, int> UnitHPChanged;
+        public event Action<Unit, int, int> UnitActionPointsChanged;
+        public event Action<Unit, int, int> UnitPowerChanged;
+        public event Action<Unit, int, int> UnitArmorChanged; 
+        public event Action<Unit> UnitReplenished; 
 
-        private List<Effect<Node, Edge, Unit>> effects; 
+        private List<Effect<Node, Edge, Unit>> effects = new(); 
 
         private Dictionary<CommandType, IMonoUnitAction<UnitAction<Node, Edge, Unit>>> monoActionsDictionary;
         public IEnumerable<IMonoUnitAction<UnitAction<Node, Edge, Unit>>> MonoActions => monoActionsDictionary.Values;
         public IReadOnlyList<Effect<Node, Edge, Unit>> Effects => effects;
+
+        public IEnumerable<CommandType> UnitCommands => unitCommands;
+
         public uint MaxPossibleActionRadius { get; private set; }
 
         #region Properties
@@ -131,8 +135,8 @@ namespace LineWars.Model
             set
             {
                 var before = currentHp;
-                currentHp = Mathf.Min(Mathf.Max(0, value), maxHp);
-                if(before == currentHp) return;
+                currentHp = Mathf.Clamp(value, 0, maxHp);
+                if (before == currentHp) return;
                 HpChanged.Invoke(before, currentHp);
                 UnitHPChanged?.Invoke(this, before, currentHp);
                 SfxManager.Instance.Play(before < currentHp ? dj.GetSound(HpHealedSounds) : dj.GetSound(HpDamagedSounds));
@@ -158,7 +162,7 @@ namespace LineWars.Model
             set
             {
                 var before = currentArmor;
-                currentArmor = Mathf.Clamp(currentArmor, 0, maxArmor);
+                currentArmor = Mathf.Clamp(value, 0, maxArmor);
                 if(before == currentArmor) return;
                 ArmorChanged.Invoke(before, currentArmor);
                 UnitArmorChanged?.Invoke(this, before, currentArmor);
@@ -217,8 +221,7 @@ namespace LineWars.Model
             currentPower = initialPower;
 
             InitialiseAllActions();
-            InitializeAllEffects();
-            index = SingleGame.Instance.AllUnits.Add(this);
+            index = SingleGameRoot.Instance.AllUnits.Add(this);
             void InitialiseAllActions()
             {
                 var serializeActions = gameObject.GetComponents<Component>()
@@ -245,9 +248,8 @@ namespace LineWars.Model
         {
             Node = node;
             UnitDirection = direction;
+            InitializeAllEffects();
         }
-
-
 
         private void InitializeAllEffects()
         {
@@ -287,7 +289,7 @@ namespace LineWars.Model
             }
 
             Owner.RemoveOwned(this);
-            SingleGame.Instance.AllUnits.Remove(this);
+            SingleGameRoot.Instance.AllUnits.Remove(this);
             if(!TryGetComponent(out AnimationResponses responses) || responses.CurrentDeathAnimation == null) 
                 Destroy(gameObject);
             else
@@ -298,7 +300,7 @@ namespace LineWars.Model
                     TargetNode = myNode,
                     TargetUnit = this
                 };
-                responses.CurrentDeathAnimation.Execute(animContext);
+                responses.PlayDeathAnimation();
             }
         }
 
@@ -339,6 +341,5 @@ namespace LineWars.Model
         {
             return visitor.Visit(this);
         }
-
     }
 }

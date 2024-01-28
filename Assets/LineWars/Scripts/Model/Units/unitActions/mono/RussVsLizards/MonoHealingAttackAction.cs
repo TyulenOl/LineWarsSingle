@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace LineWars.Model
 {
     public class MonoHealingAttackAction :
@@ -5,6 +7,9 @@ namespace LineWars.Model
         ITargetedAction<Unit>,
         IHealingAttackAction<Node, Edge, Unit>
     {
+        [SerializeField] private ActionUnitAnimation attackAnimation;
+
+        protected override bool NeedAutoComplete => false;
         protected override HealingAttackAction<Node, Edge, Unit> GetAction()
         {
             return new HealingAttackAction<Node, Edge, Unit>(Executor);
@@ -17,13 +22,63 @@ namespace LineWars.Model
 
         public void Execute(Unit target)
         {
+            if (attackAnimation == null)
+                AttackInstant(target);
+            else
+                AnimationAttack(target);
+        }
+
+        private void AttackInstant(Unit target)
+        {
             Action.Execute(target);
+            Player.LocalPlayer.RecalculateVisibility();
+            Complete();
+        }
+
+        private void AnimationAttack(Unit target)
+        {
+            var context = new AnimationContext()
+            {
+                TargetUnit = target
+            };
+            var responses = target.GetComponent<AnimationResponses>();
+            if (responses != null)
+            {
+                responses.TrySetDeathAnimation(AnimationResponseType.MeleeDied);
+            };
+            attackAnimation.SetAction(OnAttack);
+            attackAnimation.Ended.AddListener(OnAnimationEnd);
+            attackAnimation.Execute(context);
+
+            void OnAnimationEnd(UnitAnimation _)
+            {
+                attackAnimation.Ended.RemoveListener(OnAnimationEnd);
+                Player.LocalPlayer.RecalculateVisibility();
+                if (responses != null)
+                {
+                    responses.SetDefaultDeathAnimation();
+                };
+                Complete();
+            }
+            void OnAttack()
+            {
+                Action.Execute(target);
+                var context2 = new AnimationContext()
+                {
+                    TargetUnit = Executor,
+                };
+
+                if(responses != null)
+                {
+                    responses.Respond(AnimationResponseType.MeleeDamaged, context);
+                };
+            }
         }
 
         public IActionCommand GenerateCommand(Unit target)
         {
             return new TargetedUniversalCommand<Unit, MonoHealingAttackAction, Unit>
-                (this, Executor);
+                (this, target);
         }
 
         public override void Accept(IMonoUnitActionVisitor visitor)

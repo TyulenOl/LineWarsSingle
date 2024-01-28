@@ -14,8 +14,7 @@ namespace LineWars
         
         [Header("References")]
         [SerializeField] private TMP_Text missionName;
-        [SerializeField] private Image completedImage;
-        [SerializeField] private Image uncompletedImage;
+        [SerializeField] private Image missionImage;
         [SerializeField] private Button button;
         
         
@@ -43,15 +42,21 @@ namespace LineWars
             button.onClick.AddListener(OnClick);
             
             MissionInfo = GameRoot.Instance.CompaniesController.GetMissionInfo(id);
-            
-            completedImage.gameObject.SetActive(MissionInfo.MissionStatus == MissionStatus.Complete);
-            uncompletedImage.gameObject.SetActive(MissionInfo.MissionStatus != MissionStatus.Complete);
+
+            ReDrawMissionImageByStatus();
         }
 
+        private void ReDrawMissionImageByStatus()
+        {
+            var status = GameRoot.Instance.CompaniesController.GetMissionStatus(MissionInfo.MissionId);
+            missionImage.sprite = DrawHelper.GetSpriteByMissionStatus(status);
+            button.interactable = status != MissionStatus.Locked;
+        }
+        
         private void OnClick()
         {
             GameRoot.Instance.CompaniesController.ChoseMissionId = id;
-            missionInfoUI.Redraw(missionData);
+            missionInfoUI.Redraw(missionData, DrawHelper.GetOnMissionButtonTextByMissionStatus(GameRoot.Instance.CompaniesController.GetMissionStatus(MissionInfo.MissionId)));
         }
 
         private void RedrawMissionData(MissionData data)

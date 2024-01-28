@@ -34,18 +34,23 @@ namespace LineWars.Interface
             if(!isActive)
                 return;
             var inter = false;
-            if (CommandsManager.Instance.Executor as Unit == unit)
+            if (CommandsManager.Instance.Executor == null || CommandsManager.Instance.Executor as Unit == unit)
                 inter = true;
             else
             {
-                inter = CommandsManager.Instance.Executor as Unit != unit && CommandsManager.Instance.CanSetExecutor();
+                inter = CommandsManager.Instance.Executor as Unit != unit 
+                        && CommandsManager.Instance.CanSetExecutor(unit);
             }
-            BgImage.color = inter ? Color.white : Color.gray;
-            button.interactable = inter;
+            if (BgImage != null)
+                BgImage.color = inter ? Color.white : Color.gray;
+            if (button != null)
+                button.interactable = inter;
         }
 
         private void OnExecutorChanged(IMonoExecutor arg1, IMonoExecutor arg2)
         {
+            if(BgImage == null)
+                return;
             var isSelected = unit.Equals(arg2);
             if (isSelected)
             {
@@ -88,7 +93,7 @@ namespace LineWars.Interface
         
         private void OnClick()
         {
-            if (!CommandsManager.Instance.CanSetExecutor()) return;
+            if (!CommandsManager.Instance.CanSetExecutor(unit)) return;
             CameraController.Instance.MoveTo(unit.Node.Position);
             CommandsManager.Instance.SetExecutor(unit);
         }

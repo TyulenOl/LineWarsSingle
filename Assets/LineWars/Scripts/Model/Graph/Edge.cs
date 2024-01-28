@@ -123,7 +123,11 @@ namespace LineWars.Model
 #if UNITY_EDITOR
             if (EditorExtensions.CanRedraw(gameObject))
             {
-                UnityEditor.EditorApplication.delayCall += Redraw;
+                UnityEditor.EditorApplication.delayCall += () =>
+                {
+                    if (EditorExtensions.CanRedraw(gameObject))
+                        Redraw();
+                };
             }
 #endif
         }

@@ -7,13 +7,22 @@ namespace LineWars
     {
         public int MissionId;
         public MissionStatus MissionStatus;
-        public float MissionProgress;
+
+        public MissionInfo GetCopy()
+        {
+            return new MissionInfo()
+            {
+                MissionId = MissionId,
+                MissionStatus = MissionStatus,
+            };
+        }
     }
 
     public enum MissionStatus
     {
-        Failed,
-        Complete,
-        NotVisited
+        Completed,
+        Unlocked,
+        Locked,
+        Failed
     }
 }

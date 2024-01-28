@@ -4,17 +4,20 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using LineWars.Model;
+using Object = UnityEngine.Object;
 
 namespace LineWars.Controllers
 {
     public partial class CommandsManager : MonoBehaviour
     {
+        private const string CommandsManagerPrefix = "CommandsManagerLog";
         public static CommandsManager Instance { get; private set; }
         [field:SerializeField, ReadOnlyInspector] public bool ActiveSelf { get; private set; } = true;
         
         [field: SerializeField] private CommandsManagerConstrainsBase Constrains { get; set; }
 
         [SerializeField] private float maxActionDelayInSeconds = 5;
+        [SerializeField] private bool needErrorLog;
         
         public bool HaveConstrains => Constrains != null;
         public bool NotHaveConstraints => Constrains == null;
@@ -110,12 +113,12 @@ namespace LineWars.Controllers
                 executor = value;
                 if (previousExecutor != value)
                     InvokeAction(() => ExecutorChanged?.Invoke(previousExecutor, value));
-                if (previousExecutor != null)
+                if (previousExecutor as MonoBehaviour != null)
                 {
                     previousExecutor.ExecutorDestroyed -= OnExecutorDestroy;
                 }
 
-                if (executor != null)
+                if (executor as MonoBehaviour != null)
                 {
                     executor.ExecutorDestroyed += OnExecutorDestroy;
                 }
@@ -133,7 +136,7 @@ namespace LineWars.Controllers
             }
             else
             {
-                Debug.LogError($"More than two {nameof(CommandsManager)} on stage");
+                LogError($"More than two {nameof(CommandsManager)} on stage", gameObject);
             }
 
             stateMachine = new StateMachine();
@@ -172,12 +175,13 @@ namespace LineWars.Controllers
             return stateMachine.CurrentState == findTargetState && Executor.CanDoAnyAction;
         }
 
-        public bool CanSetExecutor()
+        public bool CanSetExecutor(IMonoExecutor monoExecutor)
         {
-            return ActiveSelf &&
-                   (stateMachine.CurrentState == findExecutorState || stateMachine.CurrentState == findTargetState) &&
-                   (!HaveConstrains || Constrains.CanCancelExecutor) &&
-                   canCancelExecutor;
+            return ActiveSelf 
+                   && (stateMachine.CurrentState == findExecutorState || stateMachine.CurrentState == findTargetState)
+                   && (!HaveConstrains || Constrains.CanCancelExecutor) 
+                   && canCancelExecutor
+                   && (monoExecutor == null || monoExecutor.CanDoAnyAction);
         }
         
 
@@ -206,10 +210,16 @@ namespace LineWars.Controllers
 
             if (!canCancelExecutor)
             {
-                Debug.LogError("You cannot change the executor");
+                LogError("You cannot change the executor", gameObject);
                 return;
             }
-
+            
+            if (executor as MonoBehaviour != null && !executor.CanDoAnyAction)
+            {
+                LogError("You cannot change the executor, because he cannot perform any action", gameObject);
+                return;
+            }
+            
             if (stateMachine.CurrentState == findExecutorState)
             {
                 Executor = executor;
@@ -263,15 +273,18 @@ namespace LineWars.Controllers
         
         void OnActionCompleted()
         {
+            //Debug.Log("Complite");
             currentExecutedCommand.Action.ActionCompleted -= OnActionCompleted;
             StopCoroutine(delayActionCoroutine);
+            var command = currentExecutedCommand;
+            InvokeAction(() => CommandIsExecuted?.Invoke(command));
+            
             delayActionCoroutine = null;
             currentExecutedCommand = null;
             
-            InvokeAction(() => CommandIsExecuted?.Invoke(currentExecutedCommand));
             if (Executor as MonoBehaviour == null)
             {
-                Debug.LogError("Impossible behavior!");
+                LogError("Impossible behavior!", gameObject);
                 return;
             }
             if (!Executor.CanDoAnyAction)
@@ -287,20 +300,33 @@ namespace LineWars.Controllers
 
         IEnumerator DelayActionCoroutine()
         {
+            //Debug.Log($"Start Delay {maxActionDelayInSeconds}");
             yield return new WaitForSeconds(maxActionDelayInSeconds);
-            Debug.LogError($"The action didn't stop after {maxActionDelayInSeconds} seconds!");
-            OnActionCompleted();
+            LogError($"The action didn't stop after {maxActionDelayInSeconds} seconds!", gameObject);
+            
+            currentExecutedCommand.Action.ActionCompleted -= OnActionCompleted;
+            StopCoroutine(delayActionCoroutine);
+            var command = currentExecutedCommand;
+            InvokeAction(() => CommandIsExecuted?.Invoke(command));
+            
+            delayActionCoroutine = null;
+            currentExecutedCommand = null;
+
+            Executor.CurrentActionPoints = 0;
+            Player.FinishTurn();
         }
 
         private void OnExecutorDestroy()
         {
-            Debug.Log("EXECUTOR DESTROY");
+            //Debug.Log("EXECUTOR DESTROY");
+            Executor = null;
             if (delayActionCoroutine != null)
                 StopCoroutine(delayActionCoroutine);
             if (currentExecutedCommand != null)
             {
                 currentExecutedCommand.Action.ActionCompleted -= OnActionCompleted;
-                InvokeAction(() => CommandIsExecuted?.Invoke(currentExecutedCommand));
+                var command = currentExecutedCommand;
+                InvokeAction(() => CommandIsExecuted?.Invoke(command));
             }
             delayActionCoroutine = null;
             currentExecutedCommand = null;
@@ -347,13 +373,13 @@ namespace LineWars.Controllers
 
             if (!currentOnWaitingCommandMessage.Data.Contains(preset))
             {
-                Debug.LogError($"You cant select this command preset because this command preset in not owned!", gameObject);
+                LogError($"You cant select this command preset because this command preset in not owned!", gameObject);
                 return false;
             }
             
             if (!preset.IsActive)
             {
-                Debug.LogError("You cant select this command preset because this command preset is not active!", gameObject);
+                LogError("You cant select this command preset because this command preset is not active!", gameObject);
                 return false;
             }
             ProcessCommandPreset(preset);
@@ -399,7 +425,7 @@ namespace LineWars.Controllers
 
             if (CheckContainsActions(commandType))
             {
-                Debug.LogError($"You cant {nameof(SelectCurrentCommand)} because {nameof(Executor)} will not be able to perform this");
+                LogError($"You cant {nameof(SelectCurrentCommand)} because {nameof(Executor)} will not be able to perform this", gameObject);
                 return false;
             }
             if (Executor.Actions.First(x => x.CommandType == commandType) is not ITargetedAction)
@@ -545,17 +571,23 @@ namespace LineWars.Controllers
 
         private void ConstrainsLog(string methodName)
         {
-            Debug.LogError($"Cant invoke {methodName} because you have constrains {Constrains.name}.", gameObject);
+            LogError($"Cant invoke {methodName} because you have constrains {Constrains.name}.", gameObject);
         }
 
         private void InvalidStateLog(string methodName)
         {
-            Debug.LogError($"This is invalid state {state} for action {methodName}", gameObject);
+            LogError($"This is invalid state {state} for action {methodName}", gameObject);
         }
 
         private void ActiveSelfLog(string methodName)
         {
-            Debug.LogError($"Cant execute {methodName} because {nameof(CommandsManager)} is no active!", gameObject);
+            LogError($"Cant execute {methodName} because {nameof(CommandsManager)} is no active!", gameObject);
+        }
+
+        private void LogError(string log, Object obj)
+        {
+            if (needErrorLog)
+                Debug.LogError($"<color=yellow>{CommandsManagerPrefix}</color> {log}", obj);
         }
     }
 }

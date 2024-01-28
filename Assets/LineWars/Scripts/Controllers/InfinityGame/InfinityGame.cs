@@ -6,6 +6,7 @@ using DataStructures;
 using GraphEditor;
 using LineWars.Model;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace LineWars.Controllers
 {
@@ -23,10 +24,11 @@ namespace LineWars.Controllers
         [SerializeField] private GraphCreator graphCreator;
         [SerializeField] private MapCreator mapCreator;
         [SerializeField] private CameraController cameraController;
-        [SerializeField] private SingleGame singleGame;
+        [SerializeField] private SingleGameRoot singleGameRoot;
         
         [Header("Debug")]
         [SerializeField] private InfinityGameMode gameMode;
+        [SerializeField] private bool log = true;
 
         private MonoGraph monoGraph;
 
@@ -69,13 +71,14 @@ namespace LineWars.Controllers
             }
             
             monoGraph = CreateGraph(settings.InitializeGraphSettings, settings.GraphCreatorSettings);
+            SetNodesIncomes(settings.PlayersSettings.BaseNodesIncomeRange);
             CreatePlayers(settings.PlayersSettings);
             CreateGameReferee(settings.PlayersSettings.GameRefereeCreator);
             
             mapCreator.GenerateMap(monoGraph);
             cameraController.gameObject.SetActive(true);
             
-            singleGame.StartGame();
+            singleGameRoot.StartGame();
         }
 
         private void CreateGameReferee(GameRefereeCreator creator)
@@ -83,7 +86,8 @@ namespace LineWars.Controllers
             creator.PrepareNodes(monoGraph.Nodes);
             creator.Initialize();
             var referee = creator.CreateGameReferee();
-            referee.transform.SetParent(singleGame.transform);
+            referee.transform.SetParent(singleGameRoot.transform);
+            singleGameRoot.GameReferee = referee;
         }
         
         private void CreatePlayers(PlayersSettings playersSettings)
@@ -112,12 +116,13 @@ namespace LineWars.Controllers
                 ProcessOwnedInformation(instanceOfPlayer, node, player.InitialOwnerInfo);
             }
 
-            singleGame.Player = (Player) instanceOfPlayers[0];
-            singleGame.Enemies = instanceOfPlayers.Skip(1).ToList();
+            singleGameRoot.PlayerInitializer.Player = (Player) instanceOfPlayers[0];
+            singleGameRoot.PlayerInitializer.Enemies = instanceOfPlayers.Skip(1).ToList();
             visitedNodes = null;
         }
 
         private HashSet<Node> visitedNodes;
+
         private void ProcessOwnedInformation(
             BasePlayer basePlayer,
             Node rootNode,
@@ -153,34 +158,60 @@ namespace LineWars.Controllers
                     }
                 }
             }
-        } 
+        }
+
+        private void SetNodesIncomes(Vector2Int incomeRange)
+        {
+            foreach (var node in monoGraph.Nodes)
+                node.BaseIncome = Random.Range(incomeRange.x, incomeRange.y);
+        }
             
         private MonoGraph CreateGraph(
             InitializeGraphSettings initializeGraphSettings,
             GraphCreatorSettings graphCreatorSettings)
         {
             graphCreator.LoadSettings(graphCreatorSettings);
-            var graph = graphCreator.Restart();
-            for (var i = 0; i < initializeGraphSettings.IterationCountBeforeDeleteEdges; i++)
-                graphCreator.SimpleIterate();
 
-            switch (initializeGraphSettings.EdgeRemovalType)
-            {
-                case EdgeRemovalType.ByIntersectionsCount:
-                    graphCreator.DeleteIntersectingEdgesByIntersectionsCount();
-                    break;
-                case EdgeRemovalType.ByEdgeLength:
-                    graphCreator.DeleteIntersectingEdgesByLength();
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            MonoGraph graph = null;
             
-            for (var i = 0; i < initializeGraphSettings.IterationCountAfterDeleteEdges; i++)
-                graphCreator.HardIterate();
+            for (var i = 0; i < initializeGraphSettings.GenerationAttempts; i++)
+            {
+                graph = GenerateMonoGraph();
+                if (graphCreator.GetIntersectionsCount() <= initializeGraphSettings.MaxIntersectionsCount)
+                {
+                    if (log)
+                    {
+                        Debug.Log($"MonoGraph был успешно создан с {i + 1} попытки");
+                    }
+                    break;
+                }
+            }
             
             graphCreator.RedrawAllEdges();
             return graph;
+
+            MonoGraph GenerateMonoGraph()
+            {
+                var temp = graphCreator.Restart();
+                for (var i = 0; i < initializeGraphSettings.IterationCountBeforeDeleteEdges; i++)
+                    graphCreator.SimpleIterate();
+
+                switch (initializeGraphSettings.EdgeRemovalType)
+                {
+                    case EdgeRemovalType.ByIntersectionsCount:
+                        graphCreator.DeleteIntersectingEdgesByIntersectionsCount();
+                        break;
+                    case EdgeRemovalType.ByEdgeLength:
+                        graphCreator.DeleteIntersectingEdgesByLength();
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+
+                for (var i = 0; i < initializeGraphSettings.IterationCountAfterDeleteEdges; i++)
+                    graphCreator.HardIterate();
+                return temp;
+            }
         }
 
         public static void Load(InfinityGameMode gameMode)

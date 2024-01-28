@@ -28,6 +28,7 @@ namespace LineWars.Model
         protected void Complete()
         {
             ActionCompleted?.Invoke();
+            Player.LocalPlayer.RecalculateVisibility();
         }
 
         public void OnReplenish() => Action.OnReplenish();

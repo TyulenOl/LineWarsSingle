@@ -3,20 +3,21 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using LineWars;
+using UnityEngine.Serialization;
 
 namespace LineWars.Interface
 {
     public class UnitPartDrawer : MonoBehaviour
     {
-        [SerializeField] private TMP_Text UnitName;
+        [SerializeField, FormerlySerializedAs("UnitName")] private TMP_Text unitName;
         [SerializeField] private SpriteRenderer ifInactivePanel;
         [SerializeField] private SpriteRenderer ifAvailablePanel;
         [SerializeField] private SpriteRenderer unitIsExecutorImage;
         [SerializeField] private SpriteRenderer canBlockSprite;
+        [SerializeField] private TMP_Text powerAmount;
         [field: SerializeField] public SpriteRenderer targetSprite { get; private set; }
 
-        [SerializeField] private ProgressBarV2 healthProgressBar;
-        [SerializeField] private ProgressBarV2 armorProgressBar;
+        [SerializeField] private UnitProgressBar unitProgressBar;
 
         private Unit currentUnit;
 
@@ -30,13 +31,12 @@ namespace LineWars.Interface
             }
         }
 
+        public TMP_Text UnitName => unitName;
+
         private void Init(Unit unitToInit)
         {
             UnitName.text = unitToInit.UnitName;
-            healthProgressBar.SetMaxValue(unitToInit.MaxHp);
-            armorProgressBar.SetMaxValue(unitToInit.MaxArmor);
-            healthProgressBar.SetValue(unitToInit.CurrentHp);
-            armorProgressBar.SetValue(unitToInit.CurrentArmor);
+            unitProgressBar.Init(currentUnit.MaxHp, currentUnit.CurrentArmor, currentUnit.MaxActionPoints);
         }
 
         public void SetUnitAsExecutor(bool isExecutor)
@@ -65,8 +65,9 @@ namespace LineWars.Interface
 
         public void ReDrawCharacteristics()
         {
-            healthProgressBar.SetValue(currentUnit.CurrentHp);
-            armorProgressBar.SetValue(currentUnit.CurrentArmor);
+            unitProgressBar.SetValues(currentUnit.CurrentHp, currentUnit.MaxHp,
+                currentUnit.CurrentArmor, currentUnit.CurrentActionPoints, currentUnit.MaxActionPoints);
+            powerAmount.text = currentUnit.CurrentPower.ToString();
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿// ReSharper disable Unity.InefficientPropertyAccess
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using LineWars.Controllers;
@@ -31,6 +30,9 @@ namespace GraphEditor
         [Header("Graph settings")] 
         [SerializeField] private int nodesCount = 10;
         [SerializeField] private Vector2Int edgesRange = new(2, 4);
+        
+        [Header("Debug")]
+        [SerializeField] private bool log = true;
 
         private MonoGraph monoGraph;
         private UndirectedVertexGraph vertexGraph;
@@ -49,8 +51,11 @@ namespace GraphEditor
         
         public MonoGraph Restart()
         {
-            var graph = GenerateConnectiveGraph();
-            return CreateInstanceOfGraph(graph);
+            if (monoGraph != null)
+                DestroyImmediate(monoGraph.gameObject);
+            
+            var undirectedVertexGraph = GenerateConnectiveGraph();
+            return CreateInstanceOfGraph(undirectedVertexGraph);
         }
         
         public void SimpleIterate()
@@ -245,29 +250,11 @@ namespace GraphEditor
         {
             var edgeAndIntersections = new Dictionary<Edge, List<Edge>>();
             
-            foreach (var monoEdge1 in monoGraph.Edges.ToArray())
+            foreach (var (monoEdge1, monoEdge2) in GetIntersectionsEdges())
             {
-                foreach (var monoEdge2 in monoGraph.Edges.ToArray())
-                {
-                    if (monoEdge1.FirstNode == monoEdge2.FirstNode
-                        || monoEdge1.FirstNode == monoEdge2.SecondNode
-                        || monoEdge1.SecondNode == monoEdge2.FirstNode
-                        || monoEdge1.SecondNode == monoEdge2.SecondNode)
-                    {
-                        continue;
-                    }
-                    
-                    if (!CustomMath.SegmentsIsIntersects(
-                            monoEdge1.FirstNode.Position, monoEdge1.SecondNode.Position,
-                            monoEdge2.FirstNode.Position, monoEdge2.SecondNode.Position))
-                    {
-                        continue;
-                    }
-
-                    if (!edgeAndIntersections.ContainsKey(monoEdge1))
-                        edgeAndIntersections[monoEdge1] = new List<Edge>();
-                    edgeAndIntersections[monoEdge1].Add(monoEdge2);
-                }
+                if (!edgeAndIntersections.ContainsKey(monoEdge1))
+                    edgeAndIntersections[monoEdge1] = new List<Edge>();
+                edgeAndIntersections[monoEdge1].Add(monoEdge2);
             }
 
             var deletedEdges = new List<Edge>();
@@ -311,6 +298,37 @@ namespace GraphEditor
                 deletedEdge.FirstNode.RemoveEdge(deletedEdge);
                 deletedEdge.SecondNode.RemoveEdge(deletedEdge);
                 DestroyEdge(deletedEdge.Id);
+            }
+        }
+
+        public int GetIntersectionsCount()
+        {
+            return GetIntersectionsEdges().Count() / 2;
+        }
+
+        public IEnumerable<(Edge, Edge)> GetIntersectionsEdges()
+        {
+            foreach (var monoEdge1 in monoGraph.Edges.ToArray())
+            {
+                foreach (var monoEdge2 in monoGraph.Edges.ToArray())
+                {
+                    if (monoEdge1.FirstNode == monoEdge2.FirstNode
+                        || monoEdge1.FirstNode == monoEdge2.SecondNode
+                        || monoEdge1.SecondNode == monoEdge2.FirstNode
+                        || monoEdge1.SecondNode == monoEdge2.SecondNode)
+                    {
+                        continue;
+                    }
+
+                    if (!CustomMath.SegmentsIsIntersects(
+                            monoEdge1.FirstNode.Position, monoEdge1.SecondNode.Position,
+                            monoEdge2.FirstNode.Position, monoEdge2.SecondNode.Position))
+                    {
+                        continue;
+                    }
+
+                    yield return (monoEdge1, monoEdge2);
+                }
             }
         }
         
@@ -364,7 +382,13 @@ namespace GraphEditor
             {
                 var graph = UndirectedVertexGraph.GenerateRandomGraph(nodesCount, (edgesRange.x, edgesRange.y));
                 if (graph.IsConnectedGraph())
+                {
+                    if (log)
+                    {
+                        Debug.Log($"UndirectedVertexGraph был успешно создан с {i + 1} попытки");
+                    }
                     return graph;
+                }
             }
 
             EditorDebug.LogError("Cant generate connective graph");

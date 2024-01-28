@@ -10,24 +10,27 @@ namespace LineWars.Interface
     [RequireComponent(typeof(Unit), typeof(TargetDrawer))]
     public class UnitDrawer : MonoBehaviour
     {
-        [Header("Animate Settings")] [SerializeField]
-        private Vector2 offset;
+        [Header("Animate Settings")]
+        [SerializeField] private Vector2 offset;
 
         [SerializeField] private Color damageColor = Color.red;
         [SerializeField] private Color armorDamageColor = Color.blue;
         [SerializeField] private Color healColor = Color.green;
 
-        [Header("Reference")] [SerializeField] private UnitDamageAnimator leftPart;
+        [Header("Reference")]
+        [SerializeField] private UnitDamageAnimator leftPart;
         [SerializeField] private UnitDamageAnimator rightPart;
 
-        [Header("CharacteristicsDrawers")] [SerializeField]
-        private UnitPartDrawer leftDrawer;
-
+        [Header("CharacteristicsDrawers")]
+        [SerializeField] private UnitPartDrawer leftDrawer;
         [SerializeField] private UnitPartDrawer rightDrawer;
 
         private Unit unit;
         private List<UnitPartDrawer> allDrawers;
         private TargetDrawer targetDrawer;
+
+        public UnitPartDrawer LeftDrawer => leftDrawer;
+        public UnitPartDrawer RightDrawer => rightDrawer;
 
         private void Awake()
         {
@@ -36,8 +39,9 @@ namespace LineWars.Interface
             unit.ActionPointsChanged.AddListener((_, newValue) => ExecuteForAllDrawers(drawer =>
             {
                 drawer.ReDrawActivity(newValue != 0);
-                ReDrawCharacteristics();
+                drawer.ReDrawCharacteristics();
             }));
+            
             if (unit.TryGetAction<MonoBlockAction>(out var action))
                 action.CanBlockChanged +=
                     (_, newBool) => ExecuteForAllDrawers(drawer => drawer.ReDrawCanBlock(newBool));
@@ -73,7 +77,6 @@ namespace LineWars.Interface
             unit.UnitDirectionChange.AddListener(OnUnitDirectionChange);
             unit.ArmorChanged.AddListener(OnUnitArmorChange);
             unit.HpChanged.AddListener(OnUnitHpChange);
-            ReDrawCharacteristics();
         }
 
         private void LocalPlayerOnVisibilityRecalculated()
@@ -103,7 +106,8 @@ namespace LineWars.Interface
 
             if (rightPart != null && rightPart.gameObject.activeSelf)
                 rightPart.AnimateDamageText((after - before).ToString(), armorDamageColor);
-            ReDrawCharacteristics();
+            if(before != after)
+                ReDrawCharacteristics();
         }
 
         private void OnUnitHpChange(int before, int after)
@@ -117,8 +121,8 @@ namespace LineWars.Interface
 
             if (rightPart != null && rightPart.gameObject.activeSelf)
                 rightPart.AnimateDamageText((diff).ToString(), color);
-
-            ReDrawCharacteristics();
+            if(before != after)
+                ReDrawCharacteristics();
         }
 
 

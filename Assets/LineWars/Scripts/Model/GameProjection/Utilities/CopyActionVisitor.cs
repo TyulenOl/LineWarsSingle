@@ -130,6 +130,24 @@ namespace LineWars.Model
             Result = new PowerBasedHealAction<TNode, TEdge, TUnit>(Unit);
             Result.ActionModifier = action.ActionModifier;
         }
+
+        public void Visit(ArmorBasedAttackAction<TNode, TEdge, TUnit> action)
+        {
+            Result = new PowerBasedHealAction<TNode, TEdge, TUnit>(Unit);
+            Result.ActionModifier = action.ActionModifier;
+        }
+
+        public void Visit(ConsumeUnitAction<TNode, TEdge, TUnit> action)
+        {
+            Result = new ConsumeUnitAction<TNode, TEdge, TUnit>(Unit);
+            Result.ActionModifier = action.ActionModifier;
+        }
+
+        public void Visit(FogEraseAction<TNode, TEdge, TUnit> action)
+        {
+            Result = new FogEraseAction<TNode, TEdge, TUnit>(Unit);
+            Result.ActionModifier = action.ActionModifier;
+        }
     }
 
     public static class CopyActionVisitor

@@ -28,7 +28,6 @@
             #pragma vertex vert
             #pragma fragment frag
             
-
             struct appdata
             {
                 float4 vertex : POSITION;
@@ -51,6 +50,7 @@
             sampler2D _FogEff;
             sampler2D _VisibilityMaskV3;
             sampler2D _Noise;
+            
 
             float _Cutoff;
 

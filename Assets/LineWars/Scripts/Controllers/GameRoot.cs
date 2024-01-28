@@ -19,11 +19,12 @@ namespace LineWars.Controllers
         [SerializeField] private UserInfoController userController;
         [SerializeField] private LootBoxController lootBoxController;
         [SerializeField] private CardStore cardStore;
+        [SerializeField] private CardUpgrader cardUpgrader;
 
         [Header("ProviderSettings")]
         [SerializeField] private ProviderType providerType;
 
-
+        private CardLevelsStorage cardsLevelStorage;
         private IProvider<Deck> deckProvider;
         private IProvider<MissionInfo> missionInfoProvider;
         private IProvider<UserInfo> userInfoProvider;
@@ -31,6 +32,7 @@ namespace LineWars.Controllers
         private IGetter<DateTime> timeGetter;
 
         public IStorage<DeckCard> CardsDatabase => cardsDatabase;
+        public CardLevelsStorage CardsLevelDatabase => cardsLevelStorage;
         public IStorage<MissionData> MissionsStorage => missionsStorage;
 
         public DecksController DecksController => decksController;
@@ -38,6 +40,7 @@ namespace LineWars.Controllers
         public UserInfoController UserController => userController;
         public LootBoxController LootBoxController => lootBoxController;
         public CardStore CardStore => cardStore;
+        public CardUpgrader CardUpgrader => cardUpgrader;
 
         protected override void OnAwake()
         {
@@ -47,10 +50,11 @@ namespace LineWars.Controllers
 
             InitializeProviders();
 
-            DecksController.Initialize(deckProvider);
             CompaniesController.Initialize(missionInfoProvider, missionsStorage);
             UserController.Initialize(userInfoProvider, cardsDatabase);
+            DecksController.Initialize(deckProvider, UserController);
             CardStore.Initialize(timeGetter, CardsDatabase, UserController);
+            cardsLevelStorage = new CardLevelsStorage(CardsDatabase, UserController.UserInfo);
             InitializeLootBoxController();
         }
 

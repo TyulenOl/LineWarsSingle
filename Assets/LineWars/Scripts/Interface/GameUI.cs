@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DataStructures;
 using LineWars.Controllers;
 using LineWars.Model;
 using TMPro;
@@ -9,30 +10,17 @@ using UnityEngine.UI;
 
 namespace LineWars.Interface
 {
-    public class GameUI : MonoBehaviour
+    public class GameUI : Singleton<GameUI>
     {
-        public static GameUI Instance;
         [SerializeField] private TMP_Text scoreText;
         [SerializeField] private EnemyTurnPanel enemyTurnPanel;
         [SerializeField] private List<Button> buttonsToBlockIfEnemyTurn;
 
-        private List<UnitDrawer> activeUnitDrawersHash = new();
+        private List<UnitDrawer> activeUnitDrawersСash = new();
 
         private IExecutor currentExecutor;
         private List<TargetDrawer> currentDrawers = new();
-
-        private void Awake()
-        {
-            if (Instance == null)
-            {
-                Instance = this;
-            }
-            else
-            {
-                Debug.LogError($"Больше чем два {nameof(GameUI)} на сцене");
-                Destroy(gameObject);
-            }
-        }
+        
 
         private void Start()
         {
@@ -66,7 +54,7 @@ namespace LineWars.Interface
 
         private void SubscribeEventForGameReferee()
         {
-            if (GameReferee.Instance is ScoreReferee scoreReferee)
+            if (SingleGameRoot.Instance.GameReferee is ScoreReferee scoreReferee)
             {
                 scoreReferee.ScoreChanged += (player, before, after) =>
                 {
@@ -78,7 +66,7 @@ namespace LineWars.Interface
 
                 scoreText.text = $"{scoreReferee.GetScoreForPlayer(Player.LocalPlayer)}/{scoreReferee.ScoreForWin}";
             }
-            if (GameReferee.Instance is SiegeGameReferee siegeGameReferee)
+            if (SingleGameRoot.Instance.GameReferee is SiegeGameReferee siegeGameReferee)
             {
                 siegeGameReferee.CurrentRoundsChanged += (currentRounds) =>
                 {
@@ -88,7 +76,7 @@ namespace LineWars.Interface
                 scoreText.text = $"{siegeGameReferee.CurrentRounds}/{siegeGameReferee.RoundsToWin}";
             }
             
-            if (GameReferee.Instance is NewDominationGameReferee dominationGameReferee)
+            if (SingleGameRoot.Instance.GameReferee is NewDominationGameReferee dominationGameReferee)
             {
                 dominationGameReferee.RoundsAmountChanged += () =>
                 {
@@ -126,7 +114,7 @@ namespace LineWars.Interface
                 if (!unit.CanDoAnyAction) continue;
                 var drawer = unit.GetComponent<UnitDrawer>();
                 drawer.ReDrawAvailability(isAvailable);
-                activeUnitDrawersHash.Add(drawer);
+                activeUnitDrawersСash.Add(drawer);
             }
         }
 

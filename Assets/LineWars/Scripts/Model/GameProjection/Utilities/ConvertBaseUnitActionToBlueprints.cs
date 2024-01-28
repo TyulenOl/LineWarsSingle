@@ -138,21 +138,21 @@ namespace LineWars.Model
         {
             foreach (var node in Graph.GetNodesInRange(action.Executor.Node, 1))
             {
-                if(!node.LeftIsFree)
+                if(!node.LeftIsFree && action.IsAvailable(node.LeftUnit))
                 {
-                    ProcessUnit(node);  
+                    ProcessUnit(node.LeftUnit);  
                     return;
                 }
-                if(!node.RightIsFree)
+                if(!node.RightIsFree && action.IsAvailable(node.RightUnit))
                 {
-                    ProcessUnit(node);
+                    ProcessUnit(node.RightUnit);
                     return;
                 }
             }
 
-            void ProcessUnit(TNode node)
+            void ProcessUnit(TUnit unit)
             {
-                var command = new SwingCommandBlueprint(action.Executor.Id, node.LeftUnit.Id);
+                var command = new SwingCommandBlueprint(action.Executor.Id, unit.Id);
                 BlueprintList.Add(command);
             }
         }
@@ -174,11 +174,6 @@ namespace LineWars.Model
                         BlueprintList.Add(new ShotUnitBlueprint(action.Executor.Id, unit.Id, nodeTarget.Id));
                 }
             }    
-        }
-
-        public void Visit(RLBuildAction<TNode, TEdge, TUnit> action)
-        {
-            // TODO 
         }
 
         private void ProcessAttackAction(AttackAction<TNode, TEdge, TUnit> action, uint range)
@@ -203,33 +198,150 @@ namespace LineWars.Model
             }
         } 
 
+        public void Visit(StunAttackAction<TNode, TEdge, TUnit> action)
+        {
+            foreach (var node in Graph.GetNodesInRange(action.Executor.Node, 1))
+            {
+                if (!node.LeftIsFree)
+                    ProcessUnit(node.LeftUnit);
+                if (!node.RightIsFree)
+                    ProcessUnit(node.RightUnit);
+            }
+
+            void ProcessUnit(TUnit unit)
+            {
+                if (!action.IsAvailable(unit)) return;
+
+                var executorId = action.Executor.Id;
+                var targetId = unit.Id;
+                BlueprintList.Add(new TargetUnitUniversalCommandBlueprint<
+                    MonoStunAttackAction,
+                    StunAttackAction<Node, Edge, Unit>,
+                    StunAttackAction<NodeProjection, EdgeProjection, UnitProjection>>
+                    (executorId, targetId));
+
+            }
+        }
+
+        public void Visit(HealingAttackAction<TNode, TEdge, TUnit> action)
+        {
+            foreach(var node in Graph.GetNodesInRange(action.Executor.Node, 1))
+            {
+                if (!node.LeftIsFree)
+                    ProcessUnit(node.LeftUnit);
+                if (!node.RightIsFree)
+                    ProcessUnit(node.RightUnit);
+            }
+
+            void ProcessUnit(TUnit unit)
+            {
+                if (!action.IsAvailable(unit)) return;
+
+                var executorId = action.Executor.Id;
+                var targetId = unit.Id;
+                BlueprintList.Add(new TargetUnitUniversalCommandBlueprint<
+                    MonoHealingAttackAction,
+                    HealingAttackAction<Node, Edge, Unit>,
+                    HealingAttackAction<NodeProjection, EdgeProjection, UnitProjection>>
+                    (executorId, targetId));
+
+            }
+        }
+
+        public void Visit(TargetPowerBasedAttackAction<TNode, TEdge, TUnit> action)
+        {
+            foreach (var node in Graph.GetNodesInRange(action.Executor.Node, 1))
+            {
+                if (!node.LeftIsFree)
+                    ProcessUnit(node.LeftUnit);
+                if (!node.RightIsFree)
+                    ProcessUnit(node.RightUnit);
+            }
+
+            void ProcessUnit(TUnit unit)
+            {
+                if (!action.IsAvailable(unit)) return;
+
+                var executorId = action.Executor.Id;
+                var targetId = unit.Id;
+                BlueprintList.Add(new TargetUnitUniversalCommandBlueprint<
+                    MonoTargetPowerBasedAttackAction,
+                    TargetPowerBasedAttackAction<Node, Edge, Unit>,
+                    TargetPowerBasedAttackAction<NodeProjection, EdgeProjection, UnitProjection>>
+                    (executorId, targetId));
+
+            }
+        }
+
+        public void Visit(UpArmorAction<TNode, TEdge, TUnit> action)
+        {
+            foreach (var node in Graph.GetNodesInRange(action.Executor.Node, 1))
+            {
+                if (!node.LeftIsFree)
+                    ProcessUnit(node.LeftUnit);
+                if (!node.RightIsFree)
+                    ProcessUnit(node.RightUnit);
+            }
+
+            void ProcessUnit(TUnit unit)
+            {
+                if (!action.IsAvailable(unit)) return;
+
+                var executorId = action.Executor.Id;
+                var targetId = unit.Id;
+                BlueprintList.Add(new TargetUnitUniversalCommandBlueprint<
+                    MonoUpArmorAction,
+                    UpArmorAction<Node, Edge, Unit>,
+                    UpArmorAction<NodeProjection, EdgeProjection, UnitProjection>>
+                    (executorId, targetId));
+            }
+        }
+
+        public void Visit(PowerBasedHealAction<TNode, TEdge, TUnit> action)
+        {
+            foreach (var node in Graph.GetNodesInRange(action.Executor.Node, 1))
+            {
+                if (!node.LeftIsFree)
+                    ProcessUnit(node.LeftUnit);
+                if (!node.RightIsFree)
+                    ProcessUnit(node.RightUnit);
+            }
+
+            void ProcessUnit(TUnit unit)
+            {
+                if (!action.IsAvailable(unit)) return;
+
+                var executorId = action.Executor.Id;
+                var targetId = unit.Id;
+                BlueprintList.Add(new TargetUnitUniversalCommandBlueprint<
+                    MonoPowerBasedHealAction,
+                    PowerBasedHealAction<Node, Edge, Unit>,
+                    PowerBasedHealAction<NodeProjection, EdgeProjection, UnitProjection>>
+                    (executorId, targetId));
+            }
+        }
+
+        public void Visit(RLBuildAction<TNode, TEdge, TUnit> action)
+        {
+            // TODO 
+        }
+
         public void Visit(HealYourselfAction<TNode, TEdge, TUnit> action)
         {
             // TODO 
         }
 
-        public void Visit(StunAttackAction<TNode, TEdge, TUnit> action)
+        public void Visit(ArmorBasedAttackAction<TNode, TEdge, TUnit> action)
         {
             // TODO
         }
 
-
-        public void Visit(HealingAttackAction<TNode, TEdge, TUnit> action)
+        public void Visit(ConsumeUnitAction<TNode, TEdge, TUnit> action)
         {
             // TODO
         }
 
-        public void Visit(TargetPowerBasedAttackAction<TNode, TEdge, TUnit> action)
-        {
-            // TODO
-        }
-
-        public void Visit(UpArmorAction<TNode, TEdge, TUnit> action)
-        {
-            // TODO
-        }
-
-        public void Visit(PowerBasedHealAction<TNode, TEdge, TUnit> action)
+        public void Visit(FogEraseAction<TNode, TEdge, TUnit> action)
         {
             // TODO
         }

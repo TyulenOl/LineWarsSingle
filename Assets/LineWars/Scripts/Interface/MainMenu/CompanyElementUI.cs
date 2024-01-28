@@ -35,7 +35,7 @@ namespace LineWars
             {
                 menuToOpen.Initialize();
                 var missionsInfos = menuToOpen.MissionInfos.ToList();
-                var completedMissionsCount = missionsInfos.Count(x => x.MissionStatus == MissionStatus.Complete);
+                var completedMissionsCount = missionsInfos.Count(x => x.MissionStatus == MissionStatus.Completed);
                 missionsProgress.text = $"{completedMissionsCount}/{missionsInfos.Count}";
                 companyElementButton.onClick.AddListener(OnClick);
             }
@@ -43,7 +43,7 @@ namespace LineWars
 
         private void OnClick()
         {
-            UIStack.Instance.PushElement(menuToOpen);
+            UIStack.Instance.PushElement(menuToOpen.transform);
         }
 
         private void RedrawCompanyData(CompanyData data)
