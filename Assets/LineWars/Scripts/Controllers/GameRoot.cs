@@ -20,11 +20,12 @@ namespace LineWars.Controllers
         [SerializeField] private UserInfoController userController;
         [SerializeField] private LootBoxController lootBoxController;
         [SerializeField] private CardStore cardStore;
+        [SerializeField] private CardUpgrader cardUpgrader;
 
         [Header("ProviderSettings")]
         [SerializeField] private ProviderType providerType;
 
-
+        private CardLevelsStorage cardsLevelStorage;
         private IProvider<Deck> deckProvider;
         private IProvider<MissionInfo> missionInfoProvider;
         private IProvider<UserInfo> userInfoProvider;
@@ -34,12 +35,14 @@ namespace LineWars.Controllers
         public IStorage<int, DeckCard> CardsDatabase => cardsDatabase;
         public IStorage<int, MissionData> MissionsStorage => missionsStorage;
         public IStorage<BlessingId, BaseBlessing> BlessingStorage => blessingStorage;
+        public CardLevelsStorage CardsLevelDatabase => cardsLevelStorage;
 
         public DecksController DecksController => decksController;
         public CompaniesController CompaniesController => companiesController;
         public UserInfoController UserController => userController;
         public LootBoxController LootBoxController => lootBoxController;
         public CardStore CardStore => cardStore;
+        public CardUpgrader CardUpgrader => cardUpgrader;
 
         protected override void OnAwake()
         {
@@ -48,11 +51,12 @@ namespace LineWars.Controllers
             ValidateFields();
 
             InitializeProviders();
-            
+
             CompaniesController.Initialize(missionInfoProvider, missionsStorage);
             UserController.Initialize(userInfoProvider, cardsDatabase);
             DecksController.Initialize(deckProvider, UserController);
             CardStore.Initialize(timeGetter, CardsDatabase, UserController);
+            cardsLevelStorage = new CardLevelsStorage(CardsDatabase, UserController.UserInfo);
             InitializeLootBoxController();
         }
 

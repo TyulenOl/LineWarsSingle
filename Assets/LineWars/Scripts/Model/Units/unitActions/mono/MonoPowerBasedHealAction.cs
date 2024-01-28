@@ -5,7 +5,7 @@ namespace LineWars.Model
     public class MonoPowerBasedHealAction :
         MonoUnitAction<PowerBasedHealAction<Node, Edge, Unit>>,
         ITargetedAction<Unit>,
-        IStunAttackAction<Node, Edge, Unit>
+        IPowerBasedHealAction<Node, Edge, Unit>
     {
         [SerializeField] private UnitAnimation unitAnimation;
 
