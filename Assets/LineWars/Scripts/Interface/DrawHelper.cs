@@ -43,24 +43,26 @@ public static class DrawHelper
         switch (blessingId.Rarity)
         {
             case Rarity.Common:
-                return new Color(120, 120, 120);
+                return new Color32(120, 120, 120,255);
             case Rarity.Rare:
-                return new Color(226, 43, 18);
+                return new Color32(226, 43, 18,255);
             case Rarity.Legendary:
-                return new Color(143, 0, 255);
+                return new Color32(143, 0, 255,255);
             default:
-                return new Color(120, 120, 120);
+                return new Color32(120, 120, 120,255);
         }
     }
     
     public static Sprite GetSpriteByBlessingID(BlessingId blessingId)
     {
-        return Resources.Load<Sprite>("UI/Sorokin/Icons/AttackOrder");//TODO Сделать это гавно
+        return GameRoot.Instance.BlessingStorage.TryGetValue(blessingId, out var value) 
+            ? value.Icon
+            : Resources.Load<Sprite>("UI/Sorokin/Icons/AP");
     }
 
-    public static string GetBlessingNameByBlessingID(BlessingId blessingId)
+    public static string GetBlessingTypeName(BlessingType blessingType)
     {
-        switch (blessingId.BlessingType)
+        switch (blessingType)
         {
             case BlessingType.Perun:
                 return "Сила перуна";
@@ -85,6 +87,11 @@ public static class DrawHelper
             default:
                 return "Если ты видишь это - ты уволен";
         }
+    }
+    
+    public static string GetBlessingNameByBlessingID(BlessingId blessingId)
+    {
+        return GetBlessingTypeName(blessingId.BlessingType);
     }
 
     public static string GetBlessingDescription(BlessingId blessingId)

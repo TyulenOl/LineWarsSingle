@@ -1,3 +1,4 @@
+using LineWars.Model;
 using UnityEngine;
 
 namespace LineWars.Interface
@@ -6,5 +7,11 @@ namespace LineWars.Interface
     {
         [SerializeField] private BlessingInfoDrawer blessingInfoDrawer;
         [SerializeField] private DragableBlessing dragableBlessing;
+
+        public void Init(BlessingId blessingId)
+        {
+            dragableBlessing.Init(blessingId);
+            blessingInfoDrawer.Init(DrawHelper.GetBlessingReDrawInfoByBlessingId(blessingId));
+        }
     }
 }
