@@ -5,16 +5,17 @@ using LineWars.Controllers;
 using LineWars.Model;
 using UnityEngine;
 using UnityEngine.Assertions.Must;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace LineWars.Interface
 {
-    public class BlessingsUI: MonoBehaviour
+    public class BlessingsDrawer: MonoBehaviour
     {
-        [SerializeField] private BlessingUIElement blessingUIElementPrefab;
+        [FormerlySerializedAs("blessingUIElementPrefab")] [SerializeField] private BlessingDrawer blessingDrawerPrefab;
         [SerializeField] private LayoutGroup layoutGroup;
 
-        private Dictionary<BlessingId, BlessingUIElement> blessingToUI;
+        private Dictionary<BlessingId, BlessingDrawer> blessingToUI;
         private CommandsManager CommandsManager => CommandsManager.Instance;
 
         private void Start()
@@ -24,11 +25,11 @@ namespace LineWars.Interface
 
         public void Initialize()
         {
-            blessingToUI = new Dictionary<BlessingId, BlessingUIElement>();
+            blessingToUI = new Dictionary<BlessingId, BlessingDrawer>();
             var allBlessings = CommandsManager.BlessingData.ToArray();
             foreach (var (blessingData, count) in allBlessings)
             {
-                var elementInstance = Instantiate(blessingUIElementPrefab, layoutGroup.transform);
+                var elementInstance = Instantiate(blessingDrawerPrefab, layoutGroup.transform);
                 elementInstance.BlessingData = blessingData;
                 elementInstance.BlessingCount = count;
                 blessingToUI[blessingData] = elementInstance;
@@ -55,7 +56,7 @@ namespace LineWars.Interface
         {
             if (blessingToUI.TryGetValue(massage.Data, out var ui))
             {
-                ui.State = BlessingUIElementState.Active;
+                ui.State = BlessingDrawerState.Active;
             }
         }
 
@@ -64,9 +65,9 @@ namespace LineWars.Interface
             foreach (var (blessingData, uiElement) in blessingToUI)
             {
                 if (CommandsManager.CanExecuteBlessing(blessingData))
-                    uiElement.State = BlessingUIElementState.Unlocked;
+                    uiElement.State = BlessingDrawerState.Unlocked;
                 else
-                    uiElement.State = BlessingUIElementState.Locked;
+                    uiElement.State = BlessingDrawerState.Locked;
             }
         }
 

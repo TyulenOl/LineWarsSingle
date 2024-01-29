@@ -7,38 +7,22 @@ using UnityEngine.UI;
 
 namespace LineWars.Interface
 {
-    public class BlessingUIElement: MonoBehaviour
+    public class BlessingDrawer: MonoBehaviour
     {
         [SerializeField] private Button button;
         [SerializeField] private Image blessingIcon;
         [SerializeField] private TMP_Text blessingName;
         [SerializeField] private TMP_Text blessingCount;
 
-        private BlessingId blessingData;
+        private BlessingId blessingId;
 
         public event Action<BlessingId> OnClick;
-
-        private void Start()
-        {
-            button.onClick.AddListener(ButtonOnClick);
-        }
-
-        private void OnDestroy()
-        {
-            if (button != null)
-                button.onClick.RemoveListener(ButtonOnClick);
-        }
-
-        private void ButtonOnClick()
-        {
-            OnClick?.Invoke(blessingData);
-        }
 
         public BlessingId BlessingData
         {
             set
             {
-                blessingData = value;
+                blessingId = value;
                 if (value != null)
                     blessingName.text = $"{value.BlessingType} {value.Rarity}";
             }
@@ -52,21 +36,21 @@ namespace LineWars.Interface
             }
         }
 
-        public BlessingUIElementState State
+        public BlessingDrawerState State
         {
             set
             {
                 switch (value)
                 {
-                    case BlessingUIElementState.Active:
+                    case BlessingDrawerState.Active:
                         blessingIcon.color = Color.green;
                         button.interactable = false;
                         break;
-                    case BlessingUIElementState.Locked:
+                    case BlessingDrawerState.Locked:
                         blessingIcon.color = Color.gray;
                         button.interactable = false;
                         break;
-                    case BlessingUIElementState.Unlocked:
+                    case BlessingDrawerState.Unlocked:
                         blessingIcon.color = Color.white;
                         button.interactable = true;
                         break;
@@ -75,9 +59,25 @@ namespace LineWars.Interface
                 }
             }
         }
+        
+        private void Start()
+        {
+            button.onClick.AddListener(ButtonOnClick);
+        }
+
+        private void OnDestroy()
+        {
+            if (button != null)
+                button.onClick.RemoveListener(ButtonOnClick);
+        }
+
+        private void ButtonOnClick()
+        {
+            OnClick?.Invoke(blessingId);
+        }
     }
 
-    public enum BlessingUIElementState
+    public enum BlessingDrawerState
     {
         Active,
         Locked,
