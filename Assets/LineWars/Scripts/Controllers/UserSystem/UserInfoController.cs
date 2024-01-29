@@ -29,6 +29,9 @@ namespace LineWars.Controllers
         public event Action<int> UserUpgradeCardsChanged;
         public event Action<int> PassingGameModesChanged;
         public event Action<BlessingId, int> BlessingCountChanged;
+        public event Action<BlessingId, int> SelectedBlessingIdChanged;
+        public event Action<int> TotalSelectionCountChanged;
+
 
         public IReadOnlyUserInfo UserInfo => currentInfo;
         public IBlessingsPull GlobalBlessingsPull => this;
@@ -310,6 +313,9 @@ namespace LineWars.Controllers
                 if (value < 0)
                     throw new ArgumentException($"{nameof(IBlessingSelector.Count)} can't be less than zero!");
                 var currentCount = currentInfo.SelectedBlessings.Count;
+                if (value == currentCount)
+                    return;
+                
                 if (value > currentCount)
                 {
                     var diff = value - currentCount;
@@ -322,6 +328,8 @@ namespace LineWars.Controllers
                     for (var i = 0; i < diff; i++)
                         currentInfo.SelectedBlessings.RemoveAt(currentInfo.SelectedBlessings.Count-1);
                 }
+                
+                TotalSelectionCountChanged?.Invoke(value);
             }
         }
 
@@ -333,8 +341,8 @@ namespace LineWars.Controllers
             {
                 if (value == currentInfo.SelectedBlessings[index])
                     return;
-                
                 currentInfo.SelectedBlessings[index] = value;
+                SelectedBlessingIdChanged?.Invoke(value, index);
                 SaveCurrentUserInfo();
             }
         }

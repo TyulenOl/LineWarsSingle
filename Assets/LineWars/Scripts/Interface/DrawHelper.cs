@@ -24,15 +24,15 @@ public static class DrawHelper
     }
 
 
-    public static BlessingReDrawInfo GetBlessingReDrawInfoByBlessingId(BlessingId blessingId)
+    public static AllBlessingReDrawInfo GetBlessingReDrawInfoByBlessingId(BlessingId blessingId)
     {
-        return new BlessingReDrawInfo
+        return new AllBlessingReDrawInfo
         (
             GetBlessingNameByBlessingID(blessingId),
             GetBlessingDescription(blessingId),
             GetBlessingBgColor(blessingId),
             GetSpriteByBlessingID(blessingId),
-            GameRoot.Instance.BlessingsController.GetBlessingsCount(blessingId)
+            GameRoot.Instance.UserController.GlobalBlessingsPull[blessingId]
         );
     }
 
@@ -57,14 +57,40 @@ public static class DrawHelper
             ? value.Icon
             : null;
     }
+
+    public static string GetBlessingTypeName(BlessingType blessingType)
+    {
+        switch (blessingType)
+        {
+            case BlessingType.Perun:
+                return "Сила перуна";
+            case BlessingType.Svarog:
+                return "Сила сварога";
+            case BlessingType.Health:
+                return "Лечение";
+            case BlessingType.Stribog:
+                return "Сила стрибога";
+            case BlessingType.Acceleration:
+                return "Ускорение";
+            case BlessingType.Slowdown:
+                return "Замедление";
+            case BlessingType.Power:
+                return "Сила";
+            case BlessingType.Spawn:
+                return "Призыва";
+            case BlessingType.Gold:
+                return "Золота";
+            case BlessingType.Random:
+                return "Случайное";
+            default:
+                return "Если ты видишь это - ты уволен";
+        }
+    }
     
     public static string GetBlessingNameByBlessingID(BlessingId blessingId)
     {
-        return GameRoot.Instance.BlessingStorage.TryGetValue(blessingId, out var value)
-            ? value.Name
-            : "Если ты видишь это - ты уволен";
+        return GetBlessingTypeName(blessingId.BlessingType);
     }
-
     public static string GetBlessingDescription(BlessingId blessingId)
     {
         return GameRoot.Instance.BlessingStorage.TryGetValue(blessingId, out var value)

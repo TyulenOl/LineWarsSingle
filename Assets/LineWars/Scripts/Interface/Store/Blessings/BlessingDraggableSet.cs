@@ -8,10 +8,10 @@ namespace LineWars.Interface
         [SerializeField] private BlessingInfoDrawer blessingInfoDrawer;
         [SerializeField] private DraggableBlessing draggableBlessing;
 
-        public void Init(BlessingId blessingId)
+        public void Redraw(BlessingId blessingId)
         {
             draggableBlessing.Init(blessingId);
-            blessingInfoDrawer.Init(DrawHelper.GetBlessingReDrawInfoByBlessingId(blessingId));
+            blessingInfoDrawer.Redraw(DrawHelper.GetBlessingReDrawInfoByBlessingId(blessingId));
         }
     }
 }

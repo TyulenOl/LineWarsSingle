@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace LineWars.Interface
 {
-    public class BlessingReDrawInfo
+    public class AllBlessingReDrawInfo
     {
         public string Name { get; }
         public string Description { get; }
@@ -10,7 +10,7 @@ namespace LineWars.Interface
         public Color BgColor { get; }
         public Sprite Sprite { get; }
 
-        public BlessingReDrawInfo(string name, string description, Color bgColor, Sprite sprite, int amount)
+        public AllBlessingReDrawInfo(string name, string description, Color bgColor, Sprite sprite, int amount)
         {
             Name = name;
             Description = description;

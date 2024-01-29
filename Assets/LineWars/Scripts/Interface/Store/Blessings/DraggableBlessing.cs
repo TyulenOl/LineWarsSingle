@@ -7,8 +7,8 @@ namespace LineWars.Interface
 {
     public class DraggableBlessing : MonoBehaviour, IBeginDragHandler, IEndDragHandler, IDragHandler
     {
-        [SerializeField] private RectTransform parentTransform;
         [SerializeField] private BlessingInfoDrawer blessingInfoDrawer;
+        [SerializeField] private RectTransform parentTransform;
         [SerializeField] private CanvasGroup canvasGroup;
         
         private RectTransform rectTransform;
@@ -23,7 +23,7 @@ namespace LineWars.Interface
 
         public void Init(BlessingId blessingId)
         {
-            blessingInfoDrawer.Init(DrawHelper.GetBlessingReDrawInfoByBlessingId(blessingId));
+            blessingInfoDrawer.Redraw(DrawHelper.GetBlessingReDrawInfoByBlessingId(blessingId));
             this.blessingId = blessingId;
         }
 

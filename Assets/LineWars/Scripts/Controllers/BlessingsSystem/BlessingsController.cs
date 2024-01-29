@@ -16,6 +16,10 @@ namespace LineWars.Controllers
         private IBlessingsPull globalBlessingPull;
         private IStorage<BlessingId, BaseBlessing> blessingStorage;
 
+
+        public event Action<BlessingId, int> SelectedBlessingIdChanged;
+        public event Action<int> TotalSelectionCountChanged;
+        
         public int MaxBlessingsIdsCount => maxBlessingsIdsCount;
         public int TotalBlessingsCount => totalBlessingsCount;
 
@@ -31,7 +35,10 @@ namespace LineWars.Controllers
             this.globalBlessingSelector = globalBlessingSelector;
             this.globalBlessingPull = globalBlessingPull;
             this.blessingStorage = blessingStorage;
-      
+            
+            globalBlessingSelector.SelectedBlessingIdChanged += (id, index) => SelectedBlessingIdChanged?.Invoke(id, index);
+            globalBlessingSelector.TotalSelectionCountChanged += count => TotalSelectionCountChanged?.Invoke(count);
+            
             AssignInnerBlessingSelector();
         }
 
@@ -68,7 +75,7 @@ namespace LineWars.Controllers
             get => globalBlessingSelector[index];
             set
             {
-                if (SelectedBlessings.CanSetValue(index, value))
+                if (!SelectedBlessings.CanSetValue(index, value))
                     throw new InvalidOperationException($"Cant set blessingId by {index}");
                 globalBlessingSelector[index] = value;
             }
@@ -77,7 +84,7 @@ namespace LineWars.Controllers
         bool IBlessingSelector.CanSetValue(int index, BlessingId value)
         {
             return value == BlessingId.Null
-                   && globalBlessingSelector.CanSetValue(index, value)
+                   || globalBlessingSelector.CanSetValue(index, value)
                    && !globalBlessingSelector.Contains(value);
         }
     }
