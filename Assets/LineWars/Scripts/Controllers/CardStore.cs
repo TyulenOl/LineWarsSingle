@@ -6,6 +6,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using AYellowpaper.SerializedCollections;
 
 namespace LineWars.Store
 {
@@ -14,15 +15,20 @@ namespace LineWars.Store
         [SerializeField, Min(1)] private int changeIntervalInDays = 1;
         [SerializeField] private List<Rarity> cards;
         [SerializeField] private List<DeckCard> exceptions;
-        
+        [SerializeField] private SerializedDictionary<BlessingId, int> blessingsCost;
+
         private IGetter<DateTime> timeGetter;
         private IStorage<int, DeckCard> cardStorage;
         private UserInfoController userInfoController;
 
         private bool isStoreInitialized = false;
         private List<int> cardsForPurchase = new();
+        private List<BlessingId> blessingsForPurchase;
+
         public bool StoreInitialized => isStoreInitialized;
         public IReadOnlyList<int> CardsForPurchase => cardsForPurchase;
+        public IReadOnlyList<BlessingId> BlessingsForPurchase => blessingsForPurchase;
+        public IReadOnlyDictionary<BlessingId, int> BlessingsCost => blessingsCost;
 
         public void Initialize(
             IGetter<DateTime> timeGetter, 
@@ -33,6 +39,7 @@ namespace LineWars.Store
             this.cardStorage = cardStorage;
             StartCoroutine(InitializeStore());
             userInfoController = userController;
+            blessingsForPurchase = BlessingsCost.Keys.ToList();
         }
 
         private IEnumerator InitializeStore()
@@ -77,6 +84,16 @@ namespace LineWars.Store
             }
 
             isStoreInitialized = true;
+        }
+
+        public bool CanBuy(BlessingId blessingId)
+        {
+            return false;
+        }
+
+        public void Buy(BlessingId blessingId)
+        {
+            
         }
         
         public bool CanBuy(int cardId)
