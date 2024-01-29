@@ -21,6 +21,6 @@ namespace LineWars.Model
         }
 
         protected override string DefaultName => "Благословление \"Золото\"";
-        protected override string DefaultDescription => $"Осывает вас {addedGolds} ед. золота";
+        protected override string DefaultDescription => $"Осывает вас <color=#F6C800>{addedGolds}</color> ед. золота";
     }
 }

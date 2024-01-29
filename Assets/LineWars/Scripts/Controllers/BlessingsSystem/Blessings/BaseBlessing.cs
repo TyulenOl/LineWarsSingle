@@ -17,8 +17,8 @@ namespace LineWars.Model
         public abstract bool CanExecute();
         public abstract void Execute();
 
-        protected virtual string DefaultName { get; } = "Привет из мира багов!";
-        protected virtual string DefaultDescription { get; } = "Привет из мира багов!";
+        protected abstract string DefaultName { get; }
+        protected abstract string DefaultDescription { get; }
         public string Name => overrideName.Enabled ? overrideName.Value : DefaultName;
         public string Description => overrideDescription.Enabled ? overrideDescription.Value : DefaultDescription;
         public Sprite Icon => icon;

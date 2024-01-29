@@ -37,5 +37,9 @@ namespace LineWars.Model
             
             Completed?.Invoke();
         }
+
+        protected override string DefaultName => "Благословление \"Призыв\"";
+        protected override string DefaultDescription => $"Призывает {string.Join(", ", unitPrefabsToSpawn.Select(x => x.UnitName))}" +
+                                                        " на ваших изначальных спавнах";
     }
 }
