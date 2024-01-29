@@ -36,7 +36,11 @@ namespace LineWars.Controllers
       
             AssignInnerBlessingSelector();
         }
-        
+
+        public int GetBlessingsCount(BlessingId blessingId)
+        {
+            return Math.Min(globalBlessingPull[blessingId], TotalBlessingsCount);
+        }
 
         private void AssignInnerBlessingSelector()
         {

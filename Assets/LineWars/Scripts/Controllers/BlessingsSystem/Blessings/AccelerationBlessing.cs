@@ -21,5 +21,8 @@ namespace LineWars.Model
                 unit.CurrentActionPoints += addedActionPoints;
             Completed?.Invoke();
         }
+
+        protected override string DefaultName => "Ускорение";
+        protected override string DefaultDescription => $"Восстанавливает всем союзнам юнитам {addedActionPoints} ед. очков действия";
     }
 }

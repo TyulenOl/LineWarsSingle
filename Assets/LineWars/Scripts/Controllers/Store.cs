@@ -59,7 +59,7 @@ namespace LineWars.Controllers
         private void InitializeBlessingCostInfo()
         {
             blessingToCost = blessingStorage.IdToValue
-                .Where(x=> x.Value.Cost.Amount > 0)
+                .Where(x=> x.Value.Cost.Amount >= 0)
                 .ToDictionary(x => x.Key, x => x.Value.Cost.Amount);
             blessingsForPurchase = blessingToCost.Keys.ToArray();
         }
