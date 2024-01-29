@@ -556,7 +556,7 @@ namespace LineWars.Controllers
             currentBlessing.Completed -= OnBlissingComplete;
 
             currentBlessing = null;
-            currentBlessingId = null;
+            currentBlessingId = BlessingId.Null;
             delayBlessingCoroutine = null;
             
             if (state != CommandsManagerStateType.Idle)
@@ -571,7 +571,7 @@ namespace LineWars.Controllers
             currentBlessing.Completed -= OnBlissingComplete;
             
             currentBlessing = null;
-            currentBlessingId = null;
+            currentBlessingId = BlessingId.Null;
             delayBlessingCoroutine = null;
             
             if (state != CommandsManagerStateType.Idle)

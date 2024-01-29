@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using LineWars;
 using LineWars.Controllers;
 using LineWars.Interface;
@@ -26,15 +24,15 @@ public static class DrawHelper
     }
 
 
-    public static BlessingReDrawInfo GetBlessingReDrawInfoByBlessingId(BlessingId blessingId)
+    public static AllBlessingReDrawInfo GetBlessingReDrawInfoByBlessingId(BlessingId blessingId)
     {
-        return new BlessingReDrawInfo
+        return new AllBlessingReDrawInfo
         (
             GetBlessingNameByBlessingID(blessingId),
             GetBlessingDescription(blessingId),
             GetBlessingBgColor(blessingId),
             GetSpriteByBlessingID(blessingId),
-            GameRoot.Instance.BlessingsController.GetBlessingsCount(blessingId)
+            GameRoot.Instance.UserController.GlobalBlessingsPull[blessingId]
         );
     }
 
@@ -55,9 +53,9 @@ public static class DrawHelper
     
     public static Sprite GetSpriteByBlessingID(BlessingId blessingId)
     {
-        return GameRoot.Instance.BlessingStorage.TryGetValue(blessingId, out var value) 
+        return GameRoot.Instance.BlessingStorage.TryGetValue(blessingId, out var value)
             ? value.Icon
-            : Resources.Load<Sprite>("UI/Sorokin/Icons/AP");
+            : null;
     }
 
     public static string GetBlessingTypeName(BlessingType blessingType)
@@ -93,38 +91,11 @@ public static class DrawHelper
     {
         return GetBlessingTypeName(blessingId.BlessingType);
     }
-
     public static string GetBlessingDescription(BlessingId blessingId)
     {
         return GameRoot.Instance.BlessingStorage.TryGetValue(blessingId, out var value)
             ? value.Description
             : "Привет из мира багов";
-        
-        // switch (blessingId.BlessingType)
-        // {
-        //     case BlessingType.Perun:
-        //         return "Наносит всем врагам урон";
-        //     case BlessingType.Svarog:
-        //         return "Увеличивает броню всех союзников";
-        //     case BlessingType.Health:
-        //         return "Восстанавливает здоровье всех союзников";
-        //     case BlessingType.Stribog:
-        //         return "Рассеивает туман войны по всей карте на огранниченное число раундов";
-        //     case BlessingType.Acceleration:
-        //         return "Восстанавливает часть очков действия всем союзникам";
-        //     case BlessingType.Slowdown:
-        //         return "Уменьшает очки действия всех врагов";
-        //     case BlessingType.Power:
-        //         return "Увеличивает силу всем союзников на огранниченное число раундов";
-        //     case BlessingType.Spawn:
-        //         return "Призывает различных существ на вашей базе";
-        //     case BlessingType.Gold:
-        //         return "Осыпает вас золотом";
-        //     case BlessingType.Random:
-        //         return "Случайное благословение случайной редкости";
-        //     default:
-        //         return "Привет из мира багов";
-        // }
     }
     
     public static Sprite GetSpriteByMissionStatus(MissionStatus missionStatus)

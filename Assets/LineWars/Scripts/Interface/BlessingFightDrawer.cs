@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace LineWars.Interface
 {
-    public class BlessingDrawer: MonoBehaviour
+    public class BlessingFightDrawer: MonoBehaviour
     {
         [SerializeField] private Button button;
         [SerializeField] private Image blessingIcon;

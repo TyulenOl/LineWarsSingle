@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using LineWars.Controllers;
@@ -11,39 +10,124 @@ namespace LineWars.Interface
 {
     public class ChooseBlessingsPanel : MonoBehaviour
     {
-        [SerializeField] private List<BlessingSlot> blessingSlots;
+        [SerializeField] private BlessingDropSlot blessingDropSlotPrefab;
         [SerializeField] private BlessingsGroupDrawer blessingsGroupDrawerPrefab;
-        [SerializeField] private LayoutGroup blessingsLayoutGroup;
+        [SerializeField] private LayoutGroup blessingsGroupsLayoutGroup;
+        [SerializeField] private LayoutGroup blessingSlotsLayoutGroup;
+        private IBlessingSelector Selector => GameRoot.Instance.BlessingsController;
+        private IBlessingsPull GlobalBlessingPull => GameRoot.Instance.UserController;
 
-        private Dictionary<BlessingType, BlessingsGroupDrawer> groupDrawers;
+        private Dictionary<BlessingType, BlessingsGroupDrawer> typeToDrawers;
+        private BlessingDropSlot[] blessingSlots;
+        private Dictionary<BlessingId, BlessingDropSlot> idToSlot;
 
-        private void Awake()
+        private bool initialized;
+
+        private void Start()
+        { 
+            Initialize();
+        }
+        
+        public void Initialize()
         {
-            groupDrawers = new Dictionary<BlessingType, BlessingsGroupDrawer>();
-            Init();
+            if (initialized)
+                return;
+            initialized = true;
+            
+            CreateSlotsList();
+            CreateAllGroups();
+            
+            Selector.SelectedBlessingIdChanged += SelectorOnSelectedBlessingIdChanged;
+            Selector.TotalSelectionCountChanged += SelectorOnTotalSelectionCountChanged;
+            
+            GlobalBlessingPull.BlessingCountChanged += OnBlessingCountChanged;
+        }
+        
+        private void OnDestroy()
+        {
+            if (Selector != null)
+            {
+                Selector.SelectedBlessingIdChanged -= SelectorOnSelectedBlessingIdChanged;
+                Selector.TotalSelectionCountChanged -= SelectorOnTotalSelectionCountChanged;
+            }
+        }
+        
+        private void OnBlessingCountChanged(BlessingId id, int count)
+        {
+            if (typeToDrawers.TryGetValue(id.BlessingType, out var groupDrawer))
+            {
+                if (count > 0)
+                {
+                    if (groupDrawer.RarityToSet.TryGetValue(id.Rarity, out var set))
+                        set.Redraw(id);
+                    else
+                        groupDrawer.AddRarity(id.Rarity);
+                }
+                else
+                {
+                    groupDrawer.RemoveRarity(id.Rarity);
+                    if (groupDrawer.RarityToSet.Count == 0)
+                        Destroy(groupDrawer.gameObject);
+                }
+            }
+            else
+            {
+                if (count == 0)
+                    return;
+                
+                var group = Instantiate(blessingsGroupDrawerPrefab, blessingsGroupsLayoutGroup.transform);
+                typeToDrawers[id.BlessingType] = group;
+                group.Initialize(id.BlessingType);
+                group.AddRarity(id.Rarity);
+            }
+
+            if (idToSlot.TryGetValue(id, out var slot))
+                slot.Redraw(DrawHelper.GetBlessingReDrawInfoByBlessingId(id));
         }
 
-        private void OnEnable()
+        private void SelectorOnTotalSelectionCountChanged(int newCount)
         {
-            for (var i = 0; i < blessingSlots.Count; i++)
+            DestroyAllSlots();
+            CreateSlotsList();
+        }
+
+        private void SelectorOnSelectedBlessingIdChanged(BlessingId id, int index)
+        {
+            var info = DrawHelper.GetBlessingReDrawInfoByBlessingId(id);
+            blessingSlots[index].Redraw(info);
+        }
+
+        private void CreateAllGroups()
+        {
+            typeToDrawers = new Dictionary<BlessingType, BlessingsGroupDrawer>();
+            foreach (var grouping in GlobalBlessingPull.Select(x => x.Item1).GroupBy(x => x.BlessingType))
             {
-                var blessingReDraw =
-                    DrawHelper.GetBlessingReDrawInfoByBlessingId(
-                        GameRoot.Instance.BlessingsController.SelectedBlessings[i]);
-                if(i >= GameRoot.Instance.BlessingsController.SelectedBlessings.Count)
-                    return;
-                var slot = blessingSlots[i];
-                slot.ReDraw(blessingReDraw);
+                var group = Instantiate(blessingsGroupDrawerPrefab, blessingsGroupsLayoutGroup.transform);
+                typeToDrawers[grouping.Key] = group;
+                group.Initialize(grouping.Key);
+                foreach (var id in grouping)
+                    group.AddRarity(id.Rarity);
             }
         }
 
-        private void Init()
+        private void DestroyAllSlots()
         {
-            foreach (var grouping in GameRoot.Instance.UserController.GlobalBlessingsPull.GroupBy(x => x.Item1.BlessingType, y => y.Item1))
+            foreach (var slot in blessingSlots)
+                Destroy(slot.gameObject);
+        }
+
+        private void CreateSlotsList()
+        {
+            idToSlot = new Dictionary<BlessingId, BlessingDropSlot>(Selector.Count);
+            blessingSlots = new BlessingDropSlot[Selector.Count];
+            for (var i = 0; i < Selector.Count; i++)
             {
-                var group = Instantiate(blessingsGroupDrawerPrefab, blessingsLayoutGroup.transform);
-                group.Init(grouping);
-                groupDrawers[grouping.Key] = group;
+                var info = DrawHelper.GetBlessingReDrawInfoByBlessingId(Selector[i]);
+                var instance = Instantiate(blessingDropSlotPrefab, blessingSlotsLayoutGroup.transform);
+                instance.Initialize(i);
+                blessingSlots[i] = instance;
+                instance.Redraw(info);
+                idToSlot[Selector[i]] = instance;
             }
         }
     }
