@@ -1,21 +1,28 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using LineWars.Controllers;
+using LineWars.Model;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace LineWars.Interface
 {
     public class BlessingsGroupDrawer : MonoBehaviour
     {
-        // Start is called before the first frame update
-        void Start()
-        {
+        [SerializeField] private BlessingDragableSet blessingDragableSetPrefab;
+        [SerializeField] private LayoutGroup layoutToGenerateBlessings;
+        [SerializeField] private TMP_Text groupName;
         
-        }
-
-        // Update is called once per frame
-        void Update()
+        public void Init(IEnumerable<BlessingId> blessings)
         {
-        
+            groupName.text = DrawHelper.GetBlessingTypeName(blessings.First().BlessingType);
+            foreach (var blessing in blessings)
+            {
+                var instance = Instantiate(blessingDragableSetPrefab, layoutToGenerateBlessings.transform);
+                instance.Init(blessing);
+            }
         }
     }
 }
