@@ -19,6 +19,7 @@ namespace LineWars.Controllers
         [SerializeField] private CompaniesController companiesController;
         [SerializeField] private UserInfoController userController;
         [SerializeField] private LootBoxController lootBoxController;
+        [SerializeField] private BlessingsController blessingsController;
         [SerializeField] private CardStore cardStore;
         [SerializeField] private CardUpgrader cardUpgrader;
 
@@ -41,6 +42,8 @@ namespace LineWars.Controllers
         public CompaniesController CompaniesController => companiesController;
         public UserInfoController UserController => userController;
         public LootBoxController LootBoxController => lootBoxController;
+
+        public BlessingsController BlessingsController => blessingsController;
         public CardStore CardStore => cardStore;
         public CardUpgrader CardUpgrader => cardUpgrader;
 
