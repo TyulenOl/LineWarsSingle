@@ -345,6 +345,11 @@ namespace LineWars.Model
         {
             // TODO
         }
+
+        public void Visit(ArsonAction<TNode, TEdge, TUnit> action)
+        {
+            // TODO
+        }
     }
 
     public static class ConvertUnitActionToBlueprints

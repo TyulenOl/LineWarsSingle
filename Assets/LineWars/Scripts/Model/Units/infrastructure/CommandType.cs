@@ -22,7 +22,8 @@
         UpArmor,
         ArmorBasedAttack,
         ConsumeUnit,
-        EraseFog
+        EraseFog,
+        Arson
     }
 }   
 

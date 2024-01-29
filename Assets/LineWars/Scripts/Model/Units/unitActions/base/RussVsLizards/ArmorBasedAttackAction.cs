@@ -19,6 +19,7 @@ namespace LineWars
         {
             target.DealDamageThroughArmor(Executor.CurrentArmor);
             Executor.CurrentArmor = 0;
+            CompleteAndAutoModify();
         }
 
         public bool IsAvailable(TUnit target)

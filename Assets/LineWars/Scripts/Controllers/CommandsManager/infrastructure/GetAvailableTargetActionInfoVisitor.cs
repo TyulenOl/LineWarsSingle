@@ -159,6 +159,11 @@ namespace LineWars.Controllers
                 .Select(x => new TargetActionInfo(x, action.CommandType));
         }
 
+        public IEnumerable<TargetActionInfo> Visit(IArsonAction<Node, Edge, Unit> action)
+        {
+            return ForNode(action, 1);
+        }
+
         public class ForShotUnitAction
         {
             private readonly ITarget[] targets;

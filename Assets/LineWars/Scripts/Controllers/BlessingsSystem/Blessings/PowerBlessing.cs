@@ -24,7 +24,7 @@ namespace LineWars.Model
             foreach (var unit in Player.MyUnits)
             {
                 unit.AddEffect(
-                    new RoundsTemporaryEffect<Node, Edge, Unit>(
+                    new RoundsTemporaryEffectDecorator<Node, Edge, Unit>(
                         unit,
                         new PowerBuffEffect<Node, Edge, Unit>(unit, powerBuff),
                         roundsCount)

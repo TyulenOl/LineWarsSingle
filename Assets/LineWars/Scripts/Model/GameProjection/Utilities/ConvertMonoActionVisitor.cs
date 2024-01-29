@@ -159,5 +159,11 @@ namespace LineWars.Model
             Result = new FogEraseAction<NodeProjection, EdgeProjection, UnitProjection>(Unit);
             Result.ActionModifier = action.Action.ActionModifier;
         }
+
+        public void Visit(MonoArsonAction action)
+        {
+            Result = new ArsonAction<NodeProjection, EdgeProjection, UnitProjection>(Unit, action.FireEffectRounds);
+            Result.ActionModifier = action.Action.ActionModifier;
+        }
     }    
 }
