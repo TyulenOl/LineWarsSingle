@@ -344,6 +344,11 @@ namespace LineWars.Controllers
             }
         }
 
+        bool IBlessingSelector.CanSetValue(int index, BlessingId blessingId)
+        {
+            return index >= 0 && index < currentInfo.SelectedBlessings.Count;
+        }
+
         #endregion
         
 

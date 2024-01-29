@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using AYellowpaper.SerializedCollections;
 using LineWars.Model;
 using UnityEngine;
 
@@ -68,7 +67,18 @@ namespace LineWars.Controllers
         BlessingId IBlessingSelector.this[int index]
         {
             get => globalBlessingSelector[index];
-            set => globalBlessingSelector[index] = value;
+            set
+            {
+                if (SelectedBlessings.CanSetValue(index, value))
+                    throw new InvalidOperationException();
+                globalBlessingSelector[index] = value;
+            }
+        }
+
+        bool IBlessingSelector.CanSetValue(int index, BlessingId blessingId)
+        {
+            return globalBlessingSelector.CanSetValue(index, blessingId)
+                   && !globalBlessingSelector.Contains(blessingId);
         }
     }
 }
