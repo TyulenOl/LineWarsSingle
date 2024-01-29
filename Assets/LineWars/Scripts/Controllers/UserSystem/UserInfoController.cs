@@ -89,7 +89,7 @@ namespace LineWars.Controllers
 
         private UserInfo CreateDefaultUserInfo()
         {
-            var newUserInfo = new UserInfo()
+            return  new UserInfo()
             {
                 Gold = defaultUserInfoPreset.DefaultGold,
                 Diamonds = defaultUserInfoPreset.DefaultDiamond,
@@ -97,8 +97,8 @@ namespace LineWars.Controllers
                     .Where(deckCardStorage.ValueToId.ContainsKey)
                     .Select(x => deckCardStorage.ValueToId[x])
                     .ToList(),
-                LootBoxes = Enum.GetValues(typeof(LootBoxType)).OfType<LootBoxType>()
-                    .ToSerializedDictionary(x => x, x=> 0),
+                LootBoxes = defaultUserInfoPreset.DefaultBoxesCount
+                    .ToSerializedDictionary(x => x.Key, x=> x.Value),
                 DefaultBlessingsIsAdded = true,
                 Blessings = defaultUserInfoPreset.DefaultBlessingsCount
                     .ToSerializedDictionary(x=> x.Key, x => x.Value),
@@ -106,12 +106,6 @@ namespace LineWars.Controllers
                     .Where(x => defaultUserInfoPreset.DefaultBlessingsCount.ContainsKey(x))
                     .ToList()
             };
-
-            foreach(var pair in defaultUserInfoPreset.DefaultBoxesCount)
-            {
-                newUserInfo.LootBoxes[pair.Key] = pair.Value;
-            }
-            return newUserInfo;
         }
 
         public bool CardIsOpen(DeckCard card) => openedCardsSet.Contains(card);
@@ -320,7 +314,7 @@ namespace LineWars.Controllers
                 {
                     var diff = value - currentCount;
                     for (var i = 0; i < diff; i++)
-                        currentInfo.SelectedBlessings.Add(null);
+                        currentInfo.SelectedBlessings.Add(BlessingId.Null);
                 }
                 else if (value < currentCount)
                 {
@@ -337,7 +331,8 @@ namespace LineWars.Controllers
             get => currentInfo.SelectedBlessings[index];
             set
             {
-                if (value == currentInfo.SelectedBlessings[index]) return;
+                if (value == currentInfo.SelectedBlessings[index])
+                    return;
                 
                 currentInfo.SelectedBlessings[index] = value;
                 SaveCurrentUserInfo();

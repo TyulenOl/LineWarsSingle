@@ -17,7 +17,7 @@ namespace LineWars.Interface
         public void Init(BlessingReDrawInfo blessingReDrawInfo)
         {
             image.sprite = blessingReDrawInfo.Sprite;
-            amount.text = blessingReDrawInfo.Amont.ToString();
+            amount.text = blessingReDrawInfo.Amount.ToString();
             background.color = blessingReDrawInfo.BgColor;
         }
     }

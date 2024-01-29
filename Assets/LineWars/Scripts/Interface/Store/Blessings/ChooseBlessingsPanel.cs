@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using LineWars.Controllers;
@@ -11,19 +9,19 @@ namespace LineWars.Interface
 {
     public class ChooseBlessingsPanel : MonoBehaviour
     {
-        [SerializeField] private List<BlessingSlot> blessingSlots;
+        [SerializeField] private BlessingSlot blessingSlotPrefab;
         [SerializeField] private BlessingsGroupDrawer blessingsGroupDrawerPrefab;
         [SerializeField] private LayoutGroup blessingsLayoutGroup;
 
-        private Dictionary<BlessingType, BlessingsGroupDrawer> groupDrawers;
+        private Dictionary<BlessingType, BlessingsGroupDrawer> typeToroupDrawers;
+        private List<BlessingSlot> blessingSlots;
 
         private void Awake()
-        {
-            groupDrawers = new Dictionary<BlessingType, BlessingsGroupDrawer>();
-            Init();
+        { 
+            Initialize();
         }
-
-        private void OnEnable()
+        
+        public void Initialize()
         {
             for (var i = 0; i < blessingSlots.Count; i++)
             {
@@ -35,15 +33,12 @@ namespace LineWars.Interface
                 var slot = blessingSlots[i];
                 slot.ReDraw(blessingReDraw);
             }
-        }
-
-        private void Init()
-        {
+            
             foreach (var grouping in GameRoot.Instance.UserController.GlobalBlessingsPull.GroupBy(x => x.Item1.BlessingType, y => y.Item1))
             {
                 var group = Instantiate(blessingsGroupDrawerPrefab, blessingsLayoutGroup.transform);
                 group.Init(grouping);
-                groupDrawers[grouping.Key] = group;
+                typeToroupDrawers[grouping.Key] = group;
             }
         }
     }

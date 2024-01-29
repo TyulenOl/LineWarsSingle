@@ -4,8 +4,10 @@ using UnityEngine;
 namespace LineWars.Model
 {
     [Serializable]
-    public class BlessingId: IEquatable<BlessingId>
+    public struct BlessingId: IEquatable<BlessingId>
     {
+        public static BlessingId Null = new(BlessingType.None, Rarity.Common);
+        
         [SerializeField] private BlessingType blessingType;
         [SerializeField] private Rarity rarity;
 
@@ -31,15 +33,12 @@ namespace LineWars.Model
 
         public bool Equals(BlessingId other)
         {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
             return BlessingType == other.BlessingType && Rarity == other.Rarity;
         }
 
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
             return Equals((BlessingId) obj);
         }

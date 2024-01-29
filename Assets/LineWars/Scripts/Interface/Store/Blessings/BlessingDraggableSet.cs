@@ -3,14 +3,14 @@ using UnityEngine;
 
 namespace LineWars.Interface
 {
-    public class BlessingDragableSet : MonoBehaviour
+    public class BlessingDraggableSet : MonoBehaviour
     {
         [SerializeField] private BlessingInfoDrawer blessingInfoDrawer;
-        [SerializeField] private DragableBlessing dragableBlessing;
+        [SerializeField] private DraggableBlessing draggableBlessing;
 
         public void Init(BlessingId blessingId)
         {
-            dragableBlessing.Init(blessingId);
+            draggableBlessing.Init(blessingId);
             blessingInfoDrawer.Init(DrawHelper.GetBlessingReDrawInfoByBlessingId(blessingId));
         }
     }

@@ -69,15 +69,16 @@ namespace LineWars.Controllers
             set
             {
                 if (SelectedBlessings.CanSetValue(index, value))
-                    throw new InvalidOperationException();
+                    throw new InvalidOperationException($"Cant set blessingId by {index}");
                 globalBlessingSelector[index] = value;
             }
         }
 
-        bool IBlessingSelector.CanSetValue(int index, BlessingId blessingId)
+        bool IBlessingSelector.CanSetValue(int index, BlessingId value)
         {
-            return globalBlessingSelector.CanSetValue(index, blessingId)
-                   && !globalBlessingSelector.Contains(blessingId);
+            return value == BlessingId.Null
+                   && globalBlessingSelector.CanSetValue(index, value)
+                   && !globalBlessingSelector.Contains(value);
         }
     }
 }

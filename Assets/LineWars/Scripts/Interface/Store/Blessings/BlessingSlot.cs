@@ -1,8 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using LineWars.Controllers;
-using LineWars.Interface;
 using LineWars.Model;
 using TMPro;
 using UnityEngine;
@@ -29,7 +26,7 @@ namespace LineWars.Interface
 
         public void OnDrop(PointerEventData eventData)
         {
-            var dragableItem = eventData.pointerDrag.GetComponent<DragableBlessing>();
+            var dragableItem = eventData.pointerDrag.GetComponent<DraggableBlessing>();
             var blessingId = dragableItem.BlessingId;
 
             var x = GameRoot.Instance.BlessingsController.SelectedBlessings.ToArray();
@@ -44,7 +41,7 @@ namespace LineWars.Interface
         private void Init(BlessingReDrawInfo blessingReDrawInfo)
         {
             image.sprite = blessingReDrawInfo.Sprite;
-            amount.text = blessingReDrawInfo.Amont.ToString();
+            amount.text = blessingReDrawInfo.Amount.ToString();
             background.color = blessingReDrawInfo.BgColor;
         }
         
@@ -57,7 +54,7 @@ namespace LineWars.Interface
             
             if (active == false)
             {
-                GameRoot.Instance.BlessingsController.SelectedBlessings[index] = null;
+                GameRoot.Instance.BlessingsController.SelectedBlessings[index] = BlessingId.Null;
             }
         }
     }

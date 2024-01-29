@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 
 namespace LineWars.Interface
 {
-    public class DragableBlessing : MonoBehaviour, IBeginDragHandler, IEndDragHandler, IDragHandler
+    public class DraggableBlessing : MonoBehaviour, IBeginDragHandler, IEndDragHandler, IDragHandler
     {
         [SerializeField] private RectTransform parentTransform;
         [SerializeField] private BlessingInfoDrawer blessingInfoDrawer;

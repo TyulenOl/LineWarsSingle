@@ -11,16 +11,16 @@ namespace LineWars.Interface
 {
     public class BlessingsGroupDrawer : MonoBehaviour
     {
-        [SerializeField] private BlessingDragableSet blessingDragableSetPrefab;
+        [SerializeField] private BlessingDraggableSet blessingDraggableSetPrefab;
         [SerializeField] private LayoutGroup layoutToGenerateBlessings;
         [SerializeField] private TMP_Text groupName;
         
         public void Init(IEnumerable<BlessingId> blessings)
         {
-            groupName.text = DrawHelper.GetBlessingTypeName(blessings.First().BlessingType);
+            groupName.text = DrawHelper.GetBlessingNameByBlessingID(blessings.First());
             foreach (var blessing in blessings)
             {
-                var instance = Instantiate(blessingDragableSetPrefab, layoutToGenerateBlessings.transform);
+                var instance = Instantiate(blessingDraggableSetPrefab, layoutToGenerateBlessings.transform);
                 instance.Init(blessing);
             }
         }

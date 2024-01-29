@@ -26,8 +26,7 @@ namespace LineWars.Interface
             }
 
             var resultAlpha = currentAlpha + alphaDecreaseModifier;
-            spriteRenderer.color = new Color(spriteRenderer.color.r, spriteRenderer.color.g, spriteRenderer.color.b,
-                resultAlpha / 255f);
+            spriteRenderer.color = spriteRenderer.color.WithAlpha(resultAlpha / 255f);
         }
     }
 }
