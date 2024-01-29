@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace LineWars
+namespace LineWars.Interface
 {
     public class ItemRotator : MonoBehaviour
     {

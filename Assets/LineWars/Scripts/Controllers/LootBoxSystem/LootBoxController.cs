@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
-using LineWars.Controllers;
 using LineWars.Model;
 using UnityEngine;
 
-namespace LineWars.LootBoxes
+namespace LineWars.Controllers
 {
     public class LootBoxController : MonoBehaviour
     {

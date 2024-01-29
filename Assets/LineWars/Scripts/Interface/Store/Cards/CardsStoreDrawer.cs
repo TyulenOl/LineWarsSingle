@@ -1,14 +1,12 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using LineWars.Controllers;
-using LineWars.LootBoxes;
 using LineWars.Model;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace LineWars
+namespace LineWars.Interface
 {
     public class CardsStoreDrawer : MonoBehaviour
     {
@@ -24,7 +22,7 @@ namespace LineWars
 
         private void ReDrawBoxes()
         {
-            var cards = GameRoot.Instance.CardStore.CardsForPurchase.Select(x => GameRoot.Instance.CardsDatabase.IdToValue[x]);
+            var cards = GameRoot.Instance.Store.CardsForPurchase.Select(x => GameRoot.Instance.CardsDatabase.IdToValue[x]);
             foreach (var deckCard in cards)
             {
                 var instance = Instantiate(cardDrawInfoPrefab, boxesLayout.transform);
@@ -35,7 +33,7 @@ namespace LineWars
         private BuyPanelReDrawInfo GetBuyPanelReDrawInfo(DeckCard deckCard)
         {
             return new BuyPanelReDrawInfo(() => OnButtonClick(deckCard),
-                () => GameRoot.Instance.CardStore.CanBuy(GameRoot.Instance.CardsDatabase.ValueToId[deckCard]),
+                () => GameRoot.Instance.Store.CanBuy(GameRoot.Instance.CardsDatabase.ValueToId[deckCard]),
                 deckCard.Image,
                 deckCard.Name,
                 deckCard.Description,
@@ -47,9 +45,9 @@ namespace LineWars
         {
             var cardId = GameRoot.Instance.CardsDatabase.ValueToId[deckCard];
             
-            if (!GameRoot.Instance.CardStore.CanBuy(cardId))
+            if (!GameRoot.Instance.Store.CanBuy(cardId))
                 throw new InvalidOperationException("Can't buy this Card");
-            GameRoot.Instance.CardStore.Buy(cardId);
+            GameRoot.Instance.Store.Buy(cardId);
 
             var contextedDropArray = new List<ContextedDrop>
             {

@@ -1,13 +1,9 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using LineWars.Controllers;
-using LineWars.LootBoxes;
+using LineWars.Interface;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace LineWars
+namespace LineWars.Interface
 {
     public class BuyPanel : MonoBehaviour
     {

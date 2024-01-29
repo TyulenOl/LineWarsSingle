@@ -29,7 +29,7 @@ namespace LineWars.Controllers
         {
             foreach (var id in blessings)
             {
-                if (innerPull.TryGetValue(id, out var innerCount))
+                if (innerPull.TryGetCount(id, out var innerCount))
                 {
                     yield return (id, Math.Min(innerCount, totalCount));
                 }
@@ -43,7 +43,7 @@ namespace LineWars.Controllers
 
         public int this[BlessingId id]
         {
-            get => TryGetValue(id, out var count) ? count : throw new KeyNotFoundException();
+            get => TryGetCount(id, out var count) ? count : throw new KeyNotFoundException();
             set
             {
                 if (!blessings.Contains(id))
@@ -64,10 +64,10 @@ namespace LineWars.Controllers
 
         public event Action<BlessingId, int> BlessingCountChanged;
         
-        public bool TryGetValue(BlessingId id, out int count)
+        public bool TryGetCount(BlessingId id, out int count)
         {
             count = 0;
-            if (innerPull.TryGetValue(id, out var innerCount) 
+            if (innerPull.TryGetCount(id, out var innerCount) 
                 && blessings.Contains(id))
             {
                 count = Math.Min(innerCount, totalCount);
@@ -75,6 +75,11 @@ namespace LineWars.Controllers
             }
 
             return false;
+        }
+
+        public bool ContainsId(BlessingId id)
+        {
+            return TryGetCount(id, out _);
         }
     }
 }

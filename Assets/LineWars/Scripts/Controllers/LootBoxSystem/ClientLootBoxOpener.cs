@@ -2,10 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using DataStructures;
 using LineWars.Controllers;
-using LineWars.Model;
 using UnityEngine;
 
-namespace LineWars.LootBoxes
+namespace LineWars.Model
 {
     public class ClientLootBoxOpener : ILootBoxOpener
     {

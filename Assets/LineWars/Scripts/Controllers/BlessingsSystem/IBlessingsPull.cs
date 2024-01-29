@@ -8,6 +8,7 @@ namespace LineWars.Controllers
     {
         public int this[BlessingId id] { get; set; }
         public event Action<BlessingId, int> BlessingCountChanged;
-        public bool TryGetValue(BlessingId id, out int count);
+        public bool TryGetCount(BlessingId id, out int count);
+        public bool ContainsId(BlessingId id);
     }
 }

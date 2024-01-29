@@ -10,7 +10,12 @@ namespace LineWars
         IReadOnlyDictionary<TValue, TKey> ValueToId { get; }
         IEnumerable<TValue> Values { get; }
         IEnumerable<TKey> Keys { get; }
-        int ValuesCount { get; }
+        IEnumerable<KeyValuePair<TKey, TValue>> Pairs { get; }
+        int Count { get; }
+        bool TryGetKey(TValue value, out TKey key);
+        bool ContainsKey(TKey key);
+        bool TryGetValue(TKey key, out TValue value);
+        bool ContainsValue(TValue key);
     }
 
     public abstract class ScriptableStorage<TKey, TValue> :
@@ -25,7 +30,27 @@ namespace LineWars
         public IReadOnlyDictionary<TValue, TKey> ValueToId => valueToId;
         public IEnumerable<TKey> Keys => idToValue.Keys;
         public IEnumerable<TValue> Values => idToValue.Values;
-        public int ValuesCount => idToValue.Count;
+        public int Count => idToValue.Count;
+        public IEnumerable<KeyValuePair<TKey, TValue>> Pairs => idToValue;
+        public bool TryGetKey(TValue value, out TKey key)
+        {
+            return valueToId.TryGetValue(value, out key);
+        }
+
+        public bool ContainsKey(TKey key)
+        {
+            return idToValue.ContainsKey(key);
+        }
+
+        public bool TryGetValue(TKey key, out TValue value)
+        {
+            return idToValue.TryGetValue(key, out value);
+        }
+
+        public bool ContainsValue(TValue key)
+        {
+            return valueToId.ContainsKey(key);
+        }
 
 
         public void OnBeforeSerialize()

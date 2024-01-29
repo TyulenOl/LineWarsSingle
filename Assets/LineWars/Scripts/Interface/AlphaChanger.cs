@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace LineWars.LineWars.Scripts.Interface
+namespace LineWars.Interface
 {
     public class AlphaChanger : MonoBehaviour
     {

@@ -1,5 +1,5 @@
 using System;
-using LineWars.LootBoxes;
+using LineWars.Model;
 using UnityEngine;
 using UnityEngine.Events;
 

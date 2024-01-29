@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using LineWars.Controllers;
-using LineWars.LootBoxes;
 using LineWars.Model;
 using UnityEngine;
 using UnityEngine.Events;

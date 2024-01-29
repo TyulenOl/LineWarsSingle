@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AYellowpaper.SerializedCollections;
-using LineWars.LootBoxes;
+using LineWars.Model;
 
 namespace LineWars.Model
 {
@@ -17,9 +17,10 @@ namespace LineWars.Model
         public SerializedDictionary<int, int> CardLevels;
         public int PassingGameModes;
         
-        public SerializedDictionary<BlessingId, int> Blessings;
         public bool DefaultBlessingsIsAdded;
-
+        public SerializedDictionary<BlessingId, int> Blessings;
+        public List<BlessingId> SelectedBlessings;
+        
         int IReadOnlyUserInfo.Diamonds => Diamonds;
         int IReadOnlyUserInfo.Gold => Gold;
         IReadOnlyList<int> IReadOnlyUserInfo.UnlockedCards => UnlockedCards;

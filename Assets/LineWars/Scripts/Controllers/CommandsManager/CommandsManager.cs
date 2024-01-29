@@ -502,7 +502,7 @@ namespace LineWars.Controllers
 
         private bool CanExecuteBlessingCountCondition(BlessingId blessingData)
         {
-            return blessingsPull.TryGetValue(blessingData, out var count)
+            return blessingsPull.TryGetCount(blessingData, out var count)
                    && count > 0;
         }
 

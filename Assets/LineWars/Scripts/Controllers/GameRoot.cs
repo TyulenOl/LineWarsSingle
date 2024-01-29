@@ -1,9 +1,7 @@
 ﻿using System;
 using DataStructures;
 using LineWars.Model;
-using LineWars.LootBoxes;
 using UnityEngine;
-using LineWars.Store;
 
 namespace LineWars.Controllers
 {
@@ -20,7 +18,7 @@ namespace LineWars.Controllers
         [SerializeField] private UserInfoController userController;
         [SerializeField] private LootBoxController lootBoxController;
         [SerializeField] private BlessingsController blessingsController;
-        [SerializeField] private CardStore cardStore;
+        [SerializeField] private Store store;
         [SerializeField] private CardUpgrader cardUpgrader;
 
         [Header("ProviderSettings")]
@@ -44,7 +42,7 @@ namespace LineWars.Controllers
         public LootBoxController LootBoxController => lootBoxController;
 
         public BlessingsController BlessingsController => blessingsController;
-        public CardStore CardStore => cardStore;
+        public Store Store => store;
         public CardUpgrader CardUpgrader => cardUpgrader;
 
         protected override void OnAwake()
@@ -58,8 +56,9 @@ namespace LineWars.Controllers
             CompaniesController.Initialize(missionInfoProvider, missionsStorage);
             UserController.Initialize(userInfoProvider, cardsDatabase);
             DecksController.Initialize(deckProvider, UserController);
-            CardStore.Initialize(timeGetter, CardsDatabase, UserController);
+            Store.Initialize(timeGetter, CardsDatabase, BlessingStorage, UserController);
             cardsLevelStorage = new CardLevelsStorage(CardsDatabase, UserController.UserInfo);
+            BlessingsController.Initialize(UserController, UserController, BlessingStorage);
             InitializeLootBoxController();
         }
 

@@ -16,16 +16,7 @@ namespace LineWars.Model
         {
             if (GameRoot.Instance != null)
             {
-                //временно
-                return GameRoot.Instance.UserController;
-                // return new LimitingBlessingPool(GameRoot.Instance.UserController,
-                //     new []
-                //     {
-                //         new BlessingId(BlessingType.PerunBlessing, Rarity.Common),
-                //         new BlessingId(BlessingType.StribogBlessing, Rarity.Rare),
-                //         new BlessingId(BlessingType.PowerBlessing, Rarity.Rare)
-                //     }, 
-                //     3);
+                return GameRoot.Instance.BlessingsController.BlissingPullForGame;
             }
 
             return new EmptyPull();

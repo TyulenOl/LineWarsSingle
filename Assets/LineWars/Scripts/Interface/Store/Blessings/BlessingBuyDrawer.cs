@@ -1,15 +1,11 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using LineWars.Controllers;
-using LineWars.LootBoxes;
 using LineWars.Model;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace LineWars
+namespace LineWars.Interface
 {
     public class BlessingBuyDrawer : MonoBehaviour
     {
@@ -21,11 +17,11 @@ namespace LineWars
         
         public void ReDraw(BlessingId blessingId, UnityAction action)
         {
-            var cost = 9999999;
-            if (GameRoot.Instance.CardStore.BlessingsCost.TryGetValue(blessingId, out var costValue))
-            {
-                cost = GameRoot.Instance.CardStore.BlessingsCost[blessingId];
-            }
+            var store = GameRoot.Instance.Store;
+            var cost = -1;
+            if (store.BlessingToCost.TryGetValue(blessingId, out var costValue))
+                cost = costValue;
+            
             costDrawer.DrawCost(cost, CostType.Gold);
             blessingImage.sprite = DrawHelper.GetSpriteByBlessingID(blessingId);
             blessingName.text = DrawHelper.GetBlessingNameByBlessingID(blessingId);

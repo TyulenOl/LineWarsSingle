@@ -2,15 +2,15 @@
 {
     public enum BlessingType
     {
-        PerunBlessing = 0,
-        SvarogBlessing = 1,
-        HealthBlessing = 2,
-        StribogBlessing = 3,
-        AccelerationBlessing = 4,
-        SlowdownBlessing = 5,
-        PowerBlessing = 6,
-        SpawnBlessing = 7,
-        GoldBlessing = 8,
-        RandomBlessing = 9
+        Perun = 0,
+        Svarog = 1,
+        Health = 2,
+        Stribog = 3,
+        Acceleration = 4,
+        Slowdown = 5,
+        Power = 6,
+        Spawn = 7,
+        Gold = 8,
+        Random = 9
     }
 }

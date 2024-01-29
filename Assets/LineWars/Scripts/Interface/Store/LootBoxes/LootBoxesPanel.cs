@@ -1,12 +1,10 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using LineWars.Controllers;
-using LineWars.LootBoxes;
+using LineWars.Model;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace LineWars
+namespace LineWars.Interface
 {
     public class LootBoxesPanel : MonoBehaviour
     {

@@ -1,14 +1,10 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using LineWars.Controllers;
-using LineWars.LootBoxes;
+using LineWars.Model;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace LineWars
+namespace LineWars.Interface
 {
     public class LootBoxDrawer : MonoBehaviour
     {
