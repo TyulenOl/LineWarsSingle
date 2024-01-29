@@ -24,5 +24,8 @@ namespace LineWars.Model
             
             Completed?.Invoke();
         }
+
+        protected override string DefaultName => "Благословление \"Сварога\"";
+        protected override string DefaultDescription => $"Подымает всем союзным юнитам <color=#12C9E2>{addedArmor}</color> ед. брони";
     }
 }

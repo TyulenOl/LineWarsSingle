@@ -21,5 +21,8 @@ namespace LineWars.Model
                 unit.CurrentActionPoints -= removedActionPoints;
             Completed?.Invoke();
         }
+
+        protected override string DefaultName => "Замедление";
+        protected override string DefaultDescription => $"Уменьшает очки действия всех врагов на <color=#F6C800>{removedActionPoints}</color> ед.";
     }
 }
