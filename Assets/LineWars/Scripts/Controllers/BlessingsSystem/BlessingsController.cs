@@ -15,7 +15,6 @@ namespace LineWars.Controllers
         private IBlessingSelector globalBlessingSelector;
         private IBlessingsPull globalBlessingPull;
         private IStorage<BlessingId, BaseBlessing> blessingStorage;
-        
 
         public int MaxBlessingsIdsCount => maxBlessingsIdsCount;
         public int TotalBlessingsCount => totalBlessingsCount;
