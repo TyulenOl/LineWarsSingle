@@ -14,6 +14,8 @@ namespace LineWars
         [field:SerializeField] public GameReferee GameReferee { get;  set; }
         [field:SerializeField] public WinOrLoseAction WinOrLoseAction { get; set; }
         [field:SerializeField] public PlayerInitializer PlayerInitializer { get;  set; }
+        
+        [field: Header("Getters")]
         [field: SerializeField] public DeckGetter DeckGetter { get; set; }
         [field: SerializeField] public BlessingPullGetter BlessingPullGetter { get; set; }
         [field: SerializeField] public BlessingStorageGetter BlessingStorageGetter { get; set; }
@@ -94,6 +96,16 @@ namespace LineWars
         public void LoseGame()
         {
             WinOrLoseAction.OnLose();
+        }
+
+        public void PauseGame()
+        {
+            
+        }
+
+        public void ResumeGame()
+        {
+            
         }
         
         protected override void OnDestroy()

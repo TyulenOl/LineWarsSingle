@@ -32,7 +32,7 @@ namespace LineWars.Controllers
         public event Action<BlessingId, int> BlessingCountChanged;
 
         public IReadOnlyUserInfo UserInfo => currentInfo;
-        public IBlessingsPull BlessingsCount => this;
+        public IBlessingsPull BlessingsPull => this;
         public void Initialize(IProvider<UserInfo> provider, IStorage<int, DeckCard> storage)
         {
             userInfoProvider = provider;
@@ -48,8 +48,7 @@ namespace LineWars.Controllers
             }
 #endif
             InitializeDefaultCards();
-            
-            
+            AddDefaultBlissings();
             SaveCurrentUserInfo();
         }
 
@@ -63,18 +62,9 @@ namespace LineWars.Controllers
             currentInfo.UnlockedCards = openedCardsSet
                 .Select(x => deckCardStorage.ValueToId[x])
                 .ToList();
-
-            AddDefaultBlissings();
             
-
-            foreach(var cardInfo in defaultUserInfoPreset.DefaultCardLevels)
-            {
-                var level = cardInfo.Value;
-                var cardId = cardInfo.Key;
+            foreach(var (cardId, level) in defaultUserInfoPreset.DefaultCardLevels)
                 currentInfo.CardLevels.TryAdd(cardId, level);
-            }
-            
-            SaveCurrentUserInfo();
         }
 
         private void AddDefaultBlissings()
@@ -255,7 +245,7 @@ namespace LineWars.Controllers
             set
             {
                 if (value < 0)
-                    throw new ArgumentException($"{nameof(BlessingsCount)} can't be less than zero!");
+                    throw new ArgumentException($"{nameof(BlessingsPull)} can't be less than zero!");
                     
                 
                 if (currentInfo.Blessings.TryGetValue(id, out var currentCount))
@@ -285,7 +275,7 @@ namespace LineWars.Controllers
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return BlessingsCount.GetEnumerator();
+            return BlessingsPull.GetEnumerator();
         }
 
         IEnumerator<(BlessingId, int)> IEnumerable<(BlessingId, int)>.GetEnumerator()
