@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using LineWars.Controllers;
 using UnityEngine;
 
-namespace LineWars.LootBoxes
+namespace LineWars.Model
 {
     [CreateAssetMenu(fileName = "New Loot Box Info", menuName = "Loot Boxes/Info")]
     public class LootBoxInfo : ScriptableObject

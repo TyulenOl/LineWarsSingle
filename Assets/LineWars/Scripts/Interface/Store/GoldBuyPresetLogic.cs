@@ -1,11 +1,10 @@
-using System;
 using LineWars.Controllers;
-using LineWars.LootBoxes;
+using LineWars.Model;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace LineWars
+namespace LineWars.Interface
 {
     public class GoldBuyPresetLogic : MonoBehaviour
     {

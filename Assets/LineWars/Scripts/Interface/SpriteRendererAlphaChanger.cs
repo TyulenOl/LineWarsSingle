@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace LineWars.LineWars.Scripts.Interface
+namespace LineWars.Interface
 {
     public class SpriteRendererAlphaChanger : AlphaChanger
     {

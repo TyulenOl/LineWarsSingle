@@ -1,45 +1,48 @@
 ﻿using LineWars.Model;
 using LineWars.Controllers;
-using LineWars.LootBoxes;
 using System;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using AYellowpaper.SerializedCollections;
 
-namespace LineWars.Store
+namespace LineWars.Controllers
 {
-    public class CardStore : MonoBehaviour
+    public class Store : MonoBehaviour
     {
         [SerializeField, Min(1)] private int changeIntervalInDays = 1;
         [SerializeField] private List<Rarity> cards;
         [SerializeField] private List<DeckCard> exceptions;
-        [SerializeField] private SerializedDictionary<BlessingId, int> blessingsCost;
+
 
         private IGetter<DateTime> timeGetter;
         private IStorage<int, DeckCard> cardStorage;
+        private IStorage<BlessingId, BaseBlessing> blessingStorage;
         private UserInfoController userInfoController;
 
         private bool isStoreInitialized = false;
         private List<int> cardsForPurchase = new();
-        private List<BlessingId> blessingsForPurchase;
+        private Dictionary<BlessingId, int> blessingToCost;
+        private BlessingId[] blessingsForPurchase;
 
         public bool StoreInitialized => isStoreInitialized;
         public IReadOnlyList<int> CardsForPurchase => cardsForPurchase;
         public IReadOnlyList<BlessingId> BlessingsForPurchase => blessingsForPurchase;
-        public IReadOnlyDictionary<BlessingId, int> BlessingsCost => blessingsCost;
-
+        public IReadOnlyDictionary<BlessingId, int> BlessingToCost => blessingToCost;
+        
+        
         public void Initialize(
             IGetter<DateTime> timeGetter, 
             IStorage<int, DeckCard> cardStorage,
+            IStorage<BlessingId, BaseBlessing> blessingStorage,
             UserInfoController userController)
         {
             this.timeGetter = timeGetter;
             this.cardStorage = cardStorage;
-            StartCoroutine(InitializeStore());
+            this.blessingStorage = blessingStorage;
             userInfoController = userController;
-            blessingsForPurchase = BlessingsCost.Keys.ToList();
+            StartCoroutine(InitializeStore());
+            InitializeBlessingCostInfo();
         }
 
         private IEnumerator InitializeStore()
@@ -51,6 +54,14 @@ namespace LineWars.Store
             var currentTime = timeGetter.Get();
             var random = new System.Random(currentTime.DayOfYear / changeIntervalInDays);
             FillStore(random);
+        }
+        
+        private void InitializeBlessingCostInfo()
+        {
+            blessingToCost = blessingStorage.IdToValue
+                .Where(x=> x.Value.Cost.Amount > 0)
+                .ToDictionary(x => x.Key, x => x.Value.Cost.Amount);
+            blessingsForPurchase = blessingToCost.Keys.ToArray();
         }
 
         private void FillStore(System.Random random)
@@ -88,12 +99,31 @@ namespace LineWars.Store
 
         public bool CanBuy(BlessingId blessingId)
         {
-            return false;
+            var blessing = blessingStorage.IdToValue[blessingId];
+            var canAfford = blessing.Cost.Type switch
+            {
+                CostType.Gold => 0 <= blessing.Cost.Amount && blessing.Cost.Amount <= userInfoController.UserGold,
+                CostType.Diamond => 0 <= blessing.Cost.Amount && blessing.Cost.Amount <= userInfoController.UserDiamond,
+                _ => throw new NotImplementedException()
+            };
+            return canAfford;
         }
 
         public void Buy(BlessingId blessingId)
         {
-            
+            var blessing = blessingStorage.IdToValue[blessingId];
+            switch (blessing.Cost.Type)
+            {
+                case CostType.Gold:
+                    userInfoController.UserGold -= blessing.Cost.Amount;
+                    break;
+                case CostType.Diamond:
+                    userInfoController.UserDiamond -= blessing.Cost.Amount;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            userInfoController.GlobalBlessingsPull[blessingId]++;
         }
         
         public bool CanBuy(int cardId)
@@ -101,18 +131,12 @@ namespace LineWars.Store
             var haveInStore = cardsForPurchase.Contains(cardId);
             var card = cardStorage.IdToValue[cardId];
             var cardOpen = userInfoController.CardIsOpen(card);
-            bool canAfford;
-            switch (card.ShopCostType)
+            bool canAfford = card.ShopCostType switch
             {
-                case CostType.Gold:
-                    canAfford = userInfoController.UserGold >= card.ShopCost;
-                    break;
-                case CostType.Diamond:
-                    canAfford = userInfoController.UserDiamond >= card.ShopCost;
-                    break;
-                default:
-                    throw new NotImplementedException();
-            }
+                CostType.Gold => userInfoController.UserGold >= card.ShopCost,
+                CostType.Diamond => userInfoController.UserDiamond >= card.ShopCost,
+                _ => throw new NotImplementedException()
+            };
 
             return canAfford && haveInStore && !cardOpen;
 

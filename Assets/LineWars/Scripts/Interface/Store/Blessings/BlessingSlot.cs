@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using LineWars.Interface;
 using UnityEngine;
 
-namespace LineWars
+namespace LineWars.Interface
 {
     public class BlessingSlot : MonoBehaviour
     {

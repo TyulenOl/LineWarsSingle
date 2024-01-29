@@ -24,9 +24,14 @@ namespace LineWars.Controllers
         }
 
         public event Action<BlessingId, int> BlessingCountChanged;
-        public bool TryGetValue(BlessingId id, out int count)
+        public bool TryGetCount(BlessingId id, out int count)
         {
             count = 0;
+            return false;
+        }
+
+        public bool ContainsId(BlessingId id)
+        {
             return false;
         }
     }

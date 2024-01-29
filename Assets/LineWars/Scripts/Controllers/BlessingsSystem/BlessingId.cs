@@ -19,6 +19,16 @@ namespace LineWars.Model
             this.rarity = rarity;
         }
 
+        public static bool operator ==(BlessingId left, BlessingId right)
+        {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(BlessingId left, BlessingId right)
+        {
+            return !Equals(left, right);
+        }
+
         public bool Equals(BlessingId other)
         {
             if (ReferenceEquals(null, other)) return false;
@@ -36,7 +46,7 @@ namespace LineWars.Model
 
         public override int GetHashCode()
         {
-            return HashCode.Combine((int) BlessingType, (int) Rarity);
+            return HashCode.Combine((int) blessingType, (int) rarity);
         }
     }
 }

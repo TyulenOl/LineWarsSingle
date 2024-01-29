@@ -1,9 +1,9 @@
-using LineWars.LootBoxes;
+using LineWars.Model;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace LineWars
+namespace LineWars.Interface
 {
     public class CostDrawer : MonoBehaviour
     {

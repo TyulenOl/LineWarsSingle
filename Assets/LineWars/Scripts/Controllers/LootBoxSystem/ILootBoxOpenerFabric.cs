@@ -1,4 +1,6 @@
-﻿namespace LineWars.LootBoxes
+﻿using LineWars.Model;
+
+namespace LineWars.Model
 {
     public interface ILootBoxOpenerFabric
     {

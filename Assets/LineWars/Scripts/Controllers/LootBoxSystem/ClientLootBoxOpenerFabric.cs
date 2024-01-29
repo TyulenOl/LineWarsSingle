@@ -1,6 +1,6 @@
 ﻿using LineWars.Model;
 
-namespace LineWars.LootBoxes
+namespace LineWars.Model
 {
     public class ClientLootBoxOpenerFabric : ILootBoxOpenerFabric
     {

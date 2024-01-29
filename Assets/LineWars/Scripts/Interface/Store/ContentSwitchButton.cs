@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace LineWars
+namespace LineWars.Interface
 {
     public class ContentSwitchButton : MonoBehaviour
     {

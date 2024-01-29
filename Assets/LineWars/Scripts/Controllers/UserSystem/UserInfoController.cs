@@ -4,11 +4,10 @@ using LineWars.Model;
 using UnityEngine;
 using System;
 using System.Collections;
-using LineWars.LootBoxes;
 
 namespace LineWars.Controllers
 {
-    public class UserInfoController: MonoBehaviour, IBlessingsPull
+    public class UserInfoController: MonoBehaviour, IBlessingsPull, IBlessingSelector
     {
         [SerializeField] private UserInfoPreset defaultUserInfoPreset;
 
@@ -32,7 +31,7 @@ namespace LineWars.Controllers
         public event Action<BlessingId, int> BlessingCountChanged;
 
         public IReadOnlyUserInfo UserInfo => currentInfo;
-        public IBlessingsPull BlessingsPull => this;
+        public IBlessingsPull GlobalBlessingsPull => this;
         public void Initialize(IProvider<UserInfo> provider, IStorage<int, DeckCard> storage)
         {
             userInfoProvider = provider;
@@ -48,7 +47,7 @@ namespace LineWars.Controllers
             }
 #endif
             InitializeDefaultCards();
-            AddDefaultBlissings();
+            TryAddDefaultBlessings();
             SaveCurrentUserInfo();
         }
 
@@ -67,7 +66,7 @@ namespace LineWars.Controllers
                 currentInfo.CardLevels.TryAdd(cardId, level);
         }
 
-        private void AddDefaultBlissings()
+        private void TryAddDefaultBlessings()
         {
             if (!currentInfo.DefaultBlessingsIsAdded)
             {
@@ -102,7 +101,10 @@ namespace LineWars.Controllers
                     .ToSerializedDictionary(x => x, x=> 0),
                 DefaultBlessingsIsAdded = true,
                 Blessings = defaultUserInfoPreset.DefaultBlessingsCount
-                    .ToSerializedDictionary(x=> x.Key, x => x.Value)
+                    .ToSerializedDictionary(x=> x.Key, x => x.Value),
+                SelectedBlessings = defaultUserInfoPreset.DefaultSelectedBlessings
+                    .Where(x => defaultUserInfoPreset.DefaultBlessingsCount.ContainsKey(x))
+                    .ToList()
             };
 
             foreach(var pair in defaultUserInfoPreset.DefaultBoxesCount)
@@ -239,13 +241,14 @@ namespace LineWars.Controllers
             }
         }
 
+        #region BlessingPullImplimintation
         int IBlessingsPull.this[BlessingId id]
         {
             get => currentInfo.Blessings.TryGetValue(id, out var value) ? value : 0;
             set
             {
                 if (value < 0)
-                    throw new ArgumentException($"{nameof(BlessingsPull)} can't be less than zero!");
+                    throw new ArgumentException($"{nameof(GlobalBlessingsPull)} can't be less than zero!");
                     
                 
                 if (currentInfo.Blessings.TryGetValue(id, out var currentCount))
@@ -275,7 +278,7 @@ namespace LineWars.Controllers
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return BlessingsPull.GetEnumerator();
+            return GlobalBlessingsPull.GetEnumerator();
         }
 
         IEnumerator<(BlessingId, int)> IEnumerable<(BlessingId, int)>.GetEnumerator()
@@ -286,10 +289,63 @@ namespace LineWars.Controllers
             }
         }
 
-        public bool TryGetValue(BlessingId id, out int count)
+        bool IBlessingsPull.TryGetCount(BlessingId id, out int count)
         {
             return currentInfo.Blessings.TryGetValue(id, out count);
         }
+
+        bool IBlessingsPull.ContainsId(BlessingId id)
+        {
+            return currentInfo.Blessings.ContainsKey(id);
+        }
+        #endregion
+
+        #region BlessingSelectorImplimitation
+        IEnumerator<BlessingId> IEnumerable<BlessingId>.GetEnumerator()
+        {
+            return currentInfo.SelectedBlessings.GetEnumerator();
+        }
+
+        int IReadOnlyCollection<BlessingId>.Count => currentInfo.SelectedBlessings.Count;
+
+        int IBlessingSelector.Count
+        {
+            get => currentInfo.SelectedBlessings.Count;
+            set
+            {
+                if (value < 0)
+                    throw new ArgumentException($"{nameof(IBlessingSelector.Count)} can't be less than zero!");
+                var currentCount = currentInfo.SelectedBlessings.Count;
+                if (value > currentCount)
+                {
+                    var diff = value - currentCount;
+                    for (var i = 0; i < diff; i++)
+                        currentInfo.SelectedBlessings.Add(null);
+                }
+                else if (value < currentCount)
+                {
+                    var diff = currentCount - value;
+                    for (var i = 0; i < diff; i++)
+                        currentInfo.SelectedBlessings.RemoveAt(currentInfo.SelectedBlessings.Count-1);
+                }
+            }
+        }
+
+
+        BlessingId IBlessingSelector.this[int index]
+        {
+            get => currentInfo.SelectedBlessings[index];
+            set
+            {
+                if (value == currentInfo.SelectedBlessings[index]) return;
+                
+                currentInfo.SelectedBlessings[index] = value;
+                SaveCurrentUserInfo();
+            }
+        }
+
+        #endregion
+        
 
         public int GetBoxes(LootBoxType boxType)
         {

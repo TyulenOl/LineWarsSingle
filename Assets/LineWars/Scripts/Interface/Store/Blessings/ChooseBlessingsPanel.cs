@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using LineWars.Controllers;
 using UnityEngine;
 
-namespace LineWars
+namespace LineWars.Interface
 {
     public class ChooseBlessingsPanel : MonoBehaviour
     {
@@ -12,12 +12,12 @@ namespace LineWars
 
         private void Awake()
         {
-            for (var i = 0; i < GameRoot.Instance.BlessingsController.CurrentBlessings.Count; i++)
+            for (var i = 0; i < GameRoot.Instance.BlessingsController.SelectedBlessings.Count; i++)
             {
                 if(i == blessingSlots.Count)
                     return;
                 var slot = blessingSlots[i];
-                slot.ReDraw(DrawHelper.GetBlessingReDrawInfoByBlessingId(GameRoot.Instance.BlessingsController.CurrentBlessings[i]));
+                slot.ReDraw(DrawHelper.GetBlessingReDrawInfoByBlessingId(GameRoot.Instance.BlessingsController.SelectedBlessings[i]));
             }
         }
     }
