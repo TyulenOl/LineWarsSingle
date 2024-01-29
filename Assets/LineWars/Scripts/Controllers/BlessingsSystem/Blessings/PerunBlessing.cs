@@ -28,6 +28,6 @@ namespace LineWars.Model
         }
         
         protected override string DefaultName => "Сила Перуна";
-        protected override string DefaultDescription => $"Наносит всем врагам <color=red>{damage}</color> ед. урона";
+        protected override string DefaultDescription => $"Наносит всем врагам <color=#E22B12>{damage}</color> ед. урона";
     }
 }

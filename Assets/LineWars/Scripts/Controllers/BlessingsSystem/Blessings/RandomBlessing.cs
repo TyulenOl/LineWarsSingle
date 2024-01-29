@@ -43,5 +43,8 @@ namespace LineWars.Model
             currentBlessing = null;
             Completed?.Invoke();
         }
+
+        protected override string DefaultName => "Благословление случайности";
+        protected override string DefaultDescription => "Случайное благословение случайной редкости";
     }
 }

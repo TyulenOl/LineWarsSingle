@@ -22,5 +22,8 @@ namespace LineWars.Model
                 unit.CurrentHp += addedHealth;
             Completed?.Invoke();
         }
+
+        protected override string DefaultName => "Благословление \"Здоровье\"";
+        protected override string DefaultDescription => $"Востанавливает всем союзнам юнитам <color=green>{addedHealth}</color> ед. здоровья";
     }
 }
