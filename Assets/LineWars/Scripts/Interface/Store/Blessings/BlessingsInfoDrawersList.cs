@@ -63,10 +63,10 @@ namespace LineWars.Interface
             for (var i = Selector.Count - 1; i >= 0; i--)
             {
                 var id = Selector[i];
-                var allInfo = DrawHelper.GetBlessingReDrawInfoByBlessingId(id);
+                var fullInfo = DrawHelper.GetBlessingReDrawInfoByBlessingId(id);
                 var instance = Instantiate(blessingInfoDrawerPrefab, layoutGroup.transform);
                 instance.transform.SetAsFirstSibling();
-                instance.Redraw(allInfo);
+                instance.Redraw(fullInfo);
                 blessingInfoDrawers[i] = instance;
                 idToDrawer[id] = instance;
             }

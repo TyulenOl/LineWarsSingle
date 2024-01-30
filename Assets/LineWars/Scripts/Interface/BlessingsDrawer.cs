@@ -18,11 +18,19 @@ namespace LineWars.Interface
         private Dictionary<BlessingId, BlessingFightDrawer> blessingToUI;
         private CommandsManager CommandsManager => CommandsManager.Instance;
 
+        private bool isOpened;
+        
         private void Start()
         {
             Initialize();
         }
 
+        public void SetOpen()
+        {
+            isOpened = !isOpened;
+            gameObject.SetActive(isOpened);
+        }
+        
         public void Initialize()
         {
             blessingToUI = new Dictionary<BlessingId, BlessingFightDrawer>();

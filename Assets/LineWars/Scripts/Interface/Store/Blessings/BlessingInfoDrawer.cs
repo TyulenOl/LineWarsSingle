@@ -14,14 +14,14 @@ namespace LineWars.Interface
         [SerializeField] private TMP_Text amount;
         [SerializeField] private Image background;
         
-        public void Redraw(AllBlessingReDrawInfo allBlessingReDrawInfo)
+        public void Redraw(FullBlessingReDrawInfo fullBlessingReDrawInfo)
         {
-            if (allBlessingReDrawInfo.Sprite != null)
+            if (fullBlessingReDrawInfo.Sprite != null)
             {
                 icon.gameObject.SetActive(true);
                 ifNoneImage?.gameObject.SetActive(false);
                 amount.gameObject.SetActive(true);
-                icon.sprite = allBlessingReDrawInfo.Sprite;
+                icon.sprite = fullBlessingReDrawInfo.Sprite;
             }
             else
             {
@@ -29,8 +29,8 @@ namespace LineWars.Interface
                 ifNoneImage?.gameObject.SetActive(true);
                 amount.gameObject.SetActive(false);
             }
-            amount.text = allBlessingReDrawInfo.Amount.ToString();
-            background.color = allBlessingReDrawInfo.BgColor;
+            amount.text = fullBlessingReDrawInfo.Amount.ToString();
+            background.color = fullBlessingReDrawInfo.BgColor;
         }
         
         
