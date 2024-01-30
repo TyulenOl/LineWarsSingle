@@ -16,7 +16,7 @@ namespace LineWars.Interface
             this.index = index;
         }
 
-        public void Redraw(AllBlessingReDrawInfo reDrawInfo)
+        public void Redraw(FullBlessingReDrawInfo reDrawInfo)
         {
             //Debug.Log("Redraw");
             blessingInfoDrawer.Redraw(reDrawInfo);

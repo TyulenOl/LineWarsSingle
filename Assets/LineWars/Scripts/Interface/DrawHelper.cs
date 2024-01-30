@@ -24,9 +24,9 @@ public static class DrawHelper
     }
 
 
-    public static AllBlessingReDrawInfo GetBlessingReDrawInfoByBlessingId(BlessingId blessingId)
+    public static FullBlessingReDrawInfo GetBlessingReDrawInfoByBlessingId(BlessingId blessingId)
     {
-        return new AllBlessingReDrawInfo
+        return new FullBlessingReDrawInfo
         (
             GetBlessingNameByBlessingID(blessingId),
             GetBlessingDescription(blessingId),
