@@ -165,5 +165,12 @@ namespace LineWars.Model
             Result = new ArsonAction<NodeProjection, EdgeProjection, UnitProjection>(Unit, action.FireEffectRounds);
             Result.ActionModifier = action.Action.ActionModifier;
         }
+
+        public void Visit(MonoSpawningUnitAction action)
+        {
+            var fabric = new FakeUnitFabric();
+            Result = new SpawningUnitAction<NodeProjection, EdgeProjection, UnitProjection>(Unit, fabric, CommandType.None);
+            Result.ActionModifier = action.Action.ActionModifier;
+        }
     }    
 }

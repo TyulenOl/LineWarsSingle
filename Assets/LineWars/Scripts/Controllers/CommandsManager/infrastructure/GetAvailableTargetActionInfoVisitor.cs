@@ -164,6 +164,11 @@ namespace LineWars.Controllers
             return ForNode(action, 1);
         }
 
+        public IEnumerable<TargetActionInfo> Visit(ISpawningUnitAction<Node, Edge, Unit> action)
+        {
+            return ForNode(action, 1);
+        }
+
         public class ForShotUnitAction
         {
             private readonly ITarget[] targets;

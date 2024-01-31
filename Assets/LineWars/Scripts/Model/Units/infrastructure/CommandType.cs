@@ -23,7 +23,9 @@
         ArmorBasedAttack,
         ConsumeUnit,
         EraseFog,
-        Arson
+        Arson,
+        SpawnWolf,
+        SpawnSheep
     }
 }   
 

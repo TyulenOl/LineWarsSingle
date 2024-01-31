@@ -28,5 +28,6 @@
         public TResult Visit(IConsumeUnitAction<TNode, TEdge, TUnit> action);
         public TResult Visit(IFogEraseAction<TNode, TEdge, TUnit> action);
         public TResult Visit(IArsonAction<TNode, TEdge, TUnit> action);
+        public TResult Visit(ISpawningUnitAction<TNode, TEdge, TUnit> action);
     }
 }
