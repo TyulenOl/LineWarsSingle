@@ -2,7 +2,7 @@
 
 namespace LineWars.Model
 {
-    public class RoundsTemporaryEffect<TNode, TEdge, TUnit>: Effect<TNode, TEdge, TUnit>
+    public class RoundsTemporaryEffectDecorator<TNode, TEdge, TUnit>: Effect<TNode, TEdge, TUnit>
         where TNode : class, INodeForGame<TNode, TEdge, TUnit>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
@@ -10,7 +10,7 @@ namespace LineWars.Model
         private readonly Effect<TNode, TEdge, TUnit> innerEffect;
         private int roundsCount;
 
-        public RoundsTemporaryEffect(
+        public RoundsTemporaryEffectDecorator(
             TUnit unit, 
             Effect<TNode, TEdge, TUnit> innerEffect, 
             int roundsCount): base(unit)
@@ -21,7 +21,6 @@ namespace LineWars.Model
             this.innerEffect = innerEffect;
             this.roundsCount = roundsCount;
         }
-
 
         public override EffectType EffectType => innerEffect.EffectType;
         public override void ExecuteOnEnter()

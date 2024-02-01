@@ -9,7 +9,6 @@
         { 
             this.cardStorage = cardStorage;
             this.userInfo = userInfo;
-
         }
 
         public IReadOnlyCardLevelInfo GetCardLevelInfo(int cardId)
@@ -22,7 +21,7 @@
         public IReadOnlyCardLevelInfo GetCardLevelInfo(DeckCard card)
         {
             var cardId = cardStorage.ValueToId[card];
-            return card.GetLevel(cardId);
+            return GetCardLevelInfo(cardId);
         }
     }
 }
