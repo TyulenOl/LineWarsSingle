@@ -15,6 +15,7 @@ namespace LineWars.Model
             [SerializeField] private Optional<Sprite> cardActiveBagLine;
             [SerializeField] private Optional<Sprite> cardInactiveBagLine;
             [SerializeField] private Optional<int> cost;
+            [SerializeField] private int costToUpgrade;
 
             public string CardName => cardName.Enabled ? cardName.Value : Card.Name;
             public string Description => description.Enabled ? cardName.Value : Card.Description;
@@ -23,6 +24,7 @@ namespace LineWars.Model
             public Sprite CardActiveBagLine => cardActiveBagLine.Enabled ? cardActiveBagLine.Value : Card.cardActiveBagLine;
             public Sprite CardInactiveBagLine => cardInactiveBagLine.Enabled ? cardInactiveBagLine.Value : Card.cardInactiveBagLine;
             public int Cost => cost.Enabled ? cost.Value : Card.cost;
+            public int CostToUpgrade => costToUpgrade;
         }
     }
 }

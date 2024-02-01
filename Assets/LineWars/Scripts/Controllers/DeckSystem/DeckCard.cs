@@ -43,7 +43,7 @@ namespace LineWars.Model
 
         public IReadOnlyCardLevelInfo GetLevel(int level)
         {
-            return levels[level + 1];
+            return levels[level - 1];
         }
     }
 }

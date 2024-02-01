@@ -8,8 +8,6 @@ namespace LineWars.Model
 {
     public class CardUpgrader : MonoBehaviour
     {
-        [SerializeField] private int commonUpgradeCost;
-        [SerializeField] private int epicUpgradeCost;
         private UserInfoController userInfoController;
         private IStorage<int,DeckCard> cardStorage;
 
@@ -34,9 +32,8 @@ namespace LineWars.Model
             var hasLevel = desiredLevel <= card.MaxLevel;
             if (!hasLevel)
                 return false;
-            if (card.Rarity == Rarity.Common)
-                return userInfoController.UserUpgradeCards >= commonUpgradeCost;
-            return userInfoController.UserUpgradeCards >= epicUpgradeCost;
+            var levelInfo = card.GetLevel(desiredLevel);;
+            return userInfoController.UserUpgradeCards >= levelInfo.CostToUpgrade;
         }
 
         public void Upgrade(DeckCard card)
@@ -60,7 +57,8 @@ namespace LineWars.Model
                 Debug.LogError("Can't upgrade to next level!");
                 return;
             }
-            var price = card.Rarity == Rarity.Common ? commonUpgradeCost : epicUpgradeCost;
+            var levelInfo = card.GetLevel(desiredLevel);
+            var price = levelInfo.CostToUpgrade;
             if(price > userInfoController.UserUpgradeCards)
             {
                 Debug.LogError("Cannot afford the upgrade");
