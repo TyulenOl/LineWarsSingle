@@ -1,6 +1,4 @@
 using LineWars.Controllers;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -32,7 +30,7 @@ namespace LineWars.Model
             var hasLevel = desiredLevel <= card.MaxLevel;
             if (!hasLevel)
                 return false;
-            var levelInfo = card.GetLevel(desiredLevel);;
+            var levelInfo = card.GetLevelInfo(desiredLevel);
             return userInfoController.UserUpgradeCards >= levelInfo.CostToUpgrade;
         }
 
@@ -44,11 +42,6 @@ namespace LineWars.Model
 
         public void Upgrade(int cardId)
         {
-            if (!userInfoController.UserInfo.UnlockedCards.Contains(cardId))
-            {
-                Debug.LogError("Can't upgrade locked card!");
-                return;
-            }
             var card = cardStorage.IdToValue[cardId];
             var desiredLevel = userInfoController.UserInfo.CardLevels[cardId] + 1;
             var hasLevel = desiredLevel <= card.MaxLevel;
@@ -57,7 +50,7 @@ namespace LineWars.Model
                 Debug.LogError("Can't upgrade to next level!");
                 return;
             }
-            var levelInfo = card.GetLevel(desiredLevel);
+            var levelInfo = card.GetLevelInfo(desiredLevel);
             var price = levelInfo.CostToUpgrade;
             if(price > userInfoController.UserUpgradeCards)
             {

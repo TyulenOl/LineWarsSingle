@@ -27,7 +27,6 @@ namespace LineWars.Controllers
         [Header("ProviderSettings")]
         [SerializeField] private ProviderType providerType;
 
-        private CardLevelsStorage cardsLevelStorage;
         private IProvider<Deck> deckProvider;
         private IProvider<MissionInfo> missionInfoProvider;
         private IProvider<UserInfo> userInfoProvider;
@@ -37,7 +36,6 @@ namespace LineWars.Controllers
         public IStorage<int, DeckCard> CardsDatabase => cardsDatabase;
         public IStorage<int, MissionData> MissionsStorage => missionsStorage;
         public IStorage<BlessingId, BaseBlessing> BlessingStorage => blessingStorage;
-        public CardLevelsStorage CardsLevelDatabase => cardsLevelStorage;
 
         public DecksController DecksController => decksController;
         public CompaniesController CompaniesController => companiesController;
@@ -62,7 +60,6 @@ namespace LineWars.Controllers
             UserController.Initialize(userInfoProvider, cardsDatabase);
             DecksController.Initialize(deckProvider, UserController);
             Store.Initialize(timeGetter, CardsDatabase, BlessingStorage, UserController);
-            cardsLevelStorage = new CardLevelsStorage(CardsDatabase, UserController.UserInfo);
             BlessingsController.Initialize(UserController, UserController, BlessingStorage);
             CardUpgrader.Initialize(userController, cardsDatabase);
             InitializeLootBoxController();
