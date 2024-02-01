@@ -25,7 +25,8 @@
         EraseFog,
         Arson,
         SpawnWolf,
-        SpawnSheep
+        SpawnSheep,
+        UpActionPoints
     }
 }   
 

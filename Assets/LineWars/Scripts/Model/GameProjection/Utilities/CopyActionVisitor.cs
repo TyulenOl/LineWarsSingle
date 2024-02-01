@@ -160,6 +160,12 @@ namespace LineWars.Model
             Result = new SpawningUnitAction<TNode, TEdge, TUnit>(Unit, action.UnitFabric, action.CommandType);
             Result.ActionModifier = action.ActionModifier;
         }
+
+        public void Visit(UpActionPointsAction<TNode, TEdge, TUnit> action)
+        {
+            Result = new UpActionPointsAction<TNode, TEdge, TUnit>(Unit);
+            Result.ActionModifier = action.ActionModifier;
+        }
     }
 
     public static class CopyActionVisitor
