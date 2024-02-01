@@ -36,7 +36,7 @@ namespace LineWars
         
         public new void OnBeginDrag(PointerEventData eventData)
         {
-            if(!IsActive)
+            if(!IsActive || rectTransformToGenerateCard == null)
                 return;
             var instance = Instantiate(this, rectTransformToGenerateCard);
             instance.transform.localPosition = Vector3.zero;
