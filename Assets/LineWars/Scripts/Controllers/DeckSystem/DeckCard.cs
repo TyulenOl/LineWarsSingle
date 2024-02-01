@@ -39,11 +39,11 @@ namespace LineWars.Model
         public CostType ShopCostType => shopCostType;
         public Sprite CardActiveBagLine => cardActiveBagLine;
         public Sprite CardInactiveBagLine => cardInactiveBagLine;
-        public int MaxLevel => levels.Count;
+        public int MaxLevel => levels.Count - 1;
 
         public IReadOnlyCardLevelInfo GetLevel(int level)
         {
-            return levels[level - 1];
+            return levels[level];
         }
     }
 }
