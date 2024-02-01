@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 namespace LineWars.Interface
 {
-    public class CardBuyPanel: MonoBehaviour
+    public class CardBuyPanel: MonoBehaviour // лучше не наследовать от BuyPanel
     {
         [SerializeField] private TMP_Text _name;
         [SerializeField] private TMP_Text description;
@@ -28,8 +28,15 @@ namespace LineWars.Interface
         private readonly List<ActionIconDrawer> actionIconDrawers = new ();
 
         public UnityEvent OnClick => buyButton.onClick;
-        
-        public void Redraw(DeckCard deckCard)
+
+
+        public void OpenWindow(DeckCard deckCard, bool buttonInteractable)
+        {
+            gameObject.SetActive(true);
+            Redraw(deckCard);
+            SetButtonInteractable(buttonInteractable);
+        }
+        private void Redraw(DeckCard deckCard)
         {
             if (actionIconDrawers.Count > 0)
             {
@@ -56,7 +63,7 @@ namespace LineWars.Interface
             }
         }
 
-        public void SetButtonInteractable(bool value)
+        private void SetButtonInteractable(bool value)
         {
             buyButton.interactable = value;
             buttonCanvasGroup.alpha = value ? 1f : 0.5f;

@@ -1,6 +1,7 @@
 using LineWars.Interface;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace LineWars.Interface
@@ -15,14 +16,13 @@ namespace LineWars.Interface
         [SerializeField] private TMP_Text boxDescription;
         [SerializeField] private CostDrawer costDrawer;
         
+        public UnityEvent OnClick => buyAndOpenButton.onClick;
+        
         public void OpenWindow(BuyPanelReDrawInfo buyPanelReDrawInfo)
         {
-            var canBuy = buyPanelReDrawInfo.ButtonInteractivityBool.Invoke();
-            buyAndOpenButton.interactable = canBuy;
-            inactiveCanvasGroup.alpha = canBuy ? 1f : 0.5f;
-            buyAndOpenButton.onClick.RemoveAllListeners();
-            buyAndOpenButton.onClick.AddListener(buyPanelReDrawInfo.OnButtonClickAction);
-
+            buyAndOpenButton.interactable = buyPanelReDrawInfo.ButtonInteractable;
+            inactiveCanvasGroup.alpha = buyPanelReDrawInfo.ButtonInteractable ? 1f : 0.5f;
+            
             costDrawer.DrawCost(buyPanelReDrawInfo.Cost, buyPanelReDrawInfo.CostType);
             boxName.text = buyPanelReDrawInfo.PanelName;
             if (boxDescription != null) 

@@ -35,15 +35,7 @@ namespace LineWars.Interface
             Selector.TotalSelectionCountChanged += OnTotalSelectionCountChanged;
             BlessingsPull.BlessingCountChanged += BlessingsPullOnBlessingCountChanged;
         }
-
-        private void BlessingsPullOnBlessingCountChanged(BlessingId id, int count)
-        {
-            if (idToDrawer.TryGetValue(id, out var drawer))
-            {
-                drawer.Redraw(DrawHelper.GetBlessingReDrawInfoByBlessingId(id));
-            }
-        }
-
+        
         private void OnDestroy()
         {
             Selector.SelectedBlessingIdChanged -= OnSelectedBlessingIdChanged;
@@ -81,7 +73,26 @@ namespace LineWars.Interface
         private void OnSelectedBlessingIdChanged(BlessingId id, int index)
         {
             var allInfo = DrawHelper.GetBlessingReDrawInfoByBlessingId(id);
+            var drawer = blessingInfoDrawers[index];
             blessingInfoDrawers[index].Redraw(allInfo);
+            
+            if (idToDrawer.ContainsValue(drawer))
+            {
+                var prevId = idToDrawer
+                    .First(x => drawer.Equals(x.Value))
+                    .Key;
+                idToDrawer.Remove(prevId);
+            }
+            idToDrawer[id] = drawer;
         }
+        
+        private void BlessingsPullOnBlessingCountChanged(BlessingId id, int count)
+        {
+            if (idToDrawer.TryGetValue(id, out var drawer))
+            {
+                drawer.Redraw(DrawHelper.GetBlessingReDrawInfoByBlessingId(id));
+            }
+        }
+
     }
 }
