@@ -64,6 +64,7 @@ namespace LineWars.Controllers
             Store.Initialize(timeGetter, CardsDatabase, BlessingStorage, UserController);
             cardsLevelStorage = new CardLevelsStorage(CardsDatabase, UserController.UserInfo);
             BlessingsController.Initialize(UserController, UserController, BlessingStorage);
+            CardUpgrader.Initialize(userController, cardsDatabase);
             InitializeLootBoxController();
         }
 
