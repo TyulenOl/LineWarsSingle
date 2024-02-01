@@ -7,6 +7,9 @@ namespace LineWars.Controllers
 {
     public class GameRoot : DontDestroyOnLoadSingleton<GameRoot>
     {
+        [Header("Draw")] 
+        [SerializeField] private DrawHelperInstance drawHelper;
+        
         [Header("Storages")]
         [SerializeField] private DeckCardsScriptableStorage cardsDatabase;
         [SerializeField] private MissionsScriptableStorage missionsStorage;
@@ -45,6 +48,8 @@ namespace LineWars.Controllers
         public Store Store => store;
         public CardUpgrader CardUpgrader => cardUpgrader;
 
+        public DrawHelperInstance DrawHelper => drawHelper;
+
         protected override void OnAwake()
         {
             GameVariables.Initialize();
@@ -59,6 +64,7 @@ namespace LineWars.Controllers
             Store.Initialize(timeGetter, CardsDatabase, BlessingStorage, UserController);
             cardsLevelStorage = new CardLevelsStorage(CardsDatabase, UserController.UserInfo);
             BlessingsController.Initialize(UserController, UserController, BlessingStorage);
+            CardUpgrader.Initialize(userController, cardsDatabase);
             InitializeLootBoxController();
         }
 

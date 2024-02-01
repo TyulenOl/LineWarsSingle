@@ -12,24 +12,32 @@ namespace LineWars.Interface
 {
     public class BlessingsDrawer: MonoBehaviour
     {
-        [FormerlySerializedAs("blessingUIElementPrefab")] [SerializeField] private BlessingDrawer blessingDrawerPrefab;
+        [FormerlySerializedAs("blessingUIElementPrefab")] [SerializeField] private BlessingFightDrawer blessingFightDrawerPrefab;
         [SerializeField] private LayoutGroup layoutGroup;
 
-        private Dictionary<BlessingId, BlessingDrawer> blessingToUI;
+        private Dictionary<BlessingId, BlessingFightDrawer> blessingToUI;
         private CommandsManager CommandsManager => CommandsManager.Instance;
 
+        private bool isOpened;
+        
         private void Start()
         {
             Initialize();
         }
 
+        public void SetOpen()
+        {
+            isOpened = !isOpened;
+            gameObject.SetActive(isOpened);
+        }
+        
         public void Initialize()
         {
-            blessingToUI = new Dictionary<BlessingId, BlessingDrawer>();
+            blessingToUI = new Dictionary<BlessingId, BlessingFightDrawer>();
             var allBlessings = CommandsManager.BlessingData.ToArray();
             foreach (var (blessingData, count) in allBlessings)
             {
-                var elementInstance = Instantiate(blessingDrawerPrefab, layoutGroup.transform);
+                var elementInstance = Instantiate(blessingFightDrawerPrefab, layoutGroup.transform);
                 elementInstance.BlessingData = blessingData;
                 elementInstance.BlessingCount = count;
                 blessingToUI[blessingData] = elementInstance;

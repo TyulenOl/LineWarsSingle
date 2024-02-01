@@ -14,8 +14,9 @@ namespace LineWars.Interface
         [SerializeField] private TMP_Text blessingName;
         [SerializeField] private Button buyButton;
         
+        public UnityEvent OnClick => buyButton.onClick;
         
-        public void ReDraw(BlessingId blessingId, UnityAction action)
+        public void ReDraw(BlessingId blessingId)
         {
             var store = GameRoot.Instance.Store;
             var cost = -1;
@@ -25,7 +26,6 @@ namespace LineWars.Interface
             costDrawer.DrawCost(cost, CostType.Gold);
             blessingImage.sprite = DrawHelper.GetSpriteByBlessingID(blessingId);
             blessingName.text = DrawHelper.GetBlessingNameByBlessingID(blessingId);
-            buyButton.onClick.AddListener(action);
         }
     }
 }

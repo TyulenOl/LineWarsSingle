@@ -23,6 +23,6 @@ namespace LineWars.Model
         }
 
         protected override string DefaultName => "Ускорение";
-        protected override string DefaultDescription => $"Восстанавливает всем союзнам юнитам {addedActionPoints} ед. очков действия";
+        protected override string DefaultDescription => $"Восстанавливает всем союзнам юнитам <color=#F6C800>{addedActionPoints}</color> ед. очков действия";
     }
 }

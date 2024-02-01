@@ -7,11 +7,11 @@ using UnityEngine.UI;
 
 namespace LineWars.Interface
 {
-    public class BlessingDrawer: MonoBehaviour
+    public class BlessingFightDrawer: MonoBehaviour
     {
         [SerializeField] private Button button;
+        [SerializeField] private Image bgImage;
         [SerializeField] private Image blessingIcon;
-        [SerializeField] private TMP_Text blessingName;
         [SerializeField] private TMP_Text blessingCount;
 
         private BlessingId blessingId;
@@ -23,17 +23,14 @@ namespace LineWars.Interface
             set
             {
                 blessingId = value;
-                if (value != null)
-                    blessingName.text = $"{value.BlessingType} {value.Rarity}";
+                bgImage.color = DrawHelper.GetBlessingBgColor(value);
+                blessingIcon.sprite = DrawHelper.GetSpriteByBlessingID(value);
             }
         }
 
         public int BlessingCount
         {
-            set
-            {
-                blessingCount.text = $"x{value}";
-            }
+            set => blessingCount.text = $"{value}";
         }
 
         public BlessingDrawerState State

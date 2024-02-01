@@ -1,3 +1,4 @@
+using System;
 using LineWars.Controllers;
 using LineWars.Model;
 using TMPro;
@@ -18,32 +19,47 @@ namespace LineWars.Interface
         [SerializeField] private TMP_Text costText;
         [SerializeField] private TMP_Text amountText;
 
-        private void Awake()
+        private static UserInfoController UserController => GameRoot.Instance.UserController;
+
+        private void Start()
         {
             ReDraw();
             buyButton.onClick.AddListener(OnButtonClick);
         }
 
+        private void OnDestroy()
+        {
+            buyButton.onClick.RemoveListener(OnButtonClick);
+        }
+
         private void OnButtonClick()
         {
             buyPanel.OpenWindow(GetBuyPanelReDrawInfo());
+            buyPanel.OnClick.AddListener(BuyGold);
         }
 
         private BuyPanelReDrawInfo GetBuyPanelReDrawInfo()
         {
             return new BuyPanelReDrawInfo
-            (() =>
-                {
-                    GameRoot.Instance.UserController.UserDiamond -= costInDiamonds;
-                    GameRoot.Instance.UserController.UserGold += goldAmount;
-                },
-                () => GameRoot.Instance.UserController.UserDiamond >= costInDiamonds,
+            (
                 goldSprite,
                 ParseAmount(goldAmount),
                 GetDescription(),
                 costInDiamonds,
-                CostType.Diamond
+                CostType.Diamond,
+                UserController.UserDiamond >= costInDiamonds
             );
+        }
+
+        private void BuyGold()
+        {
+            if (UserController.UserDiamond < costInDiamonds)
+                throw new InvalidOperationException();
+            
+            UserController.UserDiamond -= costInDiamonds;
+            UserController.UserGold += goldAmount;
+            
+            buyPanel.OnClick.RemoveListener(BuyGold);
         }
         
         private void ReDraw()

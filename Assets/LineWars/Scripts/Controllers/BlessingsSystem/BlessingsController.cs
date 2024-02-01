@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using AYellowpaper.SerializedCollections;
 using LineWars.Model;
 using UnityEngine;
 
@@ -16,8 +15,11 @@ namespace LineWars.Controllers
         private IBlessingSelector globalBlessingSelector;
         private IBlessingsPull globalBlessingPull;
         private IStorage<BlessingId, BaseBlessing> blessingStorage;
-        
 
+
+        public event Action<BlessingId, int> SelectedBlessingIdChanged;
+        public event Action<int> TotalSelectionCountChanged;
+        
         public int MaxBlessingsIdsCount => maxBlessingsIdsCount;
         public int TotalBlessingsCount => totalBlessingsCount;
 
@@ -33,7 +35,10 @@ namespace LineWars.Controllers
             this.globalBlessingSelector = globalBlessingSelector;
             this.globalBlessingPull = globalBlessingPull;
             this.blessingStorage = blessingStorage;
-      
+            
+            globalBlessingSelector.SelectedBlessingIdChanged += (id, index) => SelectedBlessingIdChanged?.Invoke(id, index);
+            globalBlessingSelector.TotalSelectionCountChanged += count => TotalSelectionCountChanged?.Invoke(count);
+            
             AssignInnerBlessingSelector();
         }
 
@@ -68,7 +73,19 @@ namespace LineWars.Controllers
         BlessingId IBlessingSelector.this[int index]
         {
             get => globalBlessingSelector[index];
-            set => globalBlessingSelector[index] = value;
+            set
+            {
+                if (!SelectedBlessings.CanSetValue(index, value))
+                    throw new InvalidOperationException($"Cant set blessingId by {index}");
+                globalBlessingSelector[index] = value;
+            }
+        }
+
+        bool IBlessingSelector.CanSetValue(int index, BlessingId value)
+        {
+            return value == BlessingId.Null
+                   || globalBlessingSelector.CanSetValue(index, value)
+                   && !globalBlessingSelector.Contains(value);
         }
     }
 }

@@ -10,14 +10,14 @@ public class EnemyTurnPanel : MonoBehaviour
     [SerializeField] private Image lizardsImage;
     [SerializeField] private Image rusImage;
 
-    private bool isCoroutinActive;
+    private bool isCoroutineActive;
 
-    public bool IsCoroutinActive
+    public bool IsCoroutineActive
     {
-        get => isCoroutinActive;
+        get => isCoroutineActive;
         set
         {
-            isCoroutinActive = value;
+            isCoroutineActive = value;
             if (value)
                 RestoreDefaults();
             else

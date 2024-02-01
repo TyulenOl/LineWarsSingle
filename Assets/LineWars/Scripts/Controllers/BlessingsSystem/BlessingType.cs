@@ -2,6 +2,7 @@
 {
     public enum BlessingType
     {
+        None = -1,
         Perun = 0,
         Svarog = 1,
         Health = 2,

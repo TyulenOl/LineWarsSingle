@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using LineWars;
 using LineWars.Controllers;
@@ -25,16 +24,19 @@ public static class DrawHelper
         }
     }
 
-
-    public static BlessingReDrawInfo GetBlessingReDrawInfoByBlessingId(BlessingId blessingId)
+    public static IReadOnlyDictionary<LootType, Sprite> LootTypeToSprite => GameRoot.Instance.DrawHelper.LootTypeToSprite;
+    public static IReadOnlyDictionary<Rarity, Color> RarityToColor => GameRoot.Instance.DrawHelper.RarityToColor;
+    
+    
+    public static FullBlessingReDrawInfo GetBlessingReDrawInfoByBlessingId(BlessingId blessingId)
     {
-        return new BlessingReDrawInfo
+        return new FullBlessingReDrawInfo
         (
             GetBlessingNameByBlessingID(blessingId),
             GetBlessingDescription(blessingId),
             GetBlessingBgColor(blessingId),
             GetSpriteByBlessingID(blessingId),
-            GameRoot.Instance.BlessingsController.GetBlessingsCount(blessingId)
+            GameRoot.Instance.UserController.GlobalBlessingsPull[blessingId]
         );
     }
 
@@ -43,81 +45,50 @@ public static class DrawHelper
         switch (blessingId.Rarity)
         {
             case Rarity.Common:
-                return new Color(120, 120, 120);
+                return new Color32(120, 120, 120,255);
             case Rarity.Rare:
-                return new Color(226, 43, 18);
+                return new Color32(226, 43, 18,255);
             case Rarity.Legendary:
-                return new Color(143, 0, 255);
+                return new Color32(143, 0, 255,255);
             default:
-                return new Color(120, 120, 120);
+                return new Color32(120, 120, 120,255);
         }
     }
     
     public static Sprite GetSpriteByBlessingID(BlessingId blessingId)
     {
-        return Resources.Load<Sprite>("UI/Sorokin/Icons/AttackOrder");//TODO Сделать это гавно
+        return GameRoot.Instance.BlessingStorage.TryGetValue(blessingId, out var value)
+            ? value.Icon
+            : null;
     }
 
+    public static string GetBlessingTypeName(BlessingType blessingType)
+    {
+        return blessingType switch
+        {
+            BlessingType.Perun => "Благословление Перуна",
+            BlessingType.Svarog => "Благословление Сварога",
+            BlessingType.Health => "Благословление Здоровья",
+            BlessingType.Stribog => "Благословление Стрибога",
+            BlessingType.Acceleration => "Благословление Шустрости",
+            BlessingType.Slowdown => "Благословление Сонливости",
+            BlessingType.Power => "Благословление Мощи",
+            BlessingType.Spawn => "Благословление Призыва",
+            BlessingType.Gold => "Благословление Богатства",
+            BlessingType.Random => "Благословление Случайности",
+            _ => "Если ты видишь это - ты уволен"
+        };
+    }
+    
     public static string GetBlessingNameByBlessingID(BlessingId blessingId)
     {
-        switch (blessingId.BlessingType)
-        {
-            case BlessingType.Perun:
-                return "Сила перуна";
-            case BlessingType.Svarog:
-                return "Сила сварога";
-            case BlessingType.Health:
-                return "Лечение";
-            case BlessingType.Stribog:
-                return "Сила стрибога";
-            case BlessingType.Acceleration:
-                return "Ускорение";
-            case BlessingType.Slowdown:
-                return "Замедление";
-            case BlessingType.Power:
-                return "Сила";
-            case BlessingType.Spawn:
-                return "Призыва";
-            case BlessingType.Gold:
-                return "Золота";
-            case BlessingType.Random:
-                return "Случайное";
-            default:
-                return "Если ты видишь это - ты уволен";
-        }
+        return GetBlessingTypeName(blessingId.BlessingType);
     }
-
     public static string GetBlessingDescription(BlessingId blessingId)
     {
         return GameRoot.Instance.BlessingStorage.TryGetValue(blessingId, out var value)
             ? value.Description
             : "Привет из мира багов";
-        
-        // switch (blessingId.BlessingType)
-        // {
-        //     case BlessingType.Perun:
-        //         return "Наносит всем врагам урон";
-        //     case BlessingType.Svarog:
-        //         return "Увеличивает броню всех союзников";
-        //     case BlessingType.Health:
-        //         return "Восстанавливает здоровье всех союзников";
-        //     case BlessingType.Stribog:
-        //         return "Рассеивает туман войны по всей карте на огранниченное число раундов";
-        //     case BlessingType.Acceleration:
-        //         return "Восстанавливает часть очков действия всем союзникам";
-        //     case BlessingType.Slowdown:
-        //         return "Уменьшает очки действия всех врагов";
-        //     case BlessingType.Power:
-        //         return "Увеличивает силу всем союзников на огранниченное число раундов";
-        //     case BlessingType.Spawn:
-        //         return "Призывает различных существ на вашей базе";
-        //     case BlessingType.Gold:
-        //         return "Осыпает вас золотом";
-        //     case BlessingType.Random:
-        //         return "Случайное благословение случайной редкости";
-        //     default:
-        //         return "Привет из мира багов";
-        // }
     }
     
     public static Sprite GetSpriteByMissionStatus(MissionStatus missionStatus)
@@ -170,7 +141,7 @@ public static class DrawHelper
                 return Resources.Load<Sprite>("UI/Sorokin/Icons/WaterOrder");
             case CommandType.TargetPowerBasedAttack:
                 return Resources.Load<Sprite>("UI/Sorokin/Icons/GuipnosusOrder");
-            default: return Resources.Load<Sprite>("UI/Sorokin/Icons/AttackOrder");
+            default: return null;
         }
     }
 
