@@ -13,6 +13,15 @@ namespace LineWars.Model
         {
             this.userInfoController = userInfoController;
             this.cardStorage = cardStorage;
+            SetInitialCardLevel();
+        }
+        private void SetInitialCardLevel()
+        {
+            foreach(var card in cardStorage.Values)
+            {
+                var level = userInfoController.GetCardLevel(card);
+                card.Level = level;
+            }
         }
 
         public bool CanUpgrade(DeckCard card)
