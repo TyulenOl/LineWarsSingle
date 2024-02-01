@@ -41,9 +41,7 @@ namespace LineWars.Interface
                 instance.OnClickAction.AddListener(
                     () =>
                     {
-                        buyPanel.gameObject.SetActive(true);
-                        buyPanel.Redraw(deckCard);
-                        buyPanel.SetButtonInteractable(Store.CanBuy(deckCard));
+                        buyPanel.OpenWindow(deckCard, Store.CanBuy(deckCard));
                         selectedCard = deckCard;
                     });
             }

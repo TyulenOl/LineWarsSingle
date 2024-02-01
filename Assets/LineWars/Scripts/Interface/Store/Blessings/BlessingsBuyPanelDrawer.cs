@@ -12,10 +12,21 @@ namespace LineWars.Interface
         [SerializeField] private BuyPanel buyPanel;
         [SerializeField] private LayoutGroup blessingsLayout;
 
-        private void Awake()
+        private BlessingId selectedBlessing;
+        private static Store Store => GameRoot.Instance.Store;
+
+        private void Start()
         {
             ReDrawBoxes();
+            buyPanel.OnClick.AddListener(BuyBlessing);
         }
+
+        private void OnDestroy()
+        {
+            if (buyPanel != null)
+                buyPanel.OnClick.RemoveListener(BuyBlessing);
+        }
+
 
         private void ReDrawBoxes()
         {
@@ -23,26 +34,31 @@ namespace LineWars.Interface
             foreach (var blessing in blessings)
             {
                 var instance = Instantiate(blessingBuyDrawerPrefab, blessingsLayout.transform);
-                instance.ReDraw(blessing, () => buyPanel.OpenWindow(GetBuyPanelReDrawInfo(blessing)));
+                instance.ReDraw(blessing);
+                instance.OnClick.AddListener(() =>
+                {
+                    buyPanel.OpenWindow(GetBuyPanelReDrawInfo(blessing));
+                    selectedBlessing = blessing;
+                });
             }
         }
         
         private BuyPanelReDrawInfo GetBuyPanelReDrawInfo(BlessingId blessingId)
         {
-            return new BuyPanelReDrawInfo(() => OnButtonClick(blessingId),
-                () => GameRoot.Instance.Store.CanBuy(blessingId),
+            return new BuyPanelReDrawInfo(
                 DrawHelper.GetSpriteByBlessingID(blessingId),
                 DrawHelper.GetBlessingNameByBlessingID(blessingId),
                 DrawHelper.GetBlessingDescription(blessingId),
                 GameRoot.Instance.Store.BlessingToCost[blessingId],
-                CostType.Gold);
+                CostType.Gold,
+                Store.CanBuy(blessingId));
         }
         
-        private void OnButtonClick(BlessingId blessingId)
+        private void BuyBlessing()
         {
-            if (!GameRoot.Instance.Store.CanBuy(blessingId))
+            if (!Store.CanBuy(selectedBlessing))
                 throw new InvalidOperationException("Can't buy this Blessing");
-            GameRoot.Instance.Store.Buy(blessingId);
+            Store.Buy(selectedBlessing);
         }
     }
 }
