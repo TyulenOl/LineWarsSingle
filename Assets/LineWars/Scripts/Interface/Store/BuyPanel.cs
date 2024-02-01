@@ -14,9 +14,6 @@ namespace LineWars.Interface
         [SerializeField] private TMP_Text boxName;
         [SerializeField] private TMP_Text boxDescription;
         [SerializeField] private CostDrawer costDrawer;
-
-        private readonly Color coinsColor = new (251, 184, 13);
-        private readonly Color diamondsColor = new (254, 57, 59);
         
         public void OpenWindow(BuyPanelReDrawInfo buyPanelReDrawInfo)
         {

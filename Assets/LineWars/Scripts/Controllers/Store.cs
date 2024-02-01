@@ -5,6 +5,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using AYellowpaper.SerializedCollections;
 
 namespace LineWars.Controllers
 {
@@ -13,6 +14,7 @@ namespace LineWars.Controllers
         [SerializeField, Min(1)] private int changeIntervalInDays = 1;
         [SerializeField] private List<Rarity> cards;
         [SerializeField] private List<DeckCard> exceptions;
+        [SerializeField] private SerializedDictionary<BaseBlessing, Money> costDictionary;
 
 
         private IGetter<DateTime> timeGetter;
@@ -23,12 +25,14 @@ namespace LineWars.Controllers
         private bool isStoreInitialized = false;
         private List<int> cardsForPurchase = new();
         private Dictionary<BlessingId, int> blessingToCost;
+        private Dictionary<BlessingId, Money> blessingToCostInMoneys;
         private BlessingId[] blessingsForPurchase;
 
         public bool StoreInitialized => isStoreInitialized;
         public IReadOnlyList<int> CardsForPurchase => cardsForPurchase;
         public IReadOnlyList<BlessingId> BlessingsForPurchase => blessingsForPurchase;
         public IReadOnlyDictionary<BlessingId, int> BlessingToCost => blessingToCost;
+        public IReadOnlyDictionary<BlessingId, Money> BlessingToCostInMoneys => blessingToCostInMoneys;
         
         
         public void Initialize(
@@ -58,9 +62,14 @@ namespace LineWars.Controllers
         
         private void InitializeBlessingCostInfo()
         {
-            blessingToCost = blessingStorage.IdToValue
-                .Where(x=> x.Value.Cost.Amount >= 0)
-                .ToDictionary(x => x.Key, x => x.Value.Cost.Amount);
+            blessingToCostInMoneys = costDictionary.ToDictionary(
+                x => blessingStorage.ValueToId[x.Key],
+                x => x.Value);
+            
+            blessingToCost = blessingToCostInMoneys.ToDictionary(
+                x => x.Key,
+                x => x.Value.Amount);
+            
             blessingsForPurchase = blessingToCost.Keys.ToArray();
         }
 
@@ -99,11 +108,11 @@ namespace LineWars.Controllers
 
         public bool CanBuy(BlessingId blessingId)
         {
-            var blessing = blessingStorage.IdToValue[blessingId];
-            var canAfford = blessing.Cost.Type switch
+            var moneyCost = blessingToCostInMoneys[blessingId]; 
+            var canAfford = moneyCost.Type switch
             {
-                CostType.Gold => 0 <= blessing.Cost.Amount && blessing.Cost.Amount <= userInfoController.UserGold,
-                CostType.Diamond => 0 <= blessing.Cost.Amount && blessing.Cost.Amount <= userInfoController.UserDiamond,
+                CostType.Gold => 0 <= moneyCost.Amount && moneyCost.Amount <= userInfoController.UserGold,
+                CostType.Diamond => 0 <= moneyCost.Amount && moneyCost.Amount <= userInfoController.UserDiamond,
                 _ => throw new NotImplementedException()
             };
             return canAfford;
@@ -111,14 +120,14 @@ namespace LineWars.Controllers
 
         public void Buy(BlessingId blessingId)
         {
-            var blessing = blessingStorage.IdToValue[blessingId];
-            switch (blessing.Cost.Type)
+            var moneyCost = blessingToCostInMoneys[blessingId]; 
+            switch (moneyCost.Type)
             {
                 case CostType.Gold:
-                    userInfoController.UserGold -= blessing.Cost.Amount;
+                    userInfoController.UserGold -= moneyCost.Amount;
                     break;
                 case CostType.Diamond:
-                    userInfoController.UserDiamond -= blessing.Cost.Amount;
+                    userInfoController.UserDiamond -= moneyCost.Amount;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -141,6 +150,12 @@ namespace LineWars.Controllers
             return canAfford && haveInStore && !cardOpen;
 
         }
+
+        public bool CanBuy(DeckCard card)
+        {
+            return CanBuy(cardStorage.ValueToId[card]);
+        }
+        
         public void Buy(int cardId)
         {
             if (!cardsForPurchase.Contains(cardId))
@@ -159,6 +174,11 @@ namespace LineWars.Controllers
             }
 
             userInfoController.UnlockCard(cardId);
-        }    
+        }
+
+        public void Buy(DeckCard card)
+        { 
+            Buy(cardStorage.ValueToId[card]);
+        }
     }
 }

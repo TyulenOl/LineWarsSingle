@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using LineWars;
 using LineWars.Controllers;
 using LineWars.Interface;
@@ -23,7 +24,10 @@ public static class DrawHelper
         }
     }
 
-
+    public static IReadOnlyDictionary<LootType, Sprite> LootTypeToSprite => GameRoot.Instance.DrawHelper.LootTypeToSprite;
+    public static IReadOnlyDictionary<Rarity, Color> RarityToColor => GameRoot.Instance.DrawHelper.RarityToColor;
+    
+    
     public static FullBlessingReDrawInfo GetBlessingReDrawInfoByBlessingId(BlessingId blessingId)
     {
         return new FullBlessingReDrawInfo
@@ -137,7 +141,7 @@ public static class DrawHelper
                 return Resources.Load<Sprite>("UI/Sorokin/Icons/WaterOrder");
             case CommandType.TargetPowerBasedAttack:
                 return Resources.Load<Sprite>("UI/Sorokin/Icons/GuipnosusOrder");
-            default: return Resources.Load<Sprite>("UI/Sorokin/Icons/AttackOrder");
+            default: return null;
         }
     }
 

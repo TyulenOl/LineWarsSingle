@@ -7,6 +7,9 @@ namespace LineWars.Controllers
 {
     public class GameRoot : DontDestroyOnLoadSingleton<GameRoot>
     {
+        [Header("Draw")] 
+        [SerializeField] private DrawHelperInstance drawHelper;
+        
         [Header("Storages")]
         [SerializeField] private DeckCardsScriptableStorage cardsDatabase;
         [SerializeField] private MissionsScriptableStorage missionsStorage;
@@ -44,6 +47,8 @@ namespace LineWars.Controllers
         public BlessingsController BlessingsController => blessingsController;
         public Store Store => store;
         public CardUpgrader CardUpgrader => cardUpgrader;
+
+        public DrawHelperInstance DrawHelper => drawHelper;
 
         protected override void OnAwake()
         {
