@@ -32,7 +32,8 @@ namespace LineWars.Model
         }
         public override void Accept(IMonoUnitActionVisitor visitor)
         {
-            visitor.Visit(this);
+            throw new NotImplementedException();
+            //visitor.Visit(this);
         }
 
         public override TResult Accept<TResult>(IUnitActionVisitor<TResult, Node, Edge, Unit> visitor)

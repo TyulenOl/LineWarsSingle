@@ -4,6 +4,7 @@ using LineWars.Model;
 using UnityEngine;
 using System;
 using System.Collections;
+using AYellowpaper.SerializedCollections;
 
 namespace LineWars.Controllers
 {
@@ -87,12 +88,14 @@ namespace LineWars.Controllers
         {
             foreach (LootBoxType boxType in Enum.GetValues(typeof(LootBoxType)))
                 userInfo.LootBoxes.TryAdd(boxType, 0);
+            foreach (var cardId in deckCardStorage.Keys)
+                userInfo.CardLevels.TryAdd(cardId, 1);
             return userInfo;
         }
 
         private UserInfo CreateDefaultUserInfo()
         {
-            return  new UserInfo()
+            return new UserInfo()
             {
                 Gold = defaultUserInfoPreset.DefaultGold,
                 Diamonds = defaultUserInfoPreset.DefaultDiamond,
@@ -101,13 +104,17 @@ namespace LineWars.Controllers
                     .Select(x => deckCardStorage.ValueToId[x])
                     .ToList(),
                 LootBoxes = defaultUserInfoPreset.DefaultBoxesCount
-                    .ToSerializedDictionary(x => x.Key, x=> x.Value),
+                    .ToSerializedDictionary(x => x.Key, x => x.Value),
                 DefaultBlessingsIsAdded = true,
                 Blessings = defaultUserInfoPreset.DefaultBlessingsCount
-                    .ToSerializedDictionary(x=> x.Key, x => x.Value),
+                    .ToSerializedDictionary(x => x.Key, x => x.Value),
                 SelectedBlessings = defaultUserInfoPreset.DefaultSelectedBlessings
                     .Where(x => defaultUserInfoPreset.DefaultBlessingsCount.ContainsKey(x))
-                    .ToList()
+                    .ToList(),
+                CardLevels = defaultUserInfoPreset.DefaultCards
+                    .Where(deckCardStorage.ValueToId.ContainsKey)
+                    .Select(x => deckCardStorage.ValueToId[x])
+                    .ToSerializedDictionary((cardId) => cardId, (_) => 1)
             };
         }
 
