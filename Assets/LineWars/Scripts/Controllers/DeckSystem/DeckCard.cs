@@ -20,30 +20,60 @@ namespace LineWars.Model
         [SerializeField] private CostType shopCostType;
         [SerializeField] private int cost; 
         [SerializeField] private int shopCost;
-        [SerializeField] private List<CardLevelInfo> levels;
+        [SerializeField] private List<AdditionalLevelInfo> levels;
 
-        private void OnEnable()
+        private FullLevelInfo _zeroLevelInfo;
+        private FullLevelInfo ZeroLevelInfo
         {
-            foreach (var level in levels)
-                level.Card = this;
+            get
+            {
+                if(_zeroLevelInfo == null)
+                {
+                    _zeroLevelInfo = new FullLevelInfo(
+                    cardName.Enabled ? cardName.Value : unit.UnitName,
+                    description.Enabled ? description.Value : unit.UnitDescription,
+                    cardImage.Enabled ? cardImage.Value : unit.Sprite,
+                    unit,
+                    cost,
+                    0);
+                }
+                return _zeroLevelInfo;
+            }
         }
 
-        public IReadOnlyList<IReadOnlyCardLevelInfo> Levels => levels.Cast<IReadOnlyCardLevelInfo>().ToList();
-        public string Name => cardName.Enabled ? cardName.Value : Unit.UnitName;
-        public string Description => description.Enabled ? description.Value : Unit.UnitDescription;
-        public Sprite Image => cardImage.Enabled ? cardImage.Value : Unit.Sprite;
-        public Unit Unit => unit;
+        private int level;
+        public int Level
+        {
+            get => level;
+            set
+            {
+                level = value;
+                currentLevelInfo = GetLevelInfo(level);
+            }
+        }
+
+        private FullLevelInfo currentLevelInfo { get; set; }
+
+        public FullLevelInfo GetLevelInfo(int level)
+        {
+            if (level == 0)
+                return ZeroLevelInfo;
+            level--;
+            var additionalLevelInfo = levels[level];
+            return ZeroLevelInfo.WithAdditionalInfo(additionalLevelInfo);
+        }
+
+
+        public string Name => currentLevelInfo.Name;
+        public string Description => currentLevelInfo.Description;
+        public Sprite Image => currentLevelInfo.Image;
+        public Unit Unit => currentLevelInfo.Unit;
         public Rarity Rarity => cardRarity;
-        public int Cost => cost;
+        public int Cost => currentLevelInfo.Cost;
         public int ShopCost => shopCost;
         public CostType ShopCostType => shopCostType;
         public Sprite CardActiveBagLine => cardActiveBagLine;
         public Sprite CardInactiveBagLine => cardInactiveBagLine;
-        public int MaxLevel => levels.Count - 1;
-
-        public IReadOnlyCardLevelInfo GetLevel(int level)
-        {
-            return levels[level];
-        }
+        public int MaxLevel => levels.Count;
     }
 }
