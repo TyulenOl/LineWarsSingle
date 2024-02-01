@@ -327,8 +327,27 @@ namespace LineWars.Model
                 Debug.LogError("Adding effect with other owner!");
                 return;
             }
-            effect.ExecuteOnEnter();
-            effects.Add(effect);
+            var stacked = TryStackEffect(effect);
+            if(!stacked)
+            {
+                effect.ExecuteOnEnter();
+                effects.Add(effect);
+            }
+        }
+
+        private bool TryStackEffect(Effect<Node, Edge, Unit> effect)
+        {
+            if (effect is not IStackableEffect stackableEffect)
+                return false;
+            var stacked = false;
+            foreach(var currentEffect in effects)
+            {
+                if (currentEffect is not IStackableEffect currentStackableEffect) continue;
+                if (!currentStackableEffect.CanStack(stackableEffect)) continue;
+                currentStackableEffect.Stack(stackableEffect);
+                stacked = true;
+            }
+            return stacked;
         }
 
         public void RemoveEffect(Effect<Node, Edge, Unit> effect)

@@ -17,6 +17,7 @@
         {
             Executor.CurrentPower += target.CurrentPower;
             target.CurrentHp = 0;
+            CompleteAndAutoModify();
         }
 
         public bool IsAvailable(TUnit target)

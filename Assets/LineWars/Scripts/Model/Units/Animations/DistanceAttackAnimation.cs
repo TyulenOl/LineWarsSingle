@@ -14,7 +14,14 @@ namespace LineWars.Model
         public override void Execute(AnimationContext context)
         {
             var projectilePosition = CalculateInitialProjectilePosition();  
-            destination = context.TargetUnit.transform.position;
+            if(context.TargetUnit != null)
+            {
+                destination = context.TargetUnit.transform.position;
+            }
+            else
+            {
+                destination = context.TargetPosition;
+            }
             var angle = CalculateAngle(projectilePosition, destination);
             shootProjectileInstance = 
                 Instantiate(shootProjectilePrefab, projectilePosition, Quaternion.Euler(0,0, angle));

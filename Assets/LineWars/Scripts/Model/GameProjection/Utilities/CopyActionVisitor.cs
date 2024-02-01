@@ -148,6 +148,24 @@ namespace LineWars.Model
             Result = new FogEraseAction<TNode, TEdge, TUnit>(Unit);
             Result.ActionModifier = action.ActionModifier;
         }
+
+        public void Visit(ArsonAction<TNode, TEdge, TUnit> action)
+        {
+            Result = new ArsonAction<TNode, TEdge, TUnit>(Unit, action.FireEffectRounds);
+            Result.ActionModifier = action.ActionModifier;
+        }
+
+        public void Visit(SpawningUnitAction<TNode, TEdge, TUnit> action)
+        {
+            Result = new SpawningUnitAction<TNode, TEdge, TUnit>(Unit, action.UnitFabric, action.CommandType);
+            Result.ActionModifier = action.ActionModifier;
+        }
+
+        public void Visit(UpActionPointsAction<TNode, TEdge, TUnit> action)
+        {
+            Result = new UpActionPointsAction<TNode, TEdge, TUnit>(Unit);
+            Result.ActionModifier = action.ActionModifier;
+        }
     }
 
     public static class CopyActionVisitor

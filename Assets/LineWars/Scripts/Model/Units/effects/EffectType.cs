@@ -5,6 +5,7 @@
         AuraPowerBuff,
         PowerBuff,
         Armored,
-        FightingSpirit
+        FightingSpirit,
+        Fire
     }
 }

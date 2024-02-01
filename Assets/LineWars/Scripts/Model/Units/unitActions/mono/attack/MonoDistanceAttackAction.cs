@@ -34,8 +34,7 @@ namespace LineWars.Model
             {
                 var context = new AnimationContext()
                 {
-                    TargetNode = targetUnit.Node,
-                    TargetUnit = targetUnit
+                    TargetPosition = targetUnit.transform.position
                 };
 
                 distanceAttackAnimation.Ended.AddListener(AttackOnEvent);
