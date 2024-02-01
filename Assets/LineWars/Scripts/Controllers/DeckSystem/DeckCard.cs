@@ -30,9 +30,9 @@ namespace LineWars.Model
                 if(_zeroLevelInfo == null)
                 {
                     _zeroLevelInfo = new FullLevelInfo(
-                    cardName.Enabled ? cardName.Value : Unit.UnitName,
-                    description.Enabled ? description.Value : Unit.UnitDescription,
-                    cardImage.Enabled ? cardImage.Value : Unit.Sprite,
+                    cardName.Enabled ? cardName.Value : unit.UnitName,
+                    description.Enabled ? description.Value : unit.UnitDescription,
+                    cardImage.Enabled ? cardImage.Value : unit.Sprite,
                     unit,
                     cost,
                     0);
