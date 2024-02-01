@@ -16,7 +16,8 @@ namespace LineWars.Interface
         [SerializeField] private LayoutGroup blessingSlotsLayoutGroup;
         private IBlessingSelector Selector => GameRoot.Instance.BlessingsController;
         private IBlessingsPull GlobalBlessingPull => GameRoot.Instance.UserController;
-
+        private IStorage<BlessingId, BaseBlessing> AllBlessings => GameRoot.Instance.BlessingStorage;
+        
         private Dictionary<BlessingType, BlessingsGroupDrawer> typeToDrawers;
         private BlessingDropSlot[] blessingSlots;
         private Dictionary<BlessingId, BlessingDropSlot> idToSlot;
@@ -49,40 +50,18 @@ namespace LineWars.Interface
             {
                 Selector.SelectedBlessingIdChanged -= SelectorOnSelectedBlessingIdChanged;
                 Selector.TotalSelectionCountChanged -= SelectorOnTotalSelectionCountChanged;
+                
+                GlobalBlessingPull.BlessingCountChanged -= OnBlessingCountChanged;
             }
         }
         
         private void OnBlessingCountChanged(BlessingId id, int count)
         {
-            if (typeToDrawers.TryGetValue(id.BlessingType, out var groupDrawer))
-            {
-                if (count > 0)
-                {
-                    if (groupDrawer.RarityToSet.TryGetValue(id.Rarity, out var set))
-                        set.Redraw(id);
-                    else
-                        groupDrawer.AddRarity(id.Rarity);
-                }
-                else
-                {
-                    groupDrawer.RemoveRarity(id.Rarity);
-                    if (groupDrawer.RarityToSet.Count == 0)
-                        Destroy(groupDrawer.gameObject);
-                }
-            }
-            else
-            {
-                if (count == 0)
-                    return;
-                
-                var group = Instantiate(blessingsGroupDrawerPrefab, blessingsGroupsLayoutGroup.transform);
-                typeToDrawers[id.BlessingType] = group;
-                group.Initialize(id.BlessingType);
-                group.AddRarity(id.Rarity);
-            }
+            var allInfo = DrawHelper.GetBlessingReDrawInfoByBlessingId(id);
+            typeToDrawers[id.BlessingType].RarityToSet[id.Rarity].Redraw(id);
 
             if (idToSlot.TryGetValue(id, out var slot))
-                slot.Redraw(DrawHelper.GetBlessingReDrawInfoByBlessingId(id));
+                slot.Redraw(allInfo);
         }
 
         private void SelectorOnTotalSelectionCountChanged(int newCount)
@@ -100,7 +79,8 @@ namespace LineWars.Interface
         private void CreateAllGroups()
         {
             typeToDrawers = new Dictionary<BlessingType, BlessingsGroupDrawer>();
-            foreach (var grouping in GlobalBlessingPull.Select(x => x.Item1).GroupBy(x => x.BlessingType))
+            
+            foreach (var grouping in AllBlessings.Keys.GroupBy(x => x.BlessingType))
             {
                 var group = Instantiate(blessingsGroupDrawerPrefab, blessingsGroupsLayoutGroup.transform);
                 typeToDrawers[grouping.Key] = group;
@@ -108,6 +88,15 @@ namespace LineWars.Interface
                 foreach (var id in grouping)
                     group.AddRarity(id.Rarity);
             }
+            
+            // foreach (var grouping in GlobalBlessingPull.Select(x => x.Item1).GroupBy(x => x.BlessingType))
+            // {
+            //     var group = Instantiate(blessingsGroupDrawerPrefab, blessingsGroupsLayoutGroup.transform);
+            //     typeToDrawers[grouping.Key] = group;
+            //     group.Initialize(grouping.Key);
+            //     foreach (var id in grouping)
+            //         group.AddRarity(id.Rarity);
+            // }
         }
 
         private void DestroyAllSlots()

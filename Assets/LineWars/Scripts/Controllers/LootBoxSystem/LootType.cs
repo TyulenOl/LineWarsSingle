@@ -5,7 +5,8 @@
         Card,
         Gold,
         Diamond,
-        UpgradeCard
+        UpgradeCard,
+        Blessing
     }
 }
 
