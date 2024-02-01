@@ -89,7 +89,7 @@ namespace LineWars.Controllers
             foreach (LootBoxType boxType in Enum.GetValues(typeof(LootBoxType)))
                 userInfo.LootBoxes.TryAdd(boxType, 0);
             foreach (var cardId in deckCardStorage.Keys)
-                userInfo.CardLevels.TryAdd(cardId, 1);
+                userInfo.CardLevels.TryAdd(cardId, 0);
             return userInfo;
         }
 
@@ -114,7 +114,7 @@ namespace LineWars.Controllers
                 CardLevels = defaultUserInfoPreset.DefaultCards
                     .Where(deckCardStorage.ValueToId.ContainsKey)
                     .Select(x => deckCardStorage.ValueToId[x])
-                    .ToSerializedDictionary((cardId) => cardId, (_) => 1)
+                    .ToSerializedDictionary((cardId) => cardId, (_) => 0)
             };
         }
 
