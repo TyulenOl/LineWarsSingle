@@ -24,20 +24,15 @@ namespace LineWars.Interface
             get => deckCard;
             set
             {
-                var prevValue = deckCard;
                 deckCard = value;
                 draggableCard.DeckCard = value;
-                
                 Redraw(value);
-
-                if (prevValue != deckCard)
-                {
-                    DeckCardChanged?.Invoke(this, prevValue, deckCard);
-                }
             }
         }
         
-        public event Action<CardDropSlot ,DeckCard, DeckCard> DeckCardChanged;
+        public event Action<CardDropSlot, DeckCard, DeckCard> OnDropCard;
+        public event Action<CardDropSlot, DeckCard> OnDragStartind;
+        public event Action<CardDropSlot, DeckCard> OnDragEnding;
 
         private void Start()
         {
@@ -54,11 +49,12 @@ namespace LineWars.Interface
         private void DraggableCardOnStartDragging(DraggableCard obj)
         {
             emptySlotTransform.gameObject.SetActive(true);
+            OnDragStartind?.Invoke(this, deckCard);
         }
         
         private void DraggableCardOnEndDragging(DraggableCard obj)
         {
-            
+            OnDragEnding?.Invoke(this, DeckCard);
         }
 
         public void OnDrop(PointerEventData eventData)
@@ -73,7 +69,9 @@ namespace LineWars.Interface
             if (!CanTakeCard(draggableCard.DeckCard))
                 return;
             
+            var prevValue = DeckCard;
             DeckCard = draggableCard.DeckCard;
+            OnDropCard?.Invoke(this, prevValue, DeckCard);
         }
 
         public void OnPointerEnter(PointerEventData eventData)
@@ -129,7 +127,7 @@ namespace LineWars.Interface
         private IEnumerator ChangeDeckCardCoroutine(DeckCard oldValue, DeckCard newValue)
         {
             yield return new WaitForFixedUpdate();
-            DeckCardChanged?.Invoke(this, oldValue, newValue);
+            OnDropCard?.Invoke(this, oldValue, newValue);
         }
     }
 }

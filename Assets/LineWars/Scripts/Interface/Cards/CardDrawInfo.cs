@@ -11,6 +11,7 @@ using UnityEngine.UI;
 
 namespace LineWars
 {
+    [Obsolete("Use BaseCardDrawer")]
     public class CardDrawInfo : MonoBehaviour, IBeginDragHandler, IDragHandler
     {
 

@@ -14,13 +14,19 @@ namespace LineWars.Interface
         private Deck deck => GameRoot.Instance.DecksController.IdToDeck[0];
         private DecksController DecksController => GameRoot.Instance.DecksController;
 
+        private bool dragStarting;
+        private bool dragEnding;
+        private bool dropped;
+
         private void OnEnable()
         {
             LoadDeck();
             
             foreach (var slot in slots)
             {
-                slot.DeckCardChanged += SlotOnDeckCardChanged;
+                slot.OnDropCard += SlotOnOnDropCard;
+                slot.OnDragEnding += SlotOnDragEnding;
+                slot.OnDragStartind += SlotOnDragStarting;
             }
         }
 
@@ -30,40 +36,59 @@ namespace LineWars.Interface
             
             foreach (var slot in slots)
             {
-                slot.DeckCardChanged -= SlotOnDeckCardChanged;
+                slot.OnDropCard -= SlotOnOnDropCard;
+                slot.OnDragEnding -= SlotOnDragEnding;
                 slot.Clear();
             }
         }
         
         
-        private void SlotOnDeckCardChanged(CardDropSlot dropSlot, DeckCard oldCard, DeckCard newCard)
+        private void SlotOnOnDropCard(CardDropSlot dropSlot, DeckCard oldCard, DeckCard newCard)
         {
-            // if (oldCard == null && newCard != null) 
-            // {
-            //     var otherSlot = slots.FirstOrDefault(x => x.DeckCard == newCard && x != dropSlot);
-            //     if (otherSlot != null) // переложили карту
-            //         otherSlot.DeckCard = null;
-            //     else // новая карта
-            //         cardsDrawer.DeckCardToDrawer[newCard].IsActive = false;
-            //
-            // }
-            // else if (oldCard != null && newCard == null) 
-            // {
-            //     if (slots.All(x => x.DeckCard != oldCard)) // удалили карту навсегда
-            //         cardsDrawer.DeckCardToDrawer[oldCard].IsActive = true;
-            // }
-            // else if (oldCard != null && newCard != null)
-            // {
-            //     var otherSlot = slots.FirstOrDefault(x => x.DeckCard == newCard && x != dropSlot);
-            //     if (otherSlot != null) // своп карты
-            //     {
-            //         otherSlot.DeckCard = oldCard;
-            //     }
-            //     else 
-            //     {
-            //         cardsDrawer.DeckCardToDrawer[oldCard].IsActive = true;
-            //     }
-            // }
+            dropped = true;
+            
+            if (oldCard == null && newCard != null) 
+            {
+                var otherSlot = slots.FirstOrDefault(x => x.DeckCard == newCard && x != dropSlot);
+                if (otherSlot != null) // переложили карту
+                    otherSlot.DeckCard = null;
+                else // новая карта
+                    cardsDrawer.DeckCardToDrawer[newCard].IsActive = false;
+            
+            }
+            else if (oldCard != null && newCard != null)
+            {
+                var otherSlot = slots.FirstOrDefault(x => x.DeckCard == newCard && x != dropSlot);
+                if (otherSlot != null) // своп карты
+                {
+                    otherSlot.DeckCard = oldCard;
+                }
+                else 
+                {
+                    cardsDrawer.DeckCardToDrawer[oldCard].IsActive = true;
+                    cardsDrawer.DeckCardToDrawer[newCard].IsActive = false;
+                }
+            }
+        }
+        
+        private void SlotOnDragEnding(CardDropSlot slot, DeckCard card)
+        {
+            if (!dropped)
+            {
+                slot.DeckCard = null;
+                cardsDrawer.DeckCardToDrawer[card].IsActive = true;
+            }
+            
+            dragStarting = false;
+            dragEnding = true;
+            dropped = false;
+        }
+        
+        private void SlotOnDragStarting(CardDropSlot slot, DeckCard card)
+        {
+            dragStarting = true;
+            dropped = false;
+            dragEnding = false;
         }
 
         private void LoadDeck()

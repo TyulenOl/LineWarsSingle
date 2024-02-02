@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using LineWars.Controllers;
 using UnityEngine;
@@ -5,6 +6,7 @@ using UnityEngine.UI;
 
 namespace LineWars
 {
+    [Obsolete("Use UserCardDrawer")]
     public class AllCardsPanelDrawer : MonoBehaviour
     {
         [SerializeField] private LayoutGroup cardsLayoutGroup;

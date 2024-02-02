@@ -7,6 +7,7 @@ using UnityEngine.UI;
 
 namespace LineWars
 {
+    [Obsolete("Use DraggableCard")]
     public class CardDragablePart : CardDrawInfo, IBeginDragHandler, IDragHandler, IEndDragHandler
     {
         private RectTransform rectTransform;
