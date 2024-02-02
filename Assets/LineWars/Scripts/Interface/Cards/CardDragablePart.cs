@@ -45,6 +45,7 @@ namespace LineWars
             instance.canvasGroup.blocksRaycasts = true;
             instance.isActive = true;
             instance.InfoButton.onClick.AddListener(onInfoButtonClickAction);
+            
             transform.SetParent(MainCanvas.Instance.Canvas.transform);
             canvasGroup.blocksRaycasts = false;
             StartDragging?.Invoke(instance);

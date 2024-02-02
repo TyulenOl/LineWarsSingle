@@ -7,7 +7,7 @@ namespace LineWars.Model
     public class CardUpgrader : MonoBehaviour
     {
         private UserInfoController userInfoController;
-        private IStorage<int,DeckCard> cardStorage;
+        private IStorage<int, DeckCard> cardStorage;
 
         public void Initialize(UserInfoController userInfoController, IStorage<int, DeckCard> cardStorage)
         {
@@ -43,6 +43,22 @@ namespace LineWars.Model
             return userInfoController.UserUpgradeCards >= levelInfo.CostToUpgrade;
         }
 
+        public int GetUpgradePrice(DeckCard deckCard)
+        {
+            if (!cardStorage.TryGetKey(deckCard, out int cardId))
+                return -1;
+            if (!userInfoController.CardIsOpen(deckCard))
+                return -1;
+                
+            var desiredLevel = userInfoController.UserInfo.CardLevels[cardId] + 1;
+            var hasLevel = desiredLevel <= deckCard.MaxLevel;
+            if (!hasLevel)
+                return -1;
+            
+            var levelInfo = deckCard.GetLevelInfo(desiredLevel);
+            return levelInfo.CostToUpgrade;
+        }
+        
         public void Upgrade(DeckCard card)
         {
             var cardId = cardStorage.ValueToId[card];
@@ -66,8 +82,10 @@ namespace LineWars.Model
                 Debug.LogError("Cannot afford the upgrade");
                 return;
             }
+
             userInfoController.SetCardLevel(card, desiredLevel);
             userInfoController.UserUpgradeCards -= price;
+            card.Level++;
         }
     }
 }

@@ -173,6 +173,7 @@ namespace LineWars.Controllers
             }
 
             currentInfo.CardLevels[cardId] = level;
+            SaveCurrentUserInfo();
         }
 
         public void SetCardLevel(DeckCard card, int level)
