@@ -3,12 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using LineWars.Controllers;
+using LineWars.Interface;
 using LineWars.Model;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace LineWars
 {
+    [Obsolete("Use UserDeckDrawer")]
     public class DeckDrawer : MonoBehaviour
     {
         [SerializeField] private CardSlot[] slots;

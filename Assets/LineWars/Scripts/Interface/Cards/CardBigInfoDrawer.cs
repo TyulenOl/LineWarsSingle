@@ -22,9 +22,36 @@ namespace LineWars
         [SerializeField] private Image cardImage;
 
         [SerializeField] private ActionsPanelDrawer actionsPanelDrawer;
-        
-        public void ReDraw(DeckCard deckCard)
+        [SerializeField] private CardUpgradeLogic cardUpgradeLogic;
+        private DeckCard deckCard;
+
+        public DeckCard DeckCard
         {
+            get => deckCard;
+            set
+            {
+                if (deckCard != null)
+                    deckCard.LevelChanged -= DeckCardOnLevelChanged;
+                if (value != null)
+                    value.LevelChanged += DeckCardOnLevelChanged;
+                
+                deckCard = value;
+                cardUpgradeLogic.DeckCard = deckCard;
+                
+                Redraw(value);
+            }
+        }
+
+        private void DeckCardOnLevelChanged(DeckCard card, int level)
+        {
+            Redraw(card);
+        }
+
+        private void Redraw(DeckCard deckCard)
+        {
+            if (deckCard == null)
+                return;
+            
             unitName.text = deckCard.Name;
             cardImage.sprite = deckCard.Unit.Sprite;
             
@@ -34,7 +61,7 @@ namespace LineWars
             if(hpText != null)
                 hpText.text = deckCard.Unit.MaxHp.ToString();
             if (attackText != null)
-                attackText.text = deckCard.Unit.InitialPower.ToString(); ;//deckCard.Unit.GetMaxDamage().ToString();
+                attackText.text = deckCard.Unit.InitialPower.ToString();
             if(apText != null)
                 apText.text = deckCard.Unit.MaxActionPoints.ToString();
             

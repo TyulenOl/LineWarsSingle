@@ -29,16 +29,16 @@ namespace LineWars.Model
 
         public FullLevelInfo WithAdditionalInfo(AdditionalLevelInfo additionalLevelInfo)
         {
-            var name = additionalLevelInfo.CardName.Enabled ? 
-                additionalLevelInfo.CardName.Value : Name;
-            var description = additionalLevelInfo.Description.Enabled ? 
-                additionalLevelInfo.Description.Value : Description;
-            var image = additionalLevelInfo.CardImage.Enabled ? 
-                additionalLevelInfo.CardImage.Value : Image;
-            var unit = additionalLevelInfo.Unit.Enabled ? 
-                additionalLevelInfo.Unit.Value : Unit;
-            var cost = additionalLevelInfo.Cost.Enabled ? 
-                additionalLevelInfo.Cost.Value : Cost;
+            var name = additionalLevelInfo.OverrideCardName.Enabled ? 
+                additionalLevelInfo.OverrideCardName.Value : Name;
+            var description = additionalLevelInfo.OverrideDescription.Enabled ? 
+                additionalLevelInfo.OverrideDescription.Value : Description;
+            var image = additionalLevelInfo.OverrideCardImage.Enabled ? 
+                additionalLevelInfo.OverrideCardImage.Value : Image;
+            var unit = additionalLevelInfo.OverrideUnitPrefab.Enabled ? 
+                additionalLevelInfo.OverrideUnitPrefab.Value : Unit;
+            var cost = additionalLevelInfo.OverrideCostInFight.Enabled ? 
+                additionalLevelInfo.OverrideCostInFight.Value : Cost;
             
             return new FullLevelInfo(
                 name,

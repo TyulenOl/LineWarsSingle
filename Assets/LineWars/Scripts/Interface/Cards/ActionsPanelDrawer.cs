@@ -16,24 +16,44 @@ namespace LineWars
         [SerializeField] private ActionInfoDrawer actionInfoDrawerPrefab;
         [SerializeField] private LayoutGroup actionsLayoutGroup;
 
-        public void ReDrawActions(DeckCard deckCard)
+        private Dictionary<CommandType, ActionInfoDrawer> commandToDrawer = new();
+
+        private bool initialized;
+
+        private void Initialize()
         {
-            foreach (var drawer in actionsLayoutGroup.GetComponentsInChildren<ActionInfoDrawer>())
-            {
-                Destroy(drawer.gameObject);
-            }
+            initialized = true;
             
-            var types = GetAllActionDrawInfos(deckCard);
-            foreach (var drawInfo in types)
+            foreach (var command in Enum.GetValues(typeof(CommandType))
+                         .OfType<CommandType>()
+                         .Except(nonDrawableCommandTypes)
+                         .OrderBy(x => x))
             {
+                var drawInfo = DrawHelper.GetReDrawInfoByCommandType(command);
+                if (drawInfo == null)
+                    continue;
+                
                 var instance = Instantiate(actionInfoDrawerPrefab, actionsLayoutGroup.transform);
                 instance.ReDraw(drawInfo);
+                instance.gameObject.SetActive(false);
+                commandToDrawer[command] = instance;
             }
         }
 
-        private IEnumerable<ActionReDrawInfo> GetAllActionDrawInfos(DeckCard deckCard)
+        public void ReDrawActions(DeckCard deckCard)
         {
-            return deckCard.Unit.UnitCommands.Except(nonDrawableCommandTypes).Select(DrawHelper.GetReDrawInfoByCommandType);
+            if (!initialized)
+                Initialize();
+            
+            var types = deckCard.Unit.UnitCommands
+                .Except(nonDrawableCommandTypes)
+                .ToArray();
+
+            foreach (var value in commandToDrawer.Values)
+                value.gameObject.SetActive(false);
+
+            foreach (var type in types)
+                commandToDrawer[type].gameObject.SetActive(true);
         }
     }
 }

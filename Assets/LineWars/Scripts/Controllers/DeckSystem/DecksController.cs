@@ -56,13 +56,10 @@ namespace LineWars.Model
 
         private Deck AssignDeck(Deck deck)
         {
-            foreach (var deckCard in deck.Cards.ToArray())
-            {
-                if (!userInfoController.CardIsOpen(deckCard))
-                    deck.RemoveCard(deckCard);
-            }
-
-            return deck;
+            return new Deck(deck.Id, deck.Name, deck.Cards
+                .Distinct()
+                .Where(x => userInfoController.CardIsOpen(x))
+            );
         }
 
         private void TryAddDefaultDeck()

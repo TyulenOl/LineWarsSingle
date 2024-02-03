@@ -1,14 +1,12 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using LineWars.Controllers;
-using LineWars.Model;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace LineWars
 {
+    [Obsolete("Use UserCardDrawer")]
     public class AllCardsPanelDrawer : MonoBehaviour
     {
         [SerializeField] private LayoutGroup cardsLayoutGroup;
@@ -17,7 +15,7 @@ namespace LineWars
         [SerializeField] private DeckDrawer deckDrawer;
         
 
-        private void Awake()
+        private void Start()
         {
             ReDrawAllCards();
             deckDrawer.DeckChanged += ReDrawAllCards;
@@ -25,6 +23,7 @@ namespace LineWars
 
         private void ReDrawAllCards()
         {
+            Debug.Log("ReDrawAllCards");
             foreach (var drawInfo in cardsLayoutGroup.GetComponentsInChildren<CardDrawInfo>())
             {
                 Destroy(drawInfo.transform.parent.gameObject);
@@ -38,8 +37,8 @@ namespace LineWars
                 cardInstance.ReDraw(card);
                 cardInstance.OnInfoButtonClickAction = () =>
                 {
-                    bigCardInfo.ReDraw(card);
                     bigCardInfo.gameObject.SetActive(true);
+                    bigCardInfo.DeckCard = card;
                 };
                 cardInstance.ReDrawAvailability(!deckDrawer.Slots.Select(x=> x.DeckCard).Contains(cardInstance.DeckCard));
             }
