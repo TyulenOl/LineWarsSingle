@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace LineWars.Model
 {
@@ -27,7 +26,10 @@ namespace LineWars.Model
 
         public void Execute(Node target)
         {
-            throw new NotImplementedException();
+            if(jumpAnimation == null)
+                ExecuteInstant(target);
+            else
+                ExecuteAnimation(target);   
         }
 
         private void ExecuteInstant(Node target)

@@ -28,5 +28,6 @@ namespace LineWars.Model
         public void Visit(MonoSpawningUnitAction action);
         public void Visit(MonoUpActionPointsAction action);
         public void Visit(MonoJumpAction action);
+        public void Visit(MonoHealSacrificeAction action);
     }
 }

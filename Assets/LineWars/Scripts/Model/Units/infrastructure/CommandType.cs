@@ -27,7 +27,8 @@
         SpawnWolf,
         SpawnSheep,
         UpActionPoints,
-        Jump
+        Jump,
+        HealSacrifice
     }
 }   
 
