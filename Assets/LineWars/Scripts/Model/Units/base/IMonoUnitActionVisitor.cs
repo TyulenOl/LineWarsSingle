@@ -26,5 +26,7 @@ namespace LineWars.Model
         public void Visit(MonoFogEraseAction action);
         public void Visit(MonoArsonAction action);
         public void Visit(MonoSpawningUnitAction action);
+        public void Visit(MonoUpActionPointsAction action);
+        public void Visit(MonoJumpAction action);
     }
 }

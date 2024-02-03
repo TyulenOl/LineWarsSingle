@@ -120,6 +120,12 @@ namespace LineWars.Controllers
 
         public bool CardIsOpen(DeckCard card) => openedCardsSet.Contains(card);
 
+        public bool CardIsOpen(int cardId)
+        {
+            var card = deckCardStorage.IdToValue[cardId];
+            return CardIsOpen(card);
+        }
+
         public void UnlockCard(int id)
         {
             UnlockCard(deckCardStorage.IdToValue[id]);

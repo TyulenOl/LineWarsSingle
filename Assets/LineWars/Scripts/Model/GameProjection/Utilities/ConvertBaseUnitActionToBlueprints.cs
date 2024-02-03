@@ -360,6 +360,11 @@ namespace LineWars.Model
         {
             // TODO
         }
+
+        public void Visit(JumpAction<TNode, TEdge, TUnit> action)
+        {
+            // TODO
+        }
     }
 
     public static class ConvertUnitActionToBlueprints

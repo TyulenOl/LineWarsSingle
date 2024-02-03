@@ -327,5 +327,43 @@ namespace LineWars.Model
 
             return mostRemoteNodes;
         }
+
+        public static List<TNode> StaticFindShortestPath(
+            [NotNull] TNode start,
+            [NotNull] TNode end,
+            Func<TNode, TNode, bool> condition = null)
+        {
+            var queue = new Queue<TNode>();
+            var track = new Dictionary<TNode, TNode>();
+            queue.Enqueue(start);
+            track[start] = null;
+            while (queue.Count != 0)
+            {
+                var node = queue.Dequeue();
+                foreach (var neighborhood in node.GetNeighbors())
+                {
+                    if (track.ContainsKey(neighborhood)) continue;
+                    if (condition != null && !condition(node, neighborhood)) continue;
+                    track[neighborhood] = node;
+                    queue.Enqueue(neighborhood);
+                }
+
+                if (track.ContainsKey(end)) break;
+            }
+
+            if (!track.ContainsKey(end))
+                return new List<TNode>();
+
+            var pathItem = end;
+            var result = new List<TNode>();
+            while (pathItem != null)
+            {
+                result.Add(pathItem);
+                pathItem = track[pathItem];
+            }
+
+            result.Reverse();
+            return result;
+        }
     }
 }

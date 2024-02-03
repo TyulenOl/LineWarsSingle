@@ -172,5 +172,18 @@ namespace LineWars.Model
             Result = new SpawningUnitAction<NodeProjection, EdgeProjection, UnitProjection>(Unit, fabric, CommandType.None);
             Result.ActionModifier = action.Action.ActionModifier;
         }
+
+        public void Visit(MonoUpActionPointsAction action)
+        {
+            Result = new UpActionPointsAction<NodeProjection, EdgeProjection, UnitProjection>(Unit);
+            Result.ActionModifier = action.Action.ActionModifier;
+        }
+
+        public void Visit(MonoJumpAction action)
+        {
+            Result = new JumpAction<NodeProjection, EdgeProjection, UnitProjection>
+                (Unit, action.MinJumpDistance, action.MaxJumpDistance);
+            Result.ActionModifier = action.Action.ActionModifier;
+        }
     }    
 }
