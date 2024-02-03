@@ -1,16 +1,17 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace LineWars.Model
 {
     [CreateAssetMenu(menuName = "DeckBuilding/DeckCard", order = 53)]
-    public partial class DeckCard : ScriptableObject,
+    public class DeckCard : ScriptableObject,
         IDeckCard
     {
-        [SerializeField] private Optional<string> cardName;
-        [SerializeField] private Optional<string> description;
-        [SerializeField] private Optional<Sprite> cardImage;
+        [SerializeField] private Optional<string> overrideCardName;
+        [SerializeField] private Optional<string> overrideDescription;
+        [SerializeField] private Optional<Sprite> overrideCardImage;
 
         [SerializeField] private Sprite cardActiveBagLine;
         [SerializeField] private Sprite cardInactiveBagLine;
@@ -22,6 +23,8 @@ namespace LineWars.Model
         [SerializeField] private int shopCost;
         [SerializeField] private List<AdditionalLevelInfo> levels;
 
+        public event Action<DeckCard, int> LevelChanged;
+
         private FullLevelInfo _zeroLevelInfo;
         private FullLevelInfo ZeroLevelInfo
         {
@@ -30,9 +33,9 @@ namespace LineWars.Model
                 if(_zeroLevelInfo == null)
                 {
                     _zeroLevelInfo = new FullLevelInfo(
-                    cardName.Enabled ? cardName.Value : unit.UnitName,
-                    description.Enabled ? description.Value : unit.UnitDescription,
-                    cardImage.Enabled ? cardImage.Value : unit.Sprite,
+                    overrideCardName.Enabled ? overrideCardName.Value : unit.UnitName,
+                    overrideDescription.Enabled ? overrideDescription.Value : unit.UnitDescription,
+                    overrideCardImage.Enabled ? overrideCardImage.Value : unit.Sprite,
                     unit,
                     cost,
                     0);
@@ -47,8 +50,12 @@ namespace LineWars.Model
             get => level;
             set
             {
+                var prevLevel = level;
                 level = value;
-                currentLevelInfo = GetLevelInfo(level);
+                currentLevelInfo = GetLevelInfo(value);
+                if (value == prevLevel)
+                    return;
+                LevelChanged?.Invoke(this, value);
             }
         }
 

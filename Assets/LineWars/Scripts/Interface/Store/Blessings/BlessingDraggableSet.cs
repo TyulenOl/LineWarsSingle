@@ -10,8 +10,10 @@ namespace LineWars.Interface
 
         public void Redraw(BlessingId blessingId)
         {
+            var info = DrawHelper.GetBlessingReDrawInfoByBlessingId(blessingId);
+            
             draggableBlessing.Init(blessingId);
-            blessingInfoDrawer.Redraw(DrawHelper.GetBlessingReDrawInfoByBlessingId(blessingId));
+            blessingInfoDrawer.Redraw(info);
         }
     }
 }

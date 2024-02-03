@@ -1,3 +1,4 @@
+using LineWars.Interface;
 using LineWars.Model;
 using UnityEngine;
 
@@ -5,12 +6,15 @@ namespace LineWars
 {
     public class UpgradeCardShower : ItemWithAmountShower
     {
-        [SerializeField] private CardDrawInfo cardDrawInfo;
+        [SerializeField] private BaseCardDrawer baseCardDrawer;
+        //[SerializeField] private CardDrawInfo cardDrawInfo;
 
         public void ShowItem(DeckCard deckCard,int amount)
         {
-            cardDrawInfo.ReDraw(deckCard);
-            cardDrawInfo.ReDrawAvailability(true);
+            baseCardDrawer.DeckCard = deckCard;
+            
+            // cardDrawInfo.ReDraw(deckCard);
+            // cardDrawInfo.ReDrawAvailability(true);
             base.ShowItem(amount);
         }
     }

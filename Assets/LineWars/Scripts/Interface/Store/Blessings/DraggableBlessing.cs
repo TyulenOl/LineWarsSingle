@@ -23,8 +23,11 @@ namespace LineWars.Interface
 
         public void Init(BlessingId blessingId)
         {
-            blessingInfoDrawer.Redraw(DrawHelper.GetBlessingReDrawInfoByBlessingId(blessingId));
+            var info = DrawHelper.GetBlessingReDrawInfoByBlessingId(blessingId);
+            blessingInfoDrawer.Redraw(info);
             this.blessingId = blessingId;
+
+            gameObject.SetActive(info.Amount != 0);
         }
 
         public void OnDrag(PointerEventData eventData)

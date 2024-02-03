@@ -6,6 +6,7 @@ namespace LineWars
     public abstract class LootedItemShower : MonoBehaviour
     {
         private Animator animator;
+        private static readonly int showing = Animator.StringToHash("Showing");
 
         private void Awake()
         {
@@ -14,7 +15,7 @@ namespace LineWars
 
         private void OnEnable()
         {
-            animator.SetTrigger("Showing");
+            animator.SetTrigger(showing);
         }
     }
 }
