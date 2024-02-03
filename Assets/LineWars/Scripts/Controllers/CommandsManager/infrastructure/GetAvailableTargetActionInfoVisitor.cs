@@ -179,6 +179,11 @@ namespace LineWars.Controllers
             return ForNode(action, (uint)action.MaxJumpDistance);
         }
 
+        public IEnumerable<TargetActionInfo> Visit(IHealSacrificeAction<Node, Edge, Unit> action)
+        {
+            return ForUnit(action, 1);
+        }
+
         public class ForShotUnitAction
         {
             private readonly ITarget[] targets;

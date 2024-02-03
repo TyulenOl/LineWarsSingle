@@ -1,4 +1,3 @@
-using System;
 
 namespace LineWars.Model
 {
@@ -183,6 +182,13 @@ namespace LineWars.Model
         {
             Result = new JumpAction<NodeProjection, EdgeProjection, UnitProjection>
                 (Unit, action.MinJumpDistance, action.MaxJumpDistance);
+            Result.ActionModifier = action.Action.ActionModifier;
+        }
+
+        public void Visit(MonoHealSacrificeAction action)
+        {
+            Result = new HealSacrificeAction<NodeProjection, EdgeProjection, UnitProjection>
+                (Unit);
             Result.ActionModifier = action.Action.ActionModifier;
         }
     }    
