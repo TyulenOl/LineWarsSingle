@@ -52,7 +52,7 @@ namespace LineWars.Interface
                 var otherSlot = slots.FirstOrDefault(x => x.DeckCard == newCard && x != dropSlot);
                 if (otherSlot != null) // переложили карту
                     otherSlot.DeckCard = null;
-                else // новая карта
+                else if (cardsDrawer != null) // новая карта
                     cardsDrawer.DeckCardToDrawer[newCard].IsActive = false;
             
             }
@@ -63,7 +63,7 @@ namespace LineWars.Interface
                 {
                     otherSlot.DeckCard = oldCard;
                 }
-                else 
+                else if (cardsDrawer != null)
                 {
                     cardsDrawer.DeckCardToDrawer[oldCard].IsActive = true;
                     cardsDrawer.DeckCardToDrawer[newCard].IsActive = false;
@@ -76,7 +76,8 @@ namespace LineWars.Interface
             if (!dropped)
             {
                 slot.DeckCard = null;
-                cardsDrawer.DeckCardToDrawer[card].IsActive = true;
+                if (cardsDrawer != null) 
+                    cardsDrawer.DeckCardToDrawer[card].IsActive = true;
             }
             
             dragStarting = false;
@@ -102,7 +103,8 @@ namespace LineWars.Interface
                     if (slot.DeckCard == null && slot.CanTakeCard(card))
                     {
                         slot.DeckCard = card;
-                        cardsDrawer.DeckCardToDrawer[card].IsActive = false;
+                        if (cardsDrawer != null)
+                            cardsDrawer.DeckCardToDrawer[card].IsActive = false;
                         break;
                     }
 

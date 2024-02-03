@@ -144,7 +144,7 @@ namespace LineWars.Interface
             if (leftPart != null)
             {
                 leftPart.gameObject.SetActive(true);
-                targetDrawer.image = leftDrawer.targetSprite;
+                targetDrawer.image = leftDrawer.CommandIcon;
             }
 
             if (rightPart != null)
@@ -158,7 +158,7 @@ namespace LineWars.Interface
             if (rightPart != null)
             {
                 rightPart.gameObject.SetActive(true);
-                targetDrawer.image = rightDrawer.targetSprite;
+                targetDrawer.image = rightDrawer.CommandIcon;
             }
         }
 
