@@ -9,8 +9,6 @@ namespace LineWars.Interface
 {
     public class GoldBuyPresetLogic : MonoBehaviour
     {
-        private static Sprite goldSprite => Resources.Load<Sprite>("UI/Sorokin/Icons/ColoredMoney");
-        
         [SerializeField] private BuyPanel buyPanel;
         [SerializeField] private int goldAmount;
         [SerializeField] private int costInDiamonds;
@@ -42,7 +40,7 @@ namespace LineWars.Interface
         {
             return new BuyPanelReDrawInfo
             (
-                goldSprite,
+                DrawHelper.GoldSprite,
                 ParseAmount(goldAmount),
                 GetDescription(),
                 costInDiamonds,

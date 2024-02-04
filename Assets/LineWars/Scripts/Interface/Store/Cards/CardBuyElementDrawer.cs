@@ -9,6 +9,7 @@ namespace LineWars.Interface
 {
     public class CardBuyElementDrawer : MonoBehaviour
     {
+        [SerializeField] private GameObject bg;
         [SerializeField] private TMP_Text unitName;
         [SerializeField] private TMP_Text hpText;
         [SerializeField] private TMP_Text powerText;
@@ -44,8 +45,19 @@ namespace LineWars.Interface
             sprite.sprite = deckCard.Image;
             
             costDrawer.DrawCost(deckCard.ShopCost, deckCard.ShopCostType);
-
+            
+            RedrawBg(DrawHelper.RarityToShopCardBg[deckCard.Rarity]);
+            
             this.deckCard = deckCard;
+        }
+
+        private void RedrawBg(GameObject newBg)
+        {
+            if (bg != null)
+                Destroy(bg.gameObject);
+            var newBgInstance = Instantiate(newBg, transform);
+            newBgInstance.transform.SetAsFirstSibling();
+            bg = newBgInstance;
         }
 
         private void OnClick()

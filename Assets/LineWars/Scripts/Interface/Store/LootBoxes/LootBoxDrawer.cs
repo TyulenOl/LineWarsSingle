@@ -12,7 +12,7 @@ namespace LineWars.Interface
     public class LootBoxDrawer : MonoBehaviour
     {
         [SerializeField] private Image lootBoxImage;
-        [SerializeField] private Image bgImage;
+        [SerializeField] private GameObject bg;
         [SerializeField] private TMP_Text boxName;
         [SerializeField] private TMP_Text boxDescription;
         [SerializeField] private Button button;
@@ -37,8 +37,9 @@ namespace LineWars.Interface
             if (boxDescription != null) 
                 boxDescription.text = lootBoxInfo.Description;
             lootBoxImage.sprite = lootBoxInfo.BoxSprite;
-            if(bgImage != null)
-                bgImage.sprite = lootBoxInfo.BgSprite;
+            
+            RedrawBg(lootBoxInfo.Bg);
+            
             if(onButtonClickAction != null)
                 button.onClick.AddListener(onButtonClickAction);
             this.lootBoxInfo = lootBoxInfo;
@@ -98,6 +99,15 @@ namespace LineWars.Interface
             {
                 return obj.LootType.GetHashCode();
             }
+        }
+        
+        private void RedrawBg(GameObject newBg)
+        {
+            if (bg != null)
+                Destroy(bg.gameObject);
+            var newBgInstance = Instantiate(newBg, transform);
+            newBgInstance.transform.SetAsFirstSibling();
+            bg = newBgInstance;
         }
     }
 }

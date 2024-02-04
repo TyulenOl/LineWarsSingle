@@ -12,7 +12,7 @@ namespace LineWars.Model
         [SerializeField] private string boxName;
         [SerializeField] private string boxDescription;
         [SerializeField] private Sprite boxSprite;
-        [SerializeField] private Sprite bgSprite;
+        [SerializeField] private GameObject bg;
         [SerializeField] private LootBoxType boxType;
         [SerializeField] private List<LootInfo> allLoot;
         [Header("Cost Settings")]
@@ -21,7 +21,7 @@ namespace LineWars.Model
 
         public string Name => boxName;
         public Sprite BoxSprite => boxSprite;
-        public Sprite BgSprite => bgSprite;
+        public GameObject Bg => bg;
         public CostType CostType => costType;
         public int Cost => cost;
         public LootBoxType BoxType => boxType;

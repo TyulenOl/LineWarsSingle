@@ -8,10 +8,12 @@ using UnityEngine;
 
 public static class DrawHelper
 {
+
     private static DrawHelperInstance Instance => GameRoot.Instance.DrawHelper;
     public static IReadOnlyDictionary<LootType, Sprite> LootTypeToSprite => Instance.LootTypeToSprite;
     public static IReadOnlyDictionary<Rarity, Color> RarityToColor => Instance.RarityToColor;
-    
+    public static IReadOnlyDictionary<Rarity, GameObject> RarityToShopCardBg => Instance.RarityToShopCardBg;
+    public static Sprite GoldSprite => Instance.GoldSprite;
     
     public static FullBlessingReDrawInfo GetBlessingReDrawInfoByBlessingId(BlessingId blessingId)
     {
