@@ -8,7 +8,6 @@ using UnityEngine;
 
 public static class DrawHelper
 {
-
     private static DrawHelperInstance Instance => GameRoot.Instance.DrawHelper;
     public static IReadOnlyDictionary<LootType, Sprite> LootTypeToSprite => Instance.LootTypeToSprite;
     public static IReadOnlyDictionary<Rarity, Color> RarityToColor => Instance.RarityToColor;

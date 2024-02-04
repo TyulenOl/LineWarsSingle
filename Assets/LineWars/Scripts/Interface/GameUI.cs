@@ -123,7 +123,7 @@ namespace LineWars.Interface
             enemyTurnPanel.IsCoroutineActive = isEnemyTurn;
             foreach (var button in buttonsToBlockIfEnemyTurn)
             {
-                button.gameObject.SetActive(!isEnemyTurn);
+                button.interactable = false;
             }
         }
 

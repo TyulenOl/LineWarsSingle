@@ -42,14 +42,17 @@ namespace LineWars.Interface
                     case BlessingDrawerState.Active:
                         blessingIcon.color = Color.green;
                         button.interactable = false;
+                        blessingCount.color = Color.white;
                         break;
                     case BlessingDrawerState.Locked:
                         blessingIcon.color = Color.gray;
                         button.interactable = false;
+                        blessingCount.color = Color.gray;
                         break;
                     case BlessingDrawerState.Unlocked:
                         blessingIcon.color = Color.white;
                         button.interactable = true;
+                        blessingCount.color = Color.white;
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(value), value, null);
