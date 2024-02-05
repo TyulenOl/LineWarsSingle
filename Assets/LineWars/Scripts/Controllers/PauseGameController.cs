@@ -23,8 +23,8 @@ namespace LineWars.Controllers
             if (IsPause)
                 return;
             IsPause = true;
-            previousValue = musicManager.Source.volume;
-            musicManager.Source.volume *= volumeValue;
+            previousValue = musicManager.Volume;
+            musicManager.Volume *= volumeValue;
         }
         
         public void Resume()
@@ -32,7 +32,7 @@ namespace LineWars.Controllers
             if (!IsPause)
                 return;
             IsPause = false;
-            musicManager.Source.volume = previousValue;
+            musicManager.Volume = previousValue; 
         }
     }
 }

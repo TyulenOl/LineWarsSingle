@@ -7,6 +7,7 @@
         Armored,
         FightingSpirit,
         Fire,
-        Lonelinesss
+        Lonelinesss,
+        Illness
     }
 }
