@@ -13,6 +13,7 @@
             "Queue" = "Transparent"
         }
 
+        LOD 0
         Cull Off
         Blend SrcAlpha OneMinusSrcAlpha
 

@@ -6,7 +6,7 @@ SpriteAtlas:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: UI
+  m_Name: Backgrounds
   m_EditorData:
     serializedVersion: 2
     textureSettings:
@@ -44,5 +44,5 @@ SpriteAtlas:
   m_PackedSpriteNamesToIndex:
   - MAIN_MENU_2
   m_RenderDataMap: {}
-  m_Tag: UI
+  m_Tag: Backgrounds
   m_IsVariant: 0

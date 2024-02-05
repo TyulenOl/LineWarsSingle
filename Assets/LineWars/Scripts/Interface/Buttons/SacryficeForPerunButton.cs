@@ -8,7 +8,14 @@ namespace LineWars.Interface
     {
         protected override void OnClick()
         {
-            CommandsManager.Instance.SelectCurrentCommand(CommandType.SacrificePerun);
+            if (CommandsManager.CanSelectCurrentCommand(CommandType.SacrificePerun))
+                CommandsManager.SelectCurrentCommand(CommandType.SacrificePerun);
+        }
+
+        protected override void CommandsManagerOnEnter(CommandsManagerStateType type)
+        {
+            base.CommandsManagerOnEnter(type);
+            button.interactable = CommandsManager.CanSelectCurrentCommand(CommandType.SacrificePerun);
         }
     }
 }

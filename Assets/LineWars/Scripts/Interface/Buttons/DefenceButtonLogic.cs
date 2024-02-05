@@ -9,13 +9,24 @@ namespace LineWars.Interface
     {
         protected override void OnClick()
         {
-            var executor = CommandsManager.Instance.Executor;
-            if (executor is Unit unit)
+            var command = GenerateCommand();
+            if (CanExecuteCommand(command))
             {
-                var command = new RLBlockCommand<Node, Edge, Unit>(unit);
-                if (command.CanExecute())
-                    CommandsManager.Instance.ExecuteSimpleCommand(command);
+                CommandsManager.ExecuteSimpleCommand(command);
             }
+        }
+        
+        protected override void CommandsManagerOnEnter(CommandsManagerStateType type)
+        {
+            base.CommandsManagerOnEnter(type);
+            button.interactable = CanExecuteCommand(GenerateCommand());
+        }
+
+        private static IActionCommand GenerateCommand()
+        {
+            if (CommandsManager.Executor is Unit unit)
+                return new RLBlockCommand<Node, Edge, Unit>(unit);
+            return null;
         }
     }
 }
