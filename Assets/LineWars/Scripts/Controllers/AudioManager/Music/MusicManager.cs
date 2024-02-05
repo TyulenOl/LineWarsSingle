@@ -1,8 +1,7 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace LineWars.Controllers
 {
@@ -23,7 +22,15 @@ namespace LineWars.Controllers
         private AudioSource source;
         private MusicLogic logic;
 
-        public AudioSource Source => source;
+        public MusicData CurrentMusicData { get; private set; }
+        public UnityEvent<MusicData, MusicData> MusicChanged;
+
+        //  public AudioSource Source => source;
+        public float Volume
+        {
+            get => source.volume;
+            set => source.volume = value;
+        }
 
         private void Awake()
         {
@@ -77,6 +84,26 @@ namespace LineWars.Controllers
                     source.volume = fadeInCurve.Evaluate(passedTime / fadeOutTime);
                 }
             }
+        }
+
+        public void Play(MusicData musicData)
+        {
+            var prevData = CurrentMusicData;
+            source.clip = musicData.AudioClip;
+            source.Play();
+            CurrentMusicData = musicData;
+            MusicChanged.Invoke(prevData, musicData);
+        }
+
+        public void Stop()
+        {
+            if(CurrentMusicData == null)
+                return;
+            var prevData = CurrentMusicData;
+            CurrentMusicData = null;
+            source.Stop();
+            source.clip = null;
+            MusicChanged.Invoke(prevData, null);
         }
     }
 }

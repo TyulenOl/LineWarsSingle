@@ -2,19 +2,17 @@
 
 namespace LineWars.Model
 {
-    public class MonoUpActionPointsAction :
-        MonoUnitAction<UpActionPointsAction<Node, Edge, Unit>>,
-        ITargetedAction<Unit>,
-        IUpActionPointsAction<Node, Edge, Unit>
+    public class MonoHealSacrificeAction :
+        MonoUnitAction<HealSacrificeAction<Node, Edge, Unit>>,
+        IHealSacrificeAction<Node, Edge, Unit>
     {
         [SerializeField] private UnitAnimation unitAnimation;
 
         protected override bool NeedAutoComplete => false;
-        protected override UpActionPointsAction<Node, Edge, Unit> GetAction()
+        protected override HealSacrificeAction<Node, Edge, Unit> GetAction()
         {
-            return new UpActionPointsAction<Node, Edge, Unit>(Executor);
+            return new HealSacrificeAction<Node, Edge, Unit>(Executor);
         }
-
         public bool IsAvailable(Unit target)
         {
             return Action.IsAvailable(target);
@@ -28,20 +26,17 @@ namespace LineWars.Model
                 ExecuteAnimation(target);
         }
 
-        private void ExecuteInstant(Unit target) 
-        {
-            Action.Execute(target);
-            Complete();
-        }
-
         private void ExecuteAnimation(Unit target)
         {
             var context = new AnimationContext()
             {
-                TargetPosition = target.transform.position
+                TargetPosition = target.transform.position,
+                TargetUnit = target
             };
+
             unitAnimation.Ended.AddListener(OnAnimEnd);
             unitAnimation.Execute(context);
+
             void OnAnimEnd(UnitAnimation _)
             {
                 unitAnimation.Ended.RemoveListener(OnAnimEnd);
@@ -49,14 +44,19 @@ namespace LineWars.Model
             }
         }
 
+        private void ExecuteInstant(Unit target)
+        {
+            Action.Execute(target);
+            Complete();
+        }
+
         public IActionCommand GenerateCommand(Unit target)
         {
             return new TargetedUniversalCommand<
-                Unit, 
-                MonoUpActionPointsAction,
+                Unit,
+                MonoHealSacrificeAction,
                 Unit>(this, target);
         }
-
 
         public override void Accept(IMonoUnitActionVisitor visitor)
         {

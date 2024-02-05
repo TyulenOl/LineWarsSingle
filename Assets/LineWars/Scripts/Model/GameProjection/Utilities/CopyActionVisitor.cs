@@ -166,6 +166,18 @@ namespace LineWars.Model
             Result = new UpActionPointsAction<TNode, TEdge, TUnit>(Unit);
             Result.ActionModifier = action.ActionModifier;
         }
+
+        public void Visit(JumpAction<TNode, TEdge, TUnit> action)
+        {
+            Result = new JumpAction<TNode, TEdge, TUnit>(Unit, action.MinJumpDistance, action.MaxJumpDistance);
+            Result.ActionModifier = action.ActionModifier;
+        }
+
+        public void Visit(HealSacrificeAction<TNode, TEdge, TUnit> action)
+        {
+            Result = new HealSacrificeAction<TNode, TEdge, TUnit>(Unit);
+            Result.ActionModifier = action.ActionModifier;
+        }
     }
 
     public static class CopyActionVisitor
