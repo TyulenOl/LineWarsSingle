@@ -1,6 +1,4 @@
 using LineWars.Model;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace LineWars
@@ -13,6 +11,7 @@ namespace LineWars
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
         private int powerDebuff;
+        private int deductedPower;
         public IllnessEffect(
             TUnit targetUnit, 
             int rounds,
@@ -26,23 +25,50 @@ namespace LineWars
         public override void ExecuteOnEnter()
         {
             base.ExecuteOnEnter();
+            deductedPower = Mathf.Min(TargetUnit.CurrentPower, powerDebuff);
             TargetUnit.CurrentPower -= powerDebuff;
+            Spread();   
         }
 
         public override void ExecuteOnExit()
         {
             base.ExecuteOnExit();
-            TargetUnit.CurrentPower += powerDebuff;
+            TargetUnit.CurrentPower += deductedPower;
+        }
+
+        private void Spread()
+        {
+            foreach(var neighbor in TargetUnit.Node.GetNeighbors())
+            {
+                if(!neighbor.LeftIsFree && neighbor.LeftUnit.Size == UnitSize.Little)
+                {
+                    var leftEffect = new IllnessEffect<TNode, TEdge, TUnit>
+                        (neighbor.LeftUnit, initialRounds, powerDebuff);
+                    neighbor.LeftUnit.AddEffect(leftEffect);
+                }
+                if(!neighbor.RightIsFree)
+                {
+                    var rightEffect = new IllnessEffect<TNode, TEdge, TUnit>
+                        (neighbor.RightUnit, initialRounds, powerDebuff);
+                    neighbor.RightUnit.AddEffect(rightEffect);
+                }
+            }
         }
 
         public bool CanStack(IStackableEffect effect)
         {
-            throw new System.NotImplementedException();
+            return effect is IllnessEffect<TNode, TEdge, TUnit>;
         }
 
         public void Stack(IStackableEffect effect)
         {
-            throw new System.NotImplementedException();
+            var illnessEffect = (IllnessEffect<TNode, TEdge, TUnit>)effect;
+            if(illnessEffect.Rounds > Rounds || illnessEffect.powerDebuff > powerDebuff)
+            {
+                Rounds = Mathf.Max(Rounds, illnessEffect.Rounds);
+                powerDebuff = Mathf.Max(powerDebuff, illnessEffect.powerDebuff);
+                Spread();
+            }
         }
     }
 }

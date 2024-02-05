@@ -46,9 +46,7 @@ namespace LineWars.Model
 
         public bool CanStack(IStackableEffect effect)
         {
-            if (effect is not FireEffect<TNode, TEdge, TUnit>)
-                return false;
-            return true;
+            return effect is FireEffect<TNode, TEdge, TUnit>;
         }
     }
 }
