@@ -3,6 +3,7 @@ using LineWars.Model;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Nox7atra.UIFigmaGradients;
 
 namespace LineWars.Interface
 {
@@ -17,7 +18,7 @@ namespace LineWars.Interface
         
         [SerializeField] private Image cardImage;
         [SerializeField] private Image ifInactivePanel;
-        [SerializeField] private Image borderImage;
+        [SerializeField] private UIFigmaGradientLinearDrawer border;
         
         private CardUpgrader CardUpgrader => GameRoot.Instance.CardUpgrader;
 
@@ -29,8 +30,8 @@ namespace LineWars.Interface
             get => isActive;
             set
             {
-                if (borderImage != null)
-                    borderImage.sprite = value ? DeckCard.CardActiveBagLine : DeckCard.CardInactiveBagLine;   
+                // if (borderImage != null)
+                //     borderImage.sprite = value ? DeckCard.CardActiveBagLine : DeckCard.CardInactiveBagLine;   
                 if(ifInactivePanel != null)
                     ifInactivePanel.gameObject.SetActive(!value);
                 isActive = value;
@@ -85,8 +86,21 @@ namespace LineWars.Interface
             if(apText != null)
                 apText.text = deckCard.Unit.MaxActionPoints.ToString();
 
-            if (borderImage != null)
-                borderImage.sprite = DeckCard.CardActiveBagLine;
+            if (border != null)
+            {
+                switch (DeckCard.Rarity)
+                {
+                    case Rarity.Common:
+                        border.SetGradient(DrawHelper.TypeToGradient[GradientType.Common]);
+                        break;
+                    default: 
+                        border.SetGradient(DrawHelper.TypeToGradient[GradientType.Epic]);
+                        break;
+                }
+               
+            }
+            // if (borderImage != null)
+            //     borderImage.sprite = DeckCard.CardActiveBagLine;
                 
             if (upgradeDrawer != null)
             {

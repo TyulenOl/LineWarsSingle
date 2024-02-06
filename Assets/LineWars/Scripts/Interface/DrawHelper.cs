@@ -12,6 +12,7 @@ public static class DrawHelper
     public static IReadOnlyDictionary<LootType, Sprite> LootTypeToSprite => Instance.LootTypeToSprite;
     public static IReadOnlyDictionary<Rarity, Color> RarityToColor => Instance.RarityToColor;
     public static IReadOnlyDictionary<Rarity, GameObject> RarityToShopCardBg => Instance.RarityToShopCardBg;
+    public static IReadOnlyDictionary<GradientType, Gradient> TypeToGradient => Instance.TypeToGradient;
     public static Sprite GoldSprite => Instance.GoldSprite;
     
     public static FullBlessingReDrawInfo GetBlessingReDrawInfoByBlessingId(BlessingId blessingId)

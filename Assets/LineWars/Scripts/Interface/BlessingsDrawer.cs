@@ -35,6 +35,7 @@ namespace LineWars.Interface
         
         public void Initialize()
         {
+            isOpened = gameObject.activeSelf;
             blessingToUI = new Dictionary<BlessingId, BlessingFightDrawer>();
             var allBlessings = LocalBlessingsPull.ToArray();
             foreach (var (id, count) in allBlessings)

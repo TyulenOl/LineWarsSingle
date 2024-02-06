@@ -12,9 +12,6 @@ namespace LineWars.Model
         [SerializeField] private Optional<string> overrideCardName;
         [SerializeField] private Optional<string> overrideDescription;
         [SerializeField] private Optional<Sprite> overrideCardImage;
-
-        [SerializeField] private Sprite cardActiveBagLine;
-        [SerializeField] private Sprite cardInactiveBagLine;
         
         [SerializeField] private Rarity cardRarity;
         [SerializeField] private Unit unit;
@@ -79,8 +76,6 @@ namespace LineWars.Model
         public int Cost => currentLevelInfo.Cost;
         public int ShopCost => shopCost;
         public CostType ShopCostType => shopCostType;
-        public Sprite CardActiveBagLine => cardActiveBagLine;
-        public Sprite CardInactiveBagLine => cardInactiveBagLine;
         public int MaxLevel => levels.Count;
     }
 }

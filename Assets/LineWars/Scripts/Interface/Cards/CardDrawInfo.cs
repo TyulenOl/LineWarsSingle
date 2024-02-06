@@ -109,7 +109,7 @@ namespace LineWars
         public void ReDrawAvailability(bool available)
         {
             IsActive = available;
-            borderImage.sprite = available ? DeckCard.CardActiveBagLine : DeckCard.CardInactiveBagLine;   
+            //borderImage.sprite = available ? DeckCard.CardActiveBagLine : DeckCard.CardInactiveBagLine;   
             if(ifInactivePanel != null)
                 ifInactivePanel.gameObject.SetActive(!available);
             ReDrawUpgrade();
