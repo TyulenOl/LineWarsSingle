@@ -1,6 +1,7 @@
 namespace LineWars.Model
 {
-    public class ArmoredEffect<TNode, TEdge, TUnit> : Effect<TNode, TEdge, TUnit>
+    public class ArmoredEffect<TNode, TEdge, TUnit> : 
+        Effect<TNode, TEdge, TUnit>, IPowerEffect
         where TNode : class, INodeForGame<TNode, TEdge, TUnit>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
@@ -12,6 +13,7 @@ namespace LineWars.Model
         }
 
         public override EffectType EffectType => EffectType.Armored;
+        public int Power => armorPoints;
 
         public override void ExecuteOnEnter()
         {

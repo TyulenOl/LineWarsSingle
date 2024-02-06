@@ -55,6 +55,9 @@ namespace LineWars.Model
         [field: SerializeField] public UnityEvent<int, int> ArmorChanged { get; private set; }
         [field: SerializeField] public UnityEvent<Unit> Died { get; private set; }
         [field: SerializeField] public UnityEvent<int, int> ActionPointsChanged { get; private set; }
+        [field: SerializeField] public UnityEvent<Unit, Effect<Node, Edge, Unit>> EffectAdded { get; private set; }
+        [field: SerializeField] public UnityEvent<Unit, Effect<Node, Edge, Unit>> EffectRemoved { get; private set; }
+        [field: SerializeField] public UnityEvent<Unit, Effect<Node, Edge, Unit>> EffectStacked { get; private set; }
 
         public event Action AnyActionCompleted;
         public event Action ExecutorDestroyed;
@@ -332,6 +335,7 @@ namespace LineWars.Model
             {
                 effect.ExecuteOnEnter();
                 effects.Add(effect);
+                EffectAdded.Invoke(this, effect);
             }
         }
 
@@ -346,6 +350,7 @@ namespace LineWars.Model
                 if (!currentStackableEffect.CanStack(stackableEffect)) continue;
                 currentStackableEffect.Stack(stackableEffect);
                 stacked = true;
+                EffectStacked.Invoke(this, currentEffect);
             }
             return stacked;
         }
@@ -354,6 +359,7 @@ namespace LineWars.Model
         {
             effect.ExecuteOnExit();
             effects.Remove(effect);
+            EffectRemoved.Invoke(this, effect);
         }
 
         public T Accept<T>(IMonoExecutorVisitor<T> visitor)
