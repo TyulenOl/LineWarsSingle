@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using DataStructures;
 using LineWars.Model;
 using UnityEngine;
@@ -25,12 +26,12 @@ namespace LineWars.Controllers
         [SerializeField] private CardUpgrader cardUpgrader;
 
         [Header("ProviderSettings")]
+        [SerializeField] private YandexGameProvider yandexGameProvider;
         [SerializeField] private ProviderType providerType;
 
         private IProvider<Deck> deckProvider;
         private IProvider<MissionInfo> missionInfoProvider;
         private IProvider<UserInfo> userInfoProvider;
-        private IProvider<Settings> settingsProvider;
         private IGetter<DateTime> timeGetter;
 
         public IStorage<int, DeckCard> CardsDatabase => cardsDatabase;
@@ -102,12 +103,6 @@ namespace LineWars.Controllers
                 new JsonFileAllDownloader<UserInfo>()
             );
 
-            settingsProvider = new Provider<Settings>(
-                new JsonFileSaver<Settings>(),
-                new JsonFileLoader<Settings>(),
-                new JsonFileAllDownloader<Settings>()
-            );
-
             missionInfoProvider = new Provider<MissionInfo>(
                 new JsonFileSaver<MissionInfo>(),
                 new JsonFileLoader<MissionInfo>(),
@@ -138,6 +133,7 @@ namespace LineWars.Controllers
 
     public enum ProviderType
     {
-        FileJson
+        FileJson,
+        YandexGame
     }
 }
