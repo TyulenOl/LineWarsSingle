@@ -8,6 +8,7 @@ namespace LineWars.Model
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
         private int rounds;
+        protected readonly int initialRounds;
         protected int Rounds
         {
             get => rounds;
@@ -26,6 +27,7 @@ namespace LineWars.Model
         protected TemporaryEffect(TUnit targetUnit, int rounds) : base(targetUnit)
         {
             this.rounds = rounds;
+            initialRounds = rounds;
         }
 
         public override void ExecuteOnEnter()

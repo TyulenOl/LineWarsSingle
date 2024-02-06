@@ -98,6 +98,9 @@ namespace LineWars.Controllers
                         continue;
                     if (exceptions.Contains(cardStorage.IdToValue[card]))
                         continue;
+                    if (userInfoController.CardIsOpen(card))
+                        continue;
+
                     cardsForPurchase.Add(card);
                     break;
                 }

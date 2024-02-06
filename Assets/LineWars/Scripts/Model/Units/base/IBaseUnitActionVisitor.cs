@@ -30,5 +30,7 @@ namespace LineWars.Model
         public void Visit(ArsonAction<TNode, TEdge, TUnit> action);
         public void Visit(SpawningUnitAction<TNode, TEdge, TUnit> action);
         public void Visit(UpActionPointsAction<TNode, TEdge, TUnit> action);
+        public void Visit(JumpAction<TNode, TEdge, TUnit> action);
+        public void Visit(HealSacrificeAction<TNode,TEdge, TUnit> action);
     }
 }

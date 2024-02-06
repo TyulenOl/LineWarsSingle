@@ -30,5 +30,7 @@
         public TResult Visit(IArsonAction<TNode, TEdge, TUnit> action);
         public TResult Visit(ISpawningUnitAction<TNode, TEdge, TUnit> action);
         public TResult Visit(IUpActionPointsAction<TNode, TEdge, TUnit> action);
+        public TResult Visit(IJumpAction<TNode, TEdge, TUnit> action);
+        public TResult Visit(IHealSacrificeAction<TNode, TEdge, TUnit> action);
     }
 }
