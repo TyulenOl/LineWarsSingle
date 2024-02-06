@@ -23,6 +23,15 @@ namespace LineWars.Model
         Shaman,
         Stunman,
         Stavrislav,
-        Squire
+        Squire,
+        Vedun,
+        Travoslav,
+        Wolf,
+        Sheep,
+        Ognedar,
+        StrategyMaster,
+        Fan,
+        Jumper,
+        Peasant
     }
 }
