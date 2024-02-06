@@ -51,9 +51,4 @@ namespace LineWars.Model
             return effect is FireEffect<TNode, TEdge, TUnit>;
         }
     }
-
-    public interface IPowerEffect
-    {
-        public int Power { get; }
-    }
 }

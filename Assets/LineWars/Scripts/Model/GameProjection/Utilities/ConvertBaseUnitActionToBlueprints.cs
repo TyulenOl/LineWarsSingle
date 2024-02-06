@@ -370,6 +370,11 @@ namespace LineWars.Model
         {
             // TODO
         }
+
+        public void Visit(VenomousSpitAction<TNode, TEdge, TUnit> action)
+        {
+            // TODO
+        }
     }
 
     public static class ConvertUnitActionToBlueprints
