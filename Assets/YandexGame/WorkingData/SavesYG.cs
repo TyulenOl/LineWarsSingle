@@ -39,7 +39,7 @@ namespace YG
         public int PassingGameModes;
         
         public bool DefaultBlessingsIsAdded;
-        
+
         public BlessingCountYG[] Blessings;
         public BlessingIdYG[] SelectedBlessings;
     }
@@ -66,7 +66,7 @@ namespace YG
     }
 
     [Serializable]
-    public class BlessingIdYG
+    public struct BlessingIdYG
     {
         public int Rarity;
         public int Type;

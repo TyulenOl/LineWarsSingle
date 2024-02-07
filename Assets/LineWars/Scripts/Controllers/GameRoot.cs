@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using DataStructures;
 using LineWars.Model;
 using UnityEngine;
@@ -24,11 +23,16 @@ namespace LineWars.Controllers
         [SerializeField] private BlessingsController blessingsController;
         [SerializeField] private Store store;
         [SerializeField] private CardUpgrader cardUpgrader;
-
-        [Header("ProviderSettings")]
+        
+        [Header("Providers")]
         [SerializeField] private YandexGameProvider yandexGameProvider;
-        [SerializeField] private ProviderType providerType;
+        
+        [Header("RewardControllers")]
+        [SerializeField] private YandexGameRewardController yandexGameRewardController;
 
+        [Space]
+        [SerializeField] private Platform platform;
+        
         private IProvider<Deck> deckProvider;
         private IProvider<MissionInfo> missionInfoProvider;
         private IProvider<UserInfo> userInfoProvider;
@@ -42,21 +46,28 @@ namespace LineWars.Controllers
         public CompaniesController CompaniesController => companiesController;
         public UserInfoController UserController => userController;
         public LootBoxController LootBoxController => lootBoxController;
+        public RewardControllerBase RewardController { get; private set; }
 
         public BlessingsController BlessingsController => blessingsController;
         public Store Store => store;
         public CardUpgrader CardUpgrader => cardUpgrader;
 
         public DrawHelperInstance DrawHelper => drawHelper;
+        
+        public bool GameReady { get; private set; }
+        public event Action OnGameReady;
 
         protected override void OnAwake()
         {
             GameVariables.Initialize();
-
             ValidateFields();
+            timeGetter = gameObject.AddComponent<GetWorldTime>();
+            
+            InitializeProviders(StartGame);
+        }
 
-            InitializeProviders();
-
+        private void StartGame()
+        {
             CompaniesController.Initialize(missionInfoProvider, missionsStorage);
             UserController.Initialize(userInfoProvider, cardsDatabase);
             DecksController.Initialize(deckProvider, UserController);
@@ -64,24 +75,38 @@ namespace LineWars.Controllers
             BlessingsController.Initialize(UserController, UserController, BlessingStorage);
             CardUpgrader.Initialize(userController, cardsDatabase);
             InitializeLootBoxController();
+
+            RewardController = platform switch
+            {
+                Platform.Local => gameObject.AddComponent<RewardControllerBase>(),
+                Platform.YandexGame => yandexGameRewardController,
+                _ => throw new ArgumentOutOfRangeException()
+            };
+
+            GameReady = true;
+            OnGameReady?.Invoke();
         }
 
-        private void InitializeProviders()
+        private void InitializeProviders(Action initialize)
         {
-            timeGetter = gameObject.AddComponent<GetWorldTime>();
-            switch (providerType)
+            switch (platform)
             {
-                case ProviderType.FileJson:
-                    {
-                        InitializeJsonProviders();
-                        break;
-                    }
+                case Platform.Local:
+                {
+                    InitializeJsonProviders(initialize);
+                    break;
+                }
+                case Platform.YandexGame:
+                {
+                    InitializeYandexGameProvider(initialize);
+                    break;
+                }
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
 
-        private void InitializeJsonProviders()
+        private void InitializeJsonProviders(Action initialize)
         {
             deckProvider = new Provider<Deck>(
                 new SaverConvertDecorator<Deck, DeckInfo>(
@@ -108,6 +133,31 @@ namespace LineWars.Controllers
                 new JsonFileLoader<MissionInfo>(),
                 new JsonFileAllDownloader<MissionInfo>()
             );
+            
+            initialize.Invoke();
+        }
+
+        private void InitializeYandexGameProvider(Action initialize)
+        {
+            deckProvider = new Provider<Deck>(
+                new SaverConvertDecorator<Deck, DeckInfo>(
+                    yandexGameProvider,
+                    new DeckToInfoConverter(cardsDatabase.ValueToId)
+                ),
+                new DownloaderConvertDecorator<Deck, DeckInfo>(
+                    yandexGameProvider,
+                    new DeckInfoToDeckConverter(cardsDatabase.IdToValue)
+                ),
+                new AllDownloaderConvertDecorator<Deck, DeckInfo>(
+                    yandexGameProvider,
+                    new DeckInfoToDeckConverter(cardsDatabase.IdToValue))
+            );
+
+
+            userInfoProvider = yandexGameProvider;
+            missionInfoProvider = yandexGameProvider;
+
+            yandexGameProvider.FinishLoad += initialize;
         }
 
         private void InitializeLootBoxController()
@@ -131,9 +181,9 @@ namespace LineWars.Controllers
         }
     }
 
-    public enum ProviderType
+    public enum Platform
     {
-        FileJson,
+        Local,
         YandexGame
     }
 }
