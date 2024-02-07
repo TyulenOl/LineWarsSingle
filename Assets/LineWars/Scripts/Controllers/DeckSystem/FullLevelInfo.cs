@@ -9,6 +9,7 @@ namespace LineWars.Model
         public Sprite Image{ get; }
         public Unit Unit { get; }
         public int Cost {get;}
+        public UnitCost CostProgression { get; }
         public int CostToUpgrade { get; }
 
         public FullLevelInfo(
@@ -17,6 +18,7 @@ namespace LineWars.Model
             Sprite image, 
             Unit unit, 
             int cost,
+            UnitCost costProgression,
             int costToUpgrade)
         {
             Name = name;
@@ -24,6 +26,7 @@ namespace LineWars.Model
             Image = image;
             Unit = unit;
             Cost = cost;
+            CostProgression = costProgression;
             CostToUpgrade = costToUpgrade;
         }
 
@@ -39,6 +42,8 @@ namespace LineWars.Model
                 additionalLevelInfo.OverrideUnitPrefab.Value : Unit;
             var cost = additionalLevelInfo.OverrideCostInFight.Enabled ? 
                 additionalLevelInfo.OverrideCostInFight.Value : Cost;
+            var costProgression = additionalLevelInfo.OverrideCostProgression.Enabled ?
+                additionalLevelInfo.OverrideCostProgression.Value : CostProgression;
             
             return new FullLevelInfo(
                 name,
@@ -46,6 +51,7 @@ namespace LineWars.Model
                 image,
                 unit,
                 cost,
+                costProgression,
                 additionalLevelInfo.CostToUpgrade);
 
         }

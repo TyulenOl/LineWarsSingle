@@ -1,7 +1,6 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace LineWars.Model
 {
@@ -18,8 +17,9 @@ namespace LineWars.Model
         
         [SerializeField] private Rarity cardRarity;
         [SerializeField] private Unit unit;
+        [SerializeField] private int cost;
+        [SerializeField] private UnitCost costProgression;
         [SerializeField] private CostType shopCostType;
-        [SerializeField] private int cost; 
         [SerializeField] private int shopCost;
         [SerializeField] private List<AdditionalLevelInfo> levels;
 
@@ -38,6 +38,7 @@ namespace LineWars.Model
                     overrideCardImage.Enabled ? overrideCardImage.Value : unit.Sprite,
                     unit,
                     cost,
+                    costProgression,
                     0);
                 }
                 return _zeroLevelInfo;
@@ -70,6 +71,10 @@ namespace LineWars.Model
             return ZeroLevelInfo.WithAdditionalInfo(additionalLevelInfo);
         }
 
+        public PurchaseInfo CalculateCost(int unitCount)
+        {
+            return CostProgression.Calculate(Cost, unitCount);
+        }
 
         public string Name => currentLevelInfo.Name;
         public string Description => currentLevelInfo.Description;
@@ -77,6 +82,7 @@ namespace LineWars.Model
         public Unit Unit => currentLevelInfo.Unit;
         public Rarity Rarity => cardRarity;
         public int Cost => currentLevelInfo.Cost;
+        public UnitCost CostProgression => currentLevelInfo.CostProgression;
         public int ShopCost => shopCost;
         public CostType ShopCostType => shopCostType;
         public Sprite CardActiveBagLine => cardActiveBagLine;
