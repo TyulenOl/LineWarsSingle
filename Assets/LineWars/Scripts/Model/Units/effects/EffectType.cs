@@ -8,6 +8,7 @@
         FightingSpirit,
         Fire,
         Lonelinesss,
-        Illness
+        Illness,
+        Venom
     }
 }

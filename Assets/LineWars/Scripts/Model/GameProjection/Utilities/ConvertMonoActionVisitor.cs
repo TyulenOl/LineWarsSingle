@@ -191,5 +191,12 @@ namespace LineWars.Model
                 (Unit);
             Result.ActionModifier = action.Action.ActionModifier;
         }
+
+        public void Visit(MonoVenomousSpitAction action)
+        {
+            Result = new VenomousSpitAction<NodeProjection, EdgeProjection, UnitProjection>
+                (Unit, action.Rounds);
+            Result.ActionModifier = action.Action.ActionModifier;
+        }
     }    
 }

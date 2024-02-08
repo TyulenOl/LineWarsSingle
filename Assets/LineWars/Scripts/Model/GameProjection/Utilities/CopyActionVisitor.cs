@@ -178,6 +178,12 @@ namespace LineWars.Model
             Result = new HealSacrificeAction<TNode, TEdge, TUnit>(Unit);
             Result.ActionModifier = action.ActionModifier;
         }
+
+        public void Visit(VenomousSpitAction<TNode, TEdge, TUnit> action)
+        {
+            Result = new VenomousSpitAction<TNode, TEdge, TUnit>(Unit, action.VenomRounds);
+            Result.ActionModifier = action.ActionModifier; 
+        }
     }
 
     public static class CopyActionVisitor

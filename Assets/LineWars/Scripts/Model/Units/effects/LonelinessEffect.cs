@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 namespace LineWars.Model
 {
-    public class LonelinessEffect<TNode, TEdge, TUnit> : Effect<TNode, TEdge, TUnit>
+    public class LonelinessEffect<TNode, TEdge, TUnit> : 
+        Effect<TNode, TEdge, TUnit>, IPowerEffect
         where TNode : class, INodeForGame<TNode, TEdge, TUnit>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
@@ -13,6 +14,8 @@ namespace LineWars.Model
         private bool isBuffed;
 
         public int PowerBonus => powerBonus;
+        public int Power => powerBonus;
+
         public LonelinessEffect(TUnit targetUnit, int powerBonus) : base(targetUnit)
         {
             this.powerBonus = powerBonus;

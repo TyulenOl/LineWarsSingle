@@ -32,5 +32,6 @@
         public TResult Visit(IUpActionPointsAction<TNode, TEdge, TUnit> action);
         public TResult Visit(IJumpAction<TNode, TEdge, TUnit> action);
         public TResult Visit(IHealSacrificeAction<TNode, TEdge, TUnit> action);
+        public TResult Visit(IVenomousSpitAction<TNode, TEdge, TUnit> action);
     }
 }
