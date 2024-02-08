@@ -17,8 +17,8 @@ namespace LineWars.Model
             this.powerBonus = powerBonus;
         }
 
-        private HashSet<TUnit> collectedUnits;
-        private HashSet<TNode> subscribedNodes;
+        private HashSet<TUnit> collectedUnits = new ();
+        private HashSet<TNode> subscribedNodes = new ();
         public int Power => powerBonus;
 
         public override void ExecuteOnEnter()

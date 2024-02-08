@@ -47,11 +47,11 @@ namespace LineWars.Model
                 return true;
             if(phase == PhaseType.Buy)
                 return true;
-            var executors = PhaseExecutorsData.PhaseToUnits[phase];
+            //var executors = PhaseExecutorsData.PhaseToUnits[phase];
             foreach (var owned in OwnedObjects)
             {
                 if (!(owned is Unit unit)) continue;
-                if (executors.Contains(unit.Type) && unit.CurrentActionPoints > 0)
+                if (/*executors.Contains(unit.Type) &&*/ unit.CurrentActionPoints > 0)
                     return true;
             }
 

@@ -67,5 +67,11 @@ namespace LineWars.Interface
         {
             staticDrawer.gameObject.SetActive(false);
         }
+
+        public void RedrawLevelInfo()
+        {
+            staticDrawer.RedrawUpdateInfo();
+            draggableCard.RedrawLevelInfo();
+        }
     }
 }

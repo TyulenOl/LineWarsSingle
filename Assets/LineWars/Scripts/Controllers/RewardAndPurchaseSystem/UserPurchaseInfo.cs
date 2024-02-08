@@ -2,31 +2,31 @@
 
 namespace LineWars.Model
 {
-    public class UserPurchase
+    public class UserPurchaseInfo
     {
         private string id;
-        private string name;
+        private string title;
         private string description;
-        private Sprite image;
-        private int cost;
+        private Sprite sprite;
+        private int priceValue;
         private string currencyName;
         private Prize prize;
 
         public string Id => id;
-        public string Name => name;
+        public string Title => title;
         public string Description => description;
-        public Sprite Image => image;
-        public int Cost => cost;
+        public Sprite Sprite => sprite;
+        public int PriceValue => priceValue;
         public string CurrencyName => currencyName;
         public Prize Prize => prize;
 
-        public UserPurchase(string id, string name, string description, Sprite image, int cost, string currencyName, Prize prize)
+        public UserPurchaseInfo(string id, string title, string description, Sprite sprite, int priceValue, string currencyName, Prize prize)
         {
             this.id = id;
-            this.name = name;
+            this.title = title;
             this.description = description;
-            this.image = image;
-            this.cost = cost;
+            this.sprite = sprite;
+            this.priceValue = priceValue;
             this.currencyName = currencyName;
             this.prize = prize;
         }

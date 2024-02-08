@@ -21,15 +21,19 @@ namespace LineWars.Controllers
         public event Action<string> PurchaseFailedEvent;
         
         private UserInfoController UserInfoController => GameRoot.Instance.UserController;
-        public abstract bool SdkEnabled { get; }
-       
+        public abstract bool SDKEnabled { get; }
         public void RewardForAd(Prize prize) => RewardForAd(prize.Type, prize.Amount); 
         protected abstract void RewardForAd(PrizeType prizeType, int amount);
-        public abstract IReadOnlyList<UserPurchase> GetAllPurchases();
         public abstract bool CanBuyPurchase(string id);
         public abstract void BuyPurchase(string id);
+        public abstract UserPurchaseInfo PurchaseByID(string id);
         
+        public abstract int GetPurchaseCount();
+        public abstract int GetPurchaseCount(PrizeType prizeType);
+        public abstract UserPurchaseInfo[] GetPurchases();
+        public abstract UserPurchaseInfo[] GetPurchases(PrizeType prizeType);
 
+        
         protected void Reward(Prize prize)
         {
             Reward(prize.Type, prize.Amount);

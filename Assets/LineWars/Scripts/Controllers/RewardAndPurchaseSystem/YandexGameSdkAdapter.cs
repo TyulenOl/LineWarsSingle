@@ -9,18 +9,36 @@ using YG.Utils.Pay;
 
 namespace LineWars.Controllers
 {
-    [RequireComponent(typeof(ConsumePurchasesYG))]
     public class YandexGameSdkAdapter: SDKAdapterBase
     {
-        [SerializeField] private SerializedDictionary<string, Prize> purchaseIdToPrize;
-        [SerializeField] private SerializedDictionary<string, Sprite> purchaseIdToSprite;
+        private static bool consume;
         
+        [SerializeField] private SerializedDictionary<string, Prize> purchaseIdToPrize;
+        [Tooltip("Соотношение сторон 1:1")]
+        [SerializeField] private SerializedDictionary<string, Sprite> purchaseIdToSprite;
         
         [SerializeField, Min(1)] private int priseTypeLenInBits = 10;
         [SerializeField] private Prize prizeIfAdError;
         
+        
+        private void Start()
+        {
+            if (YandexGame.SDKEnabled)
+                ConsumePurchases();
+        }
+
+        private void ConsumePurchases()
+        {
+            if (!consume)
+            {
+                consume = true;
+                YandexGame.ConsumePurchases();
+            }
+        }
+        
         private void OnEnable()
         {
+            YandexGame.GetDataEvent += ConsumePurchases;
             YandexGame.RewardVideoEvent += OnRewardVideoEvent;
             YandexGame.ErrorVideoEvent += OnErrorVideoEvent;
             YandexGame.GetPaymentsEvent += GetPaymentsEvent;
@@ -30,6 +48,7 @@ namespace LineWars.Controllers
 
         private void OnDisable()
         {
+            YandexGame.GetDataEvent -= ConsumePurchases;
             YandexGame.RewardVideoEvent -= OnRewardVideoEvent;
             YandexGame.ErrorVideoEvent -= OnErrorVideoEvent;
             YandexGame.GetPaymentsEvent -= GetPaymentsEvent;
@@ -37,11 +56,11 @@ namespace LineWars.Controllers
             YandexGame.PurchaseFailedEvent -= OnPurchaseFailedEvent;
         }
 
-        public override bool SdkEnabled => YandexGame.SDKEnabled;
+        public override bool SDKEnabled => YandexGame.SDKEnabled;
 
         protected override void RewardForAd(PrizeType prizeType, int amount)
         {
-            if (!SdkEnabled)
+            if (!SDKEnabled)
             {
                 Debug.LogError("Yandex SDK not enabled!");
                 return;
@@ -59,20 +78,42 @@ namespace LineWars.Controllers
             }
         }
 
-        public override IReadOnlyList<UserPurchase> GetAllPurchases()
+        public override UserPurchaseInfo PurchaseByID(string id)
+        {
+            return ConvertPurchase(YandexGame.PurchaseByID(id));
+        }
+
+        public override UserPurchaseInfo[] GetPurchases() 
         {
             return YandexGame.purchases
-                .Select(yg => new UserPurchase
-                (
-                    yg.id,
-                    yg.title,
-                    yg.description,
-                    purchaseIdToSprite.TryGetValue(yg.id, out var sprite) ? sprite : null,
-                    int.TryParse(yg.priceValue, out var value)? value: -1,
-                    "Ян",
-                    purchaseIdToPrize.TryGetValue(yg.id, out var prize) ? prize : null
-                    
-                )).ToArray();
+                .Select(ConvertPurchase)
+                .ToArray();
+        }
+
+        public override UserPurchaseInfo[] GetPurchases(PrizeType prizeType)
+        {
+            return GetPurchases()
+                .Where(x => x.Prize != null && x.Prize.Type == prizeType)
+                .ToArray();
+        }
+
+        public override int GetPurchaseCount() => YandexGame.purchases.Length;
+
+        public override int GetPurchaseCount(PrizeType prizeType)
+        {
+            return GetPurchases(prizeType).Length;
+        }
+        
+        private UserPurchaseInfo ConvertPurchase(Purchase yg)
+        {
+            return new UserPurchaseInfo(
+                yg.id,
+                yg.title,
+                yg.description,
+                purchaseIdToSprite.TryGetValue(yg.id, out var sprite) ? sprite : null, 
+                int.TryParse(yg.priceValue, out var value) ? value : -1, 
+                "Ян",
+                purchaseIdToPrize.TryGetValue(yg.id, out var prize) ? prize : null);
         }
 
         public override bool CanBuyPurchase(string id)

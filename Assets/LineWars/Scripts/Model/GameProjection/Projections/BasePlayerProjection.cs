@@ -14,7 +14,7 @@ namespace LineWars.Model
         public BasePlayer Original { get; set; }
         public GameProjection Game { get; set; }
         public PlayerRules Rules { get; set; }
-        public PhaseExecutorsData PhaseExecutorsData { get; set; }
+        // PhaseExecutorsData PhaseExecutorsData { get; set; }
         public int Income { get; set; }
         public int CurrentMoney { get; set; }
 
@@ -75,7 +75,7 @@ namespace LineWars.Model
     {
         public BasePlayer Original { get; }
         public PlayerRules Rules { get; }
-        public PhaseExecutorsData PhaseExecutorsData { get; }  
+        // PhaseExecutorsData PhaseExecutorsData { get; }  
         public IReadOnlyCollection<OwnedProjection> OwnedObjects { get; }
         public int Income { get; }
         public int CurrentMoney { get; }

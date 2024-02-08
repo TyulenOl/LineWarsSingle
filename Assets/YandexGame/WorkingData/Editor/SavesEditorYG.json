@@ -1,11 +1,11 @@
 {
-    "idSave": 76,
+    "idSave": 520,
     "isFirstSession": false,
     "language": "ru",
     "promptDone": false,
     "UserInfoYg": {
-        "Diamonds": 999119,
-        "Gold": 1000973,
+        "Diamonds": 996056,
+        "Gold": 1004817,
         "UnlockedCards": [
             1,
             0,
@@ -15,9 +15,20 @@
             8,
             4,
             10,
-            7
+            7,
+            2,
+            12,
+            16,
+            13,
+            15,
+            17,
+            9,
+            11,
+            14,
+            20,
+            19
         ],
-        "UpgradeCards": 7,
+        "UpgradeCards": 6,
         "LootBoxes": [
             {
                 "Id": 0,
@@ -35,51 +46,87 @@
         "CardLevels": [
             {
                 "Id": 1,
-                "Level": 0
+                "Level": 2
             },
             {
                 "Id": 0,
-                "Level": 0
+                "Level": 2
             },
             {
                 "Id": 5,
-                "Level": 0
+                "Level": 2
             },
             {
                 "Id": 2,
-                "Level": 0
+                "Level": 2
             },
             {
                 "Id": 3,
-                "Level": 0
+                "Level": 2
             },
             {
                 "Id": 4,
-                "Level": 0
+                "Level": 2
             },
             {
                 "Id": 6,
-                "Level": 0
+                "Level": 2
             },
             {
                 "Id": 7,
-                "Level": 0
+                "Level": 2
             },
             {
                 "Id": 8,
-                "Level": 0
+                "Level": 2
             },
             {
                 "Id": 9,
-                "Level": 0
+                "Level": 2
             },
             {
                 "Id": 10,
-                "Level": 0
+                "Level": 1
             },
             {
                 "Id": 11,
+                "Level": 2
+            },
+            {
+                "Id": 12,
+                "Level": 1
+            },
+            {
+                "Id": 13,
+                "Level": 2
+            },
+            {
+                "Id": 14,
+                "Level": 2
+            },
+            {
+                "Id": 15,
+                "Level": 2
+            },
+            {
+                "Id": 16,
+                "Level": 2
+            },
+            {
+                "Id": 17,
+                "Level": 2
+            },
+            {
+                "Id": 18,
                 "Level": 0
+            },
+            {
+                "Id": 19,
+                "Level": 2
+            },
+            {
+                "Id": 20,
+                "Level": 2
             }
         ],
         "PassingGameModes": 0,
@@ -140,9 +187,12 @@
         {
             "Id": 0,
             "CardsId": [
-                0,
-                1,
-                5
+                12,
+                10,
+                14,
+                7,
+                17,
+                13
             ]
         }
     ],

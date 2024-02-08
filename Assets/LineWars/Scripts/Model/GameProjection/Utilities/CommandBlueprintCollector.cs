@@ -76,7 +76,7 @@ namespace LineWars.Model
             foreach (var unit in units)
             {
                 if (unit.Owner != gameProjection.CurrentPlayer) continue;
-                if (!gameProjection.CurrentPlayer.PhaseExecutorsData[type].Contains(unit.Type)) continue;
+                //if (!gameProjection.CurrentPlayer.PhaseExecutorsData[type].Contains(unit.Type)) continue;
                 ProcessUnit(commands, unit, gameProjection, availableCommands);
             }
         }

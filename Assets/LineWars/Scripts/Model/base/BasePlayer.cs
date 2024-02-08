@@ -17,7 +17,7 @@ namespace LineWars.Model
         [field: SerializeField] public int Id { get; private set; } = -1;
 
         [field: Header("Settings")]
-        [field: SerializeField] public PhaseExecutorsData PhaseExecutorsData { get; private set; }
+        //[field: SerializeField] public PhaseExecutorsData PhaseExecutorsData { get; private set; }
 
         [field: SerializeField] public PlayerRules Rules { get; private set; }
         [field: SerializeField] public Nation Nation { get; private set; }
