@@ -47,7 +47,7 @@ namespace LineWars.Model
             };
 
             jumpAnimation.Ended.AddListener(OnAnimEnd);
-
+            jumpAnimation.Execute(context);
             void OnAnimEnd(UnitAnimation _)
             {
                 jumpAnimation.Ended.RemoveListener(OnAnimEnd);

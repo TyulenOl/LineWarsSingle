@@ -20,7 +20,7 @@ namespace LineWars.Model
         {
             this.powerBonus = powerBonus;
         }
-
+      
         public override void ExecuteOnEnter()
         {
             TargetUnit.UnitNodeChanged += OnNodeChanged;
@@ -35,12 +35,14 @@ namespace LineWars.Model
         private void SetExecutorNode(TNode node)
         {
             if(executorNode != null)
+            {
                 executorNode.UnitAdded -= OnAnotherUnitEntered;
                 executorNode.UnitLeft -= OnAnotherUnitLeft;
+            }
             executorNode = node;
             executorNode.UnitAdded += OnAnotherUnitEntered;
             executorNode.UnitLeft += OnAnotherUnitLeft;
-            if (!TargetUnit.Node.AnyIsFree)
+            if (TargetUnit.TryGetNeighbour(out var unit))
                 Buff();
             else
                 Debuff();

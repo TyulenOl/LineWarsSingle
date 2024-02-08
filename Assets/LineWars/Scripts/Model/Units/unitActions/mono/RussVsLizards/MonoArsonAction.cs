@@ -24,7 +24,14 @@ namespace LineWars.Model
 
         public void Execute(Node target)
         {
-            throw new NotImplementedException();
+            if(unitAnimation == null)
+            {
+                ExecuteInstant(target);
+            }
+            else
+            {
+                ExecuteWithAnimation(target);
+            }
         }
         
         private void ExecuteWithAnimation(Node target)
