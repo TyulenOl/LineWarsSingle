@@ -57,7 +57,6 @@ namespace LineWars
 
             void AssignNewNode()
             {
-                unit.Node = targetNode;
                 if (unit.Size == UnitSize.Large)
                 {
                     targetNode.LeftUnit = unit;
@@ -77,6 +76,7 @@ namespace LineWars
 
                 if (unit.OwnerId != targetNode.OwnerId)
                     targetNode.ConnectTo(unit.OwnerId);
+                unit.Node = targetNode;
             }
         }
     }

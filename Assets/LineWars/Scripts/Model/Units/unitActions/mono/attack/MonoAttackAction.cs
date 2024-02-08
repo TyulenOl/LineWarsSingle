@@ -36,7 +36,8 @@ namespace LineWars.Model
             }
             Action.Attack(enemy);
             Executor.PlaySfx(attackSfx);
-            yield return new WaitForSeconds(attackSfx.LengthInSeconds / 2);
+            if(attackSfx != null && attackSfx.Clip != null)
+                yield return new WaitForSeconds(attackSfx.LengthInSeconds / 2);
             Executor.PlaySfx(DJ.GetSound(sfxList));
         }
     }

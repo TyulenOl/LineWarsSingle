@@ -29,7 +29,7 @@
                 if (!node.LeftIsFree &&
                     node.LeftUnit.OwnerId == Executor.OwnerId &&
                     node.LeftUnit.Size == UnitSize.Little)
-                    node.RightUnit.CurrentHp += Executor.CurrentPower;
+                    node.LeftUnit.CurrentHp += Executor.CurrentPower;
 
                 if(!node.RightIsFree && 
                     node.RightUnit.OwnerId == Executor.OwnerId)

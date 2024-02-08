@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace LineWars.Model
@@ -17,14 +18,14 @@ namespace LineWars.Model
             this.powerBonus = powerBonus;
         }
 
-        private HashSet<TUnit> collectedUnits = new ();
-        private HashSet<TNode> subscribedNodes = new ();
+        private HashSet<TUnit> collectedUnits = new();
+        private HashSet<TNode> subscribedNodes = new();
         public int Power => powerBonus;
 
         public override void ExecuteOnEnter()
         {
             TargetUnit.UnitNodeChanged += OnUnitNodeChanged;
-            CollectAllUnits();
+            CollectAllUnits();  
             SubscribeNodes();
         }
 
@@ -87,17 +88,13 @@ namespace LineWars.Model
 
         private void CollectAllUnits()
         {
-            var neighbors = TargetUnit.Node.GetNeighbors();
-            foreach (var neighbor in neighbors)
+            var neighbors = TargetUnit.Node
+                .GetNeighbors()
+                .SelectMany(node => node.Units)
+                .Where(unit => unit != TargetUnit);
+            foreach(var unit in neighbors)
             {
-                if (neighbor.LeftUnit != null)
-                {
-                    CollectUnit(neighbor.LeftUnit);
-                }
-                if (neighbor.RightUnit != null && neighbor.LeftUnit != neighbor.RightUnit)
-                {
-                    CollectUnit(neighbor.RightUnit);
-                }
+                CollectUnit(unit);
             }
         }
 

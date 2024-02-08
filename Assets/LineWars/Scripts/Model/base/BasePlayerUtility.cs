@@ -26,20 +26,20 @@ namespace LineWars.Model
 
             if (unit.Size == UnitSize.Large)
             {
-                unit.Initialize(node, UnitDirection.Any);
                 node.RightUnit = unit;
                 node.LeftUnit = unit;
+                unit.Initialize(node, UnitDirection.Any);
             }
             else
                 switch (unitDirection)
                 {
                     case UnitDirection.Left or UnitDirection.Any when node.LeftIsFree:
-                        unit.Initialize(node, UnitDirection.Left);
                         node.LeftUnit = unit;
+                        unit.Initialize(node, UnitDirection.Left);
                         break;
                     case UnitDirection.Right or UnitDirection.Any when node.RightIsFree:
-                        unit.Initialize(node, UnitDirection.Right);
                         node.RightUnit = unit;
+                        unit.Initialize(node, UnitDirection.Right);
                         break;
                     default:
                         Debug.LogError($"Юнит {nameof(unit)} не может быть создан на {nameof(node)}");
