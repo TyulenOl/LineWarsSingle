@@ -5,6 +5,7 @@ using System.Linq;
 using LineWars.Model;
 using UnityEngine;
 using YG;
+using Purchase = YG.Utils.Pay.Purchase;
 
 namespace LineWars
 {

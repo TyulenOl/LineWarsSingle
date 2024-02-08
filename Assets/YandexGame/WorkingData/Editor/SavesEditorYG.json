@@ -1,23 +1,23 @@
 {
-    "idSave": 198,
+    "idSave": 73,
     "isFirstSession": false,
     "language": "ru",
     "promptDone": false,
     "UserInfoYg": {
-        "Diamonds": 998829,
-        "Gold": 1005281,
+        "Diamonds": 999119,
+        "Gold": 1000973,
         "UnlockedCards": [
             1,
             0,
             5,
-            2,
-            8,
-            11,
             3,
+            6,
+            8,
+            4,
             10,
-            4
+            7
         ],
-        "UpgradeCards": 20,
+        "UpgradeCards": 7,
         "LootBoxes": [
             {
                 "Id": 0,
@@ -127,12 +127,12 @@
                 "Type": 0
             },
             {
-                "Rarity": 1,
-                "Type": 7
+                "Rarity": 0,
+                "Type": -1
             },
             {
-                "Rarity": 1,
-                "Type": 9
+                "Rarity": 0,
+                "Type": -1
             }
         ]
     },
@@ -142,10 +142,7 @@
             "CardsId": [
                 0,
                 1,
-                5,
-                8,
-                10,
-                4
+                5
             ]
         }
     ],

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace LineWars.Controllers
+namespace LineWars.Model
 {
     [System.Serializable]
     public class Prize

@@ -27,8 +27,8 @@ namespace LineWars.Controllers
         [Header("Providers")]
         [SerializeField] private YandexGameProvider yandexGameProvider;
         
-        [Header("RewardControllers")]
-        [SerializeField] private YandexGameRewardController yandexGameRewardController;
+        [Header("Api")]
+        [SerializeField] private YandexGameSdkAdapter yandexGameSdkAdapter;
 
         [Space]
         [SerializeField] private Platform platform;
@@ -46,7 +46,7 @@ namespace LineWars.Controllers
         public CompaniesController CompaniesController => companiesController;
         public UserInfoController UserController => userController;
         public LootBoxController LootBoxController => lootBoxController;
-        public RewardControllerBase RewardController { get; private set; }
+        public SDKAdapterBase SdkAdapter { get; private set; }
 
         public BlessingsController BlessingsController => blessingsController;
         public Store Store => store;
@@ -76,10 +76,10 @@ namespace LineWars.Controllers
             CardUpgrader.Initialize(userController, cardsDatabase);
             InitializeLootBoxController();
 
-            RewardController = platform switch
+            SdkAdapter = platform switch
             {
-                Platform.Local => gameObject.AddComponent<RewardControllerBase>(),
-                Platform.YandexGame => yandexGameRewardController,
+                Platform.Local => throw new NotImplementedException(),
+                Platform.YandexGame => yandexGameSdkAdapter,
                 _ => throw new ArgumentOutOfRangeException()
             };
 

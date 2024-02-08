@@ -1,4 +1,5 @@
 ﻿using System;
+using LineWars.Model;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,7 +9,7 @@ namespace LineWars.Controllers
     public class OpenAdButton: MonoBehaviour
     {
         [SerializeField] private Prize prizeForAd;
-        private static RewardControllerBase RewardController => GameRoot.Instance.RewardController;
+        private static SDKAdapterBase SdkAdapter => GameRoot.Instance.SdkAdapter;
         private Button button;
 
         private void Awake()
@@ -28,8 +29,8 @@ namespace LineWars.Controllers
 
         private void OnClick()
         {
-            if (RewardController != null)
-                RewardController.RewardForAd(prizeForAd);
+            if (SdkAdapter != null)
+                SdkAdapter.RewardForAd(prizeForAd);
         }
     }
 }

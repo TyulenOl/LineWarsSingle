@@ -1,4 +1,4 @@
-namespace LineWars.Controllers
+namespace LineWars.Model
 {
     public enum PrizeType
     {
