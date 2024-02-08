@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace LineWars.Model
 {
@@ -24,7 +21,7 @@ namespace LineWars.Model
             Unit unitPrefab,
             UnitDirection unitDirection = UnitDirection.Any)
         {
-            var unit = UnityEngine.Object.Instantiate(unitPrefab, player.transform);
+            var unit = Object.Instantiate(unitPrefab, player.transform);
             unit.transform.position = node.transform.position;
 
             if (unit.Size == UnitSize.Large)

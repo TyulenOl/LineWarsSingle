@@ -1,5 +1,5 @@
 {
-    "idSave": 520,
+    "idSave": 550,
     "isFirstSession": false,
     "language": "ru",
     "promptDone": false,
@@ -189,9 +189,9 @@
             "CardsId": [
                 12,
                 10,
-                14,
                 7,
                 17,
+                14,
                 13
             ]
         }

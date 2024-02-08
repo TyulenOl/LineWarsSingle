@@ -26,7 +26,6 @@ namespace LineWars.Model
         public UnitDirection UnitDirection { get; set; }
         public TNode Node { get; set; }
         public IReadOnlyList<Effect<TNode, TEdge, TUnit>> Effects { get; }
-        public new IEnumerable<IUnitAction<TNode, TEdge, TUnit>> Actions { get; }
 
         public event Action<TUnit, TNode, TNode> UnitNodeChanged;
         public event Action<TUnit, int, int> UnitHPChanged;

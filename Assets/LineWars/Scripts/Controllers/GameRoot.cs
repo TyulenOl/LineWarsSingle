@@ -33,6 +33,9 @@ namespace LineWars.Controllers
         [Space]
         [SerializeField] private Platform platform;
         
+        [Header("Debug")]
+        [SerializeField] private bool logged = true;
+        
         private IProvider<Deck> deckProvider;
         private IProvider<MissionInfo> missionInfoProvider;
         private IProvider<UserInfo> userInfoProvider;
@@ -59,6 +62,7 @@ namespace LineWars.Controllers
 
         protected override void OnAwake()
         {
+            DebugUtility.Logged = logged;
             GameVariables.Initialize();
             ValidateFields();
             timeGetter = gameObject.AddComponent<GetWorldTime>();
