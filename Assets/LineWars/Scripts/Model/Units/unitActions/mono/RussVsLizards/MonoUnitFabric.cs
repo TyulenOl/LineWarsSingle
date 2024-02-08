@@ -5,12 +5,13 @@ namespace LineWars.Model
     public class MonoUnitFabric :
         IUnitFabric<Node, Edge, Unit>
     {
-        private BasePlayer player;
+        private Lazy<BasePlayer> _player;
+        private BasePlayer player => _player.Value;
         private Unit spawnUnit;
 
-        public MonoUnitFabric(BasePlayer player, Unit spawnUnit)
+        public MonoUnitFabric(Lazy<BasePlayer> player, Unit spawnUnit)
         {
-            this.player = player;
+            _player = player;
             this.spawnUnit = spawnUnit;
         }
 

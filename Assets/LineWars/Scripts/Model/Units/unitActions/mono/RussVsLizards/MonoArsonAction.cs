@@ -39,9 +39,10 @@ namespace LineWars.Model
             unitAnimation.Ended.AddListener(OnAnimEnd);
             var context = new AnimationContext()
             {
-                TargetNode = target
+                TargetNode = target,
+                TargetPosition = target.Position
             };
-
+            unitAnimation.Execute(context);
             void OnAnimEnd(UnitAnimation _)
             {
                 unitAnimation.Ended.RemoveListener(OnAnimEnd);

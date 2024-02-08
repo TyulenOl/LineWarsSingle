@@ -265,8 +265,10 @@ namespace LineWars.Model
         protected virtual void ExecuteReplenish()
         {
             CurrentMoney += Income;
-            foreach (var owned in OwnedObjects)
+            var objects = new List<Owned>(OwnedObjects);
+            foreach (var owned in objects)
                 owned.Replenish();
+
         }
 
         protected void InvokeTurnStarted(PhaseType phaseType)

@@ -14,7 +14,7 @@ namespace LineWars.Model
 
         protected override SpawningUnitAction<Node, Edge, Unit> GetAction()
         {
-            var player = Executor.Owner;
+            var player = new System.Lazy<BasePlayer>(() => Executor.Owner);
             var unitFabric = new MonoUnitFabric(player, spawnUnit);
             return new SpawningUnitAction<Node, Edge, Unit>
                 (Executor, unitFabric, commandType);
