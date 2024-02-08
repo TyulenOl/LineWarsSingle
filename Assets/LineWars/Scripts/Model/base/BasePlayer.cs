@@ -286,7 +286,7 @@ namespace LineWars.Model
 
         public PurchaseInfo GetDeckCardPurchaseInfo(DeckCard deckCard)
         {
-            return GetPurchaseInfoForUnit(deckCard.Unit.Type, deckCard.Cost);
+            return deckCard.CalculateCost(GetCountUnitByType(deckCard.Unit.Type));
         }
 
         public PurchaseInfo GetPurchaseInfoForUnit(UnitType unitType, int cost)

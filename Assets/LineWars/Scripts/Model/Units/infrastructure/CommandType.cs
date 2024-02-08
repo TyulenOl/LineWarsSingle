@@ -28,7 +28,8 @@
         SpawnSheep,
         UpActionPoints,
         Jump,
-        HealSacrifice
+        HealSacrifice,
+        VenomousSpit
     }
 }   
 
