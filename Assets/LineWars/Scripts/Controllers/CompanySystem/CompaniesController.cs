@@ -14,7 +14,7 @@ namespace LineWars.Controllers
         [SerializeField] private bool debugMode;
         
         private IProvider<MissionInfo> companiesProvider;
-        private IStorage<MissionData> missionStorage;
+        private IStorage<int, MissionData> missionStorage;
         
         private Dictionary<int, MissionInfo> missionInfos;
         
@@ -23,7 +23,7 @@ namespace LineWars.Controllers
 
         public bool IsInfinityGameUnlocked => debugMode || missionInfos[0].MissionStatus == MissionStatus.Completed;
 
-        public void Initialize(IProvider<MissionInfo> provider, IStorage<MissionData> storage)
+        public void Initialize(IProvider<MissionInfo> provider, IStorage<int, MissionData> storage)
         {
             companiesProvider = provider;
             missionStorage = storage;

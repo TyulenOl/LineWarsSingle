@@ -148,6 +148,42 @@ namespace LineWars.Model
             Result = new FogEraseAction<TNode, TEdge, TUnit>(Unit);
             Result.ActionModifier = action.ActionModifier;
         }
+
+        public void Visit(ArsonAction<TNode, TEdge, TUnit> action)
+        {
+            Result = new ArsonAction<TNode, TEdge, TUnit>(Unit, action.FireEffectRounds);
+            Result.ActionModifier = action.ActionModifier;
+        }
+
+        public void Visit(SpawningUnitAction<TNode, TEdge, TUnit> action)
+        {
+            Result = new SpawningUnitAction<TNode, TEdge, TUnit>(Unit, action.UnitFabric, action.CommandType);
+            Result.ActionModifier = action.ActionModifier;
+        }
+
+        public void Visit(UpActionPointsAction<TNode, TEdge, TUnit> action)
+        {
+            Result = new UpActionPointsAction<TNode, TEdge, TUnit>(Unit);
+            Result.ActionModifier = action.ActionModifier;
+        }
+
+        public void Visit(JumpAction<TNode, TEdge, TUnit> action)
+        {
+            Result = new JumpAction<TNode, TEdge, TUnit>(Unit, action.MinJumpDistance, action.MaxJumpDistance);
+            Result.ActionModifier = action.ActionModifier;
+        }
+
+        public void Visit(HealSacrificeAction<TNode, TEdge, TUnit> action)
+        {
+            Result = new HealSacrificeAction<TNode, TEdge, TUnit>(Unit);
+            Result.ActionModifier = action.ActionModifier;
+        }
+
+        public void Visit(VenomousSpitAction<TNode, TEdge, TUnit> action)
+        {
+            Result = new VenomousSpitAction<TNode, TEdge, TUnit>(Unit, action.VenomRounds);
+            Result.ActionModifier = action.ActionModifier; 
+        }
     }
 
     public static class CopyActionVisitor

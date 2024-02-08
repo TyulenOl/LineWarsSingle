@@ -34,7 +34,7 @@ namespace LineWars.Model
             IEnumerator AttackCorountine()
             {
                 moveAnimation.Ended.RemoveListener(OnFirstMoveEnd);
-                var targetNode = unit.Node;
+                //var targetNode = unit.Node;
 
                 yield return new WaitForSeconds(pauseBeforeAttack);
                 givenMethod();

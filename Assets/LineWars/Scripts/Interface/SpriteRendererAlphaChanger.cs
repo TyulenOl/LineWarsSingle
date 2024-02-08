@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace LineWars.LineWars.Scripts.Interface
+namespace LineWars.Interface
 {
     public class SpriteRendererAlphaChanger : AlphaChanger
     {
@@ -26,8 +26,7 @@ namespace LineWars.LineWars.Scripts.Interface
             }
 
             var resultAlpha = currentAlpha + alphaDecreaseModifier;
-            spriteRenderer.color = new Color(spriteRenderer.color.r, spriteRenderer.color.g, spriteRenderer.color.b,
-                resultAlpha / 255f);
+            spriteRenderer.color = spriteRenderer.color.WithAlpha(resultAlpha / 255f);
         }
     }
 }

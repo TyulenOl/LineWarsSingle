@@ -1,4 +1,3 @@
-using System;
 
 namespace LineWars.Model
 {
@@ -157,6 +156,46 @@ namespace LineWars.Model
         public void Visit(MonoFogEraseAction action)
         {
             Result = new FogEraseAction<NodeProjection, EdgeProjection, UnitProjection>(Unit);
+            Result.ActionModifier = action.Action.ActionModifier;
+        }
+
+        public void Visit(MonoArsonAction action)
+        {
+            Result = new ArsonAction<NodeProjection, EdgeProjection, UnitProjection>(Unit, action.FireEffectRounds);
+            Result.ActionModifier = action.Action.ActionModifier;
+        }
+
+        public void Visit(MonoSpawningUnitAction action)
+        {
+            var fabric = new FakeUnitFabric();
+            Result = new SpawningUnitAction<NodeProjection, EdgeProjection, UnitProjection>(Unit, fabric, CommandType.None);
+            Result.ActionModifier = action.Action.ActionModifier;
+        }
+
+        public void Visit(MonoUpActionPointsAction action)
+        {
+            Result = new UpActionPointsAction<NodeProjection, EdgeProjection, UnitProjection>(Unit);
+            Result.ActionModifier = action.Action.ActionModifier;
+        }
+
+        public void Visit(MonoJumpAction action)
+        {
+            Result = new JumpAction<NodeProjection, EdgeProjection, UnitProjection>
+                (Unit, action.MinJumpDistance, action.MaxJumpDistance);
+            Result.ActionModifier = action.Action.ActionModifier;
+        }
+
+        public void Visit(MonoHealSacrificeAction action)
+        {
+            Result = new HealSacrificeAction<NodeProjection, EdgeProjection, UnitProjection>
+                (Unit);
+            Result.ActionModifier = action.Action.ActionModifier;
+        }
+
+        public void Visit(MonoVenomousSpitAction action)
+        {
+            Result = new VenomousSpitAction<NodeProjection, EdgeProjection, UnitProjection>
+                (Unit, action.Rounds);
             Result.ActionModifier = action.Action.ActionModifier;
         }
     }    

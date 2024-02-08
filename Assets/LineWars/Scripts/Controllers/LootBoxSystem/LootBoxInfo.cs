@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using LineWars.Controllers;
 using UnityEngine;
 
-namespace LineWars.LootBoxes
+namespace LineWars.Model
 {
     [CreateAssetMenu(fileName = "New Loot Box Info", menuName = "Loot Boxes/Info")]
     public class LootBoxInfo : ScriptableObject
@@ -12,7 +12,7 @@ namespace LineWars.LootBoxes
         [SerializeField] private string boxName;
         [SerializeField] private string boxDescription;
         [SerializeField] private Sprite boxSprite;
-        [SerializeField] private Sprite bgSprite;
+        [SerializeField] private GameObject bg;
         [SerializeField] private LootBoxType boxType;
         [SerializeField] private List<LootInfo> allLoot;
         [Header("Cost Settings")]
@@ -21,7 +21,7 @@ namespace LineWars.LootBoxes
 
         public string Name => boxName;
         public Sprite BoxSprite => boxSprite;
-        public Sprite BgSprite => bgSprite;
+        public GameObject Bg => bg;
         public CostType CostType => costType;
         public int Cost => cost;
         public LootBoxType BoxType => boxType;
@@ -63,10 +63,10 @@ namespace LineWars.LootBoxes
     [System.Serializable]
     public class CardChances
     {
-        [SerializeField] private CardRarity rarity;
+        [SerializeField] private Rarity rarity;
         [SerializeField] private float chance;
 
-        public CardRarity Rarity => rarity;
+        public Rarity Rarity => rarity;
         public float Chance => chance;
     }
 }

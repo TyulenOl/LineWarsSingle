@@ -6,6 +6,7 @@ using Mathos.Parser;
 
 namespace LineWars.Model
 {
+    [Obsolete]
     [CreateAssetMenu(menuName = "UnitCostFunctions/Advanced")]
     public class AdvancedUnitCostFunction : UnitCostFunction
     {
@@ -18,6 +19,7 @@ namespace LineWars.Model
         private SerializedDictionary<UnitType, string> functions;
 
         private readonly Dictionary<UnitType, (int, int, PurchaseInfo)> cash = new();
+        private readonly Dictionary<(string, int, int), PurchaseInfo> stringCash = new();
 
         private void OnEnable()
         {

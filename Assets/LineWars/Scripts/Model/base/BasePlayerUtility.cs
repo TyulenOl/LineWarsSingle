@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace LineWars.Model
 {
@@ -24,25 +21,25 @@ namespace LineWars.Model
             Unit unitPrefab,
             UnitDirection unitDirection = UnitDirection.Any)
         {
-            var unit = UnityEngine.Object.Instantiate(unitPrefab, player.transform);
+            var unit = Object.Instantiate(unitPrefab, player.transform);
             unit.transform.position = node.transform.position;
 
             if (unit.Size == UnitSize.Large)
             {
-                unit.Initialize(node, UnitDirection.Any);
                 node.RightUnit = unit;
                 node.LeftUnit = unit;
+                unit.Initialize(node, UnitDirection.Any);
             }
             else
                 switch (unitDirection)
                 {
                     case UnitDirection.Left or UnitDirection.Any when node.LeftIsFree:
-                        unit.Initialize(node, UnitDirection.Left);
                         node.LeftUnit = unit;
+                        unit.Initialize(node, UnitDirection.Left);
                         break;
                     case UnitDirection.Right or UnitDirection.Any when node.RightIsFree:
-                        unit.Initialize(node, UnitDirection.Right);
                         node.RightUnit = unit;
+                        unit.Initialize(node, UnitDirection.Right);
                         break;
                     default:
                         Debug.LogError($"Юнит {nameof(unit)} не может быть создан на {nameof(node)}");

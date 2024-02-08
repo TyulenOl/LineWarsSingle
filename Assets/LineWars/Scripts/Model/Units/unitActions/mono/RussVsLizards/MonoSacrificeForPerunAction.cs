@@ -53,7 +53,7 @@ namespace LineWars.Model
         private void SacrificeInstant(Node node)
         {
             Action.Sacrifice(node);
-            Player.LocalPlayer.AddAdditionalVisibleNode(node);
+            Player.LocalPlayer.SetAdditionalVisibleNodeForRound(node, 1);
             Player.LocalPlayer.RecalculateVisibility();
             Executor.PlaySfx(sacrSfx);
         }

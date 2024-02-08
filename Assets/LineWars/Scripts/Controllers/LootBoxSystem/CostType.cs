@@ -1,4 +1,4 @@
-﻿namespace LineWars.LootBoxes
+﻿namespace LineWars.Model
 {
     public enum CostType
     {

@@ -9,8 +9,7 @@ namespace LineWars.Model
         public string Description { get; }
         public Sprite Image { get; }
         public Unit Unit { get; }   
-        public CardRarity Rarity { get; }
-        public IReadOnlyList<IReadOnlyCardLevelInfo> Levels { get; }
+        public Rarity Rarity { get; }
         public int MaxLevel { get; }
     }
 }

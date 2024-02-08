@@ -1,5 +1,5 @@
 using System;
-using LineWars.LootBoxes;
+using LineWars.Model;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -7,43 +7,27 @@ namespace LineWars
 {
     public class BuyPanelReDrawInfo
     {
-        private UnityAction onButtonClickAction;
-        private Func<bool> buttonInteractivityBool;
-        private Sprite unitSprite;
-        private string panelName;
-        private string panelDescription;
-        private int cost;
-        private CostType costType;
+        public int Cost { get; }
+        public CostType CostType { get; }
+        public Sprite Sprite { get; }
+        public string PanelName { get; }
+        public string PanelDescription { get; }
+        public bool ButtonInteractable { get; }
 
-        public int Cost => cost;
-
-        public CostType CostType => costType;
-
-        public UnityAction OnButtonClickAction => onButtonClickAction;
-
-        public Func<bool> ButtonInteractivityBool => buttonInteractivityBool;
-
-        public Sprite UnitSprite => unitSprite;
-
-        public string PanelName => panelName;
-
-        public string PanelDescription => panelDescription;
-
-        public BuyPanelReDrawInfo(UnityAction onButtonClickAction,
-            Func<bool> buttonInteractivityBool,
-            Sprite unitSprite,
+        public BuyPanelReDrawInfo(
+            Sprite sprite,
             string panelName,
             string panelDescription,
             int cost,
-            CostType costType)
+            CostType costType, 
+            bool buttonInteractable)
         {
-            this.onButtonClickAction = onButtonClickAction;
-            this.buttonInteractivityBool = buttonInteractivityBool;
-            this.unitSprite = unitSprite;
-            this.panelName = panelName;
-            this.panelDescription = panelDescription;
-            this.cost = cost;
-            this.costType = costType;
+            Sprite = sprite;
+            PanelName = panelName;
+            PanelDescription = panelDescription;
+            Cost = cost;
+            CostType = costType;
+            ButtonInteractable = buttonInteractable;
         }
     }
 }

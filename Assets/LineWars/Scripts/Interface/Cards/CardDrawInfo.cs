@@ -11,6 +11,7 @@ using UnityEngine.UI;
 
 namespace LineWars
 {
+    [Obsolete("Use BaseCardDrawer")]
     public class CardDrawInfo : MonoBehaviour, IBeginDragHandler, IDragHandler
     {
 
@@ -20,7 +21,8 @@ namespace LineWars
         [SerializeField] private TMP_Text hpText;
         [SerializeField] private TMP_Text attackText;
         [SerializeField] private TMP_Text apText;
-
+        [SerializeField] private RectTransform upgradeDrawer;
+        
         [SerializeField] private Image cardImage;
         [SerializeField] private Image ifInactivePanel;
         [SerializeField] private Image borderImage;
@@ -85,12 +87,14 @@ namespace LineWars
                 apText.text = deckCard.Unit.MaxActionPoints.ToString();
 
             DeckCard = deckCard;
+            ReDrawUpgrade();
         }
 
         public void OnBeginDrag(PointerEventData eventData)
         {
             if(cardDragablePartPrefab == null || !IsActive)
                 return;
+            upgradeDrawer.gameObject.SetActive(false);
             var instance = Instantiate(cardDragablePartPrefab, transform);
             instance.transform.localPosition = Vector3.zero;
             instance.transform.SetParent(MainCanvas.Instance.Canvas.transform);
@@ -105,9 +109,18 @@ namespace LineWars
         public void ReDrawAvailability(bool available)
         {
             IsActive = available;
-            borderImage.sprite = available ? DeckCard.CardActiveBagLine : DeckCard.CardInactiveBagLine;   
+            //borderImage.sprite = available ? DeckCard.CardActiveBagLine : DeckCard.CardInactiveBagLine;   
             if(ifInactivePanel != null)
                 ifInactivePanel.gameObject.SetActive(!available);
+            ReDrawUpgrade();
+        }
+
+        private void ReDrawUpgrade()
+        {
+            if(DeckCard == null)
+                return;
+            var available = GameRoot.Instance.CardUpgrader.CanUpgrade(DeckCard);
+            upgradeDrawer.gameObject.SetActive(available);
         }
     }
 }

@@ -5,6 +5,7 @@ using UnityEngine.EventSystems;
 
 namespace LineWars
 {
+    [Obsolete("Use CardDropSlot")]
     public class CardSlot : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerExitHandler
     {
         [SerializeField] private CardDragablePart cardDrawInfo;

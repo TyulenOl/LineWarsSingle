@@ -265,8 +265,10 @@ namespace LineWars.Model
         protected virtual void ExecuteReplenish()
         {
             CurrentMoney += Income;
-            foreach (var owned in OwnedObjects)
+            var objects = new List<Owned>(OwnedObjects);
+            foreach (var owned in objects)
                 owned.Replenish();
+
         }
 
         protected void InvokeTurnStarted(PhaseType phaseType)
@@ -286,7 +288,7 @@ namespace LineWars.Model
 
         public PurchaseInfo GetDeckCardPurchaseInfo(DeckCard deckCard)
         {
-            return GetPurchaseInfoForUnit(deckCard.Unit.Type, deckCard.Cost);
+            return deckCard.CalculateCost(GetCountUnitByType(deckCard.Unit.Type));
         }
 
         public PurchaseInfo GetPurchaseInfoForUnit(UnitType unitType, int cost)
@@ -295,6 +297,13 @@ namespace LineWars.Model
                 unitType,
                 cost,
                 GetCountUnitByType(unitType));
+        }
+
+
+        public IEnumerable<Unit> GetAllEnemiesUnits()
+        {
+            return SingleGameRoot.Instance.AllUnits.Values
+                .Where(x => x.OwnerId != Id);
         }
 
 

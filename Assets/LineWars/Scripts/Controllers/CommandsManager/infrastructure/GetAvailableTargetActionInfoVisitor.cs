@@ -159,6 +159,36 @@ namespace LineWars.Controllers
                 .Select(x => new TargetActionInfo(x, action.CommandType));
         }
 
+        public IEnumerable<TargetActionInfo> Visit(IArsonAction<Node, Edge, Unit> action)
+        {
+            return ForNode(action, 1);
+        }
+
+        public IEnumerable<TargetActionInfo> Visit(ISpawningUnitAction<Node, Edge, Unit> action)
+        {
+            return ForNode(action, 1);
+        }
+
+        public IEnumerable<TargetActionInfo> Visit(IUpActionPointsAction<Node, Edge, Unit> action)
+        {
+            return ForUnit(action, 1);
+        }
+
+        public IEnumerable<TargetActionInfo> Visit(IJumpAction<Node, Edge, Unit> action)
+        {
+            return ForNode(action, (uint)action.MaxJumpDistance);
+        }
+
+        public IEnumerable<TargetActionInfo> Visit(IHealSacrificeAction<Node, Edge, Unit> action)
+        {
+            return ForUnit(action, 1);
+        }
+
+        public IEnumerable<TargetActionInfo> Visit(IVenomousSpitAction<Node, Edge, Unit> action)
+        {
+            return ForUnit(action, 1);
+        }
+
         public class ForShotUnitAction
         {
             private readonly ITarget[] targets;

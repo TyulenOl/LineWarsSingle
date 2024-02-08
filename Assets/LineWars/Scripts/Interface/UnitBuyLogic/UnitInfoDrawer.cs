@@ -1,7 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using LineWars.Interface;
 using LineWars.Model;
 using TMPro;
 using UnityEngine;
@@ -25,9 +21,12 @@ public class UnitInfoDrawer : MonoBehaviour
         if(unitDescription != null)
             unitDescription.text = unit.UnitDescription;
         
-        hpAmount.text = unit.MaxHp.ToString();
-        actionPointsAmount.text = unit.MaxActionPoints.ToString();
-        damageAmount.text = unit.InitialPower.ToString();
+        if (hpAmount != null)
+            hpAmount.text = unit.MaxHp.ToString();
+        if (actionPointsAmount != null)
+            actionPointsAmount.text = unit.MaxActionPoints.ToString();
+        if (damageAmount != null)
+            damageAmount.text = unit.InitialPower.ToString();
 
         unitImage.gameObject.SetActive(true);
         unitImage.sprite = unit.Sprite;
@@ -38,9 +37,12 @@ public class UnitInfoDrawer : MonoBehaviour
         unitName.text = "Выберите воина";
         unitDescription.text = "";
         
-        hpAmount.text = "?";
-        actionPointsAmount.text = "?";
-        damageAmount.text = "?";
+        if (hpAmount != null)
+            hpAmount.text = "?";
+        if (actionPointsAmount != null)
+            actionPointsAmount.text = "?";
+        if (damageAmount != null)
+            damageAmount.text = "?";
 
         if (damageAmount != null)
         {

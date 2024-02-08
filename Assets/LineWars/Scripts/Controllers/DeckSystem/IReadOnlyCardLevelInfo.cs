@@ -11,5 +11,6 @@ namespace LineWars.Model
         public Sprite CardActiveBagLine { get; }
         public Sprite CardInactiveBagLine { get; }
         public int Cost { get; }
+        public int CostToUpgrade { get; }
     }
 }

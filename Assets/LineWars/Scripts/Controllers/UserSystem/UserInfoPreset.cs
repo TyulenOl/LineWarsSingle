@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using AYellowpaper.SerializedCollections;
-using LineWars.LootBoxes;
 using LineWars.Model;
 using UnityEngine;
 
@@ -14,12 +13,17 @@ namespace LineWars.Controllers
         [SerializeField] private List<DeckCard> defaultCards;
         [SerializeField] private SerializedDictionary<int, int> defaultCardLevels;
         [SerializeField] private SerializedDictionary<LootBoxType, int> defaultBoxesCount;
-
+        [SerializeField] private SerializedDictionary<BlessingId, int> defaultBlessingsCount;
+        [SerializeField] private List<BlessingId> defaultSelectedBlessings;
+        
+        
         public int DefaultGold => defaultGold;
         public int DefaultDiamond => defaultDiamond;
         public IEnumerable<DeckCard> DefaultCards => defaultCards;
         public IReadOnlyDictionary<LootBoxType, int> DefaultBoxesCount => defaultBoxesCount;
         public IReadOnlyDictionary<int, int> DefaultCardLevels => defaultCardLevels;
+        public IReadOnlyDictionary<BlessingId, int> DefaultBlessingsCount => defaultBlessingsCount;
+        public IReadOnlyList<BlessingId> DefaultSelectedBlessings => defaultSelectedBlessings;
 
         private void OnValidate()
         {

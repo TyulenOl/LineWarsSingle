@@ -10,31 +10,6 @@ namespace LineWars
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
-        [Obsolete]
-        public static int GetMaxDamage(TUnit unit)
-        {
-            var actions = GetDamages(unit)
-                .ToArray();
-            return actions.Length != 0
-                ? actions.Max(x => x.Item2)
-                : 0;
-        }
-
-        [Obsolete]
-        public static IEnumerable<(CommandType, int)> GetDamages(TUnit unit)
-        {
-            var actions = unit.Actions
-                .OfType<IActionWithDamage>()
-                .ToArray();
-            foreach (var action in actions)
-            {
-                if (action is IUnitAction<TNode, TEdge, TUnit> unitAction)
-                {
-                    yield return (unitAction.CommandType, action.Damage);
-                }
-            }
-        }
-
         public static bool CanMoveTo(TUnit unit, TNode targetNode)
         {
             return unit.Node != targetNode
@@ -82,7 +57,6 @@ namespace LineWars
 
             void AssignNewNode()
             {
-                unit.Node = targetNode;
                 if (unit.Size == UnitSize.Large)
                 {
                     targetNode.LeftUnit = unit;
@@ -102,6 +76,7 @@ namespace LineWars
 
                 if (unit.OwnerId != targetNode.OwnerId)
                     targetNode.ConnectTo(unit.OwnerId);
+                unit.Node = targetNode;
             }
         }
     }

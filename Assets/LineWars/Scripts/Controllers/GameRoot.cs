@@ -1,46 +1,52 @@
 ﻿using System;
 using DataStructures;
 using LineWars.Model;
-using LineWars.LootBoxes;
 using UnityEngine;
-using LineWars.Store;
 
 namespace LineWars.Controllers
 {
     public class GameRoot : DontDestroyOnLoadSingleton<GameRoot>
     {
+        [Header("Draw")] 
+        [SerializeField] private DrawHelperInstance drawHelper;
+        
         [Header("Storages")]
         [SerializeField] private DeckCardsScriptableStorage cardsDatabase;
         [SerializeField] private MissionsScriptableStorage missionsStorage;
+        [SerializeField] private BlessingStorage blessingStorage;
 
         [Header("Controllers")]
         [SerializeField] private DecksController decksController;
         [SerializeField] private CompaniesController companiesController;
         [SerializeField] private UserInfoController userController;
         [SerializeField] private LootBoxController lootBoxController;
-        [SerializeField] private CardStore cardStore;
+        [SerializeField] private BlessingsController blessingsController;
+        [SerializeField] private Store store;
         [SerializeField] private CardUpgrader cardUpgrader;
 
         [Header("ProviderSettings")]
         [SerializeField] private ProviderType providerType;
 
-        private CardLevelsStorage cardsLevelStorage;
         private IProvider<Deck> deckProvider;
         private IProvider<MissionInfo> missionInfoProvider;
         private IProvider<UserInfo> userInfoProvider;
         private IProvider<Settings> settingsProvider;
         private IGetter<DateTime> timeGetter;
 
-        public IStorage<DeckCard> CardsDatabase => cardsDatabase;
-        public CardLevelsStorage CardsLevelDatabase => cardsLevelStorage;
-        public IStorage<MissionData> MissionsStorage => missionsStorage;
+        public IStorage<int, DeckCard> CardsDatabase => cardsDatabase;
+        public IStorage<int, MissionData> MissionsStorage => missionsStorage;
+        public IStorage<BlessingId, BaseBlessing> BlessingStorage => blessingStorage;
 
         public DecksController DecksController => decksController;
         public CompaniesController CompaniesController => companiesController;
         public UserInfoController UserController => userController;
         public LootBoxController LootBoxController => lootBoxController;
-        public CardStore CardStore => cardStore;
+
+        public BlessingsController BlessingsController => blessingsController;
+        public Store Store => store;
         public CardUpgrader CardUpgrader => cardUpgrader;
+
+        public DrawHelperInstance DrawHelper => drawHelper;
 
         protected override void OnAwake()
         {
@@ -53,8 +59,9 @@ namespace LineWars.Controllers
             CompaniesController.Initialize(missionInfoProvider, missionsStorage);
             UserController.Initialize(userInfoProvider, cardsDatabase);
             DecksController.Initialize(deckProvider, UserController);
-            CardStore.Initialize(timeGetter, CardsDatabase, UserController);
-            cardsLevelStorage = new CardLevelsStorage(CardsDatabase, UserController.UserInfo);
+            Store.Initialize(timeGetter, CardsDatabase, BlessingStorage, UserController);
+            BlessingsController.Initialize(UserController, UserController, BlessingStorage);
+            CardUpgrader.Initialize(userController, cardsDatabase);
             InitializeLootBoxController();
         }
 

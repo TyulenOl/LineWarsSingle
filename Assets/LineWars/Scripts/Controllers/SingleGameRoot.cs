@@ -14,11 +14,19 @@ namespace LineWars
         [field:SerializeField] public GameReferee GameReferee { get;  set; }
         [field:SerializeField] public WinOrLoseAction WinOrLoseAction { get; set; }
         [field:SerializeField] public PlayerInitializer PlayerInitializer { get;  set; }
+        
+        [field: Header("Getters")]
         [field: SerializeField] public DeckGetter DeckGetter { get; set; }
+        [field: SerializeField] public BlessingPullGetter BlessingPullGetter { get; set; }
+        [field: SerializeField] public BlessingStorageGetter BlessingStorageGetter { get; set; }
+        
+        [field: Header("Controllers")]
+        [field: SerializeField] public CommandsManager CommandsManager { get; set; }
         
         public readonly IndexList<BasePlayer> AllPlayers = new();
         public readonly IndexList<Unit> AllUnits = new();
         public Deck CurrentDeck { get; private set; }
+        public IBlessingsPull LocalBlessingPull { get; private set; }
         
         private void Start()
         {
@@ -28,10 +36,13 @@ namespace LineWars
 
         public void StartGame()
         {
+            LocalBlessingPull = BlessingPullGetter.Get();
+            
             InitializeDeck();
 
             InitializeAndRegisterAllPlayers();
             InitializeGameReferee();
+            CommandsManager.Initialize(LocalBlessingPull, BlessingStorageGetter.Get());
             
             StartCoroutine(StartGameCoroutine());
 
@@ -88,6 +99,16 @@ namespace LineWars
         public void LoseGame()
         {
             WinOrLoseAction.OnLose();
+        }
+
+        public void PauseGame()
+        {
+            
+        }
+
+        public void ResumeGame()
+        {
+            
         }
         
         protected override void OnDestroy()

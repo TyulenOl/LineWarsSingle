@@ -50,7 +50,7 @@ namespace LineWars.Model
                 return;
             }
             var effect = unitEffects[unit];
-            unit.DeleteEffect(effect);
+            unit.RemoveEffect(effect);
             unitEffects.Remove(unit);
         }
 

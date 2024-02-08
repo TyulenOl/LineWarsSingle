@@ -5,7 +5,7 @@ namespace LineWars.Model
     public class MonoUpArmorAction :
         MonoUnitAction<UpArmorAction<Node, Edge, Unit>>,
         ITargetedAction<Unit>,
-        ITargetPowerBasedAttackAction<Node, Edge, Unit>
+        IUpArmorAction<Node, Edge, Unit>
     {
         [SerializeField] private UnitAnimation unitAnimation;
 

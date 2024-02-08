@@ -1,12 +1,12 @@
 ﻿using LineWars.Model;
 
-namespace LineWars.LootBoxes
+namespace LineWars.Model
 {
     public class ClientLootBoxOpenerFabric : ILootBoxOpenerFabric
     {
-        private readonly IStorage<DeckCard> cardStorage;
+        private readonly IStorage<int, DeckCard> cardStorage;
 
-        public ClientLootBoxOpenerFabric(IStorage<DeckCard> cardStorage)
+        public ClientLootBoxOpenerFabric(IStorage<int, DeckCard> cardStorage)
         {
             this.cardStorage = cardStorage;
         }

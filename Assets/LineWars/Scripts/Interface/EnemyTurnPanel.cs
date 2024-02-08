@@ -10,14 +10,14 @@ public class EnemyTurnPanel : MonoBehaviour
     [SerializeField] private Image lizardsImage;
     [SerializeField] private Image rusImage;
 
-    private bool isCoroutinActive;
+    private bool isCoroutineActive;
 
-    public bool IsCoroutinActive
+    public bool IsCoroutineActive
     {
-        get => isCoroutinActive;
+        get => isCoroutineActive;
         set
         {
-            isCoroutinActive = value;
+            isCoroutineActive = value;
             if (value)
                 RestoreDefaults();
             else
@@ -34,13 +34,13 @@ public class EnemyTurnPanel : MonoBehaviour
     IEnumerator HideCoroutine()
     {
         rusImage.gameObject.SetActive(true);
-        rusImage.color = new Color(rusImage.color.r, rusImage.color.g, rusImage.color.b, 1);
+        rusImage.color = rusImage.color.WithAlpha(1);
         var resultAlpha = 255f;
         while (rusImage.gameObject.activeInHierarchy && rusImage.color.a > 0.1)
         {
             resultAlpha -= 2f;
             yield return new WaitForSeconds(0.01f);
-            rusImage.color = new Color(rusImage.color.r, rusImage.color.g, rusImage.color.b, resultAlpha / 255f);
+            rusImage.color = rusImage.color.WithAlpha(resultAlpha / 255f);
         }
 
         rusImage.gameObject.SetActive(false);
@@ -48,7 +48,7 @@ public class EnemyTurnPanel : MonoBehaviour
 
     private void RestoreDefaults()
     {
-        lizardsImage.color = new Color(lizardsImage.color.r, lizardsImage.color.g, lizardsImage.color.b, 1);
+        lizardsImage.color = lizardsImage.color.WithAlpha(1);
         lizardsImage.gameObject.SetActive(true);
         rusImage.gameObject.SetActive(false);
     }

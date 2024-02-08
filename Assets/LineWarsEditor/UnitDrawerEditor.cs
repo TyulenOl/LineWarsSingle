@@ -37,19 +37,19 @@ namespace LineWarsEditor
             
             if (unit.Size == UnitSize.Little
                 && unitDrawer.LeftDrawer != null
-                && unitDrawer.LeftDrawer.targetSprite != null
-                && unitDrawer.LeftDrawer.targetSprite.sprite != unit.Sprite)
+                && unitDrawer.LeftDrawer.UnitSprite != null
+                && unitDrawer.LeftDrawer.UnitSprite.sprite != unit.Sprite)
             {
-                unitDrawer.LeftDrawer.targetSprite.sprite = unit.Sprite;
-                EditorUtility.SetDirty(unitDrawer.LeftDrawer.targetSprite);
+                unitDrawer.LeftDrawer.UnitSprite.sprite = unit.Sprite;
+                EditorUtility.SetDirty(unitDrawer.LeftDrawer.UnitSprite);
             }
 
             if (unitDrawer.RightDrawer != null
-                && unitDrawer.RightDrawer.targetSprite != null
-                && unitDrawer.RightDrawer.targetSprite.sprite != unit.Sprite)
+                && unitDrawer.RightDrawer.UnitSprite != null
+                && unitDrawer.RightDrawer.UnitSprite.sprite != unit.Sprite)
             {
-                unitDrawer.RightDrawer.targetSprite.sprite = unit.Sprite;
-                EditorUtility.SetDirty(unitDrawer.RightDrawer.targetSprite);
+                unitDrawer.RightDrawer.UnitSprite.sprite = unit.Sprite;
+                EditorUtility.SetDirty(unitDrawer.RightDrawer.UnitSprite);
             }
         }
         

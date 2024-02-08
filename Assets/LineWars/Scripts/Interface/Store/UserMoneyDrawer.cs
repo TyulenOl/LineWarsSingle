@@ -3,7 +3,7 @@ using LineWars.Controllers;
 using TMPro;
 using UnityEngine;
 
-namespace LineWars
+namespace LineWars.Interface
 {
     public class UserMoneyDrawer : MonoBehaviour
     {

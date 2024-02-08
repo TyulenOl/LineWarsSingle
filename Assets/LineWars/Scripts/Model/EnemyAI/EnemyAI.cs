@@ -1,9 +1,7 @@
 using System;
 using System.Linq;
-using UnityEngine;
-using JetBrains.Annotations;
 using LineWars.Interface;
-using UnityEngine.Rendering;
+using UnityEngine;
 
 namespace LineWars.Model
 {
@@ -42,7 +40,7 @@ namespace LineWars.Model
 
         public override bool CanExecuteTurn(PhaseType phase)
         {
-            if(!base.CanExecuteTurn(phase)) //�����? ������� ����� �������� �� PhaseExceptions?
+            if(!base.CanExecuteTurn(phase)) 
                 return false;
 
             if (phase == PhaseType.Replenish)

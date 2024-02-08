@@ -1,5 +1,6 @@
 using System;
 using LineWars.Controllers;
+using LineWars.Model;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,42 +8,26 @@ namespace LineWars.Interface
 {
     public abstract class ActionButtonLogic : MonoBehaviour
     {
+        protected static CommandsManager CommandsManager => CommandsManager.Instance;
         protected Button button;
 
-        private void Awake()
+        protected virtual void Awake()
         {
-            CommandsManager.Instance.StateEntered += ReDrawOnEnter;
-            CommandsManager.Instance.StateExited += ReDrawOnExit;
+            CommandsManager.StateEntered += CommandsManagerOnEnter;
+            
             button = GetComponent<Button>();
             button.onClick.AddListener(OnClick);
         }
-
+        
+        protected virtual void CommandsManagerOnEnter(CommandsManagerStateType type)
+        {
+        }
+        
         protected abstract void OnClick();
         
-        private void ReDrawOnEnter(CommandsManagerStateType type)
+        protected static bool CanExecuteCommand(IActionCommand command)
         {
-            switch (type)
-            {
-                case CommandsManagerStateType.WaitingSelectCommand:
-                case CommandsManagerStateType.WaitingExecuteCommand:
-                case CommandsManagerStateType.CurrentCommand:
-                case CommandsManagerStateType.MultiTarget:
-                    button.interactable = false;
-                    break;
-            }
-        }
-
-        private void ReDrawOnExit(CommandsManagerStateType type)
-        {
-            switch (type)
-            {
-                case CommandsManagerStateType.WaitingSelectCommand:
-                case CommandsManagerStateType.WaitingExecuteCommand:
-                case CommandsManagerStateType.CurrentCommand:
-                case CommandsManagerStateType.MultiTarget:
-                    button.interactable = true;
-                    break;
-            }
+            return command != null && CommandsManager.CanExecuteAnyCommand() && command.CanExecute();
         }
     }
 }

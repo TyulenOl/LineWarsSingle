@@ -5,6 +5,10 @@
         AuraPowerBuff,
         PowerBuff,
         Armored,
-        FightingSpirit
+        FightingSpirit,
+        Fire,
+        Lonelinesss,
+        Illness,
+        Venom
     }
 }

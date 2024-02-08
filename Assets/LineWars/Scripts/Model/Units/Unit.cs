@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using LineWars.Controllers;
@@ -20,8 +20,8 @@ namespace LineWars.Model
         
         [SerializeField, Min(0)] private int initialPower;
         [SerializeField, Min(0)] private int maxHp;
-        private int maxArmor = 100;
         [SerializeField, Min(0)] private int visibility;
+        private int maxArmor = 100;
         [field: SerializeField] public Sprite Sprite { get; private set; }
         
         [SerializeField] private UnitType unitType;
@@ -30,8 +30,8 @@ namespace LineWars.Model
         [SerializeField] private CommandPriorityData priorityData;
 
         [Header("Sounds")] 
-        [SerializeField] [Min(0)] private SFXList HpHealedSounds;
-        [SerializeField] [Min(0)] private SFXList HpDamagedSounds;
+        [SerializeField] private SFXList HpHealedSounds;
+        [SerializeField] private SFXList HpDamagedSounds;
         private IDJ dj;
         
         [Header("Actions Settings")] 
@@ -55,13 +55,16 @@ namespace LineWars.Model
         [field: SerializeField] public UnityEvent<int, int> ArmorChanged { get; private set; }
         [field: SerializeField] public UnityEvent<Unit> Died { get; private set; }
         [field: SerializeField] public UnityEvent<int, int> ActionPointsChanged { get; private set; }
+        [field: SerializeField] public UnityEvent<Unit, Effect<Node, Edge, Unit>> EffectAdded { get; private set; }
+        [field: SerializeField] public UnityEvent<Unit, Effect<Node, Edge, Unit>> EffectRemoved { get; private set; }
+        [field: SerializeField] public UnityEvent<Unit, Effect<Node, Edge, Unit>> EffectStacked { get; private set; }
 
         public event Action AnyActionCompleted;
         public event Action ExecutorDestroyed;
-        public event Action<Unit, Node, Node> UnitNodeChanged;
-        public event Action<Unit, int, int> UnitHPChanged;
+        public event Action<Unit, Node, Node> UnitNodeChanged; 
+        public event Action<Unit, int, int> UnitHPChanged; 
         public event Action<Unit, int, int> UnitActionPointsChanged;
-        public event Action<Unit, int, int> UnitPowerChanged;
+        public event Action<Unit, int, int> UnitPowerChanged; 
         public event Action<Unit, int, int> UnitArmorChanged; 
         public event Action<Unit> UnitReplenished; 
 
@@ -327,19 +330,55 @@ namespace LineWars.Model
                 Debug.LogError("Adding effect with other owner!");
                 return;
             }
-            effect.ExecuteOnEnter();
-            effects.Add(effect);
+            var stacked = TryStackEffect(effect);
+            if(!stacked)
+            {
+                effect.ExecuteOnEnter();
+                effects.Add(effect);
+                EffectAdded.Invoke(this, effect);
+            }
         }
 
-        public void DeleteEffect(Effect<Node, Edge, Unit> effect)
+        private bool TryStackEffect(Effect<Node, Edge, Unit> effect)
+        {
+            if (effect is not IStackableEffect stackableEffect)
+                return false;
+            var stacked = false;
+            foreach(var currentEffect in effects)
+            {
+                if (currentEffect is not IStackableEffect currentStackableEffect) continue;
+                if (!currentStackableEffect.CanStack(stackableEffect)) continue;
+                currentStackableEffect.Stack(stackableEffect);
+                stacked = true;
+                EffectStacked.Invoke(this, currentEffect);
+            }
+            return stacked;
+        }
+
+        public void RemoveEffect(Effect<Node, Edge, Unit> effect)
         {
             effect.ExecuteOnExit();
             effects.Remove(effect);
+            EffectRemoved.Invoke(this, effect);
         }
 
         public T Accept<T>(IMonoExecutorVisitor<T> visitor)
         {
             return visitor.Visit(this);
+        }
+        
+        public void DealDamageThroughArmor(int value)
+        {
+            if (value < 0)
+                throw new ArgumentException();
+            if (value == 0)
+                return;
+
+            var blockedDamage = Mathf.Min(value, CurrentArmor);
+            var notBlockedDamage = value - blockedDamage;
+
+            CurrentArmor -= blockedDamage;
+            CurrentHp -= notBlockedDamage;
         }
     }
 }

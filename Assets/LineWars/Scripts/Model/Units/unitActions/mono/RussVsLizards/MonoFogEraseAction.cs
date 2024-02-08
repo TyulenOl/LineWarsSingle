@@ -26,7 +26,8 @@ namespace LineWars.Model
                 unitAnimation.Ended.AddListener(OnAnimEnd);
                 var context = new AnimationContext()
                 {
-                    TargetNode = target
+                    TargetNode = target,
+                    TargetPosition = target.Position
                 };
                 unitAnimation.Execute(context);
             }
@@ -41,7 +42,7 @@ namespace LineWars.Model
         private void ExecuteInstant(Node target)
         {
             Action.Execute(target);
-            Player.LocalPlayer.AddAdditionalVisibleNode(target);
+            Player.LocalPlayer.SetAdditionalVisibleNodeForRound(target, Executor.CurrentPower); 
             Player.LocalPlayer.RecalculateVisibility();
             Complete();
         }

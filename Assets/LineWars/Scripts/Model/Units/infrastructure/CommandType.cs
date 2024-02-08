@@ -22,7 +22,14 @@
         UpArmor,
         ArmorBasedAttack,
         ConsumeUnit,
-        EraseFog
+        EraseFog,
+        Arson,
+        SpawnWolf,
+        SpawnSheep,
+        UpActionPoints,
+        Jump,
+        HealSacrifice,
+        VenomousSpit
     }
 }   
 
