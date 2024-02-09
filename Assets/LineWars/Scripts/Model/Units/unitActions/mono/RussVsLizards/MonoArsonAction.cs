@@ -24,7 +24,14 @@ namespace LineWars.Model
 
         public void Execute(Node target)
         {
-            throw new NotImplementedException();
+            if(unitAnimation == null)
+            {
+                ExecuteInstant(target);
+            }
+            else
+            {
+                ExecuteWithAnimation(target);
+            }
         }
         
         private void ExecuteWithAnimation(Node target)
@@ -32,9 +39,10 @@ namespace LineWars.Model
             unitAnimation.Ended.AddListener(OnAnimEnd);
             var context = new AnimationContext()
             {
-                TargetNode = target
+                TargetNode = target,
+                TargetPosition = target.Position
             };
-
+            unitAnimation.Execute(context);
             void OnAnimEnd(UnitAnimation _)
             {
                 unitAnimation.Ended.RemoveListener(OnAnimEnd);

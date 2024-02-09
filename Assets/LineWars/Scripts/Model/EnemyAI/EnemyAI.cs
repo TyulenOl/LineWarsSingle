@@ -1,9 +1,7 @@
 using System;
 using System.Linq;
-using UnityEngine;
-using JetBrains.Annotations;
 using LineWars.Interface;
-using UnityEngine.Rendering;
+using UnityEngine;
 
 namespace LineWars.Model
 {
@@ -42,18 +40,18 @@ namespace LineWars.Model
 
         public override bool CanExecuteTurn(PhaseType phase)
         {
-            if(!base.CanExecuteTurn(phase)) //�����? ������� ����� �������� �� PhaseExceptions?
+            if(!base.CanExecuteTurn(phase)) 
                 return false;
 
             if (phase == PhaseType.Replenish)
                 return true;
             if(phase == PhaseType.Buy)
                 return true;
-            var executors = PhaseExecutorsData.PhaseToUnits[phase];
+            //var executors = PhaseExecutorsData.PhaseToUnits[phase];
             foreach (var owned in OwnedObjects)
             {
                 if (!(owned is Unit unit)) continue;
-                if (executors.Contains(unit.Type) && unit.CurrentActionPoints > 0)
+                if (/*executors.Contains(unit.Type) &&*/ unit.CurrentActionPoints > 0)
                     return true;
             }
 

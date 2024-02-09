@@ -10,18 +10,23 @@ namespace LineWars.Controllers
     {
         private readonly IBlessingsPull innerPull;
         private readonly HashSet<BlessingId> blessings;
-        private int totalCount;
+        public int CurrentTotalCount { get; private set; }
+        public int TotalCount { get; }
         
+        public event Action<int, int> CurrentTotalCountChanged;
+        public event Action<BlessingId, int> BlessingCountChanged;
+
         public LimitingBlessingPool(
             IBlessingsPull innerPull,
             IEnumerable<BlessingId> blessings,
             int totalCount)
         {
-            if (this.totalCount < 0)
+            if (this.CurrentTotalCount < 0)
                 throw new ArgumentException(nameof(totalCount));
             
             this.innerPull = innerPull;
-            this.totalCount = totalCount;
+            CurrentTotalCount = totalCount;
+            TotalCount = totalCount;
             this.blessings = blessings.ToHashSet();
         }
         
@@ -31,7 +36,7 @@ namespace LineWars.Controllers
             {
                 if (innerPull.TryGetCount(id, out var innerCount))
                 {
-                    yield return (id, Math.Min(innerCount, totalCount));
+                    yield return (id, Math.Min(innerCount, CurrentTotalCount));
                 }
             }
         }
@@ -55,14 +60,13 @@ namespace LineWars.Controllers
                 if (diff == 0)
                     return;
                 innerPull[id] += diff;
-                totalCount += diff;
+                CurrentTotalCount += diff;
 
                 foreach (var (blessing, count) in this)
                     BlessingCountChanged?.Invoke(blessing, count);
+                CurrentTotalCountChanged?.Invoke(CurrentTotalCount, TotalCount);
             }
         }
-
-        public event Action<BlessingId, int> BlessingCountChanged;
         
         public bool TryGetCount(BlessingId id, out int count)
         {
@@ -70,7 +74,7 @@ namespace LineWars.Controllers
             if (innerPull.TryGetCount(id, out var innerCount) 
                 && blessings.Contains(id))
             {
-                count = Math.Min(innerCount, totalCount);
+                count = Math.Min(innerCount, CurrentTotalCount);
                 return true;
             }
 

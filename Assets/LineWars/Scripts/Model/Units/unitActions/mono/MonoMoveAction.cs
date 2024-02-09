@@ -11,19 +11,13 @@ namespace LineWars.Model
         [SerializeField] private SFXList reactionsSfx;
         [SerializeField] private UnitAnimation moveAnimation;
 
-        private IDJ dj;
+        private readonly IDJ dj =  new RandomDJ(0.5f);
 
         protected override bool NeedAutoComplete => false;
 
         public bool CanMoveTo(Node target) =>
             Action.CanMoveTo(target);
-
-        public override void Initialize()
-        {
-            base.Initialize();
-            dj = new RandomDJ(0.5f);
-        }
-
+        
         public void MoveTo(Node target)
         {
             if(moveAnimation == null)

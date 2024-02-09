@@ -121,8 +121,8 @@ namespace LineWars.Model
             foreach(var owned in player.OwnedObjects)
             {
                 if (owned is not UnitProjection unit) continue;
-                if(unit.CurrentActionPoints > 0 
-                    && player.PhaseExecutorsData[phase].Contains(unit.Type))
+                if(unit.CurrentActionPoints > 0 )
+                   // && player.PhaseExecutorsData[phase].Contains(unit.Type))
                 {
                     return true;
                 }

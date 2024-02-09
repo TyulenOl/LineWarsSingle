@@ -3,20 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using LineWars.Controllers;
 using LineWars.Model;
+using TMPro;
 using UnityEngine;
-using UnityEngine.Assertions.Must;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace LineWars.Interface
 {
     public class BlessingsDrawer: MonoBehaviour
     {
-        [FormerlySerializedAs("blessingUIElementPrefab")] [SerializeField] private BlessingFightDrawer blessingFightDrawerPrefab;
+        [SerializeField] private TMP_Text totalBlessingsCount;
+        [SerializeField] private BlessingFightDrawer blessingUIElementPrefab;
         [SerializeField] private LayoutGroup layoutGroup;
 
         private Dictionary<BlessingId, BlessingFightDrawer> blessingToUI;
         private CommandsManager CommandsManager => CommandsManager.Instance;
+        private IBlessingsPull GlobalBlessingsPull => GameRoot.Instance?.UserController;
+        private IBlessingsPull LocalBlessingsPull => SingleGameRoot.Instance?.LocalBlessingPull;
 
         private bool isOpened;
         
@@ -33,21 +35,59 @@ namespace LineWars.Interface
         
         public void Initialize()
         {
+            isOpened = gameObject.activeSelf;
             blessingToUI = new Dictionary<BlessingId, BlessingFightDrawer>();
-            var allBlessings = CommandsManager.BlessingData.ToArray();
-            foreach (var (blessingData, count) in allBlessings)
+            var allBlessings = LocalBlessingsPull.ToArray();
+            foreach (var (id, count) in allBlessings)
             {
-                var elementInstance = Instantiate(blessingFightDrawerPrefab, layoutGroup.transform);
-                elementInstance.BlessingData = blessingData;
-                elementInstance.BlessingCount = count;
-                blessingToUI[blessingData] = elementInstance;
+                var elementInstance = Instantiate(blessingUIElementPrefab, layoutGroup.transform);
+                elementInstance.BlessingData = id;
+                elementInstance.BlessingCount = GlobalBlessingsPull?[id] ?? -1;
+                blessingToUI[id] = elementInstance;
                 elementInstance.OnClick += ElementOnClick;
             }
             
-            CommandsManager.BlessingCountChanged += CommandsManagerOnBlessingCountChanged;
             CommandsManager.BlessingStarted += CommandsManagerOnBlessingStarted;
-            
             CommandsManager.StateEntered += CommandsManagerOnStateEntered;
+
+            if (GlobalBlessingsPull != null)
+            {
+                GlobalBlessingsPull.BlessingCountChanged += GlobalBlessingsPullOnBlessingCountChanged;
+            }
+
+            if (LocalBlessingsPull is LimitingBlessingPool limitingBlessingPool)
+            {
+                limitingBlessingPool.CurrentTotalCountChanged += LimitingBlessingPoolOnTotalCountChanged;
+                totalBlessingsCount.text = $"{limitingBlessingPool.CurrentTotalCount}/{limitingBlessingPool.TotalCount}";
+            }
+            else
+            {
+                totalBlessingsCount.text = "-";
+            }
+        }
+        
+        private void OnDestroy()
+        {
+            if (CommandsManager != null)
+            {
+                CommandsManager.BlessingStarted -= CommandsManagerOnBlessingStarted;
+                CommandsManager.StateEntered -= CommandsManagerOnStateEntered;
+            }
+
+            if (LocalBlessingsPull is LimitingBlessingPool limitingBlessingPool)
+            {
+                limitingBlessingPool.CurrentTotalCountChanged -= LimitingBlessingPoolOnTotalCountChanged;
+            }
+            
+            if (GlobalBlessingsPull != null)
+            {
+                GlobalBlessingsPull.BlessingCountChanged -= GlobalBlessingsPullOnBlessingCountChanged;
+            }
+        }
+
+        private void LimitingBlessingPoolOnTotalCountChanged(int current, int total)
+        {
+            totalBlessingsCount.text = $"{current}/{total}";
         }
 
         private void ElementOnClick(BlessingId data)
@@ -58,6 +98,12 @@ namespace LineWars.Interface
         private void CommandsManagerOnStateEntered(CommandsManagerStateType state)
         {
             Redraw();
+        }
+        
+        private void GlobalBlessingsPullOnBlessingCountChanged(BlessingId id, int count)
+        {
+            if (blessingToUI.TryGetValue(id, out var ui))
+                ui.BlessingCount = count;
         }
 
         private void CommandsManagerOnBlessingStarted(BlessingMassage massage)
@@ -76,22 +122,6 @@ namespace LineWars.Interface
                     uiElement.State = BlessingDrawerState.Unlocked;
                 else
                     uiElement.State = BlessingDrawerState.Locked;
-            }
-        }
-
-        private void CommandsManagerOnBlessingCountChanged(BlessingId data, int count)
-        {
-            if (blessingToUI.TryGetValue(data, out var ui))
-                ui.BlessingCount = count;
-        }
-
-        private void OnDestroy()
-        {
-            if (CommandsManager != null)
-            {
-                CommandsManager.BlessingCountChanged -= CommandsManagerOnBlessingCountChanged;
-                CommandsManager.BlessingStarted -= CommandsManagerOnBlessingStarted;
-                CommandsManager.StateEntered -= CommandsManagerOnStateEntered;
             }
         }
     }

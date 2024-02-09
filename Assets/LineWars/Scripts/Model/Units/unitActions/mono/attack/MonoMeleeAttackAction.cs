@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace LineWars.Model
 {
-    [RequireComponent(typeof(MonoMoveAction))]
     public class MonoMeleeAttackAction :
         MonoAttackAction<MeleeAttackAction<Node, Edge, Unit>>,
         IMeleeAttackAction<Node, Edge, Unit>
@@ -19,13 +18,7 @@ namespace LineWars.Model
         public bool Onslaught => Action.Onslaught;
         public UnitBlockerSelector BlockerSelector => Action.BlockerSelector;
         protected override bool NeedAutoComplete => false;
-
-        public override void Initialize()
-        {
-            base.Initialize();
-        }
-
-
+        
         public override void Attack(ITargetedAlive enemy)
         {
             if (enemy is Unit unit && attackAnimation != null)
@@ -38,7 +31,7 @@ namespace LineWars.Model
 
         private void AttackWithAnimation(Unit unit)
         {
-            attackAnimation.SetAction(() => base.Attack(unit));
+            attackAnimation.SetAction(OnAttack);
             attackAnimation.Ended.AddListener(OnAnimationEnd);
             var context = new AnimationContext()
             {
@@ -50,6 +43,22 @@ namespace LineWars.Model
                 attackAnimation.Ended.RemoveListener(OnAnimationEnd);
                 Player.LocalPlayer.RecalculateVisibility();
                 Complete();
+            }
+
+            void OnAttack()
+            {
+                var hasResponses = unit.TryGetComponent(out AnimationResponses responses);
+                if (hasResponses)
+                    responses.TrySetDeathAnimation(AnimationResponseType.MeleeDied);
+                base.Attack(unit);
+                if(unit != null && unit.CurrentHp > 0 && hasResponses)
+                {
+                    var context1 = new AnimationContext()
+                    {
+                        TargetUnit = Executor
+                    };
+                    responses.Respond(AnimationResponseType.MeleeDamaged, context1);
+                }
             }
         }
 

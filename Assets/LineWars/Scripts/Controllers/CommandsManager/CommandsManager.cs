@@ -129,9 +129,7 @@ namespace LineWars.Controllers
 
         private IStorage<BlessingId, BaseBlessing> blessingStorage;
         private IBlessingsPull blessingsPull;
-
-        public IEnumerable<(BlessingId, int)> BlessingData => blessingsPull;
-        public event Action<BlessingId, int> BlessingCountChanged; 
+        
         public event Action<BlessingMassage> BlessingStarted; 
         public event Action<BlessingMassage> BlessingCompleted;
 
@@ -179,13 +177,6 @@ namespace LineWars.Controllers
             
             Player.TurnEnded += OnTurnEnded;
             Player.TurnStarted += OnTurnStarted;
-            
-            blessingsPull.BlessingCountChanged += OnBlessingCountChanged;
-        }
-
-        private void OnBlessingCountChanged(BlessingId id, int count)
-        {
-            BlessingCountChanged?.Invoke(id, count);
         }
 
         private void OnDestroy()
@@ -431,6 +422,14 @@ namespace LineWars.Controllers
             stateMachine.SetState(findTargetState);
         }
 
+        public bool CanSelectCurrentCommand(CommandType commandType)
+        {
+            return ActiveSelf
+                   && (!HaveConstrains || Constrains.CanSelectCurrentCommand())
+                   && stateMachine.CurrentState == findTargetState
+                   && CheckContainsActions(commandType);
+        }
+
         public bool SelectCurrentCommand(CommandType commandType)
         {
             if (!ActiveSelf)
@@ -451,24 +450,25 @@ namespace LineWars.Controllers
                 return false;
             }
 
-            if (CheckContainsActions(commandType))
+            if (!CheckContainsActions(commandType))
             {
                 LogError($"You cant {nameof(SelectCurrentCommand)} because {nameof(Executor)} will not be able to perform this", gameObject);
                 return false;
             }
+            
             if (Executor.Actions.First(x => x.CommandType == commandType) is not ITargetedAction)
                 throw new NotImplementedException();
             currentCommandState.Prepare(commandType);
             stateMachine.SetState(currentCommandState);
 
             return true;
-            
-            bool CheckContainsActions(CommandType commandType)
-            {
-                return !Executor.Actions
-                    .Select(x => x.CommandType)
-                    .Contains(commandType);
-            }
+        }
+
+        private bool CheckContainsActions(CommandType commandType)
+        {
+            return Executor.Actions
+                .Select(x => x.CommandType)
+                .Contains(commandType);
         }
 
         public void CancelCurrentCommand()

@@ -14,11 +14,6 @@ namespace LineWars.Model
         private int ramResponsesPlayingCount;
         private Node currentNode;
 
-        public override void Initialize()
-        {
-            base.Initialize();
-        }
-
         public bool CanRam(Node node)
         {
             return Action.CanRam(node);

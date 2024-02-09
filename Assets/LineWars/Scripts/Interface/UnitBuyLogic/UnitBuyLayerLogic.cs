@@ -1,12 +1,9 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using LineWars;
 using LineWars.Controllers;
 using LineWars.Interface;
 using LineWars.Model;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class UnitBuyLayerLogic : MonoBehaviour
 {
@@ -39,6 +36,11 @@ public class UnitBuyLayerLogic : MonoBehaviour
     private void Start()
     {
         Player.LocalPlayer.TurnStarted += OnPhaseStarted;
+    }
+
+    private void OnDestroy()
+    {
+        Player.LocalPlayer.TurnStarted -= OnPhaseStarted;
     }
 
     private void OnPhaseStarted(IActor _,PhaseType phaseTypeNew)

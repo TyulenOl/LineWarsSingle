@@ -13,7 +13,7 @@ namespace LineWars.Model
         private Dictionary<CommandType, UnitAction<NodeProjection, EdgeProjection, UnitProjection>> actionsDictionary =
             new();
 
-        public IEnumerable<IMonoUnitAction<UnitAction<Node, Edge, Unit>>> MonoActions;
+        public IEnumerable<MonoUnitAction> MonoActions;
         public IEnumerable<UnitAction<NodeProjection, EdgeProjection, UnitProjection>> UnitActions { get; set; }
         public Unit Original { get; set; }
         public string UnitName { get; set; }

@@ -7,9 +7,10 @@
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
-        private int fireEffectRounds;
         public override CommandType CommandType => CommandType.Arson;
+        private int fireEffectRounds;
         public int FireEffectRounds => fireEffectRounds;
+
         public ArsonAction(TUnit executor, int fireEffectRounds) : base(executor)
         {
             this.fireEffectRounds = fireEffectRounds;
@@ -20,7 +21,6 @@
             var line = Executor.Node.GetLine(target);
             return ActionPointsCondition()
                     && line != null
-                    && Executor.CanMoveOnLineWithType(line.LineType)
                     && target.OwnerId != Executor.OwnerId
                     && !target.AllIsFree;
         }

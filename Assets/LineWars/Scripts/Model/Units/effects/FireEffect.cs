@@ -5,7 +5,7 @@ namespace LineWars.Model
 {
     public class FireEffect<TNode, TEdge, TUnit> : 
         TemporaryEffect<TNode, TEdge, TUnit>,
-        IStackableEffect
+        IStackableEffect, IPowerEffect
         where TNode : class, INodeForGame<TNode, TEdge, TUnit>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
@@ -16,6 +16,8 @@ namespace LineWars.Model
             this.firePower = firePower;
         }
         public override EffectType EffectType => EffectType.Fire;
+
+        public int Power => firePower;
 
         public override void ExecuteOnEnter()
         {
@@ -46,9 +48,7 @@ namespace LineWars.Model
 
         public bool CanStack(IStackableEffect effect)
         {
-            if (effect is not FireEffect<TNode, TEdge, TUnit>)
-                return false;
-            return true;
+            return effect is FireEffect<TNode, TEdge, TUnit>;
         }
     }
 }

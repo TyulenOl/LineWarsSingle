@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using UnityEngine;
 
 namespace LineWars.Model
 {
@@ -11,34 +7,65 @@ namespace LineWars.Model
         ITargetedAction<Unit>,
         IUpActionPointsAction<Node, Edge, Unit>
     {
+        [SerializeField] private UnitAnimation unitAnimation;
+
+        protected override bool NeedAutoComplete => false;
         protected override UpActionPointsAction<Node, Edge, Unit> GetAction()
         {
-            throw new NotImplementedException();
-        }
-
-        public void Execute(Unit target)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IActionCommand GenerateCommand(Unit target)
-        {
-            throw new NotImplementedException();
+            return new UpActionPointsAction<Node, Edge, Unit>(Executor);
         }
 
         public bool IsAvailable(Unit target)
         {
-            throw new NotImplementedException();
+            return Action.IsAvailable(target);
         }
+
+        public void Execute(Unit target)
+        {
+            if (unitAnimation == null)
+                ExecuteInstant(target);
+            else
+                ExecuteAnimation(target);
+        }
+
+        private void ExecuteInstant(Unit target) 
+        {
+            Action.Execute(target);
+            Complete();
+        }
+
+        private void ExecuteAnimation(Unit target)
+        {
+            var context = new AnimationContext()
+            {
+                TargetPosition = target.transform.position
+            };
+            unitAnimation.Ended.AddListener(OnAnimEnd);
+            unitAnimation.Execute(context);
+            void OnAnimEnd(UnitAnimation _)
+            {
+                unitAnimation.Ended.RemoveListener(OnAnimEnd);
+                ExecuteInstant(target);
+            }
+        }
+
+        public IActionCommand GenerateCommand(Unit target)
+        {
+            return new TargetedUniversalCommand<
+                Unit, 
+                MonoUpActionPointsAction,
+                Unit>(this, target);
+        }
+
+
         public override void Accept(IMonoUnitActionVisitor visitor)
         {
-            throw new NotImplementedException();
-            //visitor.Visit(this);
+            visitor.Visit(this);
         }
 
         public override TResult Accept<TResult>(IUnitActionVisitor<TResult, Node, Edge, Unit> visitor)
         {
-            throw new NotImplementedException();
+            return visitor.Visit(this);
         }
     }
 }

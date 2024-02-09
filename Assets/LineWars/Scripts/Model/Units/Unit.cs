@@ -37,7 +37,6 @@ namespace LineWars.Model
         [Header("Actions Settings")] 
         [SerializeField] [Min(0)] private int maxActionPoints;
         [SerializeField] private List<EffectInitializer> effectInitializers;
-        [SerializeField] private List<CommandType> unitCommands;
 
         [Header("DEBUG")] 
         [SerializeField, ReadOnlyInspector] private Node myNode;
@@ -47,6 +46,7 @@ namespace LineWars.Model
         [SerializeField, ReadOnlyInspector] private int currentArmor;
         [SerializeField, ReadOnlyInspector] private int currentActionPoints;
         [SerializeField, ReadOnlyInspector] private int currentPower;
+        [SerializeField, ReadOnlyInspector] private MonoUnitAction[] monoUnitActions;
 
 
         [field: Header("Events")]
@@ -55,8 +55,10 @@ namespace LineWars.Model
         [field: SerializeField] public UnityEvent<int, int> ArmorChanged { get; private set; }
         [field: SerializeField] public UnityEvent<Unit> Died { get; private set; }
         [field: SerializeField] public UnityEvent<int, int> ActionPointsChanged { get; private set; }
-
-        public event Action AnyActionCompleted;
+        [field: SerializeField] public UnityEvent<Unit, Effect<Node, Edge, Unit>> EffectAdded { get; private set; }
+        [field: SerializeField] public UnityEvent<Unit, Effect<Node, Edge, Unit>> EffectRemoved { get; private set; }
+        [field: SerializeField] public UnityEvent<Unit, Effect<Node, Edge, Unit>> EffectStacked { get; private set; }
+        
         public event Action ExecutorDestroyed;
         public event Action<Unit, Node, Node> UnitNodeChanged; 
         public event Action<Unit, int, int> UnitHPChanged; 
@@ -65,16 +67,11 @@ namespace LineWars.Model
         public event Action<Unit, int, int> UnitArmorChanged; 
         public event Action<Unit> UnitReplenished; 
 
-        private List<Effect<Node, Edge, Unit>> effects = new(); 
-
-        private Dictionary<CommandType, IMonoUnitAction<UnitAction<Node, Edge, Unit>>> monoActionsDictionary;
-        public IEnumerable<IMonoUnitAction<UnitAction<Node, Edge, Unit>>> MonoActions => monoActionsDictionary.Values;
+        private List<Effect<Node, Edge, Unit>> effects = new();
+      
+        public IEnumerable<MonoUnitAction> MonoActions => monoUnitActions;
         public IReadOnlyList<Effect<Node, Edge, Unit>> Effects => effects;
-
-        public IEnumerable<CommandType> UnitCommands => unitCommands;
-
-        public uint MaxPossibleActionRadius { get; private set; }
-
+        
         #region Properties
         public int Id => index;
         public bool IsVisible => Node.IsVisible;
@@ -209,43 +206,27 @@ namespace LineWars.Model
 
         public bool IsDied => CurrentHp <= 0;
 
+        public IEnumerable<CommandType> UnitCommands => monoUnitActions.Select(x => x.CommandType);
+
         #endregion
-        
-        private void Awake()
+
+        private void OnValidate()
+        {
+            monoUnitActions = GetComponents<MonoUnitAction>();
+        }
+
+        public void Initialize(Node node, UnitDirection direction)
         {
             dj = new RandomDJ(0.5f);
+            index = SingleGameRoot.Instance.AllUnits.Add(this);
             
             currentHp = maxHp;
             currentArmor = 0;
             currentActionPoints = maxActionPoints;
             currentPower = initialPower;
-
-            InitialiseAllActions();
-            index = SingleGameRoot.Instance.AllUnits.Add(this);
-            void InitialiseAllActions()
-            {
-                var serializeActions = gameObject.GetComponents<Component>()
-                    .OfType<IMonoUnitAction<UnitAction<Node, Edge, Unit>>>()
-                    .OrderByDescending(x => x.InitializePriority)
-                    .ToArray();
-
-                monoActionsDictionary = new Dictionary<CommandType, IMonoUnitAction<UnitAction<Node, Edge, Unit>>>(serializeActions.Length);
-                foreach (var serializeAction in serializeActions)
-                {
-                    serializeAction.Initialize();
-                    monoActionsDictionary.Add(serializeAction.CommandType, serializeAction);
-                    serializeAction.ActionCompleted += () =>
-                    {
-                        AnyActionCompleted?.Invoke();
-                    };
-                }
-
-                MaxPossibleActionRadius = MonoActions.Max(x => x.GetPossibleMaxRadius());
-            }
-        }
-
-        public void Initialize(Node node, UnitDirection direction)
-        {
+            
+            monoUnitActions = GetComponents<MonoUnitAction>();
+            
             Node = node;
             UnitDirection = direction;
             InitializeAllEffects();
@@ -263,9 +244,7 @@ namespace LineWars.Model
         public IEnumerable<IUnitAction<Node, Edge, Unit>> Actions => MonoActions;
         IEnumerable<IExecutorAction> IExecutor.Actions => Actions;
 
-        public T GetAction<T>() where T : IUnitAction<Node, Edge, Unit>
-            => MonoActions.OfType<T>().FirstOrDefault();
-
+        public T GetAction<T>() where T : IUnitAction<Node, Edge, Unit> => MonoActions.OfType<T>().FirstOrDefault();
         public bool TryGetAction<T>(out T action) where T : IUnitAction<Node, Edge, Unit>
         {
             action = GetAction<T>();
@@ -332,6 +311,7 @@ namespace LineWars.Model
             {
                 effect.ExecuteOnEnter();
                 effects.Add(effect);
+                EffectAdded.Invoke(this, effect);
             }
         }
 
@@ -346,6 +326,7 @@ namespace LineWars.Model
                 if (!currentStackableEffect.CanStack(stackableEffect)) continue;
                 currentStackableEffect.Stack(stackableEffect);
                 stacked = true;
+                EffectStacked.Invoke(this, currentEffect);
             }
             return stacked;
         }
@@ -354,6 +335,7 @@ namespace LineWars.Model
         {
             effect.ExecuteOnExit();
             effects.Remove(effect);
+            EffectRemoved.Invoke(this, effect);
         }
 
         public T Accept<T>(IMonoExecutorVisitor<T> visitor)

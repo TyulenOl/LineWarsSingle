@@ -6,6 +6,9 @@
         PowerBuff,
         Armored,
         FightingSpirit,
-        Fire
+        Fire,
+        Lonelinesss,
+        Illness,
+        Venom
     }
 }

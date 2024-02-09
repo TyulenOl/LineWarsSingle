@@ -7,14 +7,13 @@ namespace LineWars.Controllers
     [CreateAssetMenu(fileName = "New Random Music Logic", menuName = "Audio/Music Logic/Random")]
     public class RandomMusicLogicData : MusicLogicData
     {
-        [SerializeField] private List<AudioClip> musicList;
+        [SerializeField] private List<MusicData> musicDataList;
         [SerializeField] private float pauseTime;
         public override MusicLogic GetMusicLogic(MusicManager manager)
         {
             return new RandomMusicLogic(manager, this);
         }
-
-        public IReadOnlyList<AudioClip> MusicList => musicList;
+        public IReadOnlyList<MusicData> MusicDataList => musicDataList;
         public float PauseTime => pauseTime;
     }
 
@@ -35,8 +34,7 @@ namespace LineWars.Controllers
         public override void Exit()
         {
             manager.StopCoroutine(musicCoroutine);
-            manager.Source.Stop();
-            manager.Source.clip = null;
+            manager.Stop();
         }
 
         private IEnumerator MusicCoroutine()
@@ -46,18 +44,17 @@ namespace LineWars.Controllers
             {
                 while (true)
                 {
-                    var newId = Random.Range(0, data.MusicList.Count);
+                    var newId = Random.Range(0, data.MusicDataList.Count);
                     if (newId != musicId)
                     {
                         musicId = newId;
                         break;
                     }
                 }
-                manager.Source.Stop();
+                manager.Stop();
                 yield return new WaitForSeconds(data.PauseTime);
-                manager.Source.clip = data.MusicList[musicId];
-                manager.Source.Play();
-                yield return new WaitForSeconds(data.MusicList[musicId].length);
+                manager.Play(data.MusicDataList[musicId]);
+                yield return new WaitForSeconds(data.MusicDataList[musicId].AudioClip.length);
             }
         }
     }

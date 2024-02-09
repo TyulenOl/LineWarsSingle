@@ -27,7 +27,7 @@ namespace LineWars.Interface
             boxName.text = buyPanelReDrawInfo.PanelName;
             if (boxDescription != null) 
                 boxDescription.text = buyPanelReDrawInfo.PanelDescription;
-            lootBoxImage.sprite = buyPanelReDrawInfo.UnitSprite;
+            lootBoxImage.sprite = buyPanelReDrawInfo.Sprite;
             
             gameObject.SetActive(true);
         }

@@ -26,6 +26,7 @@ namespace LineWars
         public readonly IndexList<BasePlayer> AllPlayers = new();
         public readonly IndexList<Unit> AllUnits = new();
         public Deck CurrentDeck { get; private set; }
+        public IBlessingsPull LocalBlessingPull { get; private set; }
         
         private void Start()
         {
@@ -35,11 +36,13 @@ namespace LineWars
 
         public void StartGame()
         {
+            LocalBlessingPull = BlessingPullGetter.Get();
+            
             InitializeDeck();
 
             InitializeAndRegisterAllPlayers();
             InitializeGameReferee();
-            CommandsManager.Initialize(BlessingPullGetter.Get(), BlessingStorageGetter.Get());
+            CommandsManager.Initialize(LocalBlessingPull, BlessingStorageGetter.Get());
             
             StartCoroutine(StartGameCoroutine());
 
@@ -88,11 +91,13 @@ namespace LineWars
             GameReferee.Losed += WinOrLoseAction.OnLose;
         }
 
+        [EditorButton]
         public void WinGame()
         {
             WinOrLoseAction.OnWin();
         }
         
+        [EditorButton]
         public void LoseGame()
         {
             WinOrLoseAction.OnLose();

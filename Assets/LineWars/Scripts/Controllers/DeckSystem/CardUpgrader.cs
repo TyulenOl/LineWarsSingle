@@ -1,6 +1,4 @@
 using LineWars.Controllers;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -8,15 +6,22 @@ namespace LineWars.Model
 {
     public class CardUpgrader : MonoBehaviour
     {
-        [SerializeField] private int commonUpgradeCost;
-        [SerializeField] private int epicUpgradeCost;
         private UserInfoController userInfoController;
-        private IStorage<int,DeckCard> cardStorage;
+        private IStorage<int, DeckCard> cardStorage;
 
         public void Initialize(UserInfoController userInfoController, IStorage<int, DeckCard> cardStorage)
         {
             this.userInfoController = userInfoController;
             this.cardStorage = cardStorage;
+            SetInitialCardLevel();
+        }
+        private void SetInitialCardLevel()
+        {
+            foreach(var card in cardStorage.Values)
+            {
+                var level = userInfoController.GetCardLevel(card);
+                card.Level = level;
+            }
         }
 
         public bool CanUpgrade(DeckCard card)
@@ -34,11 +39,26 @@ namespace LineWars.Model
             var hasLevel = desiredLevel <= card.MaxLevel;
             if (!hasLevel)
                 return false;
-            if (card.Rarity == Rarity.Common)
-                return userInfoController.UserUpgradeCards >= commonUpgradeCost;
-            return userInfoController.UserUpgradeCards >= epicUpgradeCost;
+            var levelInfo = card.GetLevelInfo(desiredLevel);
+            return userInfoController.UserUpgradeCards >= levelInfo.CostToUpgrade;
         }
 
+        public int GetUpgradePrice(DeckCard deckCard)
+        {
+            if (!cardStorage.TryGetKey(deckCard, out int cardId))
+                return -1;
+            if (!userInfoController.CardIsOpen(deckCard))
+                return -1;
+                
+            var desiredLevel = userInfoController.UserInfo.CardLevels[cardId] + 1;
+            var hasLevel = desiredLevel <= deckCard.MaxLevel;
+            if (!hasLevel)
+                return -1;
+            
+            var levelInfo = deckCard.GetLevelInfo(desiredLevel);
+            return levelInfo.CostToUpgrade;
+        }
+        
         public void Upgrade(DeckCard card)
         {
             var cardId = cardStorage.ValueToId[card];
@@ -47,11 +67,6 @@ namespace LineWars.Model
 
         public void Upgrade(int cardId)
         {
-            if (!userInfoController.UserInfo.UnlockedCards.Contains(cardId))
-            {
-                Debug.LogError("Can't upgrade locked card!");
-                return;
-            }
             var card = cardStorage.IdToValue[cardId];
             var desiredLevel = userInfoController.UserInfo.CardLevels[cardId] + 1;
             var hasLevel = desiredLevel <= card.MaxLevel;
@@ -60,14 +75,17 @@ namespace LineWars.Model
                 Debug.LogError("Can't upgrade to next level!");
                 return;
             }
-            var price = card.Rarity == Rarity.Common ? commonUpgradeCost : epicUpgradeCost;
+            var levelInfo = card.GetLevelInfo(desiredLevel);
+            var price = levelInfo.CostToUpgrade;
             if(price > userInfoController.UserUpgradeCards)
             {
                 Debug.LogError("Cannot afford the upgrade");
                 return;
             }
+
             userInfoController.SetCardLevel(card, desiredLevel);
             userInfoController.UserUpgradeCards -= price;
+            card.Level++;
         }
     }
 }

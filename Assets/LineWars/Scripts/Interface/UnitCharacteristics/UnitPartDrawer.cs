@@ -10,17 +10,21 @@ namespace LineWars.Interface
     public class UnitPartDrawer : MonoBehaviour
     {
         [SerializeField, FormerlySerializedAs("UnitName")] private TMP_Text unitName;
+        [SerializeField] private SpriteRenderer unitSprite;
         [SerializeField] private SpriteRenderer ifInactivePanel;
         [SerializeField] private SpriteRenderer ifAvailablePanel;
         [SerializeField] private SpriteRenderer unitIsExecutorImage;
         [SerializeField] private SpriteRenderer canBlockSprite;
         [SerializeField] private TMP_Text powerAmount;
-        [field: SerializeField] public SpriteRenderer targetSprite { get; private set; }
-
         [SerializeField] private UnitProgressBar unitProgressBar;
-
+        [SerializeField] private SpriteRenderer commandIcon;
         private Unit currentUnit;
-
+        public SpriteRenderer CommandIcon
+        {
+            get => commandIcon;
+            private set => commandIcon = value;
+        }
+        public SpriteRenderer UnitSprite => unitSprite;
         public Unit CurrentUnit
         {
             get => currentUnit;

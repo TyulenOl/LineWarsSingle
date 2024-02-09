@@ -1,28 +1,31 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace LineWars.Model
 {
-    public class FightingSpiritEffect<TNode, TEdge, TUnit> : Effect<TNode, TEdge, TUnit>
+    public class FightingSpiritEffect<TNode, TEdge, TUnit> : 
+        Effect<TNode, TEdge, TUnit>, IPowerEffect
         where TNode : class, INodeForGame<TNode, TEdge, TUnit>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
         public override EffectType EffectType => EffectType.FightingSpirit;
 
+        private int powerBonus;
         public FightingSpiritEffect(TUnit targetUnit, int powerBonus) : base(targetUnit)
         {
             this.powerBonus = powerBonus;
         }
 
-        private int powerBonus;
-        private HashSet<TUnit> collectedUnits;
-        private HashSet<TNode> subscribedNodes;
+        private HashSet<TUnit> collectedUnits = new();
+        private HashSet<TNode> subscribedNodes = new();
+        public int Power => powerBonus;
 
         public override void ExecuteOnEnter()
         {
             TargetUnit.UnitNodeChanged += OnUnitNodeChanged;
-            CollectAllUnits();
+            CollectAllUnits();  
             SubscribeNodes();
         }
 
@@ -85,17 +88,13 @@ namespace LineWars.Model
 
         private void CollectAllUnits()
         {
-            var neighbors = TargetUnit.Node.GetNeighbors();
-            foreach (var neighbor in neighbors)
+            var neighbors = TargetUnit.Node
+                .GetNeighbors()
+                .SelectMany(node => node.Units)
+                .Where(unit => unit != TargetUnit);
+            foreach(var unit in neighbors)
             {
-                if (neighbor.LeftUnit != null)
-                {
-                    CollectUnit(neighbor.LeftUnit);
-                }
-                if (neighbor.RightUnit != null && neighbor.LeftUnit != neighbor.RightUnit)
-                {
-                    CollectUnit(neighbor.RightUnit);
-                }
+                CollectUnit(unit);
             }
         }
 

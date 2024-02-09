@@ -26,7 +26,10 @@
         Arson,
         SpawnWolf,
         SpawnSheep,
-        UpActionPoints
+        UpActionPoints,
+        Jump,
+        HealSacrifice,
+        VenomousSpit
     }
 }   
 

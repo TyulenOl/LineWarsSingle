@@ -40,7 +40,6 @@ namespace LineWars.Model
             CompleteAndAutoModify();
         }
         
-        public override uint GetPossibleMaxRadius() => Distance;
 
         public override CommandType CommandType => CommandType.Fire;
         

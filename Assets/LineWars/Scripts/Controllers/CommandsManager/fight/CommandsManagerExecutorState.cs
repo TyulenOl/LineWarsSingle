@@ -35,9 +35,9 @@ namespace LineWars.Controllers
                 if (!newObject.TryGetComponent(out Owned owned)
                     || !Player.LocalPlayer.IsMyOwn(owned)) return;
 
-                if (executor is Unit unit
-                    && !Player.LocalPlayer.PotentialExecutors.Contains(unit.Type))
-                    return;
+                // if (executor is Unit unit
+                //     && !Player.LocalPlayer.PotentialExecutors.Contains(unit.Type))
+                //     return;
                 if (!executor.CanDoAnyAction)
                     return;
 

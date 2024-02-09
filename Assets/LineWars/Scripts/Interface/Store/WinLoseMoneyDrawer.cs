@@ -14,8 +14,10 @@ namespace LineWars.Interface
 
         private void Awake()
         {
-            diamondsAmount.text = "+ " + WinOrLoseScene.DiamondsAmount;
-            moneyAmount.text = "+ " + WinOrLoseScene.MoneyAmount;
+            if (diamondsAmount)
+                diamondsAmount.text = "+ " + WinOrLoseScene.DiamondsAmount;
+            if (moneyAmount)
+                moneyAmount.text = "+ " + WinOrLoseScene.MoneyAmount;
         }
     }
 }

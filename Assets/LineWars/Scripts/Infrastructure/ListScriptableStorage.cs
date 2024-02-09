@@ -7,7 +7,7 @@ namespace LineWars
     public abstract class ListScriptableStorage<TKey, TValue> : ScriptableObject,
         IStorage<TKey, TValue>
     {
-        [SerializeField] private List<TValue> data;
+        [SerializeField] private List<TValue> data = new ();
 
         private Dictionary<TKey, TValue> idToValue;
         private Dictionary<TValue, TKey> valueToId;

@@ -33,6 +33,11 @@ namespace LineWars
             PhaseManager.Instance.PhaseEntered.AddListener(OnPhaseEntered);
         }
 
+        public void SetRounds(int value)
+        {
+            rounds = value;
+        }
+
         private void OnPhaseEntered(PhaseType currentType)
         {
             if (currentType != PhaseType.Replenish)
