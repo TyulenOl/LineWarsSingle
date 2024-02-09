@@ -1,5 +1,4 @@
-﻿using System;
-using LineWars.Controllers;
+﻿using LineWars.Controllers;
 using LineWars.Model;
 using UnityEngine;
 

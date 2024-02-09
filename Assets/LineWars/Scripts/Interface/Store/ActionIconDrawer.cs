@@ -10,7 +10,11 @@ namespace LineWars.Interface
 
         public void Redraw(CommandType commandType)
         {
-            icon.sprite = DrawHelper.GetSpriteByCommandType(commandType);
+            var sprite = DrawHelper.GetIconByCommandType(commandType);
+            if (sprite)
+                icon.sprite = sprite;
+            else
+                gameObject.SetActive(false);
         }
     }
 }

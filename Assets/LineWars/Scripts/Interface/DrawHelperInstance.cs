@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using AYellowpaper.SerializedCollections;
 using LineWars;
 using LineWars.Model;
@@ -12,14 +13,13 @@ public class DrawHelperInstance : MonoBehaviour
     [SerializeField] private SerializedDictionary<LootType, Sprite> lootTypeToSprite;
     [SerializeField] private SerializedDictionary<Rarity, Color> rarityToColor;
     [SerializeField] private SerializedDictionary<MissionStatus, Sprite> missionStatusToIcon;
-    [SerializeField] private SerializedDictionary<CommandType, Sprite> commandTypeToIcon;
+    [SerializeField] private SerializedDictionary<CommandType, CommandTypeInfo> commandTypeToIcon;
     [SerializeField] private SerializedDictionary<Rarity, GameObject> rarityToShopCardBg;
     [SerializeField] private SerializedDictionary<GradientType, Gradient> typeToGradient;
 
-
     public IReadOnlyDictionary<LootType, Color> LootTypeToColor => lootTypeToColor;
     public IReadOnlyDictionary<MissionStatus, Sprite> MissionStatusToIcon => missionStatusToIcon;
-    public IReadOnlyDictionary<CommandType, Sprite> CommandTypeToIcon => commandTypeToIcon;
+    public IReadOnlyDictionary<CommandType, CommandTypeInfo> CommandTypeToIcon => commandTypeToIcon;
     public IReadOnlyDictionary<LootType, Sprite> LootTypeToSprite => lootTypeToSprite;
     public IReadOnlyDictionary<Rarity, Color> RarityToColor => rarityToColor;
     public IReadOnlyDictionary<Rarity, GameObject> RarityToShopCardBg => rarityToShopCardBg;
@@ -35,4 +35,11 @@ public enum GradientType
     Gold,
     Upgrade,
     Diamond
+}
+
+[Serializable]
+public class CommandTypeInfo
+{
+    public Sprite icon;
+    public Sprite orderIcon;
 }

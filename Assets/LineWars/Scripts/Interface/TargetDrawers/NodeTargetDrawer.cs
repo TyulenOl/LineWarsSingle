@@ -10,26 +10,31 @@ namespace LineWars.Interface
     public class NodeTargetDrawer : TargetDrawer
     {
         [field: SerializeField] public LayoutGroup ImagesLayout { get; set; }
-        [field: SerializeField] public SpriteRenderer imagePrefab;
-        [field: SerializeField] public SpriteRenderer buyOnNodeInfo;
+        [field: SerializeField] public Image OrderImagePrefab { get; set; }
+        [field: SerializeField] public SpriteRenderer BuyOnNodeInfo { get; set; }
+
+        private List<Image> orderImages = new();
 
         public void ReDrawBuyInfo(bool isActive)
         {
-            buyOnNodeInfo.gameObject.SetActive(isActive);
+            BuyOnNodeInfo.gameObject.SetActive(isActive);
         }
         
         public void ReDrawCommads(IEnumerable<CommandType> commandTypes)
         {
             Clean();
             
-            var types = commandTypes.Distinct().ToList();
-            if(types.Count == 1 && types[0] == CommandType.None)
-                return;
+            var types = commandTypes
+                .Distinct()
+                .Where(x => x != CommandType.None)
+                .OrderBy(x => x)
+                .ToList();
             
             foreach (var commandType in types)
             {
-                var instance = Instantiate(imagePrefab, ImagesLayout.transform);
-                instance.sprite = DrawHelper.GetSpriteByCommandType(commandType);
+                var instance = Instantiate(OrderImagePrefab, ImagesLayout.transform);
+                instance.sprite = DrawHelper.GetOrderIconByCommandType(commandType);
+                orderImages.Add(instance);
             }
         }
 
@@ -40,11 +45,9 @@ namespace LineWars.Interface
 
         private void Clean()
         {
-            var images = ImagesLayout.GetComponentsInChildren<SpriteRenderer>();
-            foreach (var image in images)
-            {
-                Destroy(image.gameObject);
-            }
+            foreach (var el in orderImages)
+                Destroy(el.gameObject);
+            orderImages.Clear();
         }
     }
 }
