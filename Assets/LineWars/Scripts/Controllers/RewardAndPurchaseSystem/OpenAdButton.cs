@@ -12,6 +12,15 @@ namespace LineWars.Controllers
         private static SDKAdapterBase SdkAdapter => GameRoot.Instance.SdkAdapter;
         private Button button;
 
+        public Prize PrizeForAd
+        {
+            get => prizeForAd;
+            set => prizeForAd = value;
+        }
+
+        public Button Button => button;
+
+
         private void Awake()
         {
             button = GetComponent<Button>();

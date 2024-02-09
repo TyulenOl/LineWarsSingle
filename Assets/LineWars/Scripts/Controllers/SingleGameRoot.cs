@@ -91,11 +91,13 @@ namespace LineWars
             GameReferee.Losed += WinOrLoseAction.OnLose;
         }
 
+        [EditorButton]
         public void WinGame()
         {
             WinOrLoseAction.OnWin();
         }
         
+        [EditorButton]
         public void LoseGame()
         {
             WinOrLoseAction.OnLose();

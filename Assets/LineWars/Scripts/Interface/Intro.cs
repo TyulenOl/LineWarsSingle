@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using LineWars.Controllers;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,6 +15,9 @@ namespace LineWars.Interface
         [SerializeField] private Transform onLoadedText;
         [SerializeField] private Transform mainMenu;
         [SerializeField] private UIStack uiStack;
+        [SerializeField] private Animator animator;
+        private static readonly int startId = Animator.StringToHash("start");
+        [SerializeField] private float animationTime;
 
         private void Start()
         {
@@ -54,6 +58,22 @@ namespace LineWars.Interface
 
         private void OnClick()
         {
+            if (animator != null)
+                Animate();
+            else 
+                uiStack.PushElement(mainMenu);
+            
+        }
+
+        private void Animate()
+        {
+            animator.SetTrigger(startId);
+            StartCoroutine(Waiting());
+        }
+
+        private IEnumerator Waiting()
+        {
+            yield return new WaitForSeconds(animationTime);
             uiStack.PushElement(mainMenu);
         }
     }

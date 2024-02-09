@@ -137,6 +137,10 @@ namespace LineWars.Model
         public Unit SpawnUnit(Node node, Unit unitPrefab)
         {
             var unitInstance = BasePlayerUtility.CreateUnitForPlayer(this, node, unitPrefab);
+            if (node.Owner != this)
+            {
+                Owned.Connect(this, node);
+            }
             OnSpawnUnit();
             return unitInstance;
         }

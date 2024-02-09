@@ -29,6 +29,7 @@ namespace LineWars.Controllers
         
         [Header("Api")]
         [SerializeField] private YandexGameSdkAdapter yandexGameSdkAdapter;
+        [SerializeField] private FakeSDKAdapter fakeSDKAdapter;
 
         [Space]
         [SerializeField] private Platform platform;
@@ -82,7 +83,7 @@ namespace LineWars.Controllers
 
             SdkAdapter = platform switch
             {
-                Platform.Local => throw new NotImplementedException(),
+                Platform.Local => fakeSDKAdapter,
                 Platform.YandexGame => yandexGameSdkAdapter,
                 _ => throw new ArgumentOutOfRangeException()
             };

@@ -53,7 +53,10 @@ namespace LineWars
                 value.gameObject.SetActive(false);
 
             foreach (var type in types)
-                commandToDrawer[type].gameObject.SetActive(true);
+            {
+                if (commandToDrawer.TryGetValue(type, out var drawer))
+                    drawer.gameObject.SetActive(true);
+            }
         }
     }
 }

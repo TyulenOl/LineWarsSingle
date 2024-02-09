@@ -71,7 +71,7 @@ namespace LineWars.Interface
             {
                 var instance = Instantiate(dropElementPrefab, dropLayoutGroup.transform);
                 instance.Icon.sprite = DrawHelper.LootTypeToSprite[lootInfo.LootType];
-                instance.Background.color = DrawHelper.RarityToColor[Rarity.Common];
+                instance.Background.color = DrawHelper.LootTypeToColor[lootInfo.LootType];
                 dropElements.Add(instance);
             }
         }

@@ -6,7 +6,6 @@ using LineWars.Controllers;
 using LineWars.Model;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace LineWars.Interface
 {

@@ -111,12 +111,12 @@ namespace LineWars
                 return savesYg;
             }
 
-            if (gameInfo.Decks == null)
-                Debug.LogError($"{nameof(gameInfo.Decks)} is null!");
-            if (gameInfo.Missions == null)
-                Debug.LogError($"{nameof(gameInfo.Missions)} is null!");
-            if (gameInfo.UserInfo == null)
-                Debug.LogError($"{nameof(gameInfo.UserInfo)} is null!");
+            // if (gameInfo.Decks == null)
+            //     Debug.LogError($"{nameof(gameInfo.Decks)} is null!");
+            // if (gameInfo.Missions == null)
+            //     Debug.LogError($"{nameof(gameInfo.Missions)} is null!");
+            // if (gameInfo.UserInfo == null)
+            //     Debug.LogError($"{nameof(gameInfo.UserInfo)} is null!");
 
             savesYg.Decks = gameInfo.Decks?.Select(pair => pair.Value).Convert().ToArray();
             savesYg.Missions = gameInfo.Missions?.Select(pair => pair.Value).Convert().ToArray();

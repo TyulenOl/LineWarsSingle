@@ -56,12 +56,17 @@ namespace LineWars.Model
             var otherOwner = owned.Owner;
             if (otherOwner != null)
             {
-                owned.Owner = null;
                 if (otherOwner != basePlayer)
+                {
+                    owned.Owner = null;
                     otherOwner.RemoveOwned(owned);
+                }
+                else
+                {
+                    return;
+                }
             }
-
-
+            
             basePlayer.AddOwned(owned);
             owned.Owner = basePlayer;
         }
