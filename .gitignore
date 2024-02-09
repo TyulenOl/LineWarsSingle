@@ -65,6 +65,7 @@ crashlytics-build.properties
 .vscode
 .vsconfig
 UserSettings
+Assets/YandexGame
 
 
 # Never ignore DLLs in the FMOD subfolder.
