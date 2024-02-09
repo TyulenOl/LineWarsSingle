@@ -14,7 +14,8 @@ namespace LineWars
         {
             AudioPause = 1,
             TimeScalePause = 2,
-            CursorActivity = 4
+            CursorActivity = 4,
+            EventSystemLock = 8
         }
 
         public enum PauseMethod
@@ -96,6 +97,7 @@ namespace LineWars
 
         protected override void Awake()
         {
+            base.Awake();
             if (awakeSetValues)
             {
                 audioPauseOnAd = awakeValues.audioPause;
@@ -133,25 +135,28 @@ namespace LineWars
             if (logPause)
                 Debug.Log("Pause game: " + pause);
 
-            if (pause)
+            if (pauseType.HasFlag(PauseType.EventSystemLock))
             {
-                if (awaitingClosure)
-                    return;
-                awaitingClosure = true;
+                if (pause)
+                {
+                    if (awaitingClosure)
+                        return;
+                    awaitingClosure = true;
 
-                if (!eventSystem)
-                    eventSystem = FindObjectOfType<EventSystem>();
-                if (eventSystem)
-                    eventSystem.enabled = false;
-            }
-            else
-            {
-                awaitingClosure = false; 
-                
-                if (!eventSystem)
-                    eventSystem = FindObjectOfType<EventSystem>();
-                if (eventSystem)
-                    eventSystem.enabled = true;
+                    if (!eventSystem)
+                        eventSystem = FindObjectOfType<EventSystem>();
+                    if (eventSystem)
+                        eventSystem.enabled = false;
+                }
+                else
+                {
+                    awaitingClosure = false;
+
+                    if (!eventSystem)
+                        eventSystem = FindObjectOfType<EventSystem>();
+                    if (eventSystem)
+                        eventSystem.enabled = true;
+                }
             }
             
             if (pauseType.HasFlag(PauseType.AudioPause))
