@@ -114,7 +114,7 @@ namespace LineWars.Model
             switch (phaseType)
             {
                 case PhaseType.Buy:
-                    GameUI.Instance.SetEnemyTurn(false);
+                    GameUI.Instance.SetEconomyTurn();
                     break;
                 case PhaseType.Replenish:
                     ExecuteReplenish();
