@@ -1,5 +1,5 @@
 {
-    "idSave": 134,
+    "idSave": 187,
     "isFirstSession": false,
     "language": "ru",
     "promptDone": false,
@@ -172,11 +172,7 @@
     "Decks": [
         {
             "Id": 0,
-            "CardsId": [
-                1,
-                0,
-                5
-            ]
+            "CardsId": []
         }
     ],
     "Missions": [

@@ -7,8 +7,8 @@ public class EnemyTurnPanel : MonoBehaviour
 {
     private float alphaDecreaseModifier;
 
-    [SerializeField] private Image lizardsImage;
-    [SerializeField] private Image rusImage;
+    [SerializeField] private CanvasGroup lizardsImage;
+    [SerializeField] private CanvasGroup rusImage;
 
     private bool isCoroutineActive;
 
@@ -34,13 +34,13 @@ public class EnemyTurnPanel : MonoBehaviour
     IEnumerator HideCoroutine()
     {
         rusImage.gameObject.SetActive(true);
-        rusImage.color = rusImage.color.WithAlpha(1);
+        rusImage.alpha = 1;
         var resultAlpha = 255f;
-        while (rusImage.gameObject.activeInHierarchy && rusImage.color.a > 0.1)
+        while (rusImage.gameObject.activeInHierarchy && rusImage.alpha > 0.1)
         {
             resultAlpha -= 2f;
             yield return new WaitForSeconds(0.01f);
-            rusImage.color = rusImage.color.WithAlpha(resultAlpha / 255f);
+            rusImage.alpha = resultAlpha / 255f;
         }
 
         rusImage.gameObject.SetActive(false);
@@ -48,7 +48,7 @@ public class EnemyTurnPanel : MonoBehaviour
 
     private void RestoreDefaults()
     {
-        lizardsImage.color = lizardsImage.color.WithAlpha(1);
+        lizardsImage.alpha = 1;
         lizardsImage.gameObject.SetActive(true);
         rusImage.gameObject.SetActive(false);
     }
