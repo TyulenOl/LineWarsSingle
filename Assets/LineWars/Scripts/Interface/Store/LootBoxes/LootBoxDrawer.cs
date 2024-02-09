@@ -17,6 +17,7 @@ namespace LineWars.Interface
         [SerializeField] private TMP_Text boxDescription;
         [SerializeField] private Button button;
         [SerializeField] private CostDrawer costDrawer;
+        [SerializeField] private Transform transformToGenerateSibling;
         
         [SerializeField] private LayoutGroup dropLayoutGroup;
         [SerializeField] private DropElement dropElementPrefab;
@@ -105,7 +106,7 @@ namespace LineWars.Interface
         {
             if (bg != null)
                 Destroy(bg.gameObject);
-            var newBgInstance = Instantiate(newBg, transform);
+            var newBgInstance = Instantiate(newBg, transformToGenerateSibling);
             newBgInstance.transform.SetAsFirstSibling();
             bg = newBgInstance;
         }
