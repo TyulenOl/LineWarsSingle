@@ -32,6 +32,9 @@ namespace LineWars.Model
         StrategyMaster,
         Fan,
         Jumper,
-        Peasant
+        Peasant,
+        Rider,
+        Hedgehog,
+        VenomLizard
     }
 }

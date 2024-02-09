@@ -8,12 +8,13 @@ namespace LineWars
     [CreateAssetMenu(fileName = "New Phase Order Data", menuName = "Phase Order Data")]
     public class PhaseOrderData : ScriptableObject, IReadOnlyList<PhaseType>
     {
+        [SerializeField] private PhaseType firstPhase;
         [SerializeField] private List<PhaseType> order;
 
         public IReadOnlyList<PhaseType> Order => order;
 
         public PhaseType this[int index] => ((IReadOnlyList<PhaseType>)order)[index];
-
+        public PhaseType FirstPhase => firstPhase;
         public int Count => ((IReadOnlyCollection<PhaseType>)order).Count;
 
         public IEnumerator<PhaseType> GetEnumerator()
@@ -25,5 +26,7 @@ namespace LineWars
         {
             return ((IEnumerable)order).GetEnumerator();
         }
+
+        
     }
 }

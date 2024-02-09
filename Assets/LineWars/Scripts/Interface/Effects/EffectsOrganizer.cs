@@ -8,7 +8,8 @@ namespace LineWars.Interface
     {
         [SerializeField] private Unit unit;
         [SerializeField] private EffectDrawer drawerPrefab;
-        private List<EffectDrawer> currentDrawers;
+        private List<EffectDrawer> currentDrawers = new();
+
         private void Start()
         {
             unit.EffectAdded.AddListener(Redraw);
