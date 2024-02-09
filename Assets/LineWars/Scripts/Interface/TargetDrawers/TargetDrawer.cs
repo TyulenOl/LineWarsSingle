@@ -13,7 +13,7 @@ namespace LineWars.Interface
         public virtual void ReDrawCommads(CommandType commandType)
         {
             image.enabled = commandType != CommandType.None;
-            image.sprite = DrawHelper.GetSpriteByCommandType(commandType);
+            image.sprite = DrawHelper.GetOrderIconByCommandType(commandType);
         }
     }
 }

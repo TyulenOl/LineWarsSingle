@@ -43,8 +43,10 @@ namespace LineWars.Interface
             }));
             
             if (unit.TryGetAction<MonoBlockAction>(out var action))
+            {
                 action.CanBlockChanged +=
                     (_, newBool) => ExecuteForAllDrawers(drawer => drawer.ReDrawCanBlock(newBool));
+            }
 
             if (leftPart != null)
             {

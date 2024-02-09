@@ -1,18 +1,19 @@
 {
-    "idSave": 134,
+    "idSave": 174,
     "isFirstSession": false,
     "language": "ru",
     "promptDone": false,
     "UserInfoYg": {
-        "Diamonds": 999815,
-        "Gold": 1002451,
+        "Diamonds": 999801,
+        "Gold": 1002485,
         "UnlockedCards": [
             1,
             0,
             5,
             4,
             15,
-            16
+            16,
+            14
         ],
         "UpgradeCards": 0,
         "LootBoxes": [
@@ -175,7 +176,9 @@
             "CardsId": [
                 1,
                 0,
-                5
+                16,
+                5,
+                14
             ]
         }
     ],
