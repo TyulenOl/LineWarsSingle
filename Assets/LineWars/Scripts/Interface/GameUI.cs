@@ -127,9 +127,14 @@ namespace LineWars.Interface
             }
         }
 
+        public void SetEconomyTurn()
+        {
+            
+        }
+        
         public void SetEnemyTurn(bool isEnemyTurn)
         {
-            enemyTurnPanel.IsCoroutineActive = isEnemyTurn;
+            enemyTurnPanel.SetTurn(isEnemyTurn);
         }
 
         private void ReDrawCurrentTargets(ExecutorMessage message)
