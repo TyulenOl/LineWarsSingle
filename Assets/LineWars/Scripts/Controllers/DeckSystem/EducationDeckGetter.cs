@@ -19,7 +19,11 @@ namespace LineWars.Controllers
                 Name = "EducationDeck"
             };
             foreach (var card in deckCards)
+            {
+                card.Level = 0;
                 deck.AddCard(card);
+            }
+                
             return deck;
         }
     }

@@ -10,7 +10,8 @@ namespace LineWars
         Fight,
         Scout,
         Replenish,
-        None
+        None,
+        Payday
     }
 
     public enum PhaseMode
@@ -29,7 +30,8 @@ namespace LineWars
                 {PhaseType.Artillery, PhaseMode.Alternating},
                 {PhaseType.Fight,PhaseMode.Alternating},
                 {PhaseType.Scout, PhaseMode.Alternating},
-                {PhaseType.Replenish, PhaseMode.NotPlayable}
+                {PhaseType.Replenish, PhaseMode.NotPlayable},
+                {PhaseType.Payday, PhaseMode.Simultaneous}
             };
 
         public static PhaseType Next(this PhaseType type, IReadOnlyList<PhaseType> orderData)

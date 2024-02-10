@@ -47,6 +47,8 @@ namespace LineWars.Model
                 return true;
             if(phase == PhaseType.Buy)
                 return true;
+            if(phase == PhaseType.Payday) 
+                return true;
             //var executors = PhaseExecutorsData.PhaseToUnits[phase];
             foreach (var owned in OwnedObjects)
             {
@@ -61,6 +63,12 @@ namespace LineWars.Model
         public override void ExecuteTurn(PhaseType phaseType)
         {
             InvokeTurnStarted(phaseType);
+            if(phaseType == PhaseType.Payday)
+            {
+                ExecutePayday();
+                InvokeTurnEnded(phaseType);
+                return;
+            }
             if (phaseType == PhaseType.Replenish)
             {
                 ExecuteReplenish();
