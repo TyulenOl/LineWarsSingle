@@ -17,7 +17,7 @@ namespace LineWars.Model
         [field: SerializeField] public int Id { get; private set; } = -1;
 
         [field: Header("Settings")]
-        [field: SerializeField] public PhaseExecutorsData PhaseExecutorsData { get; private set; }
+        //[field: SerializeField] public PhaseExecutorsData PhaseExecutorsData { get; private set; }
 
         [field: SerializeField] public PlayerRules Rules { get; private set; }
         [field: SerializeField] public Nation Nation { get; private set; }
@@ -137,6 +137,10 @@ namespace LineWars.Model
         public Unit SpawnUnit(Node node, Unit unitPrefab)
         {
             var unitInstance = BasePlayerUtility.CreateUnitForPlayer(this, node, unitPrefab);
+            if (node.Owner != this)
+            {
+                Owned.Connect(this, node);
+            }
             OnSpawnUnit();
             return unitInstance;
         }

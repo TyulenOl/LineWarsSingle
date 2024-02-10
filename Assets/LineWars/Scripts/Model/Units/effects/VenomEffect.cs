@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace LineWars.Model
@@ -13,6 +12,8 @@ namespace LineWars.Model
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
         private int venomPower;
+        public event Action<IPowerEffect, int, int> PowerChanged;
+
         public VenomEffect(TUnit targetUnit, int rounds, int venomPower) : base(targetUnit, rounds)
         {
             this.venomPower = venomPower;
@@ -45,7 +46,9 @@ namespace LineWars.Model
                 throw new ArgumentException("Can't stack this effect");
             }
             Rounds += venomEffect.Rounds;
+            var prevPower = venomPower;
             venomPower = Mathf.Max(venomPower, venomEffect.venomPower);
+            PowerChanged?.Invoke(venomEffect, prevPower, venomPower);
         }
 
         public bool CanStack(IStackableEffect effect)

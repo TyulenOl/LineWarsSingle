@@ -19,6 +19,8 @@ namespace LineWars
         [SerializeField] private TMP_Text attackText;
         [SerializeField] private TMP_Text apText;
 
+        [SerializeField] private TMP_Text costInfo;
+
         [SerializeField] private Image cardImage;
 
         [SerializeField] private ActionsPanelDrawer actionsPanelDrawer;
@@ -66,6 +68,9 @@ namespace LineWars
                 apText.text = deckCard.Unit.MaxActionPoints.ToString();
             
             actionsPanelDrawer.ReDrawActions(deckCard);
+
+            if (costInfo)
+                costInfo.text = $"{deckCard.Cost}(+TODO)";
         }
     }
 }

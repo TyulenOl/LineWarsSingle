@@ -10,6 +10,9 @@ namespace LineWars.Model
     {
         private readonly Effect<TNode, TEdge, TUnit> innerEffect;
         private int roundsCount;
+
+        public event Action<ITemporaryEffect, int, int> RoundsChanged;
+
         public int InitialRounds { get; private set; }
 
         public RoundsTemporaryEffectDecorator(
@@ -39,7 +42,9 @@ namespace LineWars.Model
 
         private void TargetUnitOnUnitReplenished(TUnit unit)
         {
+            var prevRounds = roundsCount;
             roundsCount--;
+            RoundsChanged?.Invoke(this, prevRounds, roundsCount);
             if (roundsCount <= 0)
             {
                 TargetUnit.UnitReplenished -= TargetUnitOnUnitReplenished;

@@ -23,11 +23,6 @@ namespace LineWars.Model
                 MonoGraph.Instance);
         }
 
-        public override void Initialize()
-        {
-            base.Initialize();
-        }
-
         public override void Attack(ITargetedAlive enemy)
         {
             if(enemy is Unit targetUnit && distanceAttackAnimation != null)

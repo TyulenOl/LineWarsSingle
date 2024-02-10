@@ -36,14 +36,14 @@ namespace LineWars.Interface
                     ifInactivePanel.gameObject.SetActive(!value);
                 isActive = value;
 
-                if (!value)
-                {
-                    upgradeDrawer.gameObject.SetActive(false);
-                }
-                else
-                {
-                    upgradeDrawer.gameObject.SetActive(deckCard != null && CardUpgrader.CanUpgrade(deckCard));
-                }
+                // if (!value)
+                // {
+                //     upgradeDrawer.gameObject.SetActive(false);
+                // }
+                // else
+                // {
+                //     upgradeDrawer.gameObject.SetActive(deckCard != null && CardUpgrader.CanUpgrade(deckCard));
+                // }
             }
         }
 
@@ -52,20 +52,20 @@ namespace LineWars.Interface
             get => deckCard;
             set
             {
-                if (deckCard != null)
-                    deckCard.LevelChanged -= DeckCardOnLevelChanged;
-                if (value != null)
-                    value.LevelChanged += DeckCardOnLevelChanged;
+                // if (deckCard != null)
+                //     deckCard.LevelChanged -= DeckCardOnLevelChanged;
+                // if (value != null)
+                //     value.LevelChanged += DeckCardOnLevelChanged;
                 
                 deckCard = value;
                 Redraw(deckCard);
             }
         }
 
-        private void DeckCardOnLevelChanged(DeckCard deckCard, int level)
-        {
-            Redraw(deckCard);
-        }
+        // private void DeckCardOnLevelChanged(DeckCard deckCard, int level)
+        // {
+        //     Redraw(deckCard);
+        // }
 
         private void Redraw(DeckCard deckCard)
         {
@@ -99,20 +99,25 @@ namespace LineWars.Interface
                 }
                
             }
+            
+            RedrawUpdateInfo();
+            
             // if (borderImage != null)
             //     borderImage.sprite = DeckCard.CardActiveBagLine;
-                
-            if (upgradeDrawer != null)
-            {
-                var active = IsActive && CardUpgrader.CanUpgrade(deckCard);
-                upgradeDrawer.gameObject.SetActive(active);
-            }
         }
         
         private void ReStoreDefaults()
         {
             cardImage.sprite = null;
             unitName.text = "Нет юнита";
+        }
+
+        public void RedrawUpdateInfo()
+        {
+            if (upgradeDrawer != null)
+            {
+                upgradeDrawer.gameObject.SetActive(deckCard != null && CardUpgrader.CanUpgrade(deckCard));
+            }
         }
     }
 }

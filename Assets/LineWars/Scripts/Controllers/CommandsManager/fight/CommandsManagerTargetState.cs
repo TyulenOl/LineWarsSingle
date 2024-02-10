@@ -88,8 +88,7 @@ namespace LineWars.Controllers
             {
                 return executor.Actions
                     .OfType<ITargetedAction>()
-                    .Where(x => x.IsAvailable(target)
-                                && CheckAction(x));
+                    .Where(x => x.IsAvailable(target) && CheckAction(x));
             }
 
             private void CancelExecutor()

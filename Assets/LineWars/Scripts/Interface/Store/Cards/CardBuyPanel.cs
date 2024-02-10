@@ -36,6 +36,7 @@ namespace LineWars.Interface
             Redraw(deckCard);
             SetButtonInteractable(buttonInteractable);
         }
+        
         private void Redraw(DeckCard deckCard)
         {
             if (actionIconDrawers.Count > 0)

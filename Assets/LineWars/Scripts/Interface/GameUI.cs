@@ -6,7 +6,6 @@ using LineWars.Controllers;
 using LineWars.Model;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace LineWars.Interface
 {
@@ -106,7 +105,7 @@ namespace LineWars.Interface
 
         private void ReDrawAllAvailability(IExecutor before, IExecutor after)
         {
-            var unitsToReDraw = Player.LocalPlayer.GetAllUnitsByPhase(PhaseManager.Instance.CurrentPhase);
+            var unitsToReDraw = Player.LocalPlayer.MyUnits;
             if (after is null)
             {
                 if (before is { CanDoAnyAction: true })

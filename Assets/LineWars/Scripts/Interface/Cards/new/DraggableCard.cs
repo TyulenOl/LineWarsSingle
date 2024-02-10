@@ -83,5 +83,10 @@ namespace LineWars.Interface
             
             EndDragging?.Invoke(this);
         }
+        
+        public void RedrawLevelInfo()
+        {
+            baseCardDrawer.RedrawUpdateInfo();
+        }
     }
 }

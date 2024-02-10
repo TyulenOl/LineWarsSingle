@@ -18,13 +18,7 @@ namespace LineWars.Model
         public bool Onslaught => Action.Onslaught;
         public UnitBlockerSelector BlockerSelector => Action.BlockerSelector;
         protected override bool NeedAutoComplete => false;
-
-        public override void Initialize()
-        {
-            base.Initialize();
-        }
-
-
+        
         public override void Attack(ITargetedAlive enemy)
         {
             if (enemy is Unit unit && attackAnimation != null)

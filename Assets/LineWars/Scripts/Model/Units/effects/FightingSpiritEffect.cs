@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -20,6 +21,9 @@ namespace LineWars.Model
 
         private HashSet<TUnit> collectedUnits = new();
         private HashSet<TNode> subscribedNodes = new();
+
+        public event Action<IPowerEffect, int, int> PowerChanged;
+
         public int Power => powerBonus;
 
         public override void ExecuteOnEnter()

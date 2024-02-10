@@ -13,14 +13,14 @@ namespace LineWars.Model
     {
         public static Player LocalPlayer { get; private set; }
 
-        private IReadOnlyCollection<UnitType> potentialExecutors;
+        //private IReadOnlyCollection<UnitType> potentialExecutors;
         private readonly Dictionary<Node, int> additionalVisibleNodesRound = new();
         private readonly Dictionary<Node, int> additionalVisibleNodeTurn = new();
 
         public event Action VisibilityRecalculated;
 
         public PhaseType? CurrentPhase { get; protected set; } 
-        public IReadOnlyCollection<UnitType> PotentialExecutors => potentialExecutors;
+        //public IReadOnlyCollection<UnitType> PotentialExecutors => potentialExecutors;
         public IReadOnlyDictionary<Node, bool> VisibilityMap { get; private set; }
 
 
@@ -70,19 +70,19 @@ namespace LineWars.Model
             // }
         }
 
-        public IEnumerable<Unit> GetAllUnitsByPhase(PhaseType phaseType)
-        {
-            if (PhaseExecutorsData.PhaseToUnits.TryGetValue(phaseType, out var value))
-            {
-                foreach (var myUnit in MyUnits)
-                {
-                    if (value.Contains(myUnit.Type))
-                    {
-                        yield return myUnit;
-                    }
-                }
-            }
-        }
+        // public IEnumerable<Unit> GetAllUnitsByPhase(PhaseType phaseType)
+        // {
+        //     if (PhaseExecutorsData.PhaseToUnits.TryGetValue(phaseType, out var value))
+        //     {
+        //         foreach (var myUnit in MyUnits)
+        //         {
+        //             if (value.Contains(myUnit.Type))
+        //             {
+        //                 yield return myUnit;
+        //             }
+        //         }
+        //     }
+        // }
 
         public void FinishTurn() 
         {
@@ -120,9 +120,9 @@ namespace LineWars.Model
                     ExecuteReplenish();
                     break;
                 default:
-                    potentialExecutors = PhaseExecutorsData[phaseType];
+                    //potentialExecutors = PhaseExecutorsData[phaseType];
                     GameUI.Instance.SetEnemyTurn(false);
-                    GameUI.Instance.ReDrawAllAvailability(GetAllUnitsByPhase(phaseType), true);
+                    GameUI.Instance.ReDrawAllAvailability(MyUnits, true);
                     break;
             }
         }
@@ -151,12 +151,12 @@ namespace LineWars.Model
             if (phaseType == PhaseType.Buy || phaseType == PhaseType.Replenish)
                 return true;
 
-            var phaseExecutors = PhaseExecutorsData.PhaseToUnits[phaseType];
+            //var phaseExecutors = PhaseExecutorsData.PhaseToUnits[phaseType];
 
             foreach (var owned in OwnedObjects)
             {
                 if(!(owned is Unit unit)) continue;
-                if(phaseExecutors.Contains(unit.Type) && unit.CurrentActionPoints > 0)
+                if(/*phaseExecutors.Contains(unit.Type) &&*/ unit.CurrentActionPoints > 0)
                     return true;
             }
 

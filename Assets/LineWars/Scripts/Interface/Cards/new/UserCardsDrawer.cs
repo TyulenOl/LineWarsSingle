@@ -46,14 +46,24 @@ namespace LineWars.Interface
                 });
 
                 deckCardToDrawer[card] = instance;
+                
+                card.LevelChanged += CardOnLevelChanged;
             }
         }
-
         private void DestroyAllCards()
         {
             foreach (var drawer in deckCardToDrawer.Values)
+            {
+                drawer.DeckCard.LevelChanged -= CardOnLevelChanged;
                 Destroy(drawer.gameObject);
+            }
             deckCardToDrawer.Clear();
+        }
+        
+        private void CardOnLevelChanged(DeckCard deckCard, int level)
+        {
+            foreach (var value in deckCardToDrawer.Values)
+                value.RedrawLevelInfo();
         }
     }
 }

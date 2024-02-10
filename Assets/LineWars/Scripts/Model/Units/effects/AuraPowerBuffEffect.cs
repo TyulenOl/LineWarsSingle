@@ -116,16 +116,18 @@ namespace LineWars.Model
 
         private void OnUnitLeft(TNode node, TUnit unit) 
         {
+            if (unit == TargetUnit) return;
             DebuffUnit(unit);
         }
 
         private void OnUnitAdded(TNode node, TUnit unit) 
         {
+            if (unit == TargetUnit) return;
             BuffUnit(unit);
         }
 
         private void OnUnitPowerChanged(TUnit unit, int prevPower, int currentPower)
-        {
+        { 
             RebuffUnits();
         }
     }

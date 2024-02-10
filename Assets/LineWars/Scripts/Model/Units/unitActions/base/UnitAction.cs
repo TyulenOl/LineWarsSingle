@@ -14,8 +14,6 @@ namespace LineWars.Model
         protected UnitAction(TUnit executor) : base(executor)
         {
         }
-        
-        public virtual uint GetPossibleMaxRadius() => (uint) Executor.CurrentActionPoints;
 
         public abstract void Accept(IBaseUnitActionVisitor<TNode, TEdge, TUnit> visitor);
         public abstract TResult Accept<TResult>(IUnitActionVisitor<TResult, TNode, TEdge, TUnit> visitor);
