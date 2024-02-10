@@ -41,7 +41,9 @@ namespace LineWars.Interface
                 roundsObjects.SetActive(false);
             }
 
-            if (GameRoot.Instance.DrawHelper.EffectTypeToSprite.ContainsKey(effect.EffectType))
+            if (GameRoot.Instance != null &&
+                GameRoot.Instance.DrawHelper != null &&
+                GameRoot.Instance.DrawHelper.EffectTypeToSprite.ContainsKey(effect.EffectType))
             {
                 var icon = GameRoot.Instance.DrawHelper.EffectTypeToSprite[effect.EffectType];
                 image.sprite = icon;

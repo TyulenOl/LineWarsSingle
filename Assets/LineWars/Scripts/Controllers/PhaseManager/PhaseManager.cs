@@ -23,6 +23,7 @@ namespace LineWars
         private PhaseAlternatingState fightState;
         private PhaseAlternatingState scoutState;
         private PhaseSynchronousState replenishState;
+        private PhaseSynchronousState paydayState;
         
         private Dictionary<PhaseType, Phase> typeToPhase;
         private int currentActorId;
@@ -86,6 +87,7 @@ namespace LineWars
             fightState = new PhaseAlternatingState(PhaseType.Fight, this);
             scoutState = new PhaseAlternatingState(PhaseType.Scout, this);
             replenishState = new PhaseSynchronousState(PhaseType.Replenish, this);
+            paydayState = new PhaseSynchronousState(PhaseType.Payday, this);
             
             typeToPhase = new Dictionary<PhaseType, Phase>()
             {
@@ -93,7 +95,8 @@ namespace LineWars
                 {PhaseType.Artillery, artilleryState},
                 {PhaseType.Fight, fightState},
                 {PhaseType.Scout, scoutState},
-                {PhaseType.Replenish, replenishState}
+                {PhaseType.Replenish, replenishState},
+                {PhaseType.Payday, paydayState}
             };
         }
         
