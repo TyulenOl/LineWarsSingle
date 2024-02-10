@@ -30,10 +30,6 @@ namespace LineWars.Model
 
         private IEnumerator AttackCoroutine(ITargetedAlive enemy)
         {
-            if (attackSfx == null)
-            {
-                Debug.LogError($"{nameof(attackSfx)} is null on {Executor.gameObject.name}");
-            }
             Action.Attack(enemy);
             Executor.PlaySfx(attackSfx);
             if(attackSfx != null && attackSfx.Clip != null)

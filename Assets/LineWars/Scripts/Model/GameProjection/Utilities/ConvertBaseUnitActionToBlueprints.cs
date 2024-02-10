@@ -46,7 +46,7 @@ namespace LineWars.Model
             foreach (var node in Graph.GetNodesInRange(action.Executor.Node, 1))
             {
                 
-                if(action.CanMoveTo(node) && (!node.IsBase || action.Executor.OwnerId == node.OwnerId))
+                if(action.CanMoveTo(node))
                 {
 
                     var command = new MoveCommandBlueprint(action.Executor.Id, node.Id);

@@ -21,7 +21,6 @@ public class AutoVisibilityMapGenerator: MonoBehaviour
     private string AbsoluteDirPath => $"{Application.dataPath}/{dirPath}";
     private string AbsoluteFilePath => $"{AbsoluteDirPath}/{fileName}{Guid.NewGuid()}.png";
 
-
     public Texture2D GenerateVisibilityMap()
     {
         if (mapRenderer == null || mapRenderer.sprite == null)
@@ -55,7 +54,7 @@ public class AutoVisibilityMapGenerator: MonoBehaviour
         var bytes = tex.EncodeToPNG();
         var path = AbsoluteFilePath;
         File.WriteAllBytes(path, bytes);
-        UnityEditor.AssetDatabase.ImportAsset(path);
+        UnityEditor.AssetDatabase.ImportAsset(path.Replace($"{Application.dataPath}/", "Assets/"));
         Debug.Log("Saved to " + path);
     }
 #endif

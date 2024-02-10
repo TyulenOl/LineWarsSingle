@@ -33,7 +33,8 @@ namespace LineWars.Model
                 distance <= maxJumpDistance &&
                 FreeNodeCondition() &&
                 ForBigCondition() &&
-                ActionPointsCondition();
+                ActionPointsCondition()
+                && target.CanOwnerMove(Executor.OwnerId);
 
             bool FreeNodeCondition()
             {
