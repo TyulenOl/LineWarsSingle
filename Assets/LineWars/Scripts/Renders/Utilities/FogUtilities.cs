@@ -6,17 +6,17 @@ using UnityEngine;
 public static class FogUtilities
 {
     public static Texture2D GenerateVisibilityMapTexture(
-        Vector2 mapSizeInUnits,
-        Vector2Int textureSize,
-        IEnumerable<Vector2> nodesPositionsInWorldSpace,
-        int colorStep)
+        Vector2Int visibilityTextureSize,
+        IEnumerable<Vector2Int> nodesPositionsInWorldSpace,
+        int colorStep,
+        TextureFormat textureFormat = TextureFormat.RGBA32,
+        bool mipMap = false)
     {
-        var totalPixelsCount = textureSize.x * textureSize.y;
-        var visibilityMap = new Texture2D(textureSize.x, textureSize.y);
+        var totalPixelsCount = visibilityTextureSize.x * visibilityTextureSize.y;
+        var visibilityMap = new Texture2D(visibilityTextureSize.x, visibilityTextureSize.y, textureFormat, mipMap);
 
         var centers = nodesPositionsInWorldSpace
-            .Select(x => x.GetPixelCoord(mapSizeInUnits, textureSize))
-            .Where(x => x.CheckPixelCoord(textureSize))
+            .Where(x => x.CheckPixelCoord(visibilityTextureSize))
             .Distinct()
             .ToArray();
 
@@ -55,7 +55,7 @@ public static class FogUtilities
 
                     foreach (var neighbour in GetNeighboursPixels(current))
                     {
-                        if (!neighbour.CheckPixelCoord(textureSize))
+                        if (!neighbour.CheckPixelCoord(visibilityTextureSize))
                             continue;
                         if (coloredPixels.Contains(neighbour))
                             continue;
@@ -89,7 +89,7 @@ public static class FogUtilities
             currentRadius++;
         }
 
-        var uncoloredPixels = FogExtensions.GetAllPixels(textureSize)
+        var uncoloredPixels = FogExtensions.GetAllPixels(visibilityTextureSize)
             .Where(x => !coloredPixels.Contains(x))
             .ToArray();
 

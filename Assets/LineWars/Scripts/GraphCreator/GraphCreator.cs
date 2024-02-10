@@ -391,7 +391,7 @@ namespace GraphEditor
                 }
             }
 
-            EditorDebug.LogError("Cant generate connective graph");
+            Debug.LogError("Cant generate connective graph");
             return null;
         }
 

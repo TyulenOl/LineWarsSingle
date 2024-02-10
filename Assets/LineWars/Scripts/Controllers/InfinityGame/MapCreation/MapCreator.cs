@@ -44,9 +44,9 @@ namespace LineWars.Controllers
                 maxVisibilityMapSide);
 
             var visibilityMap = FogUtilities.GenerateVisibilityMapTexture(
-                mapSize,
                 visibilityMapTextureSize,
-                monoGraph.Nodes.Select(x => x.Position - minPointOfMap),
+                monoGraph.Nodes.Select(x => x.Position - minPointOfMap)
+                    .Select(x => x.GetPixelCoord(mapSize, visibilityMapTextureSize)),
                 colorStep);
 
 
