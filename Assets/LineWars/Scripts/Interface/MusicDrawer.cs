@@ -19,7 +19,7 @@ namespace LineWars.Interface
         private void OnEnable()
         {
             MusicManager.MusicChanged.AddListener(MusicChanged);
-            if (MusicManager.CurrentMusicData != null && MusicManager.CurrentMusicData != current)
+            if (MusicManager.CurrentMusicData != null)
                 Animate(MusicManager.CurrentMusicData);
         }
 
@@ -30,7 +30,7 @@ namespace LineWars.Interface
 
         private void MusicChanged(MusicData before, MusicData after)
         {
-            if (after != null && current != after)
+            if (after != null)
             {
                 Animate(after);
             }
@@ -38,6 +38,10 @@ namespace LineWars.Interface
 
         private void Animate(MusicData musicData)
         {
+            if (current == musicData)
+                return;
+            
+            Debug.Log("Animate");
             current = musicData;
             
             var haveName = !string.IsNullOrEmpty(musicData.Name);
