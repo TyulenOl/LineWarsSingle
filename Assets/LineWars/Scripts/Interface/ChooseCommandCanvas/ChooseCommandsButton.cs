@@ -27,7 +27,7 @@ namespace LineWars
         public void ReDraw(CommandPreset commandPreset)
         {
             hash = commandPreset;
-            var sprite = DrawHelper.GetOrderIconByCommandType(hash.Action.CommandType);
+            var sprite = DrawHelper.GetIconByCommandType(hash.Action.CommandType);
             commandImage.sprite = sprite;
             costOfAction.text = commandPreset.Action.GetActionPointsCost().ToString();
         }
