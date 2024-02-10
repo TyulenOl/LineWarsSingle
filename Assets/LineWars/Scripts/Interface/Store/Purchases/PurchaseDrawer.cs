@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 namespace LineWars.Interface
 {
-    public class PurchaseDrawer: MonoBehaviour
+    public class PurchaseDrawer: PurchaseContainer
     {
         private static SDKAdapterBase SDKAdapter => GameRoot.Instance.SdkAdapter;
         
@@ -18,8 +18,7 @@ namespace LineWars.Interface
         [SerializeField] private bool addCurrency_toPrice = true;
         
         public UnityEvent<UserPurchaseInfo> OnClick;
-        public UserPurchaseInfo Data { get; set; }
-
+        
         private void OnEnable()
         {
             if (button)
