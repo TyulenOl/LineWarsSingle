@@ -1,4 +1,5 @@
 using LineWars.Model;
+using System;
 using UnityEngine;
 
 namespace LineWars
@@ -12,6 +13,9 @@ namespace LineWars
     {
         private int powerDebuff;
         private int deductedPower;
+
+        public event Action<IPowerEffect, int, int> PowerChanged;
+
         public IllnessEffect(
             TUnit targetUnit, 
             int rounds,
@@ -68,7 +72,9 @@ namespace LineWars
             if(illnessEffect.Rounds > Rounds || illnessEffect.powerDebuff > powerDebuff)
             {
                 Rounds = Mathf.Max(Rounds, illnessEffect.Rounds);
+                var prevDebuff = powerDebuff;
                 powerDebuff = Mathf.Max(powerDebuff, illnessEffect.powerDebuff);
+                PowerChanged?.Invoke(illnessEffect, prevDebuff, powerDebuff);
                 Spread();
             }
         }

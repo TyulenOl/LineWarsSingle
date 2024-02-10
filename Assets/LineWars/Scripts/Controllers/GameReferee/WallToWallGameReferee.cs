@@ -9,10 +9,10 @@ namespace LineWars.Model
         public override void Initialize([NotNull] Player player, IEnumerable<BasePlayer> enemies)
         {
             base.Initialize(player, enemies);
-            player.PhaseExceptions.Add(PhaseType.Buy);
+            //player.PhaseExceptions.Add(PhaseType.Buy);
             foreach(var enemy in enemies)
             {
-                enemy.PhaseExceptions.Add(PhaseType.Buy);
+                //enemy.PhaseExceptions.Add(PhaseType.Buy);
                 enemy.OwnedRemoved += Enemy_OwnerRemoved;
             }
             player.OwnedRemoved += Me_OwnedRemoved;

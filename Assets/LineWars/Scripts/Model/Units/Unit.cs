@@ -281,6 +281,12 @@ namespace LineWars.Model
                 };
                 responses.PlayDeathAnimation();
             }
+
+            var effectsToDelete = new List<Effect<Node, Edge, Unit>>(effects);
+            foreach(var effect in effectsToDelete)
+            {
+                RemoveEffect(effect);
+            }
         }
 
         private void DestroyOnAnimationEnd(UnitAnimation animation)
@@ -299,6 +305,7 @@ namespace LineWars.Model
 
             UnitReplenished?.Invoke(this);
         }
+
         public void AddEffect(Effect<Node, Edge, Unit> effect)
         {
             if(effect.TargetUnit != this)

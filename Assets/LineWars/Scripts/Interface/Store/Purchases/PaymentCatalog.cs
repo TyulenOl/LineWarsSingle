@@ -2,6 +2,7 @@
 using LineWars.Controllers;
 using LineWars.Model;
 using UnityEngine;
+using UnityEngine.Events;
 using Utilities.Runtime;
 
 namespace LineWars.Interface
@@ -9,6 +10,9 @@ namespace LineWars.Interface
     public class PaymentCatalog: MonoBehaviour
     {
         private static SDKAdapterBase SdkAdapter => GameRoot.Instance.SdkAdapter;
+        
+        [Header("References")]
+        [SerializeField] private PurchaseBuyPanel purchaseBuyPanel;
         
         [Header("Settings")]
         [SerializeField] private bool spawnPurchases = true;
@@ -18,14 +22,14 @@ namespace LineWars.Interface
         [SerializeField] private GameObject purchasePrefab;
         
         [Tooltip("Когда следует обновлять список покупок?\nStart - Обновлять в методе Start.\nOnEnable - Обновлять при каждой активации объекта (в методе OnEnable)\nDoNotUpdate - Не обновлять.")]
-        [SerializeField]private UpdateListMethod updateListMethod;
+        [SerializeField] private UpdateListMethod updateListMethod;
 
         [Tooltip("Список покупок")]
-        [SerializeField]public PurchaseDrawer[] purchasesDrawers = Array.Empty<PurchaseDrawer>();
+        [SerializeField] private PurchaseDrawer[] purchasesDrawers = Array.Empty<PurchaseDrawer>();
 
         [SerializeField] private PrizeType prizeType;
         
-        public Action OnUpdatePurchasesList;
+        public UnityEvent OnUpdatePurchasesList;
         private void OnEnable()
         {
             if (updateListMethod != UpdateListMethod.DoNotUpdate)
@@ -85,6 +89,7 @@ namespace LineWars.Interface
                 purchasesDrawers[i] = purchaseObj.GetComponent<PurchaseDrawer>();
                 purchasesDrawers[i].Data = purchase;
                 purchasesDrawers[i].UpdateEntries();
+                purchasesDrawers[i].OnClick.AddListener(purchaseBuyPanel.OpenWindow);
             }
         }
 
@@ -107,7 +112,6 @@ namespace LineWars.Interface
             }
         }
     }
-
     public enum UpdateListMethod
     {
         OnEnable,

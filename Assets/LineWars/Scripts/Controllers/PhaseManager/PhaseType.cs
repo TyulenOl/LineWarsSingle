@@ -9,7 +9,8 @@ namespace LineWars
         Artillery,
         Fight,
         Scout,
-        Replenish
+        Replenish,
+        None
     }
 
     public enum PhaseMode
@@ -31,7 +32,7 @@ namespace LineWars
                 {PhaseType.Replenish, PhaseMode.NotPlayable}
             };
 
-        public static PhaseType Next(this PhaseType type, PhaseOrderData orderData)
+        public static PhaseType Next(this PhaseType type, IReadOnlyList<PhaseType> orderData)
         {
             var index = orderData.FindIndex(type);
             if (index == -1) throw new ArgumentException("Order Data doesn't contains given PhaseType!");

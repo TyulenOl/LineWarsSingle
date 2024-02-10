@@ -17,7 +17,9 @@ namespace LineWars.Model
             return new Deck(
                 value.Id,
                 value.Name,
-                value.Cards.Select(e => idToCard[e.CardId])
+                value.Cards
+                .Where(card => idToCard.ContainsKey(card.CardId))
+                .Select(e => idToCard[e.CardId])
             );
         }
     }

@@ -22,6 +22,7 @@ namespace LineWars.Model
 
         public Unit Spawn(Node node)
         {
+            node.ConnectTo(player.Id);
             return player.SpawnUnit(node, spawnUnit);
         }
     }

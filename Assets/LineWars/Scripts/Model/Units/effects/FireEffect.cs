@@ -11,6 +11,9 @@ namespace LineWars.Model
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
         private int firePower;
+
+        public event Action<IPowerEffect, int, int> PowerChanged;
+
         public FireEffect(TUnit targetUnit, int rounds, int firePower) : base(targetUnit, rounds)
         {
             this.firePower = firePower;
@@ -43,7 +46,9 @@ namespace LineWars.Model
                 throw new ArgumentException("Can't stack this effect");
             }
             Rounds += fireEffect.Rounds;
+            var prevPower = fireEffect.Power;
             firePower = Mathf.Max(firePower, fireEffect.firePower);
+            PowerChanged?.Invoke(fireEffect, prevPower, firePower);
         }
 
         public bool CanStack(IStackableEffect effect)

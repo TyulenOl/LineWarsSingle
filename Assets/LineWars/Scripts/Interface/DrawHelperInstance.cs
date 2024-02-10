@@ -16,6 +16,7 @@ public class DrawHelperInstance : MonoBehaviour
     [SerializeField] private SerializedDictionary<CommandType, CommandTypeInfo> commandTypeToIcon;
     [SerializeField] private SerializedDictionary<Rarity, GameObject> rarityToShopCardBg;
     [SerializeField] private SerializedDictionary<GradientType, Gradient> typeToGradient;
+    [SerializeField] private SerializedDictionary<EffectType, Sprite> effectTypeToSprite;
 
     public IReadOnlyDictionary<LootType, Color> LootTypeToColor => lootTypeToColor;
     public IReadOnlyDictionary<MissionStatus, Sprite> MissionStatusToIcon => missionStatusToIcon;
@@ -24,6 +25,7 @@ public class DrawHelperInstance : MonoBehaviour
     public IReadOnlyDictionary<Rarity, Color> RarityToColor => rarityToColor;
     public IReadOnlyDictionary<Rarity, GameObject> RarityToShopCardBg => rarityToShopCardBg;
     public IReadOnlyDictionary<GradientType, Gradient> TypeToGradient => typeToGradient;
+    public IReadOnlyDictionary<EffectType, Sprite> EffectTypeToSprite => effectTypeToSprite;
 
     public Sprite GoldSprite => goldSprite;
 }
