@@ -21,6 +21,19 @@ namespace LineWars.Interface
         {
             Instance._OpenPanel(title, money);
         }
+
+        public static void OpenErrorPanel()
+        {
+            OpenPanel(
+                new TextRedrawInfo("Ой-ой", Color.white),
+                new TextRedrawInfo("произошла ошибка", Color.white)
+            );
+        }
+        
+        public static void OpenSuccessPanel(Money money)
+        {
+            FullscreenPanel.OpenPanel(new TextRedrawInfo("Успешно", Color.red), money);
+        }
         
         private void _OpenPanel(TextRedrawInfo title, TextRedrawInfo description)
         {

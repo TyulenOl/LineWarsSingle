@@ -30,16 +30,13 @@ namespace LineWars.Interface
             if (prize == PrizeType.Gold && amount == WinOrLoseScene.MoneyAmount)
             {
                 openAdButton.Button.interactable = false;
-                FullscreenPanel.OpenPanel(new TextRedrawInfo("Успешно", Color.red), new Money(CostType.Gold, amount));
+                FullscreenPanel.OpenSuccessPanel(new Money(CostType.Gold, amount));
             }
         }
         
         private void SDKAdapterOnErrorVideoEvent()
         {
-            FullscreenPanel.OpenPanel(
-                new TextRedrawInfo("Ой-ой", Color.white),
-                new TextRedrawInfo("произошла ошибка", Color.white)
-            );
+            FullscreenPanel.OpenErrorPanel();
         }
     }
 }

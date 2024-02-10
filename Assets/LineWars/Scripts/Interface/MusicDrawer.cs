@@ -19,8 +19,8 @@ namespace LineWars.Interface
         private void OnEnable()
         {
             MusicManager.MusicChanged.AddListener(MusicChanged);
-            if (MusicManager.CurrentMusicData != null)
-                Animate(MusicManager.CurrentMusicData);
+            // if (MusicManager.CurrentMusicData != null)
+            //     Animate(MusicManager.CurrentMusicData);
         }
 
         private void OnDisable()

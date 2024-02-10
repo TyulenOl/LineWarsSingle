@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AYellowpaper.SerializedCollections;
+using LineWars.Interface;
 using LineWars.Model;
 using UnityEngine;
 using YG;
@@ -158,17 +159,20 @@ namespace LineWars.Controllers
             if (purchaseIdToPrize.TryGetValue(id, out var prize))
             {
                 Reward(prize);
+                FullscreenPanel.OpenSuccessPanel(new Money(prize.Type.ToCostType(), prize.Amount));
                 InvokePurchaseSuccessEvent(id);
             }
             else
             {
                 Debug.LogError("The purchase cannot be processed!");
+                FullscreenPanel.OpenErrorPanel();
                 InvokeErrorVideoEvent();
             }
         }
         
         private void OnPurchaseFailedEvent(string id)
         {
+            FullscreenPanel.OpenErrorPanel();
             InvokePurchaseFailedEvent(id);
         }
         
