@@ -23,6 +23,11 @@ namespace LineWars
                     .Where((actor) => actor.CanExecuteTurn(Type))
                     .ToArray();
                 actorsLeft = elligbleActors.Length;
+                if(AreActorsDone )
+                {
+                    manager.ToNextPhase();
+                    return;
+                }
                 foreach (var actor in elligbleActors) 
                     actor.TurnEnded += OnTurnLogicEnd;
                 foreach(var actor in elligbleActors)

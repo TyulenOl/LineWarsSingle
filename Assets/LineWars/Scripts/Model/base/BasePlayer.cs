@@ -268,11 +268,14 @@ namespace LineWars.Model
 
         protected virtual void ExecuteReplenish()
         {
-            CurrentMoney += Income;
             var objects = new List<Owned>(OwnedObjects);
             foreach (var owned in objects)
                 owned.Replenish();
+        }
 
+        protected virtual void ExecutePayday()
+        {
+            CurrentMoney += Income;
         }
 
         protected void InvokeTurnStarted(PhaseType phaseType)

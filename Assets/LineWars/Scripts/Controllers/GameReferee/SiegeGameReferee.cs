@@ -30,8 +30,15 @@ namespace LineWars
         {
             base.Initialize(player, enemies);
             PhaseManager.Instance.PhaseEntered.AddListener(OnPhaseEntered);
+            PhaseManager.Instance.PhaseExited.AddListener(OnPhaseExited);
             player.OwnedRemoved += OnRemoveOwned;
-            player.PhaseExceptions.Add(PhaseType.Buy);
+        }
+
+        private void OnPhaseExited(PhaseType previous)
+        {
+            if(previous != PhaseType.Buy)
+                return;
+            Player.LocalPlayer.PhaseExceptions.Add(PhaseType.Buy);
         }
 
         private void OnPhaseEntered(PhaseType current)
