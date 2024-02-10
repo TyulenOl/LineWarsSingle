@@ -39,12 +39,16 @@ SpriteAtlas:
     - {fileID: 2800000, guid: 04a0736f3af934345a58f89abd2f30dc, type: 3}
     - {fileID: 2800000, guid: c6ec991f862f05e439bab517a80b3e25, type: 3}
     - {fileID: 2800000, guid: c2e6f8f46cb84ae49bc1134f37d72635, type: 3}
+    - {fileID: 2800000, guid: 313395439878f82438db07b84440166f, type: 3}
+    - {fileID: 2800000, guid: d56fd34701d12b843801ad78057406d6, type: 3}
     bindAsDefault: 1
     isAtlasV2: 0
     cachedData: {fileID: 0}
     packedSpriteRenderDataKeys:
     - 802accc1f7198ba49b81e61410990627: 21300000
+    - 313395439878f82438db07b84440166f: 21300000
     - c2e6f8f46cb84ae49bc1134f37d72635: 21300000
+    - d56fd34701d12b843801ad78057406d6: 21300000
     - 4309fd1bb13f16147a59b024b3a9c688: 21300000
     - 64c709cdde4cf7545bc6ffb636eabbf8: 21300000
     - 3e9b8d8e6a159904aae8df65fc1496d4: 21300000
@@ -53,7 +57,9 @@ SpriteAtlas:
   m_MasterAtlas: {fileID: 0}
   m_PackedSprites:
   - {fileID: 21300000, guid: 802accc1f7198ba49b81e61410990627, type: 3}
+  - {fileID: 21300000, guid: 313395439878f82438db07b84440166f, type: 3}
   - {fileID: 21300000, guid: c2e6f8f46cb84ae49bc1134f37d72635, type: 3}
+  - {fileID: 21300000, guid: d56fd34701d12b843801ad78057406d6, type: 3}
   - {fileID: 21300000, guid: 4309fd1bb13f16147a59b024b3a9c688, type: 3}
   - {fileID: 21300000, guid: 64c709cdde4cf7545bc6ffb636eabbf8, type: 3}
   - {fileID: 21300000, guid: 3e9b8d8e6a159904aae8df65fc1496d4, type: 3}
@@ -61,7 +67,9 @@ SpriteAtlas:
   - {fileID: 21300000, guid: 04a0736f3af934345a58f89abd2f30dc, type: 3}
   m_PackedSpriteNamesToIndex:
   - Money
+  - MusicBack
   - Context 4
+  - MusicIcon
   - MapCapture
   - CurrentUnitPanel
   - BuyUnitsPanel

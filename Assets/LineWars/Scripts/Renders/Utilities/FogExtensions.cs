@@ -54,4 +54,26 @@ public static class FogExtensions
             throw new ArgumentOutOfRangeException();
         return texture2D.GetPixel(pixelCoord.x, pixelCoord.y);
     }
+
+    public static bool CheckCoord(
+        this Vector2 coord,
+        Vector2 size)
+    {
+        return coord.x >= 0
+               && coord.x < size.x
+               && coord.y >= 0
+               && coord.y < size.y;
+    }
+    
+    public static bool CheckCoord(
+        this Vector3 coord,
+        Vector3 size)
+    {
+        return coord.x >= 0
+               && coord.x <= size.x
+               && coord.y >= 0
+               && coord.y <= size.y
+               && coord.z >= 0
+               && coord.z <= size.z;
+    }
 }

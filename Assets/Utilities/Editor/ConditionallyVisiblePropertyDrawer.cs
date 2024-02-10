@@ -29,7 +29,7 @@ namespace Utilities.Editor
         {
             var attr = (ConditionallyVisibleAttribute)attribute;
             var dependentProp = property.serializedObject.FindProperty(attr.propertyName);
-            return dependentProp.boolValue;
+            return attr.invert? !dependentProp.boolValue : dependentProp.boolValue;
         }
     }
 }

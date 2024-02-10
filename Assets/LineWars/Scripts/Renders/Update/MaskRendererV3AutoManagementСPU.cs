@@ -105,7 +105,7 @@ public class MaskRendererV3AutoManagementСPU : Singleton<MaskRendererV3AutoMana
     {
         if (initialized)
         {
-            Debug.LogError($"{nameof(MaskRendererV3)} is Initialized!");
+            Debug.LogError($"{nameof(MaskRendererV3AutoManagementСPU)} is Initialized!");
             return;
         }
         if (!CheckValid()) return;
