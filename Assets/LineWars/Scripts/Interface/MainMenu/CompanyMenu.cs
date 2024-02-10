@@ -29,7 +29,7 @@ namespace LineWars
 
         public void OnEnable()
         {
-            missionInfoUI.gameObject.SetActive(false);
+            //missionInfoUI.gameObject.SetActive(false);
         }
     }
 }

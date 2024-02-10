@@ -33,6 +33,7 @@ namespace LineWars
         public void Redraw(MissionData data, string onButtonText)
         { 
             gameObject.SetActive(true);
+            startButton.gameObject.SetActive(true);
             missionName.text = data.MissionName;
             missionDescription.text = data.MissionDescription;
             missionImage.sprite = data.MissionImage;

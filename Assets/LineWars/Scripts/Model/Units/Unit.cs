@@ -363,5 +363,11 @@ namespace LineWars.Model
             CurrentArmor -= blockedDamage;
             CurrentHp -= notBlockedDamage;
         }
+        
+        public int GetMoveCost()
+        {
+            var action = monoUnitActions.FirstOrDefault(x => x.CommandType == CommandType.Move);
+            return action == null ? 0 : action.GetActionPointsCost();
+        }
     }
 }
