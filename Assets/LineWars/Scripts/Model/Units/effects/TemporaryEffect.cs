@@ -1,5 +1,4 @@
 ﻿using System;
-using UnityEditorInternal.VR;
 
 namespace LineWars.Model
 {
