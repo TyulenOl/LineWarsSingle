@@ -75,6 +75,8 @@ SpriteAtlas:
     - {fileID: 2800000, guid: 370abbff295b3f14ca8c0d121fcf72b2, type: 3}
     - {fileID: 2800000, guid: fd55e0f514459704da1e7d38098ae14f, type: 3}
     - {fileID: 2800000, guid: a8fbe817c65afe246af283b8c4428ed9, type: 3}
+    - {fileID: 2800000, guid: d42cb0987ae7c8848b26f2f389235ce1, type: 3}
+    - {fileID: 2800000, guid: ff68cf2a3d158194d8b1436c3203e58c, type: 3}
     bindAsDefault: 1
     isAtlasV2: 0
     cachedData: {fileID: 0}
@@ -90,14 +92,18 @@ SpriteAtlas:
     - 1ae3d565344e0ff43a4ef83cf0bc8621: 21300000
     - 458e9795dff66614485e194b4c0bbaa5: 21300000
     - 5bd8efc5ed4ed9d41987ddb17e3cb277: 21300000
+    - fd55e0f514459704da1e7d38098ae14f: 21300000
     - 459bf55636efca64fbd33a733c135a15: 21300000
     - 5dedccd68ef7afd4f8ebdb471010400a: 21300000
     - fc2ca6e6d26fff44cb913f83e8eeb5fd: 21300000
     - 97ed3ff69dc9ddf4b9a16a6ad9582398: 21300000
+    - a8fbe817c65afe246af283b8c4428ed9: 21300000
     - 8530ed28d0fcdd9489e40500c2047461: 21300000
     - 77b78838ea5601d4db4f2edc5ef21094: 21300000
     - 16d79978b1f5cec40a0c60cae48a9d53: 21300000
+    - d42cb0987ae7c8848b26f2f389235ce1: 21300000
     - 77f691e8fded25c4392e2eeeffb49e94: 21300000
+    - ff68cf2a3d158194d8b1436c3203e58c: 21300000
     - 750a08baa970247488d2123bc031519d: 21300000
     - a18217ebfbc6c234fb6b92de17560307: 21300000
     - 4bf0fafcaeffa7a44b628b0ddf1c73fe: 21300000
@@ -106,6 +112,7 @@ SpriteAtlas:
     - 88d6aecd7dae2b54ba2f54296c7d4cc3: 21300000
     - a3ffbdde66f05614db90e3f0f51e39df: 21300000
     - acf1818f1cab0fc4b9a1a6345c694c64: 21300000
+    - 370abbff295b3f14ca8c0d121fcf72b2: 21300000
   m_MasterAtlas: {fileID: 0}
   m_PackedSprites:
   - {fileID: 21300000, guid: eac98f502ce2aa248a81708eb9d77069, type: 3}
@@ -119,14 +126,18 @@ SpriteAtlas:
   - {fileID: 21300000, guid: 1ae3d565344e0ff43a4ef83cf0bc8621, type: 3}
   - {fileID: 21300000, guid: 458e9795dff66614485e194b4c0bbaa5, type: 3}
   - {fileID: 21300000, guid: 5bd8efc5ed4ed9d41987ddb17e3cb277, type: 3}
+  - {fileID: 21300000, guid: fd55e0f514459704da1e7d38098ae14f, type: 3}
   - {fileID: 21300000, guid: 459bf55636efca64fbd33a733c135a15, type: 3}
   - {fileID: 21300000, guid: 5dedccd68ef7afd4f8ebdb471010400a, type: 3}
   - {fileID: 21300000, guid: fc2ca6e6d26fff44cb913f83e8eeb5fd, type: 3}
   - {fileID: 21300000, guid: 97ed3ff69dc9ddf4b9a16a6ad9582398, type: 3}
+  - {fileID: 21300000, guid: a8fbe817c65afe246af283b8c4428ed9, type: 3}
   - {fileID: 21300000, guid: 8530ed28d0fcdd9489e40500c2047461, type: 3}
   - {fileID: 21300000, guid: 77b78838ea5601d4db4f2edc5ef21094, type: 3}
   - {fileID: 21300000, guid: 16d79978b1f5cec40a0c60cae48a9d53, type: 3}
+  - {fileID: 21300000, guid: d42cb0987ae7c8848b26f2f389235ce1, type: 3}
   - {fileID: 21300000, guid: 77f691e8fded25c4392e2eeeffb49e94, type: 3}
+  - {fileID: 21300000, guid: ff68cf2a3d158194d8b1436c3203e58c, type: 3}
   - {fileID: 21300000, guid: 750a08baa970247488d2123bc031519d, type: 3}
   - {fileID: 21300000, guid: a18217ebfbc6c234fb6b92de17560307, type: 3}
   - {fileID: 21300000, guid: 4bf0fafcaeffa7a44b628b0ddf1c73fe, type: 3}
@@ -135,6 +146,7 @@ SpriteAtlas:
   - {fileID: 21300000, guid: 88d6aecd7dae2b54ba2f54296c7d4cc3, type: 3}
   - {fileID: 21300000, guid: a3ffbdde66f05614db90e3f0f51e39df, type: 3}
   - {fileID: 21300000, guid: acf1818f1cab0fc4b9a1a6345c694c64, type: 3}
+  - {fileID: 21300000, guid: 370abbff295b3f14ca8c0d121fcf72b2, type: 3}
   m_PackedSpriteNamesToIndex:
   - LichKing
   - KvasWalk
@@ -147,14 +159,18 @@ SpriteAtlas:
   - Michailo
   - Koldun
   - Alesha
+  - Rider
   - Piromant
   - Pronura
   - StategyMaster
   - Vityaz
+  - VenomLizard
   - Sheep
   - Stavrislav
   - VibeKnyaz
+  - Peasant
   - Squire
+  - Fan
   - Dubin
   - Strelec
   - Myromec
@@ -163,6 +179,7 @@ SpriteAtlas:
   - Svatogor
   - BigGuy
   - Vedun
+  - Hedgehog
   m_RenderDataMap: {}
   m_Tag: UnitSprites
   m_IsVariant: 0

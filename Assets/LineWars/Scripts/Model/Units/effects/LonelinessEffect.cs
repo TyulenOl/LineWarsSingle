@@ -12,6 +12,7 @@ namespace LineWars.Model
         private TNode executorNode;
         private int powerBonus;
         private bool isBuffed;
+        public event Action<IPowerEffect, int, int> PowerChanged;
 
         public int PowerBonus => powerBonus;
         public int Power => powerBonus;

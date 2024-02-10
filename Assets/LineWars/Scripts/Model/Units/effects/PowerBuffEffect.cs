@@ -1,4 +1,6 @@
-﻿namespace LineWars.Model
+﻿using System;
+
+namespace LineWars.Model
 {
     public class PowerBuffEffect<TNode, TEdge, TUnit> : 
         Effect<TNode, TEdge, TUnit>, 
@@ -16,6 +18,8 @@
         public override EffectType EffectType => EffectType.PowerBuff;
 
         public int Power => addedPower;
+
+        public event Action<IPowerEffect, int, int> PowerChanged;
 
         public override void ExecuteOnEnter()
         {

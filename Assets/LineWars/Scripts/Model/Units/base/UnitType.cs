@@ -35,6 +35,7 @@ namespace LineWars.Model
         Peasant,
         Rider,
         Hedgehog,
-        VenomLizard
+        VenomLizard,
+        Michailo
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEditorInternal.VR;
 
 namespace LineWars.Model
 {
@@ -10,13 +11,17 @@ namespace LineWars.Model
     {
         private int rounds;
         protected readonly int initialRounds;
+
+        public event Action<ITemporaryEffect, int, int> RoundsChanged;
+
         public int Rounds
         {
             get => rounds;
             protected set
             {
+                var prevValue = rounds;
                 rounds = value;
-                RoundsChanged?.Invoke(this);
+                RoundsChanged?.Invoke(this, prevValue, rounds);
                 if(rounds <= 0)
                 {
                     TargetUnit.RemoveEffect(this);
@@ -26,7 +31,7 @@ namespace LineWars.Model
 
         public int InitialRounds => initialRounds;
 
-        public Action<TemporaryEffect<TNode, TEdge, TUnit>> RoundsChanged;
+
         protected TemporaryEffect(TUnit targetUnit, int rounds) : base(targetUnit)
         {
             this.rounds = rounds;
