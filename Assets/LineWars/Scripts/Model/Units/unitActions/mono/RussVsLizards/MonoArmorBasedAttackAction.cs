@@ -3,15 +3,15 @@
 namespace LineWars.Model
 {
     public class MonoArmorBasedAttackAction :
-        MonoUnitAction<PowerBasedHealAction<Node, Edge, Unit>>,
+        MonoUnitAction<ArmorBasedAttackAction<Node, Edge, Unit>>,
         ITargetedAction<Unit>,
         IArmorBasedAttackAction<Node, Edge, Unit>
     {
         [SerializeField] private ActionUnitAnimation attackAnimation;
         protected override bool NeedAutoComplete => false;
-        protected override PowerBasedHealAction<Node, Edge, Unit> GetAction()
+        protected override ArmorBasedAttackAction<Node, Edge, Unit> GetAction()
         {
-            return new PowerBasedHealAction<Node, Edge, Unit>(Executor);
+            return new ArmorBasedAttackAction<Node, Edge, Unit>(Executor);
         }
 
         public void Execute(Unit target)

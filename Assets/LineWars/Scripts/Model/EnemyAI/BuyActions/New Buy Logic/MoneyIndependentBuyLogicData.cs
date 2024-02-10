@@ -65,7 +65,8 @@ namespace LineWars.Model
 
         public override void CalculateBuy()
         {
-            
+            if (data.UnitsPerRound.Count == 0)
+                return;
             foreach (var purchase in data.UnitsPerRound[currentRoundId])
             {
                 var currentUnit = player.GetUnitPrefab(purchase.UnitType);
