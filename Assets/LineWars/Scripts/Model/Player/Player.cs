@@ -113,6 +113,10 @@ namespace LineWars.Model
             InvokeTurnStarted(phaseType);
             switch (phaseType)
             {
+                case PhaseType.Payday:
+                    ExecutePayday();
+                    FinishTurn();
+                    break;
                 case PhaseType.Buy:
                     GameUI.Instance.SetEconomyTurn();
                     break;
@@ -148,7 +152,9 @@ namespace LineWars.Model
         {
             if(!base.CanExecuteTurn(phaseType)) //плохо? сделать явное сравнение на PhaseExceptions?
                 return false;
-            if (phaseType == PhaseType.Buy || phaseType == PhaseType.Replenish)
+            if (phaseType == PhaseType.Buy || 
+                phaseType == PhaseType.Replenish ||
+                phaseType == PhaseType.Payday)
                 return true;
 
             //var phaseExecutors = PhaseExecutorsData.PhaseToUnits[phaseType];

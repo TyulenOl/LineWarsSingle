@@ -220,10 +220,10 @@ namespace LineWars.Model
             dj = new RandomDJ(0.5f);
             index = SingleGameRoot.Instance.AllUnits.Add(this);
             
-            currentHp = maxHp;
-            currentArmor = 0;
-            currentActionPoints = maxActionPoints;
-            currentPower = initialPower;
+            currentHp += maxHp;
+            currentArmor += 0;
+            currentActionPoints += maxActionPoints;
+            currentPower += initialPower;
             
             monoUnitActions = GetComponents<MonoUnitAction>();
             

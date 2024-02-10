@@ -9,7 +9,11 @@ namespace LineWars.Model
         protected readonly EnemyAI ai;
         protected readonly GameEvaluator gameEvaluator;
         protected readonly DepthDetailsData depthDetailsData;
-
+        private List<PhaseType> skippedPhases = new List<PhaseType>()
+        { 
+            PhaseType.Buy,
+            PhaseType.Payday
+        };
         public BaseEnemyAITurnLogic(
             EnemyAI ai, 
             GameEvaluator gameEvaluator, 
@@ -64,10 +68,24 @@ namespace LineWars.Model
                 else
                     newGame.CyclePlayers();
             }
-            if (newGame.CurrentPhase == PhaseType.Buy)
+            var safeguard = 0;
+            while(true)
             {
-                newGame.CycleTurn();
+                if(skippedPhases.Contains(newGame.CurrentPhase))
+                {
+                    newGame.CycleTurn();
+                }
+                else
+                {
+                    break;
+                }
+                safeguard++;
+                if(safeguard > 100)
+                {
+                    return new(gameEvaluator.Evaluate(newGame, thisPlayerProjection), firstCommandChain);
+                }    
             }
+
             if (depth > ai.Depth || newGame.CurrentPhase == PhaseType.Buy)
             {
                 return new(gameEvaluator.Evaluate(newGame, thisPlayerProjection), firstCommandChain);
