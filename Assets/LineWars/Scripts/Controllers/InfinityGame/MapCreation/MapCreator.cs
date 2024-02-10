@@ -15,6 +15,13 @@ namespace LineWars.Controllers
         [SerializeField] private GameObject maskRendererObj;
         [SerializeField, Min(0)] private int maxVisibilityMapSide = 128;
         [SerializeField, Range(1, 255)] private int colorStep = 1000;
+        [SerializeField] private bool generateOnStart = false;
+
+        private void Start()
+        {
+            if(generateOnStart)
+                GenerateMap(MonoGraph.Instance);
+        }
 
         public void GenerateMap(MonoGraph monoGraph)
         {

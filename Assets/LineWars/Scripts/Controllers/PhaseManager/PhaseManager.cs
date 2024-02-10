@@ -26,7 +26,7 @@ namespace LineWars
         
         private Dictionary<PhaseType, Phase> typeToPhase;
         private int currentActorId;
-
+        private bool isFirstRound = false;
         public IReadOnlyList<IActor> Actors => actors.AsReadOnly();
         public IActor CurrentActor => actors[currentActorId];
         public PhaseType CurrentPhase => ((Phase)stateMachine.CurrentState).Type;
@@ -60,6 +60,12 @@ namespace LineWars
         public void StartGame()
         {
             Debug.Log("Game Started!");
+            if(OrderData.FirstPhase != PhaseType.None)
+            {
+                stateMachine.SetState(typeToPhase[OrderData.FirstPhase]);
+                isFirstRound = true;
+                return;
+            }
             stateMachine.SetState(typeToPhase[OrderData.Order[0]]);
         }
 
@@ -104,6 +110,11 @@ namespace LineWars
 
         private Phase GetNextPhase(PhaseType phaseType)
         {
+            if(isFirstRound)
+            {
+                isFirstRound = false;
+                return typeToPhase[OrderData.Order[0]];
+            }
             var nextState = phaseType.Next(OrderData);
             return (typeToPhase[nextState]);
         }

@@ -50,11 +50,17 @@ namespace LineWars.Controllers
                 UserGold = 10000;
             }
 #endif
+            DeleteNullCards();
             InitializeDefaultCards();
             TryAddDefaultBlessings();
             SaveCurrentUserInfo();
         }
-
+        private void DeleteNullCards()
+        {
+            currentInfo.UnlockedCards = currentInfo.UnlockedCards
+                .Where(id => deckCardStorage.ContainsKey(id))
+                .ToList();
+        }
         private void InitializeDefaultCards()
         {
             openedCardsSet = currentInfo.UnlockedCards
