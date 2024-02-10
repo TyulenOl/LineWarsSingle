@@ -11,6 +11,7 @@ public class UnitInfoDrawer : MonoBehaviour
     [SerializeField] private TMP_Text hpAmount;
     [SerializeField] private TMP_Text actionPointsAmount;
     [SerializeField] private TMP_Text damageAmount;
+    [SerializeField] private TMP_Text moveAmount;
 
     [SerializeField] private Image unitImage;
 
@@ -27,6 +28,8 @@ public class UnitInfoDrawer : MonoBehaviour
             actionPointsAmount.text = unit.MaxActionPoints.ToString();
         if (damageAmount != null)
             damageAmount.text = unit.InitialPower.ToString();
+        if (moveAmount != null)
+            moveAmount.text = unit.GetMoveCost().ToString();
 
         unitImage.gameObject.SetActive(true);
         unitImage.sprite = unit.Sprite;
