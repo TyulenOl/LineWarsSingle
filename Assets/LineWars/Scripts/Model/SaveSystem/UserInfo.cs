@@ -11,15 +11,17 @@ namespace LineWars.Model
     {
         public int Diamonds;
         public int Gold;
-        public List<int> UnlockedCards;
         public int UpgradeCards;
+        public int PassingGameModes;
+        public bool DefaultBlessingsIsAdded;
+        
         public SerializedDictionary<LootBoxType, int> LootBoxes;
         public SerializedDictionary<int, int> CardLevels;
-        public int PassingGameModes;
-        
-        public bool DefaultBlessingsIsAdded;
         public SerializedDictionary<BlessingId, int> Blessings;
+        
+        public List<int> UnlockedCards;
         public List<BlessingId> SelectedBlessings;
+        public List<string> UsedPromoCodes;
         
         int IReadOnlyUserInfo.Diamonds => Diamonds;
         int IReadOnlyUserInfo.Gold => Gold;

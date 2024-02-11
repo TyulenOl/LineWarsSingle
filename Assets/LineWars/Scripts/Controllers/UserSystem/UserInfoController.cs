@@ -42,6 +42,7 @@ namespace LineWars.Controllers
             deckCardStorage = storage;
             
             currentInfo = AssignUserInfo(provider.Load(0) ?? CreateDefaultUserInfo());
+            
 #if UNITY_EDITOR
             if (debugMode)
             {
@@ -52,7 +53,6 @@ namespace LineWars.Controllers
 #endif
             DeleteNullCards();
             InitializeDefaultCards();
-            TryAddDefaultBlessings();
             SaveCurrentUserInfo();
         }
         private void DeleteNullCards()
@@ -61,6 +61,7 @@ namespace LineWars.Controllers
                 .Where(id => deckCardStorage.ContainsKey(id))
                 .ToList();
         }
+        
         private void InitializeDefaultCards()
         {
             openedCardsSet = currentInfo.UnlockedCards
@@ -75,27 +76,38 @@ namespace LineWars.Controllers
             foreach(var (cardId, level) in defaultUserInfoPreset.DefaultCardLevels)
                 currentInfo.CardLevels.TryAdd(cardId, level);
         }
-
-        private void TryAddDefaultBlessings()
-        {
-            if (!currentInfo.DefaultBlessingsIsAdded)
-            {
-                foreach (var (key, value) in defaultUserInfoPreset.DefaultBlessingsCount)
-                {
-                    currentInfo.Blessings.TryAdd(key, 0);
-                    currentInfo.Blessings[key] += value;
-                }
-
-                currentInfo.DefaultBlessingsIsAdded = true;
-            }
-        }
-
+        
         private UserInfo AssignUserInfo(UserInfo userInfo)
         {
+            userInfo.LootBoxes ??= new SerializedDictionary<LootBoxType, int>();
+            userInfo.CardLevels ??= new SerializedDictionary<int, int>();
+            userInfo.Blessings ??= new SerializedDictionary<BlessingId, int>();
+            userInfo.SelectedBlessings ??= new List<BlessingId>();
+            userInfo.UnlockedCards ??= new List<int>();
+            userInfo.UsedPromoCodes ??= new List<string>();
+            
             foreach (LootBoxType boxType in Enum.GetValues(typeof(LootBoxType)))
                 userInfo.LootBoxes.TryAdd(boxType, 0);
             foreach (var cardId in deckCardStorage.Keys)
                 userInfo.CardLevels.TryAdd(cardId, 0);
+            
+            userInfo = TryAddDefaultBlessings(userInfo);
+            
+            return userInfo;
+        }
+        
+        private UserInfo TryAddDefaultBlessings(UserInfo userInfo)
+        {
+            if (userInfo.DefaultBlessingsIsAdded) 
+                return userInfo;
+            
+            foreach (var (key, value) in defaultUserInfoPreset.DefaultBlessingsCount)
+            {
+                userInfo.Blessings.TryAdd(key, 0);
+                userInfo.Blessings[key] += value;
+            }
+            userInfo.DefaultBlessingsIsAdded = true;
+
             return userInfo;
         }
 
@@ -390,12 +402,30 @@ namespace LineWars.Controllers
             SaveCurrentUserInfo();
         }
 
+        public bool PromoCodeIsUsed(string promoCode)
+        {
+            return currentInfo.UsedPromoCodes.Contains(promoCode);
+        }
+        
+        public IReadOnlyList<string> GetUsedPromoCodes()
+        {
+            return currentInfo.UsedPromoCodes;
+        }
+
+        public void UsePromoCode(string promoCode)
+        {
+            if (currentInfo.UsedPromoCodes.Contains(promoCode))
+                return;
+            
+            currentInfo.UsedPromoCodes.Add(promoCode);
+            SaveCurrentUserInfo();
+        }
+
         private void SaveCurrentUserInfo()
         {
             StartCoroutine(SaveCurrentUserInfoCoroutine());
         }
-
-
+        
         private IEnumerator SaveCurrentUserInfoCoroutine()
         {
             yield return null;

@@ -130,7 +130,7 @@ public class MaskRendererV3AutoManagementGPU : Singleton<MaskRendererV3AutoManag
     {
         if (initialized)
         {
-            Debug.LogError($"{nameof(MaskRendererV3)} is Initialized!");
+            Debug.LogError($"{nameof(MaskRendererV3AutoManagementGPU)} is Initialized!");
             return;
         }
 

@@ -14,6 +14,9 @@ namespace LineWars.Model
 
         public Deck Convert(DeckInfo value)
         {
+            if (value == null)
+                return null;
+            
             return new Deck(
                 value.Id,
                 value.Name,

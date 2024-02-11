@@ -32,7 +32,15 @@ namespace LineWars.Interface
         
         public static void OpenSuccessPanel(Money money)
         {
-            FullscreenPanel.OpenPanel(new TextRedrawInfo("Успешно", Color.red), money);
+            OpenPanel(new TextRedrawInfo("Успешно", Color.red), money);
+        }
+
+        public static void OpenPromoCodePanel(string promoCode)
+        {
+            OpenPanel(
+                new TextRedrawInfo("Активация промокода", Color.red),
+                new TextRedrawInfo($"Вы успешно активировали промокод {promoCode}", Color.white)
+            );
         }
         
         private void _OpenPanel(TextRedrawInfo title, TextRedrawInfo description)
