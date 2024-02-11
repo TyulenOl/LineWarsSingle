@@ -7,13 +7,13 @@ namespace LineWars.Controllers
     public class OnWaitingCommandMessage
     {
         public Node SelectedNode { get; }
-        public IEnumerable<CommandPreset> Data { get; }
+        public IReadOnlyList<CommandPreset> Data { get; }
 
         public OnWaitingCommandMessage(
             IEnumerable<CommandPreset> data,
             Node selectedNode)
         {
-            Data = data.ToHashSet();
+            Data = data.ToArray();
             SelectedNode = selectedNode;
         }
     }

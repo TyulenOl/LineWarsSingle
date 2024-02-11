@@ -68,12 +68,12 @@ SpriteAtlas:
   m_PackedSpriteNamesToIndex:
   - Money
   - MusicBack
-  - Context 4
+  - 3 Commands
   - MusicIcon
   - MapCapture
   - CurrentUnitPanel
   - BuyUnitsPanel
-  - Context 3
+  - 2 Commands
   - ButtonsBacground
   m_RenderDataMap: {}
   m_Tag: FigthUI

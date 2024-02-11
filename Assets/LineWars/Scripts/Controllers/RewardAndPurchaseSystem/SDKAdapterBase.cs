@@ -20,7 +20,7 @@ namespace LineWars.Controllers
         public event Action<string> PurchaseSuccessEvent;
         public event Action<string> PurchaseFailedEvent;
         
-        private UserInfoController UserInfoController => GameRoot.Instance.UserController;
+        protected UserInfoController UserInfoController => GameRoot.Instance.UserController;
         public abstract bool SDKEnabled { get; }
         public void RewardForAd(Prize prize) => RewardForAd(prize.Type, prize.Amount); 
         protected abstract void RewardForAd(PrizeType prizeType, int amount);

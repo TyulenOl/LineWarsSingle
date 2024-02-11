@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using LineWars.Model;
 using UnityEngine;
 using YG;
-using Purchase = YG.Utils.Pay.Purchase;
 
 namespace LineWars
 {
