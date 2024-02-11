@@ -14,6 +14,7 @@ namespace LineWars.Controllers
     {
         public static VolumeUpdater Instance { get; private set; }
         [SerializeField] private AudioMixer mixer;
+        [SerializeField, Range(0, 1)] private float initialVolume = 0.2f;
         
         private void Awake()
         {
@@ -50,7 +51,7 @@ namespace LineWars.Controllers
                 var param = channelType.ToString();
                 if (!PlayerPrefs.HasKey(param))
                 {
-                    PlayerPrefs.SetFloat(param, 1);
+                    PlayerPrefs.SetFloat(param, initialVolume);
                 }
 
                 var volume = FloatToMixer(PlayerPrefs.GetFloat(param));

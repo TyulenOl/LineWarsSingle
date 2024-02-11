@@ -66,4 +66,11 @@ public static class EditorTools
     {
         Process.Start("explorer.exe", "/select, \"" + Application.persistentDataPath.Replace(@"/", @"\") + "\"");
     }
+
+    [MenuItem("Tools/Clear PlayerPrefs")]
+    static void ClearPlayerPrefs()
+    {
+        PlayerPrefs.DeleteAll();
+        Debug.Log("PlayerPrefs are deleted");
+    }
 }
