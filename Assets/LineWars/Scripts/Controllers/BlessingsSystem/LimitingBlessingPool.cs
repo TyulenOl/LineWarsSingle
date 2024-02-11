@@ -6,7 +6,7 @@ using LineWars.Model;
 
 namespace LineWars.Controllers
 {
-    public class LimitingBlessingPool: IBlessingsPull
+    public class LimitingBlessingPool: ILimitingBlessingPool
     {
         private readonly IBlessingsPull innerPull;
         private readonly HashSet<BlessingId> blessings;

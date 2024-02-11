@@ -12,7 +12,8 @@ namespace LineWars.Model
         
         private void OnEnable()
         {
-            ValidateUnitTypeUnitPairs();
+            if (Application.isPlaying)
+                ValidateUnitTypeUnitPairs();
         }
         
         private void ValidateUnitTypeUnitPairs()

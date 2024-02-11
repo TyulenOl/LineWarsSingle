@@ -1,84 +1,54 @@
-﻿/*using AYellowpaper.SerializedCollections;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace LineWars.Model
 {
     public class ProgrammedAI : BasePlayer
     {
-        [SerializeField] private SerializedDictionary<PhaseType, ProgrammedAIActions> turnsForPhase;
-
-        protected override bool CanExecuteReplenish() => true;
-
-        protected override bool CanExecuteArtillery()
+        [SerializeField] public ProgrammedAIActions turns;
+        public override bool CanExecuteTurn(PhaseType phaseType)
         {
-            return CanExecuteProgrammedAITurn(PhaseType.Artillery);
+            if (!base.CanExecuteTurn(phaseType))
+                return false;
+            
+            if (phaseType == PhaseType.Buy || 
+                phaseType == PhaseType.Replenish ||
+                phaseType == PhaseType.Payday)
+                return true;
+            
+            foreach (var owned in OwnedObjects)
+            {
+                if (owned is not Unit unit) continue;
+                if (unit.CurrentActionPoints > 0)
+                    return turns.ContainsNext();
+            }
+
+            return false;
         }
 
-        protected override bool CanExecuteScout()
+        public override void ExecuteTurn(PhaseType phaseType)
         {
-            return CanExecuteProgrammedAITurn(PhaseType.Scout);
-        }
+            InvokeTurnStarted(phaseType);
+            if (phaseType == PhaseType.Replenish)
+            {
+                ExecuteReplenish();
+                InvokeTurnEnded(phaseType);
+                return;
+            }
 
-        protected override bool CanExecuteFight()
-        {
-            return CanExecuteProgrammedAITurn(PhaseType.Fight);
-        }
-
-        protected override bool CanExecuteBuy()
-        {
-            return CanExecuteProgrammedAITurn(PhaseType.Buy);
-        }
-
-        private bool CanExecuteProgrammedAITurn(PhaseType phaseType)
-        {
-            return turnsForPhase.TryGetValue(phaseType, out var turns) && turns.ContainsNext();
-        }
-
-
-        protected override void ExecuteScout()
-        {
-            base.ExecuteScout();
-            ExecuteProgrammedAITurn(PhaseType.Scout);
-        }
-
-        protected override void ExecuteArtillery()
-        {
-            base.ExecuteArtillery();
-            ExecuteProgrammedAITurn(PhaseType.Artillery);
-        }
-
-        protected override void ExecuteFight()
-        {
-            base.ExecuteFight();
-            ExecuteProgrammedAITurn(PhaseType.Fight);
-        }
-
-        protected override void ExecuteBuy()
-        {
-            base.ExecuteBuy();
-            ExecuteProgrammedAITurn(PhaseType.Buy);
-        }
-
-        protected override void ExecuteReplenish()
-        {
-            base.ExecuteReplenish();
-            FinishTurn();
-        }
-
-        private void ExecuteProgrammedAITurn(PhaseType phaseType)
-        {
-            if (turnsForPhase[phaseType].TryGetNext(out var turn))
+            if (phaseType == PhaseType.Payday)
+            {
+                ExecutePayday();
+                InvokeTurnEnded(phaseType);
+            }
+            
+            if (turns.TryGetNext(out var turn))
             {
                 if (turn is IAIActionWithNeedProgrammedPlayer needProgrammedPlayer)
                     needProgrammedPlayer.Prepare(this);
                 turn.Execute();
             }
-            else
-            {
-                Debug.LogError($"Программируемый ИИ не может продолжить ход!");
-            }
-
-            FinishTurn();
+            
+            InvokeTurnEnded(phaseType);
         }
     }
-}*/
+}

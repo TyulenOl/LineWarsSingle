@@ -487,12 +487,18 @@ namespace LineWars.Controllers
             stateMachine.SetState(findTargetState);
         }
         
-        public bool CanExecuteBlessing(BlessingId blessingData)
+        public bool CanExecuteBlessing(BlessingId id)
         {
             return !blissingIsExecuted 
                    && CanExecuteBlessingStateCondition()
-                   && CanExecuteBlessingCountCondition(blessingData)
-                   && CanExecuteBlessingCanExecuteCondition(blessingData);
+                   && CanExecuteBlessingCountCondition(id)
+                   && CanExecuteBlessingCanExecuteCondition(id)
+                   && CanExecuteBlessingCanExecuteCondition(id);
+        }
+
+        private bool CanExecuteBlessingConstrainsCondition(BlessingId id)
+        {
+            return NotHaveConstraints || Constrains.CanSelectBlessing(id);
         }
 
         private bool CanExecuteBlessingStateCondition()
@@ -500,19 +506,19 @@ namespace LineWars.Controllers
             return state == CommandsManagerStateType.Executor;
         }
 
-        private bool CanExecuteBlessingCountCondition(BlessingId blessingData)
+        private bool CanExecuteBlessingCountCondition(BlessingId id)
         {
-            return blessingsPull.TryGetCount(blessingData, out var count)
+            return blessingsPull.TryGetCount(id, out var count)
                    && count > 0;
         }
 
-        private bool CanExecuteBlessingCanExecuteCondition(BlessingId blessingData)
+        private bool CanExecuteBlessingCanExecuteCondition(BlessingId id)
         {
-            return blessingStorage.IdToValue.TryGetValue(blessingData, out var blessing)
+            return blessingStorage.IdToValue.TryGetValue(id, out var blessing)
                    && blessing.CanExecute();
         }
 
-        public void ExecuteBlessing(BlessingId blessingData)
+        public void ExecuteBlessing(BlessingId id)
         {
             if (!CanExecuteBlessingStateCondition())
             {
@@ -526,26 +532,32 @@ namespace LineWars.Controllers
                 return;
             }
             
-            if (!CanExecuteBlessingCountCondition(blessingData))
+            if (!CanExecuteBlessingCountCondition(id))
             {
                 LogError($"Cant execute blissing because not enough points", gameObject);
                 return;
             }
 
-            if (!CanExecuteBlessingCanExecuteCondition(blessingData))
+            if (!CanExecuteBlessingCanExecuteCondition(id))
             {
                 LogError("Cant execute blissing!", gameObject);
                 return;
             }
 
+            if (!CanExecuteBlessingConstrainsCondition(id))
+            {
+                ConstrainsLog(nameof(ExecuteBlessing));
+                return;
+            }
+
             blissingIsExecuted = true;
-            currentBlessingId = blessingData;
-            currentBlessing = blessingStorage.IdToValue[blessingData];
+            currentBlessingId = id;
+            currentBlessing = blessingStorage.IdToValue[id];
             currentBlessing.Completed += OnBlissingComplete;
             delayBlessingCoroutine = StartCoroutine(DelayBlissingCoroutine());
-            blessingsPull[blessingData]--;
+            blessingsPull[id]--;
             stateMachine.SetState(waitingExecuteState);
-            BlessingStarted?.Invoke(new BlessingMassage(blessingData));
+            BlessingStarted?.Invoke(new BlessingMassage(id));
             currentBlessing.Execute();
         }
 

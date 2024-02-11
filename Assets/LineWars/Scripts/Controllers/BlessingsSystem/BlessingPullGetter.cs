@@ -7,6 +7,8 @@ namespace LineWars.Model
 {
     public class BlessingPullGetter: MonoBehaviour, IGetter<IBlessingsPull>
     {
+        [SerializeField] protected bool isGlobal;
+        
         public virtual bool CanGet()
         {
             return GameRoot.Instance != null;
@@ -16,7 +18,10 @@ namespace LineWars.Model
         {
             if (GameRoot.Instance != null)
             {
-                return GameRoot.Instance.BlessingsController.BlissingPullForGame;
+                
+                return isGlobal
+                    ?GameRoot.Instance.UserController 
+                    :GameRoot.Instance.BlessingsController.BlissingPullForGame;
             }
 
             return new EmptyPull();

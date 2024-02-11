@@ -11,7 +11,8 @@ namespace LineWars.Education
         ITargetConstrain,
         ISimpleCommandConstrain,
         ICurrentCommandConstrain,
-        IBuyConstrain
+        IBuyConstrain,
+        IBlessingConstrain
     {
        
 
@@ -27,5 +28,7 @@ namespace LineWars.Education
 
         public virtual bool CanSelectNode(Node node) => false;
         public virtual bool CanSelectDeckCard(DeckCard deckCard) => false;
+
+        public virtual bool CanSelectBlessing(BlessingId blessingId) => false;
     }
 }

@@ -17,8 +17,9 @@ namespace LineWars
         
         [field: Header("Getters")]
         [field: SerializeField] public DeckGetter DeckGetter { get; set; }
-        [field: SerializeField] public BlessingPullGetter BlessingPullGetter { get; set; }
         [field: SerializeField] public BlessingStorageGetter BlessingStorageGetter { get; set; }
+        [field: SerializeField] public BlessingPullGetter LocalBlessingPullGetter { get; set; }
+        [field: SerializeField] public BlessingPullGetter GlobalBlessingPullGetter { get; set; }
         
         [field: Header("Controllers")]
         [field: SerializeField] public CommandsManager CommandsManager { get; set; }
@@ -27,6 +28,7 @@ namespace LineWars
         public readonly IndexList<Unit> AllUnits = new();
         public Deck CurrentDeck { get; private set; }
         public IBlessingsPull LocalBlessingPull { get; private set; }
+        public IBlessingsPull GlobalBlessingPull { get; private set; }
         
         private void Start()
         {
@@ -36,7 +38,8 @@ namespace LineWars
 
         public void StartGame()
         {
-            LocalBlessingPull = BlessingPullGetter.Get();
+            LocalBlessingPull = LocalBlessingPullGetter.Get();
+            GlobalBlessingPull = GlobalBlessingPullGetter.Get();
             
             InitializeDeck();
 
