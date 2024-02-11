@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace LineWars.Education
 {
-    public class UseBlessing: PlayerAction
+    public class UseBlessingPlayerAction: PlayerAction
     {
         [SerializeField] private BlessingId blessingId;
 

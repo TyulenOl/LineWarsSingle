@@ -47,6 +47,7 @@ namespace LineWars.Model
         [SerializeField, ReadOnlyInspector] private int currentActionPoints;
         [SerializeField, ReadOnlyInspector] private int currentPower;
         [SerializeField, ReadOnlyInspector] private MonoUnitAction[] monoUnitActions;
+        [SerializeField, ReadOnlyInspector] private MonoMoveAction moveAction;
 
 
         [field: Header("Events")]
@@ -213,6 +214,11 @@ namespace LineWars.Model
         private void OnValidate()
         {
             monoUnitActions = GetComponents<MonoUnitAction>();
+            moveAction = GetComponent<MonoMoveAction>();
+            currentHp = maxHp;
+            currentArmor = 0;
+            currentActionPoints = maxActionPoints;
+            currentPower = initialPower;
         }
 
         public void Initialize(Node node, UnitDirection direction)
@@ -220,12 +226,13 @@ namespace LineWars.Model
             dj = new RandomDJ(0.5f);
             index = SingleGameRoot.Instance.AllUnits.Add(this);
             
-            currentHp += maxHp;
-            currentArmor += 0;
-            currentActionPoints += maxActionPoints;
-            currentPower += initialPower;
+            // currentHp += maxHp;
+            // currentArmor += 0;
+            // currentActionPoints += maxActionPoints;
+            // currentPower += initialPower;
             
-            monoUnitActions = GetComponents<MonoUnitAction>();
+            // monoUnitActions = GetComponents<MonoUnitAction>();
+            // moveAction = GetComponent<MonoMoveAction>();
             
             Node = node;
             UnitDirection = direction;
@@ -366,8 +373,9 @@ namespace LineWars.Model
         
         public int GetMoveCost()
         {
-            var action = monoUnitActions.FirstOrDefault(x => x.CommandType == CommandType.Move);
-            return action == null ? 0 : action.GetActionPointsCost();
+            if (moveAction == null)
+                return 0;
+            return currentActionPoints / moveAction.GetActionPointsCost();
         }
     }
 }
