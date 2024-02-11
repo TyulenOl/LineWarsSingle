@@ -30,18 +30,31 @@ namespace LineWars.Education
         private void OnEnable()
         {
             commandsManager.CommandIsExecuted += CommandsManagerOnCommandIsExecuted;
+            commandsManager.BlessingCompleted += CommandsManagerOnBlessingCompleted;
+            
 #if UNITY_EDITOR
             TurnFinished.AddListener(() => Debug.Log("TurnFinished"));
             EducationFinished.AddListener(() => Debug.Log("EducationFinished"));          
 #endif
         }
-
+        
         private void OnDisable()
         {
             commandsManager.CommandIsExecuted -= CommandsManagerOnCommandIsExecuted;
+            commandsManager.BlessingCompleted -= CommandsManagerOnBlessingCompleted;
+        }
+        
+        private void CommandsManagerOnBlessingCompleted(BlessingMassage blessingMassage)
+        {
+            NextTurn();
+        }
+        
+        private void CommandsManagerOnCommandIsExecuted(ICommand command)
+        {
+            NextTurn();
         }
 
-        private void CommandsManagerOnCommandIsExecuted(ICommand command)
+        private void NextTurn()
         {
             currentAction = playerActions.FindNext();
             if (currentAction is FinishTurnPlayerAction)
@@ -92,6 +105,11 @@ namespace LineWars.Education
         public override bool CanSelectDeckCard(DeckCard deckCard)
         {
             return CheckCurrentAction() && currentAction.CanSelectDeckCard(deckCard);
+        }
+
+        public override bool CanSelectBlessing(BlessingId blessingId)
+        {
+            return CheckCurrentAction() && currentAction.CanSelectBlessing(blessingId);
         }
 
         private bool CheckCurrentAction()

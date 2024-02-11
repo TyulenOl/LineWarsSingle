@@ -1,4 +1,4 @@
-﻿/*using UnityEngine;
+﻿using UnityEngine;
 
 namespace LineWars.Model
 {
@@ -17,4 +17,4 @@ namespace LineWars.Model
             programmedAI.SpawnUnit(node, unitType);
         }
     }
-}*/
+}

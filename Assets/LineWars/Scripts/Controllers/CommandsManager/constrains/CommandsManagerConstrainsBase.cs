@@ -9,7 +9,8 @@ namespace LineWars.Controllers
         ITargetConstrain,
         ISimpleCommandConstrain,
         ICurrentCommandConstrain,
-        IBuyConstrain
+        IBuyConstrain,
+        IBlessingConstrain
     {
         public abstract bool CanCancelExecutor { get; }
         public abstract bool CanSelectExecutor(IMonoExecutor executor);
@@ -19,5 +20,6 @@ namespace LineWars.Controllers
         public abstract bool CanSelectCurrentCommand();
         public abstract bool CanSelectNode(Node node);
         public abstract bool CanSelectDeckCard(DeckCard deckCard);
+        public abstract bool CanSelectBlessing(BlessingId blessingId);
     }
 }
