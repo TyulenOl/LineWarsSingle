@@ -46,7 +46,7 @@ namespace LineWars.Model
             foreach (var node in Graph.GetNodesInRange(action.Executor.Node, 1))
             {
                 
-                if(action.CanMoveTo(node) && (!node.IsBase || action.Executor.OwnerId == node.OwnerId))
+                if(action.CanMoveTo(node))
                 {
 
                     var command = new MoveCommandBlueprint(action.Executor.Id, node.Id);
@@ -373,8 +373,29 @@ namespace LineWars.Model
 
         public void Visit(VenomousSpitAction<TNode, TEdge, TUnit> action)
         {
-            // TODO
+            foreach (var node in Graph.GetNodesInRange(action.Executor.Node, 1))
+            {
+                if (!node.LeftIsFree && node.LeftUnit.Size == UnitSize.Little)
+                    ProcessUnit(node.LeftUnit);
+                if (!node.RightIsFree)
+                    ProcessUnit(node.RightUnit);
+            }
+
+            void ProcessUnit(TUnit unit)
+            {
+                if (!action.IsAvailable(unit)) return;
+
+                var executorId = action.Executor.Id;
+                var targetId = unit.Id;
+                BlueprintList.Add(new TargetUnitUniversalCommandBlueprint<
+                    MonoVenomousSpitAction,
+                    VenomousSpitAction<Node, Edge, Unit>,
+                    VenomousSpitAction<NodeProjection, EdgeProjection, UnitProjection>>
+                    (executorId, targetId));
+            }
         }
+
+        //private void VisitUnitBasedAction(UnitAction<TNode, TEdge, TUnit> action, )
     }
 
     public static class ConvertUnitActionToBlueprints

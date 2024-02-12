@@ -40,6 +40,7 @@ namespace LineWars
                     break;
                 default:
                     Debug.LogError($"Окно выбра команд для количества аргументов {message.Data.Count()} не реализовано");
+                    forFourPreset.ReDraw(message);
                     break;
             }
         }

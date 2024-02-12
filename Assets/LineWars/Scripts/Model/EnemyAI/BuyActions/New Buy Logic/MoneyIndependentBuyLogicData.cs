@@ -52,7 +52,7 @@ namespace LineWars.Model
     }
 
     public class MoneyIndependentLogic : AIBuyLogic
-    { 
+    {
         private int currentRoundId = 0;
         private int currentNodeId = 0;
         private readonly EnemyAI player;
@@ -67,6 +67,7 @@ namespace LineWars.Model
         {
             if (data.UnitsPerRound.Count == 0)
                 return;
+            var hasBought = false;
             foreach (var purchase in data.UnitsPerRound[currentRoundId])
             {
                 var currentUnit = player.GetUnitPrefab(purchase.UnitType);
@@ -86,6 +87,7 @@ namespace LineWars.Model
                     if (BasePlayerUtility.CanSpawnUnit(currentNode, currentUnit))
                     {
                         player.SpawnUnit(currentNode, currentUnit);
+                        hasBought = true;
                         quantity--;
                         eligbleNodes = MonoGraph.Instance.Nodes
                             .Where(node => node.IsQualifiedForSpawn(player))
@@ -97,8 +99,8 @@ namespace LineWars.Model
                     currentNodeId = (currentNodeId + 1) % eligbleNodes.Count;
                 }
             }
-
-            currentRoundId = (currentRoundId + 1) % data.UnitsPerRound.Count;
+            if (hasBought || data.UnitsPerRound[currentRoundId].Count == 0)
+                currentRoundId = (currentRoundId + 1) % data.UnitsPerRound.Count;
         }
 
         private bool AreNodesFree(IEnumerable<Node> nodes, Unit unit)

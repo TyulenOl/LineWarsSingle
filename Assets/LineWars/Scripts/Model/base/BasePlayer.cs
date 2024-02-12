@@ -298,15 +298,6 @@ namespace LineWars.Model
             return deckCard.CalculateCost(GetCountUnitByType(deckCard.Unit.Type));
         }
 
-        public PurchaseInfo GetPurchaseInfoForUnit(UnitType unitType, int cost)
-        {
-            return Rules.CostFunction.Calculate(
-                unitType,
-                cost,
-                GetCountUnitByType(unitType));
-        }
-
-
         public IEnumerable<Unit> GetAllEnemiesUnits()
         {
             return SingleGameRoot.Instance.AllUnits.Values

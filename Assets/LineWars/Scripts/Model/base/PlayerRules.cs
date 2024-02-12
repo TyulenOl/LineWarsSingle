@@ -12,6 +12,5 @@ namespace LineWars
         [field: SerializeField] public int StartMoney { get; private set; }
         [field: SerializeField] public int MoneyForFirstCapturingNode { get; private set; }
         [field: SerializeField] public FloatModifier IncomeModifier { get; private set; }
-        [field: SerializeField] public UnitCostFunction CostFunction { get; private set; }
     }
 }

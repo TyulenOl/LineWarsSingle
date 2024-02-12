@@ -55,12 +55,12 @@ namespace LineWars.Model
 
             private Task<PossibleOutcome[]> FindAllOutcomes(GameProjection gameProjection)
             {
-                Debug.Log($"{Prefix} Find All Outcomes");
+                //Debug.Log($"{Prefix} Find All Outcomes");
                 var possibleCommands = 
                     CommandBlueprintCollector.CollectAllCommands(
                     gameProjection,
                     ai.depthDetailsData.GetDepthDetails(1).AvailableCommands);
-                Debug.Log($"{Prefix} PossibleCommandsCount: {possibleCommands.Count}");
+                //Debug.Log($"{Prefix} PossibleCommandsCount: {possibleCommands.Count}");
                 var tasksList = new List<Task<PossibleOutcome>>();
                 foreach (var command in possibleCommands)
                 {
@@ -74,7 +74,7 @@ namespace LineWars.Model
             private Task<PossibleOutcome> ExploreOutcome(GameProjection gameProjection, ICommandBlueprint blueprint, int depth,
                 int currentExecutorId, List<ICommandBlueprint> firstCommandChain, bool isSavingCommands)
             {
-                Debug.Log($"{Prefix} Explore Outcome");
+                //Debug.Log($"{Prefix} Explore Outcome");
                 var task = new Task<PossibleOutcome>(
                     () => MinMax(gameProjection, blueprint, depth, currentExecutorId, firstCommandChain, isSavingCommands));
                 task.Start();

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using LineWars.Model;
 using UnityEngine;
 using UnityEngine.Events;
@@ -21,6 +20,7 @@ namespace LineWars.Controllers
         public event Action<string> PurchaseFailedEvent;
         
         protected UserInfoController UserInfoController => GameRoot.Instance.UserController;
+        
         public abstract bool SDKEnabled { get; }
         public void RewardForAd(Prize prize) => RewardForAd(prize.Type, prize.Amount); 
         protected abstract void RewardForAd(PrizeType prizeType, int amount);
