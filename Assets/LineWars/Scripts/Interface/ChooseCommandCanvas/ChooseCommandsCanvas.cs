@@ -9,8 +9,10 @@ namespace LineWars
 {
     public class ChooseCommandsCanvas : MonoBehaviour
     {
+        [SerializeField] private ChooseCommandsCanvasPreset forOnePreset;
         [SerializeField] private ChooseCommandsCanvasPreset forTwoPreset;
         [SerializeField] private ChooseCommandsCanvasPreset forThreePreset;
+        [SerializeField] private ChooseCommandsCanvasPreset forFourPreset;
 
         private void Awake()
         {
@@ -21,23 +23,24 @@ namespace LineWars
         {
             gameObject.SetActive(true);
             transform.position = message.SelectedNode.Position;
-            var amount = message.Data.Select(x=> x.Action.CommandType).Distinct().Count();
             
-            var presets = message.Data.GroupBy(x => x.Action.CommandType).ToArray();
-
-            var message2 = new OnWaitingCommandMessage(presets.Select(x => x.ToArray().First()), message.SelectedNode);
-            
-            switch (message2.Data.Count())
+            switch (message.Data.Count())
             {
+                case 1:
+                    forOnePreset.ReDraw(message);
+                    break;
                 case 2:
-                    forTwoPreset.ReDraw(message2);
+                    forTwoPreset.ReDraw(message);
                     break;
                 case 3:
-                    forThreePreset.ReDraw(message2);
+                    forThreePreset.ReDraw(message);
+                    break;
+                case 4:
+                    forFourPreset.ReDraw(message);
                     break;
                 default:
-                    throw new NotImplementedException(
-                        $"Окно выбра команд для количества аргументов {message2.Data.Count()} не реализовано");
+                    Debug.LogError($"Окно выбра команд для количества аргументов {message.Data.Count()} не реализовано");
+                    break;
             }
         }
     }

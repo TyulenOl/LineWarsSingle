@@ -17,7 +17,7 @@ namespace LineWars.Interface
 
         private Dictionary<BlessingId, BlessingFightDrawer> blessingToUI;
         private CommandsManager CommandsManager => CommandsManager.Instance;
-        private IBlessingsPull GlobalBlessingsPull => GameRoot.Instance?.UserController;
+        private IBlessingsPull GlobalBlessingsPull => SingleGameRoot.Instance?.GlobalBlessingPull;
         private IBlessingsPull LocalBlessingsPull => SingleGameRoot.Instance?.LocalBlessingPull;
 
         private bool isOpened;
@@ -55,7 +55,7 @@ namespace LineWars.Interface
                 GlobalBlessingsPull.BlessingCountChanged += GlobalBlessingsPullOnBlessingCountChanged;
             }
 
-            if (LocalBlessingsPull is LimitingBlessingPool limitingBlessingPool)
+            if (LocalBlessingsPull is ILimitingBlessingPool limitingBlessingPool)
             {
                 limitingBlessingPool.CurrentTotalCountChanged += LimitingBlessingPoolOnTotalCountChanged;
                 totalBlessingsCount.text = $"{limitingBlessingPool.CurrentTotalCount}/{limitingBlessingPool.TotalCount}";

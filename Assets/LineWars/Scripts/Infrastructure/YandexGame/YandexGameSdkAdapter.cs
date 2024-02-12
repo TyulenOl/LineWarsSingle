@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using AYellowpaper.SerializedCollections;
 using LineWars.Interface;
 using LineWars.Model;
@@ -20,6 +18,7 @@ namespace LineWars.Controllers
         
         [SerializeField, Min(1)] private int priseTypeLenInBits = 10;
         [SerializeField] private Prize prizeIfAdError;
+        [SerializeField] private SerializedDictionary<string, Prize> promoCodes = new();
         
         
         private void Start()
@@ -42,9 +41,12 @@ namespace LineWars.Controllers
             YandexGame.GetDataEvent += ConsumePurchases;
             YandexGame.RewardVideoEvent += OnRewardVideoEvent;
             YandexGame.ErrorVideoEvent += OnErrorVideoEvent;
-            YandexGame.GetPaymentsEvent += GetPaymentsEvent;
+            YandexGame.GetPaymentsEvent += OnPaymentsEvent;
             YandexGame.PurchaseSuccessEvent += OnPurchaseSuccessEvent;
             YandexGame.PurchaseFailedEvent += OnPurchaseFailedEvent;
+            YandexGame.GetDataEvent += OnPaymentsEvent;
+            
+            YandexGame.GetDataEvent += OnGetDataEvent;
         }
 
         private void OnDisable()
@@ -52,11 +54,13 @@ namespace LineWars.Controllers
             YandexGame.GetDataEvent -= ConsumePurchases;
             YandexGame.RewardVideoEvent -= OnRewardVideoEvent;
             YandexGame.ErrorVideoEvent -= OnErrorVideoEvent;
-            YandexGame.GetPaymentsEvent -= GetPaymentsEvent;
+            YandexGame.GetPaymentsEvent -= OnPaymentsEvent;
             YandexGame.PurchaseSuccessEvent -= OnPurchaseSuccessEvent;
             YandexGame.PurchaseFailedEvent -= OnPurchaseFailedEvent;
+            
+            YandexGame.GetDataEvent -= OnGetDataEvent;
         }
-
+        
         public override bool SDKEnabled => YandexGame.SDKEnabled;
 
         protected override void RewardForAd(PrizeType prizeType, int amount)
@@ -176,9 +180,23 @@ namespace LineWars.Controllers
             InvokePurchaseFailedEvent(id);
         }
         
-        private void GetPaymentsEvent()
+        private void OnPaymentsEvent()
         {
             InvokePurchasesUpdated();
+        }
+        
+        private void OnGetDataEvent()
+        {
+            var promoCode = YandexGame.EnvironmentData.payload;
+            if (!string.IsNullOrEmpty(promoCode)
+                && promoCodes.TryGetValue(promoCode, out var prize)
+                && !UserInfoController.PromoCodeIsUsed(promoCode))
+            {
+                DebugUtility.Log($"Промокод: {promoCode}");
+                UserInfoController.UsePromoCode(promoCode);
+                FullscreenPanel.OpenPromoCodePanel(promoCode);
+                Reward(prize);
+            }
         }
     }
 }
