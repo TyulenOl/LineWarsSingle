@@ -6,6 +6,13 @@ namespace LineWars.Controllers
     public class FakeSDKAdapter: SDKAdapterBase
     {
         public override bool SDKEnabled => true;
+
+
+        public override void Initialize()
+        {
+            GameRoot.Instance.StartGame();
+        }
+
         protected override void RewardForAd(PrizeType prizeType, int amount)
         {
             Reward(prizeType, amount);
@@ -21,7 +28,7 @@ namespace LineWars.Controllers
             
         }
 
-        public override UserPurchaseInfo PurchaseByID(string id)
+        public override PurchaseData PurchaseByID(string id)
         {
             return null;
         }
@@ -36,14 +43,14 @@ namespace LineWars.Controllers
             return 0;
         }
 
-        public override UserPurchaseInfo[] GetPurchases()
+        public override PurchaseData[] GetPurchases()
         {
-            return Array.Empty<UserPurchaseInfo>();
+            return Array.Empty<PurchaseData>();
         }
 
-        public override UserPurchaseInfo[] GetPurchases(PrizeType prizeType)
+        public override PurchaseData[] GetPurchases(PrizeType prizeType)
         {
-            return Array.Empty<UserPurchaseInfo>();
+            return Array.Empty<PurchaseData>();
         }
     }
 }

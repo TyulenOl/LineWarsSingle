@@ -8,19 +8,18 @@ namespace LineWars.Controllers
     [RequireComponent(typeof(Button))]
     public class OpenAdButton: MonoBehaviour
     {
-        [SerializeField] private Prize prizeForAd;
         private static SDKAdapterBase SdkAdapter => GameRoot.Instance.SdkAdapter;
+        
+        [SerializeField] private Prize prizeForAd;
         private Button button;
 
         public Prize PrizeForAd
         {
-            get => prizeForAd;
             set => prizeForAd = value;
         }
 
         public Button Button => button;
-
-
+        
         private void Awake()
         {
             button = GetComponent<Button>();

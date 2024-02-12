@@ -41,38 +41,65 @@ namespace LineWars.Controllers
         private IProvider<MissionInfo> missionInfoProvider;
         private IProvider<UserInfo> userInfoProvider;
         private IGetter<DateTime> timeGetter;
+        private SDKAdapterBase sdkAdapter;
 
-        public IStorage<int, DeckCard> CardsDatabase => cardsDatabase;
-        public IStorage<int, MissionData> MissionsStorage => missionsStorage;
-        public IStorage<BlessingId, BaseBlessing> BlessingStorage => blessingStorage;
+        public IStorage<int, DeckCard> CardsDatabase => GameStartedLog() ? cardsDatabase : null;
+        public IStorage<int, MissionData> MissionsStorage => GameStartedLog() ? missionsStorage : null;
+        public IStorage<BlessingId, BaseBlessing> BlessingStorage => GameStartedLog() ? blessingStorage: null;
 
-        public DecksController DecksController => decksController;
-        public CompaniesController CompaniesController => companiesController;
-        public UserInfoController UserController => userController;
-        public LootBoxController LootBoxController => lootBoxController;
-        public SDKAdapterBase SdkAdapter { get; private set; }
+        public DecksController DecksController => GameStartedLog() ? decksController : null;
+        public CompaniesController CompaniesController => GameStartedLog() ? companiesController : null;
+        public UserInfoController UserController =>  GameStartedLog() ? userController : null;
+        public LootBoxController LootBoxController =>  GameStartedLog() ? lootBoxController : null;
+        public SDKAdapterBase SdkAdapter => GameStartedLog() ? sdkAdapter : null;
 
-        public BlessingsController BlessingsController => blessingsController;
-        public Store Store => store;
-        public CardUpgrader CardUpgrader => cardUpgrader;
-
-        public DrawHelperInstance DrawHelper => drawHelper;
+        public BlessingsController BlessingsController =>  GameStartedLog() ? blessingsController : null;
+        public Store Store => GameStartedLog() ? store : null;
+        public CardUpgrader CardUpgrader => GameStartedLog() ? cardUpgrader: null;
         
+        public DrawHelperInstance DrawHelper => drawHelper;
+
+        
+        private bool fieldsValidated;
         public bool GameReady { get; private set; }
         public event Action OnGameReady;
+        
 
         protected override void OnAwake()
         {
             DebugUtility.Logged = logged;
             GameVariables.Initialize();
-            ValidateFields();
-            timeGetter = gameObject.AddComponent<GetWorldTime>();
+            fieldsValidated = ValidateFields();
             
-            InitializeProviders(StartGame);
+            sdkAdapter = platform switch
+            {
+                Platform.Local => fakeSDKAdapter,
+                Platform.YandexGame => yandexGameSdkAdapter,
+                _ => throw new ArgumentOutOfRangeException()
+            };
+            
+            sdkAdapter.Initialize();
         }
 
-        private void StartGame()
+        public void StartGame()
         {
+            if (!fieldsValidated)
+            {
+                DebugUtility.LogError("Cant start game because fields error!");
+                return;
+            }
+            
+            if (GameReady)
+            {
+                DebugUtility.LogError("Game is initialized!");
+                return;
+            }
+            
+            GameReady = true;
+            
+            timeGetter = gameObject.AddComponent<GetWorldTime>();
+            InitializeProviders();
+            
             CompaniesController.Initialize(missionInfoProvider, missionsStorage);
             UserController.Initialize(userInfoProvider, cardsDatabase);
             DecksController.Initialize(deckProvider, UserController);
@@ -80,38 +107,29 @@ namespace LineWars.Controllers
             BlessingsController.Initialize(UserController, UserController, BlessingStorage);
             CardUpgrader.Initialize(userController, cardsDatabase);
             InitializeLootBoxController();
-
-            SdkAdapter = platform switch
-            {
-                Platform.Local => fakeSDKAdapter,
-                Platform.YandexGame => yandexGameSdkAdapter,
-                _ => throw new ArgumentOutOfRangeException()
-            };
-
-            GameReady = true;
+            
             OnGameReady?.Invoke();
         }
 
-        private void InitializeProviders(Action initialize)
+        private void InitializeProviders()
         {
             switch (platform)
             {
                 case Platform.Local:
                 {
-                    InitializeJsonProviders(initialize);
+                    InitializeJsonProviders();
                     break;
                 }
                 case Platform.YandexGame:
                 {
-                    InitializeYandexGameProvider(initialize);
+                    InitializeYandexGameProvider();
                     break;
                 }
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
-
-        private void InitializeJsonProviders(Action initialize)
+        private void InitializeJsonProviders()
         {
             deckProvider = new Provider<Deck>(
                 new SaverConvertDecorator<Deck, DeckInfo>(
@@ -138,11 +156,8 @@ namespace LineWars.Controllers
                 new JsonFileLoader<MissionInfo>(),
                 new JsonFileAllDownloader<MissionInfo>()
             );
-            
-            initialize.Invoke();
         }
-
-        private void InitializeYandexGameProvider(Action initialize)
+        private void InitializeYandexGameProvider()
         {
             deckProvider = new Provider<Deck>(
                 new SaverConvertDecorator<Deck, DeckInfo>(
@@ -161,10 +176,7 @@ namespace LineWars.Controllers
 
             userInfoProvider = yandexGameProvider;
             missionInfoProvider = yandexGameProvider;
-
-            yandexGameProvider.FinishLoad += initialize;
         }
-
         private void InitializeLootBoxController()
         {
             var lootBoxOpenerFabric = new ClientLootBoxOpenerFabric(cardsDatabase);
@@ -177,12 +189,20 @@ namespace LineWars.Controllers
 
         }
 
-        private void ValidateFields()
+        private bool ValidateFields()
         {
             if (cardsDatabase == null)
-                Debug.LogError($"{nameof(cardsDatabase)} is null on {name}!", gameObject);
+                return DebugUtility.LogError($"{nameof(cardsDatabase)} is null on {name}!", gameObject);
             if (decksController == null)
-                Debug.LogError($"{nameof(decksController)} is null on {name}!", gameObject);
+                return DebugUtility.LogError($"{nameof(decksController)} is null on {name}!", gameObject);
+            return true;
+        }
+
+        private bool GameStartedLog()
+        {
+            if (!GameReady)
+                DebugUtility.LogError("Game has not started!");
+            return GameReady;
         }
     }
 

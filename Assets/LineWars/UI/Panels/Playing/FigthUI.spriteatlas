@@ -20,7 +20,20 @@ SpriteAtlas:
       readable: 0
       crunchedCompression: 0
       sRGB: 1
-    platformSettings: []
+    platformSettings:
+    - serializedVersion: 3
+      m_BuildTarget: DefaultTexturePlatform
+      m_MaxTextureSize: 4096
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: -1
+      m_TextureCompression: 1
+      m_CompressionQuality: 50
+      m_CrunchedCompression: 0
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 0
+      m_IgnorePlatformSupport: 0
+      m_AndroidETC2FallbackOverride: 0
+      m_ForceMaximumCompressionQuality_BC6H_BC7: 0
     packingSettings:
       serializedVersion: 2
       padding: 4
@@ -32,7 +45,6 @@ SpriteAtlas:
     secondaryTextureSettings: {}
     variantMultiplier: 1
     packables:
-    - {fileID: 2800000, guid: 3e9b8d8e6a159904aae8df65fc1496d4, type: 3}
     - {fileID: 2800000, guid: 64c709cdde4cf7545bc6ffb636eabbf8, type: 3}
     - {fileID: 2800000, guid: 4309fd1bb13f16147a59b024b3a9c688, type: 3}
     - {fileID: 2800000, guid: 802accc1f7198ba49b81e61410990627, type: 3}
@@ -41,38 +53,79 @@ SpriteAtlas:
     - {fileID: 2800000, guid: c2e6f8f46cb84ae49bc1134f37d72635, type: 3}
     - {fileID: 2800000, guid: 313395439878f82438db07b84440166f, type: 3}
     - {fileID: 2800000, guid: d56fd34701d12b843801ad78057406d6, type: 3}
+    - {fileID: 2800000, guid: f1511c3d85a92f6428844e21344b4ac5, type: 3}
+    - {fileID: 2800000, guid: c6ec991f862f05e439bab517a80b3e25, type: 3}
+    - {fileID: 2800000, guid: c2e6f8f46cb84ae49bc1134f37d72635, type: 3}
+    - {fileID: 2800000, guid: 789fbbaa9dbf4e34dac98be235e098b7, type: 3}
+    - {fileID: 2800000, guid: 04a0736f3af934345a58f89abd2f30dc, type: 3}
+    - {fileID: 2800000, guid: 6a37c8b5311d96e41a24a1c6123111a7, type: 3}
+    - {fileID: 2800000, guid: 64c709cdde4cf7545bc6ffb636eabbf8, type: 3}
+    - {fileID: 2800000, guid: c782f2f91f3b8fb42b0352a7728996ce, type: 3}
+    - {fileID: 2800000, guid: 4309fd1bb13f16147a59b024b3a9c688, type: 3}
+    - {fileID: 2800000, guid: 802accc1f7198ba49b81e61410990627, type: 3}
+    - {fileID: 2800000, guid: 313395439878f82438db07b84440166f, type: 3}
+    - {fileID: 2800000, guid: d56fd34701d12b843801ad78057406d6, type: 3}
+    - {fileID: 2800000, guid: 773d0ddc8d5e8c14ca805ba8d2ffd683, type: 3}
+    - {fileID: 2800000, guid: e8fe35d382f21134a8805f7b69d0c0c7, type: 3}
+    - {fileID: 2800000, guid: 388b30fbcd41579439ce7cd33c8ddf3b, type: 3}
+    - {fileID: 2800000, guid: e2da044cdd0bc034db2534c828de6ffa, type: 3}
+    - {fileID: 2800000, guid: 8128847c550189445a99703a4f2d7e79, type: 3}
     bindAsDefault: 1
     isAtlasV2: 0
     cachedData: {fileID: 0}
     packedSpriteRenderDataKeys:
     - 802accc1f7198ba49b81e61410990627: 21300000
     - 313395439878f82438db07b84440166f: 21300000
+    - e8fe35d382f21134a8805f7b69d0c0c7: 21300000
     - c2e6f8f46cb84ae49bc1134f37d72635: 21300000
+    - 6a37c8b5311d96e41a24a1c6123111a7: 21300000
     - d56fd34701d12b843801ad78057406d6: 21300000
+    - c782f2f91f3b8fb42b0352a7728996ce: 21300000
+    - 789fbbaa9dbf4e34dac98be235e098b7: 21300000
     - 4309fd1bb13f16147a59b024b3a9c688: 21300000
+    - 388b30fbcd41579439ce7cd33c8ddf3b: 21300000
+    - e2da044cdd0bc034db2534c828de6ffa: 21300000
+    - 8128847c550189445a99703a4f2d7e79: 21300000
+    - 773d0ddc8d5e8c14ca805ba8d2ffd683: 21300000
+    - f1511c3d85a92f6428844e21344b4ac5: 21300000
     - 64c709cdde4cf7545bc6ffb636eabbf8: 21300000
-    - 3e9b8d8e6a159904aae8df65fc1496d4: 21300000
     - c6ec991f862f05e439bab517a80b3e25: 21300000
     - 04a0736f3af934345a58f89abd2f30dc: 21300000
   m_MasterAtlas: {fileID: 0}
   m_PackedSprites:
   - {fileID: 21300000, guid: 802accc1f7198ba49b81e61410990627, type: 3}
   - {fileID: 21300000, guid: 313395439878f82438db07b84440166f, type: 3}
+  - {fileID: 21300000, guid: e8fe35d382f21134a8805f7b69d0c0c7, type: 3}
   - {fileID: 21300000, guid: c2e6f8f46cb84ae49bc1134f37d72635, type: 3}
+  - {fileID: 21300000, guid: 6a37c8b5311d96e41a24a1c6123111a7, type: 3}
   - {fileID: 21300000, guid: d56fd34701d12b843801ad78057406d6, type: 3}
+  - {fileID: 21300000, guid: c782f2f91f3b8fb42b0352a7728996ce, type: 3}
+  - {fileID: 21300000, guid: 789fbbaa9dbf4e34dac98be235e098b7, type: 3}
   - {fileID: 21300000, guid: 4309fd1bb13f16147a59b024b3a9c688, type: 3}
+  - {fileID: 21300000, guid: 388b30fbcd41579439ce7cd33c8ddf3b, type: 3}
+  - {fileID: 21300000, guid: e2da044cdd0bc034db2534c828de6ffa, type: 3}
+  - {fileID: 21300000, guid: 8128847c550189445a99703a4f2d7e79, type: 3}
+  - {fileID: 21300000, guid: 773d0ddc8d5e8c14ca805ba8d2ffd683, type: 3}
+  - {fileID: 21300000, guid: f1511c3d85a92f6428844e21344b4ac5, type: 3}
   - {fileID: 21300000, guid: 64c709cdde4cf7545bc6ffb636eabbf8, type: 3}
-  - {fileID: 21300000, guid: 3e9b8d8e6a159904aae8df65fc1496d4, type: 3}
   - {fileID: 21300000, guid: c6ec991f862f05e439bab517a80b3e25, type: 3}
   - {fileID: 21300000, guid: 04a0736f3af934345a58f89abd2f30dc, type: 3}
   m_PackedSpriteNamesToIndex:
   - Money
   - MusicBack
+  - RusTurn
   - 3 Commands
+  - Buy
   - MusicIcon
+  - LizardsTurn
+  - 4 Commands
   - MapCapture
+  - Education Panel
+  - ProgressBarIcon
+  - BorderLine
+  - NewBuyPanel
+  - 1 Command
   - CurrentUnitPanel
-  - BuyUnitsPanel
   - 2 Commands
   - ButtonsBacground
   m_RenderDataMap: {}
