@@ -1,55 +1,67 @@
 using System;
 using System.Collections;
+using LineWars.Interface;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class EnemyTurnPanel : MonoBehaviour
 {
-    private float alphaDecreaseModifier;
+    [SerializeField] private float alphaDecreaseModifier;
+    [SerializeField] private float minAlpha;
+    
+    [SerializeField] private CanvasGroup lizardsImage;
+    [SerializeField] private CanvasGroup rusImage;
+    [SerializeField] private CanvasGroup economyImage;
+    
+    private CanvasGroup currentCanvasGroup;
 
-    [SerializeField] private Image lizardsImage;
-    [SerializeField] private Image rusImage;
-
-    private bool isCoroutineActive;
-
-    public bool IsCoroutineActive
+    private CanvasGroup CurrentCanvasGroup
     {
-        get => isCoroutineActive;
+        get => currentCanvasGroup;
+
         set
         {
-            isCoroutineActive = value;
-            if (value)
-                RestoreDefaults();
-            else
-                Hide();
+            value.alpha = currentCanvasGroup.alpha;
+            currentCanvasGroup.gameObject.SetActive(false);
+            currentCanvasGroup = value;
+            currentCanvasGroup.gameObject.SetActive(true);
         }
     }
+    
+    private bool isCoroutineActive;
 
-    private void Hide()
+    private void Awake()
     {
-        lizardsImage.gameObject.SetActive(false);
-        StartCoroutine(HideCoroutine());
+        currentCanvasGroup = rusImage;
     }
 
-    IEnumerator HideCoroutine()
+    private void FixedUpdate()
     {
-        rusImage.gameObject.SetActive(true);
-        rusImage.color = rusImage.color.WithAlpha(1);
-        var resultAlpha = 255f;
-        while (rusImage.gameObject.activeInHierarchy && rusImage.color.a > 0.1)
+        ChangeAlpha(currentCanvasGroup);
+    }
+
+    public void SetTurn(bool isEnemyTurn)
+    {
+        CurrentCanvasGroup = isEnemyTurn ? lizardsImage : rusImage;
+    }
+
+    public void SetEconomyTurn()
+    {
+        CurrentCanvasGroup = economyImage;
+    }
+    
+    private void ChangeAlpha(CanvasGroup canvasGroup)
+    {
+        var currentAlpha = (float)Math.Round(canvasGroup.alpha * 255);
+        if (currentAlpha >= 255)
         {
-            resultAlpha -= 2f;
-            yield return new WaitForSeconds(0.01f);
-            rusImage.color = rusImage.color.WithAlpha(resultAlpha / 255f);
+            alphaDecreaseModifier = -Math.Abs(alphaDecreaseModifier);
+        }
+        else if (currentAlpha <= minAlpha)
+        {
+            alphaDecreaseModifier = Math.Abs(alphaDecreaseModifier);
         }
 
-        rusImage.gameObject.SetActive(false);
-    }
-
-    private void RestoreDefaults()
-    {
-        lizardsImage.color = lizardsImage.color.WithAlpha(1);
-        lizardsImage.gameObject.SetActive(true);
-        rusImage.gameObject.SetActive(false);
+        canvasGroup.alpha = (currentAlpha + alphaDecreaseModifier)/255;
     }
 }

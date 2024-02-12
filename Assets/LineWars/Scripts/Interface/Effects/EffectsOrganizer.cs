@@ -8,6 +8,7 @@ namespace LineWars.Interface
     {
         [SerializeField] private Unit unit;
         [SerializeField] private EffectDrawer drawerPrefab;
+        [SerializeField] private List<EffectType> effectExceptions;
         private List<EffectDrawer> currentDrawers = new();
 
         private void Start()
@@ -30,6 +31,8 @@ namespace LineWars.Interface
             DeleteDrawers();
             foreach (var effect in unit.Effects)
             {
+                if (effectExceptions.Contains(effect.EffectType))
+                    continue;
                 var drawer = Instantiate(drawerPrefab, transform);
                 drawer.DrawEffect(effect);
                 currentDrawers.Add(drawer);

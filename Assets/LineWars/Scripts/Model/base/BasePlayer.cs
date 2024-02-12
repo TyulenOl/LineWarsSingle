@@ -268,11 +268,14 @@ namespace LineWars.Model
 
         protected virtual void ExecuteReplenish()
         {
-            CurrentMoney += Income;
             var objects = new List<Owned>(OwnedObjects);
             foreach (var owned in objects)
                 owned.Replenish();
+        }
 
+        protected virtual void ExecutePayday()
+        {
+            CurrentMoney += Income;
         }
 
         protected void InvokeTurnStarted(PhaseType phaseType)
@@ -294,15 +297,6 @@ namespace LineWars.Model
         {
             return deckCard.CalculateCost(GetCountUnitByType(deckCard.Unit.Type));
         }
-
-        public PurchaseInfo GetPurchaseInfoForUnit(UnitType unitType, int cost)
-        {
-            return Rules.CostFunction.Calculate(
-                unitType,
-                cost,
-                GetCountUnitByType(unitType));
-        }
-
 
         public IEnumerable<Unit> GetAllEnemiesUnits()
         {
