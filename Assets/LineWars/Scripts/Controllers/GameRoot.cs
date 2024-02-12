@@ -101,10 +101,10 @@ namespace LineWars.Controllers
             InitializeProviders();
             
             CompaniesController.Initialize(missionInfoProvider, missionsStorage);
-            UserController.Initialize(userInfoProvider, cardsDatabase);
-            DecksController.Initialize(deckProvider, UserController);
-            Store.Initialize(timeGetter, CardsDatabase, BlessingStorage, UserController);
-            BlessingsController.Initialize(UserController, UserController, BlessingStorage);
+            UserController.Initialize(userInfoProvider, cardsDatabase, blessingStorage);
+            DecksController.Initialize(deckProvider, userController);
+            Store.Initialize(timeGetter, cardsDatabase, blessingStorage, userController);
+            BlessingsController.Initialize(userController, userController, blessingStorage);
             CardUpgrader.Initialize(userController, cardsDatabase);
             InitializeLootBoxController();
             
