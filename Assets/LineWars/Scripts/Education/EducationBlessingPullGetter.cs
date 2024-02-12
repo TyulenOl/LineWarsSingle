@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using AYellowpaper.SerializedCollections;
 using LineWars.Controllers;
 using LineWars.Model;
@@ -11,6 +12,19 @@ namespace LineWars.Education
         [SerializeField] private int totalCount;
         [SerializeField] private SerializedDictionary<BaseBlessing, int> blessingToCount;
 
+        private EducationBlessingPull educationBlessingPull;
+
+        private void Awake()
+        {
+            educationBlessingPull = new EducationBlessingPull(
+                blessingToCount
+                    .ToDictionary(
+                        pair => pair.Key.BlessingId,
+                        pair => pair.Value),
+                totalCount
+            );
+        }
+
         public override bool CanGet()
         {
             return true;
@@ -18,13 +32,7 @@ namespace LineWars.Education
 
         public override IBlessingsPull Get()
         {
-            return new EducationBlessingPull(
-                blessingToCount
-                    .ToDictionary(
-                        pair => pair.Key.BlessingId,
-                        pair => pair.Value),
-                 totalCount
-            );
+            return educationBlessingPull;
         }
     }
 }

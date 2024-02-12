@@ -10,6 +10,7 @@
     SiegeLarge,
     Education,
     InfinityGame,
+    EducationBlessings,
     M1C1,
     M2C1,
     M3C1,

@@ -39,6 +39,7 @@ namespace LineWars.Model
             {
                 ExecutePayday();
                 InvokeTurnEnded(phaseType);
+                return;
             }
             
             if (turns.TryGetNext(out var turn))
