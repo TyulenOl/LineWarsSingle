@@ -11,6 +11,7 @@ namespace LineWars
         [SerializeField] private TMP_Text missionDescription;
         [SerializeField] private Image missionImage;
         [SerializeField] private Button startButton;
+        [SerializeField] private Button openDeckPanelButton;
         [SerializeField] private TMP_Text onButtonText;
 
         private SceneName sceneToLoad;
@@ -33,7 +34,7 @@ namespace LineWars
         public void Redraw(MissionData data, string onButtonText)
         { 
             gameObject.SetActive(true);
-            startButton.gameObject.SetActive(true);
+            openDeckPanelButton.gameObject.SetActive(true);
             missionName.text = data.MissionName;
             missionDescription.text = data.MissionDescription;
             missionImage.sprite = data.MissionImage;
