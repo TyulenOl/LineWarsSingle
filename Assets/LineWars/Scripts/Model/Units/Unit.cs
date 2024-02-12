@@ -375,7 +375,7 @@ namespace LineWars.Model
         {
             if (moveAction == null)
                 return 0;
-            return currentActionPoints / moveAction.GetActionPointsCost();
+            return maxActionPoints / moveAction.GetActionPointsCost();
         }
     }
 }
