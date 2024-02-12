@@ -210,11 +210,10 @@ namespace LineWars.Model
 
         public bool CanOwnerMove(int ownerId)
         {
-            if (!TryGetComponent<PlayerMoveBan>(out var moveBan))
+            if (!TryGetComponent<NewPlayerMoveBan>(out var moveBan))
                 return true;
 
-            var banOwners = moveBan.BannedNodes.Select(spawn => spawn.OwnerId).ToList();
-            return !banOwners.Contains(ownerId);
+            return moveBan.CanPlayerMove(ownerId);
         }
 
 

@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/LineWars/UI/Panels/Playing/4 Commands.png.meta
 guid: 789fbbaa9dbf4e34dac98be235e098b7
+========
+guid: f4440b71b813975479844b408c545893
+>>>>>>>> newModel:Assets/LineWars/Resources/Maps/EmptyFieldFog.png.meta
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -69,7 +73,7 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 2048
+    maxTextureSize: 1024
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 1
