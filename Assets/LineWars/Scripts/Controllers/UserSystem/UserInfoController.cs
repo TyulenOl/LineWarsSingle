@@ -19,6 +19,7 @@ namespace LineWars.Controllers
         
         private IProvider<UserInfo> userInfoProvider;
         private IStorage<int, DeckCard> deckCardStorage;
+        private IStorage<BlessingId, BaseBlessing> blessingStorage;
 
         private UserInfo currentInfo;
         
@@ -36,10 +37,14 @@ namespace LineWars.Controllers
 
         public IReadOnlyUserInfo UserInfo => currentInfo;
         public IBlessingsPull GlobalBlessingsPull => this;
-        public void Initialize(IProvider<UserInfo> provider, IStorage<int, DeckCard> storage)
+        public void Initialize(
+            IProvider<UserInfo> provider, 
+            IStorage<int, DeckCard> deckCardStorage,
+            IStorage<BlessingId, BaseBlessing> blessingStorage)
         {
             userInfoProvider = provider;
-            deckCardStorage = storage;
+            this.deckCardStorage = deckCardStorage;
+            this.blessingStorage = blessingStorage; 
             
             currentInfo = AssignUserInfo(provider.Load(0) ?? CreateDefaultUserInfo());
             
@@ -103,8 +108,14 @@ namespace LineWars.Controllers
             
             foreach (var (key, value) in defaultUserInfoPreset.DefaultBlessingsCount)
             {
-                userInfo.Blessings.TryAdd(key, 0);
-                userInfo.Blessings[key] += value;
+                if (!blessingStorage.TryGetKey(key, out var id))
+                {
+                    DebugUtility.LogError($"Благословление {key} не содержится в базе данный!");
+                    continue;
+                }
+                
+                userInfo.Blessings.TryAdd(id, 0);
+                userInfo.Blessings[id] += value;
             }
             userInfo.DefaultBlessingsIsAdded = true;
 
@@ -125,9 +136,12 @@ namespace LineWars.Controllers
                     .ToSerializedDictionary(x => x.Key, x => x.Value),
                 DefaultBlessingsIsAdded = true,
                 Blessings = defaultUserInfoPreset.DefaultBlessingsCount
-                    .ToSerializedDictionary(x => x.Key, x => x.Value),
+                    .Where(pair => blessingStorage.ContainsValue(pair.Key))
+                    .ToSerializedDictionary(pair => blessingStorage.ValueToId[pair.Key], pair => pair.Value),
                 SelectedBlessings = defaultUserInfoPreset.DefaultSelectedBlessings
-                    .Where(x => defaultUserInfoPreset.DefaultBlessingsCount.ContainsKey(x))
+                    .Where(blessing => blessingStorage.ContainsValue(blessing))
+                    .Where(blessing => defaultUserInfoPreset.DefaultBlessingsCount.ContainsKey(blessing))
+                    .Select(blessing => blessingStorage.ValueToId[blessing])
                     .ToList(),
                 CardLevels = defaultUserInfoPreset.DefaultCards
                     .Where(deckCardStorage.ValueToId.ContainsKey)

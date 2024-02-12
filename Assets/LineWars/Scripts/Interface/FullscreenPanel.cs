@@ -14,12 +14,18 @@ namespace LineWars.Interface
 
         public static void OpenPanel(TextRedrawInfo title, TextRedrawInfo description)
         {
-            Instance._OpenPanel(title, description);
+            if (Instance != null)
+                Instance._OpenPanel(title, description);
+            else
+                Debug.LogError($"{nameof(FullscreenPanel)} is null!");
         }
 
         public static void OpenPanel(TextRedrawInfo title, Money money)
-        {
-            Instance._OpenPanel(title, money);
+        { 
+            if (Instance != null)
+                Instance._OpenPanel(title, money);
+            else
+                Debug.LogError($"{nameof(FullscreenPanel)} is null!");
         }
 
         public static void OpenErrorPanel()

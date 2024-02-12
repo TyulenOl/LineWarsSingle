@@ -14,17 +14,11 @@ namespace LineWars
     {
         private bool isLoaded;
         private GameInfo gameInfo;
-
-        public bool IsLoaded => isLoaded;
-        public event Action FinishLoad;
-
-        private void OnEnable() => YandexGame.GetDataEvent += DownLoadAll;
-        private void OnDisable() => YandexGame.GetDataEvent -= DownLoadAll;
-        private void DownLoadAll()
+        
+        public void LoadAll()
         {
             isLoaded = true;
             gameInfo = new GameInfo().UpdateInfo(YandexGame.savesData);
-            FinishLoad?.Invoke();
         }
         
         void ISaver<MissionInfo>.Save(MissionInfo value, int id)

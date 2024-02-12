@@ -7,36 +7,23 @@ namespace LineWars.Interface
     public class WinOrLosePanel: MonoBehaviour
     {
         [SerializeField] private OpenAdButton openAdButton;
-        
         private SDKAdapterBase SDKAdapter => GameRoot.Instance.SdkAdapter;
 
         private void OnEnable()
         {
             openAdButton.PrizeForAd = new Prize(PrizeType.Gold, WinOrLoseScene.MoneyAmount);
-            
-            SDKAdapter.RewardVideoEvent += SDKAdapterOnRewardVideoEvent;
-            SDKAdapter.ErrorVideoEvent += SDKAdapterOnErrorVideoEvent;
-        }
-
-
-        private void OnDisable()
-        {
-            SDKAdapter.RewardVideoEvent -= SDKAdapterOnRewardVideoEvent;
-            SDKAdapter.ErrorVideoEvent -= SDKAdapterOnErrorVideoEvent;
-        }
-
-        private void SDKAdapterOnRewardVideoEvent(PrizeType prize, int amount)
-        {
-            if (prize == PrizeType.Gold && amount == WinOrLoseScene.MoneyAmount)
-            {
-                openAdButton.Button.interactable = false;
-                FullscreenPanel.OpenSuccessPanel(new Money(CostType.Gold, amount));
-            }
+            openAdButton.Button.onClick.AddListener(OpenAdButtonOnClick);
         }
         
-        private void SDKAdapterOnErrorVideoEvent()
+        private void OnDisable()
         {
-            FullscreenPanel.OpenErrorPanel();
+            if (openAdButton != null && openAdButton.Button != null)
+                openAdButton.Button.onClick.RemoveListener(OpenAdButtonOnClick);
+        }
+
+        private void OpenAdButtonOnClick()
+        {
+            openAdButton.Button.interactable = false;
         }
     }
 }

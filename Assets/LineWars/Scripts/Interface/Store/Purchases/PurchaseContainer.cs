@@ -5,6 +5,6 @@ namespace LineWars.Interface
 {
     public class PurchaseContainer: MonoBehaviour
     {
-        public UserPurchaseInfo Data { get; set; }
+        public PurchaseData Data { get; set; }
     }
 }
