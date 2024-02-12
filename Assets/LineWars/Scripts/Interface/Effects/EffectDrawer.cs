@@ -22,7 +22,7 @@ namespace LineWars.Interface
             if (effect is IPowerEffect powerEffect)
             {
                 powerObjects.SetActive(true);
-                powerText.text = powerEffect.Power.ToString();
+                powerText.text = powerEffect.Power.GetRoman();
                 powerEffect.PowerChanged += OnPowerChanged;
             }
             else

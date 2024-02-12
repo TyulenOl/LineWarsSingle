@@ -9,5 +9,6 @@
     CaptureThePoints,
     SiegeLarge,
     Education,
-    InfinityGame
+    InfinityGame,
+    EducationBlessings
 }
