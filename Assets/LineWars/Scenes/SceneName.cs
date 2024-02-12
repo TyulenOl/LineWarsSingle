@@ -9,5 +9,17 @@
     CaptureThePoints,
     SiegeLarge,
     Education,
-    InfinityGame
+    InfinityGame,
+    EducationBlessings,
+    M1C1,
+    M2C1,
+    M3C1,
+    
+    M1C2,
+    M2C2,
+    M3C2,
+
+    M1C3,
+    M2C3,
+    M3C3
 }
