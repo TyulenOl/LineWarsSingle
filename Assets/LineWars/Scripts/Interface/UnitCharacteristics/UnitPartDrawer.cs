@@ -41,6 +41,7 @@ namespace LineWars.Interface
         {
             UnitName.text = unitToInit.UnitName;
             unitProgressBar.Init(currentUnit.MaxHp, currentUnit.CurrentArmor, currentUnit.MaxActionPoints);
+            powerAmount.text = currentUnit.CurrentPower.ToString();
         }
 
         public void SetUnitAsExecutor(bool isExecutor)

@@ -21,6 +21,7 @@ namespace LineWars.Education
         {
             this.blessingsCount = new Dictionary<BlessingId, int>(blessingsCount);
             TotalCount = totalCount;
+            CurrentTotalCount = totalCount;
         }
 
         public IEnumerator<(BlessingId, int)> GetEnumerator()
