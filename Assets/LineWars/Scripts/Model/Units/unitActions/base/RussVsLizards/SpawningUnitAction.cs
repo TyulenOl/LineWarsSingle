@@ -24,7 +24,19 @@
             var line = Executor.Node.GetLine(target);
             return ActionPointsCondition()
                    && line != null
-                   && UnitFabric.CanSpawn(target);
+                   && UnitFabric.CanSpawn(target)
+                   && NoEnemiesCondition(target);
+        }
+
+        private bool NoEnemiesCondition(TNode target)
+        {
+            if (!target.LeftIsFree && 
+                target.LeftUnit.OwnerId != Executor.OwnerId)
+                return false;
+            if (!target.RightIsFree &&
+                target.RightUnit.OwnerId != Executor.OwnerId)
+                return false;
+            return true;
         }
 
         public void Execute(TNode target)
