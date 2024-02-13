@@ -35,7 +35,7 @@ SpriteAtlas:
     - {fileID: 2800000, guid: 2337dc215ab024e46a748813b666a81e, type: 3}
     - {fileID: 2800000, guid: 4f751245ea3bee4458badac627977523, type: 3}
     - {fileID: 2800000, guid: dc33eadc0d819cd43b7b96eebb7dd38a, type: 3}
-    - {fileID: 2800000, guid: 388b30fbcd41579439ce7cd33c8ddf3b, type: 3}
+    - {fileID: 2800000, guid: ef72e9097ff052a428846fb2e1830099, type: 3}
     - {fileID: 2800000, guid: 337b2da7a23a7394a84a44edfb0f5e05, type: 3}
     - {fileID: 2800000, guid: e602775aae0ddab429a76ddf5c30a52a, type: 3}
     - {fileID: 2800000, guid: 0177a8dfdea51b84c9eb65630663f6a4, type: 3}
@@ -67,7 +67,6 @@ SpriteAtlas:
     - {fileID: 2800000, guid: 34f57cea91f6346499f8bf736d619bb9, type: 3}
     - {fileID: 2800000, guid: 71c9bf541ef2de046b4ae467da8dbc66, type: 3}
     - {fileID: 2800000, guid: a015392df615fcd4e9f6df174803aefd, type: 3}
-    - {fileID: 2800000, guid: ef72e9097ff052a428846fb2e1830099, type: 3}
     bindAsDefault: 1
     isAtlasV2: 0
     cachedData: {fileID: 0}
@@ -100,7 +99,6 @@ SpriteAtlas:
     - 685cdd6afb880cc42aa0c3a2370286ea: 21300000
     - 34f57cea91f6346499f8bf736d619bb9: 21300000
     - b3eaac4b1bb5e21489baad2230661d34: 21300000
-    - 388b30fbcd41579439ce7cd33c8ddf3b: 21300000
     - dc33eadc0d819cd43b7b96eebb7dd38a: 21300000
     - d8272e1d60bcc0c47a022f44a996dada: 21300000
     - a015392df615fcd4e9f6df174803aefd: 21300000
@@ -138,7 +136,6 @@ SpriteAtlas:
   - {fileID: 21300000, guid: 685cdd6afb880cc42aa0c3a2370286ea, type: 3}
   - {fileID: 21300000, guid: 34f57cea91f6346499f8bf736d619bb9, type: 3}
   - {fileID: 21300000, guid: b3eaac4b1bb5e21489baad2230661d34, type: 3}
-  - {fileID: 21300000, guid: 388b30fbcd41579439ce7cd33c8ddf3b, type: 3}
   - {fileID: 21300000, guid: dc33eadc0d819cd43b7b96eebb7dd38a, type: 3}
   - {fileID: 21300000, guid: d8272e1d60bcc0c47a022f44a996dada, type: 3}
   - {fileID: 21300000, guid: a015392df615fcd4e9f6df174803aefd, type: 3}
@@ -175,7 +172,6 @@ SpriteAtlas:
   - CardsBackground
   - CircleBorder
   - Circle2
-  - Education Panel
   - ScreBG
   - LineWarsIcon
   - DefeatedMission

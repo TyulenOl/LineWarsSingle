@@ -9,7 +9,7 @@ namespace LineWars
     {
         public override bool SDKEnabled => RuStoreBillingClient.Instance.IsInitialized;
 
-        private void Start()
+        public override void Initialize()
         {
             RuStoreBillingClient.Instance.Init();
         }
@@ -29,7 +29,7 @@ namespace LineWars
             throw new System.NotImplementedException();
         }
 
-        public override UserPurchaseInfo PurchaseByID(string id)
+        public override PurchaseData PurchaseByID(string id)
         {
             throw new System.NotImplementedException();
         }
@@ -44,12 +44,12 @@ namespace LineWars
             throw new System.NotImplementedException();
         }
 
-        public override UserPurchaseInfo[] GetPurchases()
+        public override PurchaseData[] GetPurchases()
         {
             throw new System.NotImplementedException();
         }
 
-        public override UserPurchaseInfo[] GetPurchases(PrizeType prizeType)
+        public override PurchaseData[] GetPurchases(PrizeType prizeType)
         {
             throw new System.NotImplementedException();
         }

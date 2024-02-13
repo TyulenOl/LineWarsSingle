@@ -13,8 +13,8 @@ namespace LineWars.Controllers
         [SerializeField] private List<DeckCard> defaultCards;
         [SerializeField] private SerializedDictionary<int, int> defaultCardLevels;
         [SerializeField] private SerializedDictionary<LootBoxType, int> defaultBoxesCount;
-        [SerializeField] private SerializedDictionary<BlessingId, int> defaultBlessingsCount;
-        [SerializeField] private List<BlessingId> defaultSelectedBlessings;
+        [SerializeField] private SerializedDictionary<BaseBlessing, int> defaultBlessingsCount;
+        [SerializeField] private List<BaseBlessing> defaultSelectedBlessings;
         
         
         public int DefaultGold => defaultGold;
@@ -22,8 +22,8 @@ namespace LineWars.Controllers
         public IEnumerable<DeckCard> DefaultCards => defaultCards;
         public IReadOnlyDictionary<LootBoxType, int> DefaultBoxesCount => defaultBoxesCount;
         public IReadOnlyDictionary<int, int> DefaultCardLevels => defaultCardLevels;
-        public IReadOnlyDictionary<BlessingId, int> DefaultBlessingsCount => defaultBlessingsCount;
-        public IReadOnlyList<BlessingId> DefaultSelectedBlessings => defaultSelectedBlessings;
+        public IReadOnlyDictionary<BaseBlessing, int> DefaultBlessingsCount => defaultBlessingsCount;
+        public IReadOnlyList<BaseBlessing> DefaultSelectedBlessings => defaultSelectedBlessings;
 
         private void OnValidate()
         {

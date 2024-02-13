@@ -11,65 +11,89 @@ namespace LineWars.Controllers
     public class YandexGameSdkAdapter: SDKAdapterBase
     {
         private static bool consume;
+        private static bool dataInitialized;
         
+        [Space]
+        [SerializeField, Min(1)] private int priseTypeLenInBits = 10;
+        [Space]
         [SerializeField] private SerializedDictionary<string, Prize> purchaseIdToPrize;
         [Tooltip("Соотношение сторон 1:1")]
         [SerializeField] private SerializedDictionary<string, Sprite> purchaseIdToSprite;
-        
-        [SerializeField, Min(1)] private int priseTypeLenInBits = 10;
-        [SerializeField] private Prize prizeIfAdError;
         [SerializeField] private SerializedDictionary<string, Prize> promoCodes = new();
         
+        [Header("References")]
+        [SerializeField] private YandexGameProvider yandexGameProvider;
         
-        private void Start()
-        {
-            if (YandexGame.SDKEnabled)
-                ConsumePurchases();
-        }
-
-        private void ConsumePurchases()
-        {
-            if (!consume)
-            {
-                consume = true;
-                YandexGame.ConsumePurchases();
-            }
-        }
+        public override bool SDKEnabled => YandexGame.SDKEnabled;
         
         private void OnEnable()
         {
-            YandexGame.GetDataEvent += ConsumePurchases;
             YandexGame.RewardVideoEvent += OnRewardVideoEvent;
             YandexGame.ErrorVideoEvent += OnErrorVideoEvent;
             YandexGame.GetPaymentsEvent += OnPaymentsEvent;
             YandexGame.PurchaseSuccessEvent += OnPurchaseSuccessEvent;
             YandexGame.PurchaseFailedEvent += OnPurchaseFailedEvent;
-            YandexGame.GetDataEvent += OnPaymentsEvent;
             
-            YandexGame.GetDataEvent += OnGetDataEvent;
+            YandexGame.GetDataEvent += InitializeData;
+            YandexGame.GetDataEvent += ConsumePurchases;
         }
 
         private void OnDisable()
         {
-            YandexGame.GetDataEvent -= ConsumePurchases;
             YandexGame.RewardVideoEvent -= OnRewardVideoEvent;
             YandexGame.ErrorVideoEvent -= OnErrorVideoEvent;
             YandexGame.GetPaymentsEvent -= OnPaymentsEvent;
             YandexGame.PurchaseSuccessEvent -= OnPurchaseSuccessEvent;
             YandexGame.PurchaseFailedEvent -= OnPurchaseFailedEvent;
             
-            YandexGame.GetDataEvent -= OnGetDataEvent;
+            YandexGame.GetDataEvent -= InitializeData;
+            YandexGame.GetDataEvent -= ConsumePurchases;
+        }
+
+        public override void Initialize()
+        {
+            if (SDKEnabled)
+            {
+                ConsumePurchases();
+                InitializeData();
+            }
         }
         
-        public override bool SDKEnabled => YandexGame.SDKEnabled;
+        private void ConsumePurchases()
+        {
+            if (consume) return;
+            consume = true;
+            
+            YandexGame.ConsumePurchases();
+        }
+        
+        private void InitializeData()
+        {
+            if (dataInitialized) return;
+            dataInitialized = true;
+            
+            yandexGameProvider.LoadAll();
+            GameRoot.Instance.StartGame();
+            
+            UsePromoCode();
+        }
+
+        private void UsePromoCode()
+        {
+            var promoCode = YandexGame.EnvironmentData.payload;
+            if (!string.IsNullOrEmpty(promoCode)
+                && promoCodes.TryGetValue(promoCode, out var prize)
+                && !UserInfoController.PromoCodeIsUsed(promoCode))
+            {
+                Reward(prize);
+                UserInfoController.UsePromoCode(promoCode);
+                FullscreenPanel.OpenPromoCodePanel(promoCode);
+            }
+        }
 
         protected override void RewardForAd(PrizeType prizeType, int amount)
         {
-            if (!SDKEnabled)
-            {
-                Debug.LogError("Yandex SDK not enabled!");
-                return;
-            }
+            if (!CheckEnableSdk()) return;
             
             try
             {
@@ -83,35 +107,64 @@ namespace LineWars.Controllers
             }
         }
 
-        public override UserPurchaseInfo PurchaseByID(string id)
+        public override PurchaseData PurchaseByID(string id)
         {
+            if (!CheckEnableSdk()) return null;
+            
             return ConvertPurchase(YandexGame.PurchaseByID(id));
         }
 
-        public override UserPurchaseInfo[] GetPurchases() 
+        public override PurchaseData[] GetPurchases() 
         {
+            if (!CheckEnableSdk()) return null;
+            
             return YandexGame.purchases
                 .Select(ConvertPurchase)
                 .ToArray();
         }
 
-        public override UserPurchaseInfo[] GetPurchases(PrizeType prizeType)
+        public override PurchaseData[] GetPurchases(PrizeType prizeType)
         {
+            if (!CheckEnableSdk()) return null;
+            
             return GetPurchases()
                 .Where(x => x.Prize != null && x.Prize.Type == prizeType)
                 .ToArray();
         }
 
-        public override int GetPurchaseCount() => YandexGame.purchases.Length;
+        public override int GetPurchaseCount()
+        {
+            if (!CheckEnableSdk()) return -1;
+            return YandexGame.purchases.Length;
+        }
 
         public override int GetPurchaseCount(PrizeType prizeType)
         {
+            if (!CheckEnableSdk()) return -1;
             return GetPurchases(prizeType).Length;
         }
         
-        private UserPurchaseInfo ConvertPurchase(Purchase yg)
+        public override bool CanBuyPurchase(string id)
         {
-            return new UserPurchaseInfo(
+            if (!CheckEnableSdk()) return false;
+            return purchaseIdToPrize.ContainsKey(id);
+        }
+
+        public override void BuyPurchase(string id)
+        {
+            if (!CheckEnableSdk()) return;
+            
+            if (!CanBuyPurchase(id))
+            {
+                Debug.LogError($"Cant buy this Purchase {nameof(id)}={id}");
+                return;
+            }
+            YandexGame.BuyPayments(id);
+        }
+        
+        private PurchaseData ConvertPurchase(Purchase yg)
+        {
+            return new PurchaseData(
                 yg.id,
                 yg.title,
                 yg.description,
@@ -121,21 +174,6 @@ namespace LineWars.Controllers
                 purchaseIdToPrize.TryGetValue(yg.id, out var prize) ? prize : null);
         }
 
-        public override bool CanBuyPurchase(string id)
-        {
-            return purchaseIdToPrize.ContainsKey(id);
-        }
-
-        public override void BuyPurchase(string id)
-        {
-            if (!CanBuyPurchase(id))
-            {
-                Debug.LogError($"Cant buy this Purchase {nameof(id)}={id}");
-                return;
-            }
-            YandexGame.BuyPayments(id);
-        }
-
         private void OnRewardVideoEvent(int id)
         {
             Debug.Log("OnRewardVideoEvent");
@@ -143,18 +181,22 @@ namespace LineWars.Controllers
             {
                 var (type, amount) = RewardUtilities.DecodeId(id, priseTypeLenInBits);
                 Reward(type, amount);
+                
+                FullscreenPanel.OpenSuccessPanel(new Money(CostType.Gold, amount));
                 InvokeRewardVideoEvent(type, amount);
             }
             catch
             {
                 Debug.LogError("DecodeId exception!");
-                //Reward(prizeIfAdError);
+                
+                FullscreenPanel.OpenErrorPanel();
                 InvokeErrorVideoEvent();
             }
         }
         
         private void OnErrorVideoEvent()
         {
+            FullscreenPanel.OpenErrorPanel();
             InvokeErrorVideoEvent();
         }
         
@@ -185,18 +227,11 @@ namespace LineWars.Controllers
             InvokePurchasesUpdated();
         }
         
-        private void OnGetDataEvent()
+        private bool CheckEnableSdk()
         {
-            var promoCode = YandexGame.EnvironmentData.payload;
-            if (!string.IsNullOrEmpty(promoCode)
-                && promoCodes.TryGetValue(promoCode, out var prize)
-                && !UserInfoController.PromoCodeIsUsed(promoCode))
-            {
-                DebugUtility.Log($"Промокод: {promoCode}");
-                UserInfoController.UsePromoCode(promoCode);
-                FullscreenPanel.OpenPromoCodePanel(promoCode);
-                Reward(prize);
-            }
+            if (!SDKEnabled)
+                DebugUtility.LogError("Yandex SDK not enabled!");
+            return SDKEnabled;
         }
     }
 }

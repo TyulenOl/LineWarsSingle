@@ -17,7 +17,7 @@ namespace LineWars.Interface
         [SerializeField] private Button button;
         [SerializeField] private bool addCurrency_toPrice = true;
         
-        public UnityEvent<UserPurchaseInfo> OnClick;
+        public UnityEvent<PurchaseData> OnClick;
         
         private void OnEnable()
         {

@@ -97,7 +97,7 @@ namespace LineWars.Interface
         {
             for (int i = 0; i < purchasesDrawers.Length; i++)
             {
-                UserPurchaseInfo purchaseInfo = SdkAdapter.PurchaseByID(purchasesDrawers[i].Data.Id);
+                PurchaseData purchaseInfo = SdkAdapter.PurchaseByID(purchasesDrawers[i].Data.Id);
                 if (purchaseInfo != null)
                 {
                     purchasesDrawers[i].Data = purchaseInfo;

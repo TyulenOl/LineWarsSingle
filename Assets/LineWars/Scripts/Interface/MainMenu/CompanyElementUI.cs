@@ -14,6 +14,7 @@ namespace LineWars
         [SerializeField] private Image companyImage;
         [SerializeField] private TMP_Text missionsProgress;
         [SerializeField] private Button companyElementButton;
+        [SerializeField] private Image bg;
 
         [SerializeField] private CompanyMenu menuToOpen;
 
@@ -38,6 +39,14 @@ namespace LineWars
                 var completedMissionsCount = missionsInfos.Count(x => x.MissionStatus == MissionStatus.Completed);
                 missionsProgress.text = $"{completedMissionsCount}/{missionsInfos.Count}";
                 companyElementButton.onClick.AddListener(OnClick);
+                var isOpen = missionsInfos.Any(x => x.MissionStatus != MissionStatus.Locked);
+                bg.gameObject.SetActive(!isOpen);
+                companyElementButton.interactable = isOpen;
+            }
+            else
+            {
+                bg.gameObject.SetActive(true);
+                companyElementButton.interactable = false;
             }
         }
 

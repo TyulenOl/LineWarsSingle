@@ -30,16 +30,18 @@ namespace LineWars
                 Debug.LogWarning(massage, context);
         }
         
-        public static void LogError(object massage)
+        public static bool LogError(object massage)
         {
             if (Logged)
                 Debug.LogError(massage);
+            return false;
         }
         
-        public static void LogError(object massage, Object context)
+        public static bool LogError(object massage, Object context)
         {
             if (Logged)
                 Debug.LogError(massage, context);
+            return false;
         }
     }
 }
