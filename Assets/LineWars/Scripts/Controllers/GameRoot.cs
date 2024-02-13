@@ -179,7 +179,7 @@ namespace LineWars.Controllers
         }
         private void InitializeLootBoxController()
         {
-            var lootBoxOpenerFabric = new ClientLootBoxOpenerFabric(cardsDatabase);
+            var lootBoxOpenerFabric = new ClientLootBoxOpenerFabric(cardsDatabase, blessingStorage);
             var dropConverter = new DuplicateEreaserDropConverter(userController.UserInfo, cardsDatabase);
             lootBoxController.Initialize(
                 userController.UserInfo, 

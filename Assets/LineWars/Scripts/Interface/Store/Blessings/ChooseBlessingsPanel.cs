@@ -85,7 +85,8 @@ namespace LineWars.Interface
                 var group = Instantiate(blessingsGroupDrawerPrefab, blessingsGroupsLayoutGroup.transform);
                 typeToDrawers[grouping.Key] = group;
                 group.Initialize(grouping.Key);
-                foreach (var id in grouping)
+                
+                foreach (var id in grouping.OrderBy(x => x.Rarity))
                     group.AddRarity(id.Rarity);
             }
             

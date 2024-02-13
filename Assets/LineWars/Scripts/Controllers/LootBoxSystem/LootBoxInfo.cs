@@ -1,7 +1,5 @@
 using System;
-using LineWars.Model;
 using System.Collections.Generic;
-using LineWars.Controllers;
 using UnityEngine;
 
 namespace LineWars.Model
@@ -49,6 +47,7 @@ namespace LineWars.Model
         [SerializeField] private int maxUpgradeCardChances;
 
         [SerializeField] private List<CardChances> cardChances;
+        [SerializeField] private List<BlessingChances> blessingChances;
 
         public LootType LootType => lootType;
         public int MinGoldChances => minGoldChances;
@@ -58,10 +57,22 @@ namespace LineWars.Model
         public int MinUpgradeCardChances => minUpgradeCardChances;
         public int MaxUpgradeCardChances => maxUpgradeCardChances;
         public IReadOnlyList<CardChances> CardChances => cardChances;
+
+        public IReadOnlyList<BlessingChances> BlessingChances => blessingChances;
     }
 
-    [System.Serializable]
+    [Serializable]
     public class CardChances
+    {
+        [SerializeField] private Rarity rarity;
+        [SerializeField] private float chance;
+
+        public Rarity Rarity => rarity;
+        public float Chance => chance;
+    }
+
+    [Serializable]
+    public class BlessingChances
     {
         [SerializeField] private Rarity rarity;
         [SerializeField] private float chance;
