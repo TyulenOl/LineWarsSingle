@@ -1,3 +1,4 @@
+using LineWars.Controllers;
 using UnityEngine;
 
 namespace LineWars.Model
@@ -8,6 +9,7 @@ namespace LineWars.Model
         IHealingAttackAction<Node, Edge, Unit>
     {
         [SerializeField] private ActionUnitAnimation attackAnimation;
+        [SerializeField] private SFXData attackReaction;
 
         protected override bool NeedAutoComplete => false;
         protected override HealingAttackAction<Node, Edge, Unit> GetAction()
@@ -32,6 +34,7 @@ namespace LineWars.Model
         {
             Action.Execute(target);
             Player.LocalPlayer.RecalculateVisibility();
+            Executor.PlaySfx(attackReaction);
             Complete();
         }
 
@@ -63,6 +66,7 @@ namespace LineWars.Model
             void OnAttack()
             {
                 Action.Execute(target);
+                Executor.PlaySfx(attackReaction);
                 var context2 = new AnimationContext()
                 {
                     TargetUnit = Executor,

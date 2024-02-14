@@ -1,3 +1,4 @@
+using LineWars.Controllers;
 using UnityEngine;
 
 namespace LineWars.Model
@@ -8,6 +9,7 @@ namespace LineWars.Model
         IUpArmorAction<Node, Edge, Unit>
     {
         [SerializeField] private UnitAnimation unitAnimation;
+        [SerializeField] private SFXData upArmorSFX;
 
         protected override bool NeedAutoComplete => false;
         protected override UpArmorAction<Node, Edge, Unit> GetAction()
@@ -33,6 +35,7 @@ namespace LineWars.Model
 
         private void ExecuteInstant(Unit target)
         {
+            Executor.PlaySfx(upArmorSFX);
             Action.Execute(target);
             Complete();
         }
