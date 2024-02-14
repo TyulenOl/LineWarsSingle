@@ -14,15 +14,28 @@ namespace LineWars.Interface
         private void Start()
         {
             unit.EffectAdded.AddListener(Redraw);
+            unit.EffectAdded.AddListener(OnEffectAdded);
+
             unit.EffectRemoved.AddListener(Redraw);
+            unit.EffectRemoved.AddListener(OnEffectRemoved);
+
             unit.EffectStacked.AddListener(Redraw);
             Redraw(unit, null);
+
+            foreach(var effect in unit.Effects)
+            {
+                effect.ActiveChanged += OnActiveChanged;
+            }
         }
 
         private void OnDestroy()
         {
             unit.EffectAdded.RemoveListener(Redraw);
+            unit.EffectAdded.RemoveListener(OnEffectAdded);
+
             unit.EffectRemoved.RemoveListener(Redraw);
+            unit.EffectRemoved.RemoveListener(OnEffectRemoved);
+
             unit.EffectStacked.RemoveListener(Redraw);
         }
 
@@ -31,12 +44,37 @@ namespace LineWars.Interface
             DeleteDrawers();
             foreach (var effect in unit.Effects)
             {
-                if (effectExceptions.Contains(effect.EffectType))
-                    continue;
-                var drawer = Instantiate(drawerPrefab, transform);
-                drawer.DrawEffect(effect);
-                currentDrawers.Add(drawer);
+                DrawEffect(effect);
             }
+        }
+
+        private void DrawEffect(Effect<Node, Edge, Unit> effect)
+        {
+            if (effectExceptions.Contains(effect.EffectType))
+                return;
+            if (!effect.IsActive)
+                return;
+            var drawer = Instantiate(drawerPrefab, transform);
+            drawer.DrawEffect(effect);
+            currentDrawers.Add(drawer);
+        }
+
+        private void OnActiveChanged(Effect<Node, Edge, Unit> effect, bool prevValue, bool newValue)
+        {
+            if(prevValue == newValue) return;
+            Redraw(unit, effect);
+        }
+
+        private void OnEffectAdded(Unit unit, Effect<Node, Edge, Unit> effect)
+        {
+            effect.ActiveChanged += OnActiveChanged;
+            Redraw(unit, effect);
+        }
+
+        private void OnEffectRemoved(Unit unit, Effect<Node, Edge, Unit> effect)
+        {
+            effect.ActiveChanged -= OnActiveChanged;
+            Redraw(unit, effect);
         }
 
         private void DeleteDrawers()

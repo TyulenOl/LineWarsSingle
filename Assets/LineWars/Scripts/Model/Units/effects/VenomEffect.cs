@@ -6,22 +6,19 @@ using UnityEngine;
 namespace LineWars.Model
 {
     public class VenomEffect<TNode, TEdge, TUnit> 
-        : TemporaryEffect<TNode, TEdge, TUnit>, IPowerEffect,
+        : TemporaryEffect<TNode, TEdge, TUnit>,
         IStackableEffect
         where TNode : class, INodeForGame<TNode, TEdge, TUnit>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
         private int venomPower;
-        public event Action<IPowerEffect, int, int> PowerChanged;
 
         public VenomEffect(TUnit targetUnit, int rounds, int venomPower) : base(targetUnit, rounds)
         {
             this.venomPower = venomPower;
         }
         public override EffectType EffectType => EffectType.Venom;
-
-        public int Power => venomPower;
 
         public override void ExecuteOnEnter()
         {
@@ -49,7 +46,7 @@ namespace LineWars.Model
             Rounds += venomEffect.Rounds;
             var prevPower = venomPower;
             venomPower = Mathf.Max(venomPower, venomEffect.venomPower);
-            PowerChanged?.Invoke(venomEffect, prevPower, venomPower);
+            InvokeCharacteristicsChanged(this, EffectCharecteristicType.Power, prevPower, venomPower);
         }
 
         public bool CanStack(IStackableEffect effect)

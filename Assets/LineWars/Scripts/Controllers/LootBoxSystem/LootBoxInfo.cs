@@ -34,31 +34,24 @@ namespace LineWars.Model
     {
         [SerializeField] private LootType lootType;
 
-        [Header("Gold Settings")]
-        [SerializeField] private int minGoldChances;
-        [SerializeField] private int maxGoldChances;
+        [Header("Count Settings")]
+        [SerializeField] private int minCount;
+        [SerializeField] private int maxCount;
+ 
 
-        [Header("Diamond Settings")]
-        [SerializeField] private int minDiamondChances;
-        [SerializeField] private int maxDiamondChances;
-
-        [Header("Upgrade Card Settings")]
-        [SerializeField] private int minUpgradeCardChances;
-        [SerializeField] private int maxUpgradeCardChances;
-
+        [Header("Card Settings")]
         [SerializeField] private List<CardChances> cardChances;
         [SerializeField] private List<BlessingChances> blessingChances;
 
+        [Header("Blessing Settings")]
+        [SerializeField] private List<BlessingChances> blessingChanses;
+
         public LootType LootType => lootType;
-        public int MinGoldChances => minGoldChances;
-        public int MaxGoldChances => maxGoldChances;
-        public int MinDiamondChances => minDiamondChances;
-        public int MaxDiamondChances => maxDiamondChances;
-        public int MinUpgradeCardChances => minUpgradeCardChances;
-        public int MaxUpgradeCardChances => maxUpgradeCardChances;
+        public int MinCount => minCount;
+        public int MaxCount => maxCount;
         public IReadOnlyList<CardChances> CardChances => cardChances;
 
-        public IReadOnlyList<BlessingChances> BlessingChances => blessingChances;
+        public IReadOnlyList<BlessingChances> BlessingChances => blessingChanses;
     }
 
     [Serializable]
@@ -70,6 +63,7 @@ namespace LineWars.Model
         public Rarity Rarity => rarity;
         public float Chance => chance;
     }
+
 
     [Serializable]
     public class BlessingChances

@@ -3,15 +3,13 @@
 namespace LineWars.Model
 {
     public abstract class TemporaryEffect<TNode, TEdge, TUnit> : 
-        Effect<TNode, TEdge, TUnit>, ITemporaryEffect
+        Effect<TNode, TEdge, TUnit>
         where TNode : class, INodeForGame<TNode, TEdge, TUnit>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
         private int rounds;
         protected readonly int initialRounds;
-
-        public event Action<ITemporaryEffect, int, int> RoundsChanged;
 
         public int Rounds
         {
@@ -20,7 +18,11 @@ namespace LineWars.Model
             {
                 var prevValue = rounds;
                 rounds = value;
-                RoundsChanged?.Invoke(this, prevValue, rounds);
+                InvokeCharacteristicsChanged(
+                    this,
+                    EffectCharecteristicType.Duration,
+                    prevValue,
+                    rounds);
                 if(rounds <= 0)
                 {
                     TargetUnit.RemoveEffect(this);
@@ -35,6 +37,7 @@ namespace LineWars.Model
         {
             this.rounds = rounds;
             initialRounds = rounds;
+            characteristics[EffectCharecteristicType.Duration] = () => this.rounds;
         }
 
         public override void ExecuteOnEnter()

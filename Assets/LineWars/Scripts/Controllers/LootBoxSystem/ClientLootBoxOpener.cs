@@ -9,12 +9,12 @@ namespace LineWars.Model
 {
     public class ClientLootBoxOpener : ILootBoxOpener
     {
-        private readonly IStorage<int, DeckCard> cardStorage;
-        private readonly IStorage<BlessingId, BaseBlessing> blessingStorage;
+        private IStorage<int, DeckCard> cardStorage;
+        private IStorage<BlessingId, BaseBlessing> blessingStorage;
         public LootBoxInfo BoxInfo {get; private set;}
 
         public ClientLootBoxOpener(
-            LootBoxInfo info,
+            LootBoxInfo info, 
             IStorage<int, DeckCard> cardStorage,
             IStorage<BlessingId, BaseBlessing> blessingStorage)
         {
@@ -39,20 +39,20 @@ namespace LineWars.Model
                     case LootType.Gold:
                         drops.Add(HandleUsualDrop(
                             loot.LootType, 
-                            loot.MinGoldChances, 
-                            loot.MaxGoldChances));
+                            loot.MinCount, 
+                            loot.MaxCount));
                         break;
                     case LootType.Diamond:
                         drops.Add(HandleUsualDrop(
                             loot.LootType, 
-                            loot.MinDiamondChances,
-                            loot.MaxDiamondChances)); 
+                            loot.MinCount,
+                            loot.MaxCount)); 
                         break;
                     case LootType.UpgradeCard:
                         drops.Add(HandleUsualDrop(
                             loot.LootType,
-                            loot.MinUpgradeCardChances,
-                            loot.MaxUpgradeCardChances));
+                            loot.MinCount,
+                            loot.MaxCount));
                         break;
                     case LootType.Card:
                         drops.Add(HandleCard(loot));
@@ -89,27 +89,17 @@ namespace LineWars.Model
         
         private Drop HandleBlessing(LootInfo info)
         {
+            var value = Random.Range(info.MinCount, info.MaxCount);
             var chanceList = new RandomChanceList<Rarity>();
-            foreach (var blessingChances in info.BlessingChances)
+            foreach (var cardChance in info.BlessingChances)
             {
-                chanceList.Add(blessingChances.Rarity, blessingChances.Chance);
+                chanceList.Add(cardChance.Rarity, cardChance.Chance);
             }
             var rarity = chanceList.PickRandomObject();
 
-            var blessingIds = blessingStorage.FindBlessingByType(rarity).ToArray();
-            var randomCard = Random.Range(0, blessingIds.Length);
-
-            throw new NotImplementedException();
-            //return new Drop(LootType.Card);
-        }
-
-        private IEnumerable<int> FindAllElligbleCards(Rarity rarity)
-        {
-            foreach(var card in cardStorage.Values)
-            {
-                if (card.Rarity == rarity)
-                    yield return cardStorage.ValueToId[card];
-            }
+            var elligbleBlessings = blessingStorage.FindBlessingsByType(rarity).ToArray();
+            var randomBlessing = Random.Range(0, elligbleBlessings.Length);
+            return new Drop(LootType.Blessing, elligbleBlessings[randomBlessing], value);
         }
     }
 }

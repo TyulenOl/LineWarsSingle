@@ -7,6 +7,9 @@ namespace LineWars.Model
     public class LonelinessEffectInitializer : EffectInitializer
     {
         [SerializeField] private int powerBonus;
+
+        public override EffectType EffectType => EffectType.Loneliness;
+
         public override Effect<Node, Edge, Unit> GetEffect(Unit unit)
         {
             return new LonelinessEffect<Node, Edge, Unit>(unit, powerBonus);

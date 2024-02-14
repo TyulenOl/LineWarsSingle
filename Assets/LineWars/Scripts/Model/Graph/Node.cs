@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -102,11 +103,11 @@ namespace LineWars.Model
                 
                 if(prevUnit != null && prevUnit.Size == UnitSize.Little)
                 {
-                    UnitLeft?.Invoke(this, prevUnit);
+                    ExecuteUnitLeft(prevUnit);
                 }
                 if(leftUnit != null && leftUnit.Size == UnitSize.Little)
                 {
-                    UnitAdded?.Invoke(this, leftUnit);
+                    ExecuteUnitAdded(leftUnit);
                 }
             }
 
@@ -124,12 +125,32 @@ namespace LineWars.Model
 
                 if (prevUnit != null)
                 {
-                    UnitLeft?.Invoke(this, prevUnit);
+                    ExecuteUnitLeft(prevUnit);
                 }
                 if (rightUnit != null)
                 {
-                    UnitAdded?.Invoke(this, rightUnit);
+                    ExecuteUnitAdded(rightUnit);
                 }
+            }
+        }
+
+        private void ExecuteUnitLeft(Unit unit)
+        {
+            StartCoroutine(StupidCoroutine(unit));
+            IEnumerator StupidCoroutine(Unit unit)
+            {
+                yield return null;
+                UnitLeft?.Invoke(this, unit);
+            }
+        }
+
+        private void ExecuteUnitAdded(Unit unit)
+        {
+            StartCoroutine(StupidCoroutine(unit));
+            IEnumerator StupidCoroutine(Unit unit)
+            {
+                yield return null;
+                UnitAdded?.Invoke(this, unit);
             }
         }
 

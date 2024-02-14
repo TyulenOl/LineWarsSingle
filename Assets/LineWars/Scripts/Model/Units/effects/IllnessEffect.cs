@@ -6,7 +6,7 @@ namespace LineWars
 {
     public class IllnessEffect<TNode, TEdge, TUnit> :
         TemporaryEffect<TNode, TEdge, TUnit>,
-        IStackableEffect, IPowerEffect
+        IStackableEffect
         where TNode : class, INodeForGame<TNode, TEdge, TUnit>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
@@ -14,14 +14,13 @@ namespace LineWars
         private int powerDebuff;
         private int deductedPower;
 
-        public event Action<IPowerEffect, int, int> PowerChanged;
-
         public IllnessEffect(
             TUnit targetUnit, 
             int rounds,
             int powerDebuff) : base(targetUnit, rounds)
         {
             this.powerDebuff = powerDebuff;
+            characteristics[EffectCharecteristicType.Power] = () => this.powerDebuff;
         }
 
         public override EffectType EffectType => EffectType.Illness;
@@ -74,7 +73,11 @@ namespace LineWars
                 Rounds = Mathf.Max(Rounds, illnessEffect.Rounds);
                 var prevDebuff = powerDebuff;
                 powerDebuff = Mathf.Max(powerDebuff, illnessEffect.powerDebuff);
-                PowerChanged?.Invoke(illnessEffect, prevDebuff, powerDebuff);
+                InvokeCharacteristicsChanged(
+                    this, 
+                    EffectCharecteristicType.Power, 
+                    prevDebuff, 
+                    powerDebuff);
                 Spread();
             }
         }
