@@ -96,8 +96,8 @@ namespace LineWars.Controllers
             }
             
             GameReady = true;
-            
-            timeGetter = gameObject.AddComponent<GetWorldTime>();
+
+            timeGetter = new GetLocalTime();
             InitializeProviders();
             
             CompaniesController.Initialize(missionInfoProvider, missionsStorage);

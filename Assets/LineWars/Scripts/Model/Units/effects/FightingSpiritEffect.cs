@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 namespace LineWars.Model
 {
     public class FightingSpiritEffect<TNode, TEdge, TUnit> : 
-        Effect<TNode, TEdge, TUnit>, IPowerEffect
+        Effect<TNode, TEdge, TUnit>
         where TNode : class, INodeForGame<TNode, TEdge, TUnit>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
@@ -14,17 +13,35 @@ namespace LineWars.Model
         public override EffectType EffectType => EffectType.FightingSpirit;
 
         private int powerBonus;
+        private int _givenPower;
+
+        private int givenPower
+        {
+            get => _givenPower;
+            set
+            {
+                var prevPower = _givenPower;
+                _givenPower = value;
+                if (_givenPower <= 0 && isActive)
+                    isActive = false;
+                if (_givenPower > 0 && !isActive)
+                    isActive = true;
+                InvokeCharacteristicsChanged(this,
+                    EffectCharecteristicType.Power,
+                    prevPower,
+                    _givenPower);
+            }
+        }
+
         public FightingSpiritEffect(TUnit targetUnit, int powerBonus) : base(targetUnit)
         {
             this.powerBonus = powerBonus;
+            characteristics[EffectCharecteristicType.Power] = () => givenPower;
+            isActive = false;
         }
 
         private HashSet<TUnit> collectedUnits = new();
         private HashSet<TNode> subscribedNodes = new();
-
-        public event Action<IPowerEffect, int, int> PowerChanged;
-
-        public int Power => powerBonus;
 
         public override void ExecuteOnEnter()
         {
@@ -42,6 +59,8 @@ namespace LineWars.Model
 
         private void CollectUnit(TUnit unit)
         {
+            if (unit.OwnerId != TargetUnit.OwnerId)
+                return;
             if(collectedUnits.Contains(unit))
             {
                 Debug.LogError("Unit already collected");
@@ -49,17 +68,21 @@ namespace LineWars.Model
             }
             collectedUnits.Add(unit);
             TargetUnit.CurrentPower += powerBonus;
+            givenPower += powerBonus;
         }
 
         private void DeleteUnit(TUnit unit)
         {
+            if(unit.OwnerId != TargetUnit.OwnerId)
+                return;
             if (!collectedUnits.Contains(unit))
             {
-                Debug.LogError("Can't collect not collected unit!");
+                Debug.LogError("Can't delete not collected unit!");
                 return;
             }
             collectedUnits.Remove(unit);
             TargetUnit.CurrentPower -= powerBonus;
+            givenPower -= powerBonus;
         }
 
         private void RecollectUnits()

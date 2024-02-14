@@ -4,10 +4,11 @@ using LineWars.Model;
 using UnityEditor;
 using UnityEngine;
 
-
+[Obsolete]
 [CustomEditor(typeof(AdvancedUnitCostFunction))]
 public class AdvancedUnitCostFunctionEditor : Editor
 {
+
     private AdvancedUnitCostFunction Function => (AdvancedUnitCostFunction) target;
 
     public override void OnInspectorGUI()
