@@ -22,8 +22,8 @@ namespace LineWars
             } 
         }
 
+        protected override bool noBaseWinCondition => false;
         public int RoundsToWin => roundsToWin;
-
         public event Action<int> CurrentRoundsChanged;
         
         public override void Initialize([NotNull] Player player, IEnumerable<BasePlayer> enemies)

@@ -6,6 +6,7 @@ namespace LineWars.Model
 {
     public class WallToWallGameReferee : GameReferee
     {
+        protected override bool noBaseWinCondition => false;
         public override void Initialize([NotNull] Player player, IEnumerable<BasePlayer> enemies)
         {
             base.Initialize(player, enemies);

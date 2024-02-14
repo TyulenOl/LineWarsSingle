@@ -30,7 +30,7 @@ namespace LineWars.Model
         private void Stun(TUnit target)
         {
             target.CurrentActionPoints -= Executor.CurrentPower;
-            CompleteAndAutoModify();
+            target.DealDamageThroughArmor(Executor.CurrentPower);
         }
 
         public IActionCommand GenerateCommand(TUnit target)
