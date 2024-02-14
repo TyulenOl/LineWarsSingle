@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using LineWars.Controllers;
@@ -241,10 +242,15 @@ namespace LineWars.Model
 
         private void InitializeAllEffects()
         {
-            foreach (var effectInit in effectInitializers)
+            StartCoroutine(StupidCoroutine());
+            IEnumerator StupidCoroutine()
             {
-                var newEffect = effectInit.GetEffect(this);
-                AddEffect(newEffect);
+                yield return null;
+                foreach (var effectInit in effectInitializers)
+                {
+                    var newEffect = effectInit.GetEffect(this);
+                    AddEffect(newEffect);
+                }
             }
         }
 
