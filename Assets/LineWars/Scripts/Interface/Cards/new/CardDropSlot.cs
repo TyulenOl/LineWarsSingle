@@ -68,6 +68,9 @@ namespace LineWars.Interface
             if (!CanTakeCard(draggableCard.DeckCard))
                 return;
             
+            if (draggableCard is DelayDraggableCard {DragStarting: false})
+                return;
+            
             var prevValue = DeckCard;
             DeckCard = draggableCard.DeckCard;
             OnDropCard?.Invoke(this, prevValue, DeckCard);
@@ -80,6 +83,10 @@ namespace LineWars.Interface
             var dragableItem = eventData.pointerDrag.GetComponent<DraggableCard>();
             if(dragableItem == null)
                 return;
+            
+            if (dragableItem is DelayDraggableCard {DragStarting: false})
+                return;
+            
             ShowAvailability(CanTakeCard(dragableItem.DeckCard));
         }
         
