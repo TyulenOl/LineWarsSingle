@@ -3,8 +3,7 @@
 namespace LineWars.Model
 {
     public class PowerBuffEffect<TNode, TEdge, TUnit> : 
-        Effect<TNode, TEdge, TUnit>, 
-        IPowerEffect
+        Effect<TNode, TEdge, TUnit>
         where TNode : class, INodeForGame<TNode, TEdge, TUnit>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
@@ -13,13 +12,12 @@ namespace LineWars.Model
         public PowerBuffEffect(TUnit targetUnit, int addedPower) : base(targetUnit)
         {
             this.addedPower = addedPower;
+            characteristics[EffectCharecteristicType.Power] = () => this.addedPower;
         }
 
         public override EffectType EffectType => EffectType.PowerBuff;
 
         public int Power => addedPower;
-
-        public event Action<IPowerEffect, int, int> PowerChanged;
 
         public override void ExecuteOnEnter()
         {

@@ -19,22 +19,24 @@ namespace LineWars.Interface
         public void DrawEffect(Effect<Node, Edge, Unit> effect)
         {
             this.effect = effect;
-            if (effect is IPowerEffect powerEffect)
+            if (effect.HasCharacteristic(EffectCharecteristicType.Power))
             {
+                var power = effect.GetCharacteristic(EffectCharecteristicType.Power);
                 powerObjects.SetActive(true);
-                powerText.text = powerEffect.Power.GetRoman();
-                powerEffect.PowerChanged += OnPowerChanged;
+                powerText.text = power.GetRoman();
+                effect.CharacteristicsChanged += OnPowerChanged;
             }
             else
             {
                 powerObjects.SetActive(false);
             }
 
-            if (effect is ITemporaryEffect temporaryEffect)
+            if (effect.HasCharacteristic(EffectCharecteristicType.Duration))
             {
+                var duration = effect.GetCharacteristic(EffectCharecteristicType.Duration);
                 roundsObjects.SetActive(true);
-                roundText.text = temporaryEffect.Rounds.ToString();
-                temporaryEffect.RoundsChanged += OnRoundsChanged;
+                roundText.text = effect.GetCharacteristic(EffectCharecteristicType.Duration).ToString();
+                effect.CharacteristicsChanged += OnRoundsChanged;
             }
             else
             {
@@ -52,25 +54,35 @@ namespace LineWars.Interface
 
         private void OnDestroy()
         {
-            if (effect is IPowerEffect powerEffect)
+            if (effect.HasCharacteristic(EffectCharecteristicType.Power))
             {
-                powerEffect.PowerChanged -= OnPowerChanged;
+                effect.CharacteristicsChanged -= OnPowerChanged;
             }
 
-            if (effect is ITemporaryEffect temporaryEffect)
+            if (effect.HasCharacteristic(EffectCharecteristicType.Duration))
             {
-                temporaryEffect.RoundsChanged -= OnRoundsChanged;
+                effect.CharacteristicsChanged -= OnRoundsChanged;
             }
         }
 
-        private void OnRoundsChanged(ITemporaryEffect effect, int prevRounds, int currentRounds)
+        private void OnRoundsChanged(Effect<Node, Edge, Unit> effect,
+            EffectCharecteristicType type,
+            int prevRounds,
+            int currentRounds)
         {
-            roundText.text = effect.Rounds.ToString();
+            var durationType = EffectCharecteristicType.Duration;
+            if (type != durationType) return;
+            roundText.text = effect.GetCharacteristic(durationType).ToString();
         }
 
-        private void OnPowerChanged(IPowerEffect effect, int prevRounds, int currentRounds)
+        private void OnPowerChanged(Effect<Node, Edge, Unit> effect, 
+            EffectCharecteristicType type, 
+            int prevRounds, 
+            int currentRounds)
         {
-            roundText.text = effect.Power.ToString();
+            var powerType = EffectCharecteristicType.Power;
+            if (type != powerType) return;
+            powerText.text = effect.GetCharacteristic(powerType).GetRoman();
         }
     }
 }
