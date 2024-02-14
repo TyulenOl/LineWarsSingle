@@ -35,6 +35,8 @@ namespace LineWars.Model
 
         private void BuffUnit(TUnit unit) 
         {
+            if (unit.OwnerId != TargetUnit.OwnerId)
+                return;
             var effect = new PowerBuffEffect<TNode, TEdge, TUnit>(unit, TargetUnit.CurrentPower);
             unit.AddEffect(effect);
             if (unitEffects.ContainsKey(unit))
@@ -43,8 +45,10 @@ namespace LineWars.Model
         }
 
         private void DebuffUnit(TUnit unit) 
-        { 
-            if(!unitEffects.ContainsKey(unit))
+        {
+            if (unit.OwnerId != TargetUnit.OwnerId)
+                return;
+            if (!unitEffects.ContainsKey(unit))
             {
                 Debug.LogError("Can't debuff not buffed unit!");
                 return;
