@@ -122,7 +122,7 @@ namespace LineWars.Interface
         
         public bool CanTakeCard(DeckCard deckCard)
         {
-            return deckCard.Unit.Size == unitSize && DeckCard != deckCard;
+            return deckCard.Unit.Size == unitSize;
         }
         
         public void Clear()
