@@ -39,19 +39,6 @@ namespace LineWars.Model
                 //Debug.Log($"Chosen: {bestOutcome.Score}, {bestOutcome.Commands.First()}");
                 ai.StartCoroutine(PlayOutcome(bestOutcome, gameProjection));
             }
-
-            public IEnumerator PlayOutcome(PossibleOutcome outcome, GameProjection gameProjection)
-            {
-                yield return new WaitForSeconds(ai.firstCommandPause);
-                foreach (var blueprint in outcome.Commands)
-                {
-                    var command = blueprint.GenerateMonoCommand(gameProjection);
-                    UnitsController.ExecuteCommand(command);
-                    yield return new WaitForSeconds(ai.commandPause);
-                }
-
-                InvokeEnded();
-            }
         }
     }
 }

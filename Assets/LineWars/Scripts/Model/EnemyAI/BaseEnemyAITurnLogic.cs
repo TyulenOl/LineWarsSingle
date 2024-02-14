@@ -1,158 +1,201 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Collections;
+using UnityEngine;
 
 namespace LineWars.Model
 {
-    public abstract class BaseEnemyAITurnLogic
+    public partial class EnemyAI
     {
-        protected readonly EnemyAI ai;
-        protected readonly GameEvaluator gameEvaluator;
-        protected readonly DepthDetailsData depthDetailsData;
-        private List<PhaseType> skippedPhases = new List<PhaseType>()
-        { 
+        public abstract class BaseEnemyAITurnLogic
+        {
+            protected readonly EnemyAI ai;
+            protected readonly GameEvaluator gameEvaluator;
+            protected readonly DepthDetailsData depthDetailsData;
+            private List<PhaseType> skippedPhases = new List<PhaseType>()
+        {
             PhaseType.Buy,
             PhaseType.Payday
         };
-        public BaseEnemyAITurnLogic(
-            EnemyAI ai, 
-            GameEvaluator gameEvaluator, 
-            DepthDetailsData depthDetailsData)
-        {
-            this.ai = ai;
-            this.gameEvaluator = gameEvaluator;
-            this.depthDetailsData = depthDetailsData;
-        }
-
-        public event Action Ended;
-
-        public abstract void Start();
-
-        protected void InvokeEnded()
-        {
-            Ended?.Invoke();
-        }
-
-        protected PossibleOutcome MinMax(GameProjection gameProjection, 
-            ICommandBlueprint blueprint, 
-            int depth,
-            int currentExecutorId, 
-            List<ICommandBlueprint> firstCommandChain, 
-            bool isSavingCommands, int alpha = int.MinValue, int beta = int.MaxValue)
-        {
-            if (currentExecutorId != -1 && blueprint.ExecutorId != currentExecutorId)
-                throw new ArgumentException();
-            currentExecutorId = blueprint.ExecutorId;
-            var newGame = GameProjectionCreator.FromProjection(gameProjection);
-            var thisCommand = blueprint.GenerateCommand(newGame);
-            thisCommand.Execute();
-
-            if (isSavingCommands)
+            public BaseEnemyAITurnLogic(
+                EnemyAI ai,
+                GameEvaluator gameEvaluator,
+                DepthDetailsData depthDetailsData)
             {
-                var newCommandChain = new List<ICommandBlueprint>(firstCommandChain);
-                newCommandChain.Add(blueprint);
-                firstCommandChain = newCommandChain;
+                this.ai = ai;
+                this.gameEvaluator = gameEvaluator;
+                this.depthDetailsData = depthDetailsData;
             }
 
-            var thisPlayerProjection = newGame.OriginalToProjectionPlayers[ai];
-            if (newGame.UnitsIndexList.Count == 0)
-                return new(gameEvaluator.Evaluate(newGame, thisPlayerProjection), firstCommandChain);
+            public event Action Ended;
 
-            if (IsTurnOver(newGame, currentExecutorId))
+            public abstract void Start();
+
+            protected void InvokeEnded()
             {
-                depth++;
-                currentExecutorId = -1;
-                isSavingCommands = false;
-                if (!newGame.IsUnitPhaseAvailable())
-                    newGame.CycleTurn();
-                else
-                    newGame.CyclePlayers();
+                Ended?.Invoke();
             }
-            var safeguard = 0;
-            while(true)
+
+            protected PossibleOutcome MinMax(GameProjection gameProjection,
+                ICommandBlueprint blueprint,
+                int depth,
+                int currentExecutorId,
+                List<ICommandBlueprint> firstCommandChain,
+                bool isSavingCommands, int alpha = int.MinValue, int beta = int.MaxValue)
             {
-                if(skippedPhases.Contains(newGame.CurrentPhase))
+                if (currentExecutorId != -1 && blueprint.ExecutorId != currentExecutorId)
+                    throw new ArgumentException();
+                currentExecutorId = blueprint.ExecutorId;
+                var newGame = GameProjectionCreator.FromProjection(gameProjection);
+                var thisCommand = blueprint.GenerateCommand(newGame);
+                thisCommand.Execute();
+
+                if (isSavingCommands)
                 {
-                    newGame.CycleTurn();
+                    var newCommandChain = new List<ICommandBlueprint>(firstCommandChain);
+                    newCommandChain.Add(blueprint);
+                    firstCommandChain = newCommandChain;
                 }
-                else
+
+                var thisPlayerProjection = newGame.OriginalToProjectionPlayers[ai];
+                if (newGame.UnitsIndexList.Count == 0)
+                    return new(gameEvaluator.Evaluate(newGame, thisPlayerProjection), firstCommandChain);
+
+                if (IsTurnOver(newGame, currentExecutorId))
                 {
-                    break;
+                    depth++;
+                    currentExecutorId = -1;
+                    isSavingCommands = false;
+                    if (!newGame.IsUnitPhaseAvailable())
+                        newGame.CycleTurn();
+                    else
+                        newGame.CyclePlayers();
                 }
-                safeguard++;
-                if(safeguard > 100)
+                var safeguard = 0;
+                while (true)
+                {
+                    if (skippedPhases.Contains(newGame.CurrentPhase))
+                    {
+                        newGame.CycleTurn();
+                    }
+                    else
+                    {
+                        break;
+                    }
+                    safeguard++;
+                    if (safeguard > 100)
+                    {
+                        return new(gameEvaluator.Evaluate(newGame, thisPlayerProjection), firstCommandChain);
+                    }
+                }
+
+                if (depth > ai.Depth || newGame.CurrentPhase == PhaseType.Buy)
                 {
                     return new(gameEvaluator.Evaluate(newGame, thisPlayerProjection), firstCommandChain);
-                }    
-            }
-
-            if (depth > ai.Depth || newGame.CurrentPhase == PhaseType.Buy)
-            {
-                return new(gameEvaluator.Evaluate(newGame, thisPlayerProjection), firstCommandChain);
-            }
-
-            var availableCommands = depthDetailsData.GetDepthDetails(depth).AvailableCommands;
-            var possibleCommands = CommandBlueprintCollector.CollectAllCommands(newGame, availableCommands)
-            .Where(newBlueprint => currentExecutorId == -1 || newBlueprint.ExecutorId == currentExecutorId);
-
-            if (thisPlayerProjection != newGame.CurrentPlayer)
-            {
-                var currentValue = new PossibleOutcome(int.MaxValue, null);
-                foreach (var command in possibleCommands)
-                {
-                    var newValue = MinMax(newGame, 
-                        command, 
-                        depth, 
-                        currentExecutorId, 
-                        firstCommandChain, 
-                        isSavingCommands, 
-                        alpha, beta);
-                    if (newValue.Score < currentValue.Score)
-                        currentValue = newValue;
-                    if (newValue.Score <= alpha)
-                    {
-                        return currentValue;
-                    }
-                    if (newValue.Score < beta)
-                        beta = newValue.Score;
                 }
-                return currentValue;
-            }
-            else
-            {
-                var currentValue = new PossibleOutcome(int.MinValue, null);
-                foreach (var command in possibleCommands)
-                {
-                    var newValue = MinMax(newGame, 
-                        command, 
-                        depth, 
-                        currentExecutorId, 
-                        firstCommandChain, 
-                        isSavingCommands, 
-                        alpha, beta);
-                    if (newValue.Score > currentValue.Score)
-                        currentValue = newValue;
-                    if (newValue.Score >= beta)
-                    {
-                        return currentValue;
-                    }
-                    if (newValue.Score > alpha)
-                        alpha = newValue.Score;
-                }
-                return currentValue;
-            }
-        }
 
-        private bool IsTurnOver(GameProjection game, int currentExecutorId)
-        {
-            if (game.CurrentPhase != PhaseType.Buy && currentExecutorId != -1)
-            {
-                if (!game.UnitsIndexList.ContainsKey(currentExecutorId))
-                    return true;
-                var currentExecutor = game.UnitsIndexList[currentExecutorId];
-                return currentExecutor.CurrentActionPoints <= 0;
+                var availableCommands = depthDetailsData.GetDepthDetails(depth).AvailableCommands;
+                var possibleCommands = CommandBlueprintCollector.CollectAllCommands(newGame, availableCommands)
+                .Where(newBlueprint => currentExecutorId == -1 || newBlueprint.ExecutorId == currentExecutorId);
+
+                if (thisPlayerProjection != newGame.CurrentPlayer)
+                {
+                    var currentValue = new PossibleOutcome(int.MaxValue, null);
+                    foreach (var command in possibleCommands)
+                    {
+                        var newValue = MinMax(newGame,
+                            command,
+                            depth,
+                            currentExecutorId,
+                            firstCommandChain,
+                            isSavingCommands,
+                            alpha, beta);
+                        if (newValue.Score < currentValue.Score)
+                            currentValue = newValue;
+                        if (newValue.Score <= alpha)
+                        {
+                            return currentValue;
+                        }
+                        if (newValue.Score < beta)
+                            beta = newValue.Score;
+                    }
+                    return currentValue;
+                }
+                else
+                {
+                    var currentValue = new PossibleOutcome(int.MinValue, null);
+                    foreach (var command in possibleCommands)
+                    {
+                        var newValue = MinMax(newGame,
+                            command,
+                            depth,
+                            currentExecutorId,
+                            firstCommandChain,
+                            isSavingCommands,
+                            alpha, beta);
+                        if (newValue.Score > currentValue.Score)
+                            currentValue = newValue;
+                        if (newValue.Score >= beta)
+                        {
+                            return currentValue;
+                        }
+                        if (newValue.Score > alpha)
+                            alpha = newValue.Score;
+                    }
+                    return currentValue;
+                }
             }
-            return true;
+
+            private bool IsTurnOver(GameProjection game, int currentExecutorId)
+            {
+                if (game.CurrentPhase != PhaseType.Buy && currentExecutorId != -1)
+                {
+                    if (!game.UnitsIndexList.ContainsKey(currentExecutorId))
+                        return true;
+                    var currentExecutor = game.UnitsIndexList[currentExecutorId];
+                    return currentExecutor.CurrentActionPoints <= 0;
+                }
+                return true;
+            }
+
+            protected IEnumerator PlayOutcome(PossibleOutcome outcome, GameProjection gameProjection)
+            {
+                yield return new WaitForSeconds(ai.firstCommandPause);
+                foreach (var blueprint in outcome.Commands)
+                {
+                    var command = blueprint.GenerateMonoCommand(gameProjection);
+                    
+                    if (command is IActionCommand actionCommand)
+                    {
+                        Debug.Log(actionCommand.Action);
+                        var isCompleted = false;
+                        actionCommand.Action.ActionCompleted += OnActionCompleted;
+                        UnitsController.ExecuteCommand(command);
+                        while (!isCompleted)
+                        {
+                            yield return new WaitForFixedUpdate();
+                        }
+
+                        yield return new WaitForSeconds(ai.commandPause);
+                        void OnActionCompleted()
+                        {
+                            actionCommand.Action.ActionCompleted -= OnActionCompleted;
+                            isCompleted = true;
+                        }
+                    }
+                    else
+                    {
+                        UnitsController.ExecuteCommand(command);
+                        yield return new WaitForSeconds(ai.commandPause);
+                    }
+                    
+                }
+
+                InvokeEnded();
+            }
+
+            
         }
     }
 }

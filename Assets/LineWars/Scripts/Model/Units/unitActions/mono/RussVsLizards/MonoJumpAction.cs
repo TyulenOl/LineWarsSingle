@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using LineWars.Controllers;
+using UnityEngine;
 
 namespace LineWars.Model
 {
@@ -9,10 +10,13 @@ namespace LineWars.Model
         [SerializeField, Min(0)] private int minJumpDistance;
         [SerializeField, Min(0)] private int maxJumpDistance;
         [SerializeField] private UnitAnimation jumpAnimation;
+        [SerializeField] private SFXList moveReactions;
 
         public int MinJumpDistance => minJumpDistance;
         public int MaxJumpDistance => maxJumpDistance;
         protected override bool NeedAutoComplete => false;
+
+        private IDJ DJ = new RandomDJ(1);
 
         protected override JumpAction<Node, Edge, Unit> GetAction()
         {
@@ -34,6 +38,7 @@ namespace LineWars.Model
 
         private void ExecuteInstant(Node target)
         {
+            Executor.PlaySfx(DJ.GetSound(moveReactions));
             Action.Execute(target);
             Complete();
         }
