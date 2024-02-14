@@ -208,7 +208,7 @@ namespace LineWars.Model
         public bool IsDied => CurrentHp <= 0;
 
         public IEnumerable<CommandType> UnitCommands => monoUnitActions.Select(x => x.CommandType);
-
+        public IEnumerable<EffectType> InitialEffects => effectInitializers.Select(x => x.EffectType);
         #endregion
 
         private void OnValidate()
