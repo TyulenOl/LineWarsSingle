@@ -20,6 +20,8 @@ namespace LineWars.Controllers
         [Tooltip("Соотношение сторон 1:1")]
         [SerializeField] private SerializedDictionary<string, Sprite> purchaseIdToSprite;
         [SerializeField] private SerializedDictionary<string, Prize> promoCodes = new();
+        [SerializeField] private string lockAdId;
+        
         
         [Header("References")]
         [SerializeField] private YandexGameProvider yandexGameProvider;
@@ -132,6 +134,17 @@ namespace LineWars.Controllers
                 .ToArray();
         }
 
+        public override void LockAd()
+        {
+            BuyPurchase(lockAdId);
+        }
+
+        private void _LockAd()
+        {
+            //YandexGame.Instance.infoYG.AdWhenLoadingScene = false;
+            //TODO
+        }
+
         public override int GetPurchaseCount()
         {
             if (!CheckEnableSdk()) return -1;
@@ -202,6 +215,15 @@ namespace LineWars.Controllers
         
         private void OnPurchaseSuccessEvent(string id)
         {
+            if (id == lockAdId)
+            {
+                UserInfoController.LockAd = true;
+                FullscreenPanel.OpenSuccessLockAdPanel();
+                InvokeSuccessLockAd();
+                InvokePurchaseSuccessEvent(id);
+                return;
+            }
+            
             if (purchaseIdToPrize.TryGetValue(id, out var prize))
             {
                 Reward(prize);

@@ -18,7 +18,8 @@ namespace LineWars.Controllers
         
         private Dictionary<int, MissionInfo> missionInfos;
         
-        public int ChoseMissionId { get; set; }
+        public int ChosenMissionId { get; set; }
+        public MissionInfo ChosenMission => GetMissionInfo(ChosenMissionId); 
         public event Action AnyMissionInfoChanged;
 
         public bool IsInfinityGameUnlocked => debugMode || missionInfos[0].MissionStatus == MissionStatus.Completed;
@@ -59,7 +60,7 @@ namespace LineWars.Controllers
 
         public void DefeatChoseMissionIfNoWin()
         {
-            var missionInfo = missionInfos[ChoseMissionId];
+            var missionInfo = missionInfos[ChosenMissionId];
             if (missionInfo.MissionStatus 
                 is MissionStatus.Completed 
                 or MissionStatus.Failed)
@@ -71,7 +72,7 @@ namespace LineWars.Controllers
         
         public void WinChoseMission()
         {
-            var missionInfo = missionInfos[ChoseMissionId];
+            var missionInfo = missionInfos[ChosenMissionId];
             if (missionInfo.MissionStatus is MissionStatus.Completed) return;
             
             missionInfo.MissionStatus = MissionStatus.Completed;
@@ -107,8 +108,8 @@ namespace LineWars.Controllers
         
         public void UnlockNextMission()
         {
-            if (missionInfos.ContainsKey(ChoseMissionId + 1))
-                UnlockMission(ChoseMissionId + 1);
+            if (missionInfos.ContainsKey(ChosenMissionId + 1))
+                UnlockMission(ChosenMissionId + 1);
         }
 
         public MissionStatus GetMissionStatus(int missionId)

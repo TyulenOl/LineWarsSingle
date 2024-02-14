@@ -30,6 +30,7 @@ namespace LineWars.Controllers
         public event Action<int> DiamondsChanged;
         public event Action<int> UserUpgradeCardsChanged;
         public event Action<int> PassingGameModesChanged;
+        public event Action<bool> LockAdChanged; 
         public event Action<BlessingId, int> BlessingCountChanged;
         public event Action<BlessingId, int> SelectedBlessingIdChanged;
         public event Action<int> TotalSelectionCountChanged;
@@ -281,6 +282,21 @@ namespace LineWars.Controllers
                 currentInfo.PassingGameModes = value;
                 SaveCurrentUserInfo();
                 PassingGameModesChanged?.Invoke(value);
+            }
+        }
+
+        public bool LockAd
+        {
+            get => currentInfo.LockAd;
+            set
+            {
+                var prevValue = currentInfo.LockAd;
+                currentInfo.LockAd = value;
+                if (prevValue != value)
+                {
+                    SaveCurrentUserInfo();
+                    LockAdChanged?.Invoke(value);
+                }
             }
         }
 

@@ -7,10 +7,13 @@ namespace LineWars.Controllers
     {
         public override bool SDKEnabled => true;
 
-
         public override void Initialize()
         {
             GameRoot.Instance.StartGame();
+        }
+        public override void LockAd()
+        {
+            
         }
 
         protected override void RewardForAd(PrizeType prizeType, int amount)
