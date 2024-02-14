@@ -11,7 +11,8 @@ namespace LineWars.Interface
 
         private void OnEnable()
         {
-            openAdButton.PrizeForAd = new Prize(PrizeType.Gold, WinOrLoseScene.MoneyAmount);
+            openAdButton.Button.interactable = WinOrLoseScene.CanDoublicateGold;
+            openAdButton.PrizeForAd = new Prize(PrizeType.Gold, WinOrLoseScene.GoldAmount);
             openAdButton.Button.onClick.AddListener(OpenAdButtonOnClick);
         }
         

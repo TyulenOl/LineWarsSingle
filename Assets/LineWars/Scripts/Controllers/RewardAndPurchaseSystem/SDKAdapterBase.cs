@@ -12,17 +12,22 @@ namespace LineWars.Controllers
         [SerializeField] private UnityEvent purchasesUpdatedEvent;
         [SerializeField] private UnityEvent<string> purchaseSuccessEvent;
         [SerializeField] private UnityEvent<string> purchaseFailedEvent;
+        [SerializeField] private UnityEvent successLockAd;
         
         public event Action<PrizeType, int> RewardVideoEvent;
         public event Action ErrorVideoEvent;
         public event Action PurchasesUpdated;
         public event Action<string> PurchaseSuccessEvent;
         public event Action<string> PurchaseFailedEvent;
+        public event Action SuccesLockAd; 
         
         protected UserInfoController UserInfoController => GameRoot.Instance.UserController;
         
         public abstract void Initialize();
         public abstract bool SDKEnabled { get; }
+        public abstract void LockAd();
+        public bool AdIsLocked => UserInfoController.LockAd;
+        
         public void RewardForAd(Prize prize) => RewardForAd(prize.Type, prize.Amount); 
         protected abstract void RewardForAd(PrizeType prizeType, int amount);
         public abstract bool CanBuyPurchase(string id);
@@ -33,7 +38,7 @@ namespace LineWars.Controllers
         public abstract int GetPurchaseCount(PrizeType prizeType);
         public abstract PurchaseData[] GetPurchases();
         public abstract PurchaseData[] GetPurchases(PrizeType prizeType);
-
+      
         
         protected void Reward(Prize prize)
         {
@@ -86,6 +91,12 @@ namespace LineWars.Controllers
         {
             purchaseFailedEvent?.Invoke(id);
             PurchaseFailedEvent?.Invoke(id);
+        }
+
+        protected void InvokeSuccessLockAd()
+        {
+            successLockAd?.Invoke();
+            SuccesLockAd?.Invoke();
         }
     }
 }

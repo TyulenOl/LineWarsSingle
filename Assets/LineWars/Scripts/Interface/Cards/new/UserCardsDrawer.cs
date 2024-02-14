@@ -12,6 +12,7 @@ namespace LineWars.Interface
     {
         [SerializeField] private CardBigInfoDrawer bigCardInfo;
         [SerializeField] private CardDraggableSet cardPrefab;
+        [SerializeField] private ScrollRect scrollRect;
         [SerializeField] private LayoutGroup cardsLayoutGroup;
 
         private readonly Dictionary<DeckCard, CardDraggableSet> deckCardToDrawer = new ();
@@ -39,6 +40,7 @@ namespace LineWars.Interface
                 var instance = Instantiate(cardPrefab, cardsLayoutGroup.transform);
 
                 instance.DeckCard = card;
+                instance.ScrollRect = scrollRect;
                 instance.OnClick.AddListener(() =>
                 {
                     bigCardInfo.gameObject.SetActive(true);

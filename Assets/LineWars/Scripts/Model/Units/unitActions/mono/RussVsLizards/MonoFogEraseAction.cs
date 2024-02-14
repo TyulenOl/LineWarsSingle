@@ -49,7 +49,8 @@ namespace LineWars.Model
 
         public bool IsAvailable(Node target)
         {
-            return Action.IsAvailable(target);
+            return Action.IsAvailable(target) &&
+                !target.IsVisible;
         }
 
         public IActionCommand GenerateCommand(Node target)

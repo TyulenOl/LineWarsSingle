@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using LineWars.Controllers;
@@ -208,7 +209,7 @@ namespace LineWars.Model
         public bool IsDied => CurrentHp <= 0;
 
         public IEnumerable<CommandType> UnitCommands => monoUnitActions.Select(x => x.CommandType);
-
+        public IEnumerable<EffectType> InitialEffects => effectInitializers.Select(x => x.EffectType);
         #endregion
 
         private void OnValidate()
@@ -241,10 +242,15 @@ namespace LineWars.Model
 
         private void InitializeAllEffects()
         {
-            foreach (var effectInit in effectInitializers)
+            StartCoroutine(StupidCoroutine());
+            IEnumerator StupidCoroutine()
             {
-                var newEffect = effectInit.GetEffect(this);
-                AddEffect(newEffect);
+                yield return null;
+                foreach (var effectInit in effectInitializers)
+                {
+                    var newEffect = effectInit.GetEffect(this);
+                    AddEffect(newEffect);
+                }
             }
         }
 

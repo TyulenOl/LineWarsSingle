@@ -17,7 +17,7 @@ namespace LineWars.Interface
             if (diamondsAmount)
                 diamondsAmount.text = "+ " + WinOrLoseScene.DiamondsAmount;
             if (moneyAmount)
-                moneyAmount.text = "+ " + WinOrLoseScene.MoneyAmount;
+                moneyAmount.text = "+ " + WinOrLoseScene.GoldAmount;
         }
     }
 }

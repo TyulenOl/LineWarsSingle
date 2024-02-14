@@ -103,6 +103,7 @@ public class MaskRendererV3AutoManagementСPU : Singleton<MaskRendererV3AutoMana
     
     public void Initialise()
     {
+        
         if (initialized)
         {
             Debug.LogError($"{nameof(MaskRendererV3AutoManagementСPU)} is Initialized!");

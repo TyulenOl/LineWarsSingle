@@ -28,6 +28,8 @@ namespace LineWars.Interface
         [SerializeField] private PurchaseDrawer[] purchasesDrawers = Array.Empty<PurchaseDrawer>();
 
         [SerializeField] private PrizeType prizeType;
+        [SerializeField] private bool disableWhenPurchasesEmpty = true;
+        [SerializeField, ConditionallyVisible(nameof(disableWhenPurchasesEmpty))] private GameObject disabledObject;
         
         public UnityEvent OnUpdatePurchasesList;
         private void OnEnable()
@@ -55,10 +57,17 @@ namespace LineWars.Interface
 
         public void UpdatePurchasesList()
         {
+            var purchases = SdkAdapter.GetPurchases(prizeType);
+            if (disableWhenPurchasesEmpty && purchases.Length == 0)
+            {
+                disabledObject?.SetActive(false);
+                return;
+            }
+            
             if (spawnPurchases)
             {
                 DestroyPurchasesList();
-                SpawnPurchasesList();
+                SpawnPurchasesList(purchases);
             }
             else
             {
@@ -76,10 +85,8 @@ namespace LineWars.Interface
             }
         }
 
-        private void SpawnPurchasesList()
+        private void SpawnPurchasesList(PurchaseData[] purchases)
         {
-            var purchases = SdkAdapter.GetPurchases(prizeType);
-            
             purchasesDrawers = new PurchaseDrawer[purchases.Length];
             for (var i = 0; i < purchases.Length; i++)
             {

@@ -73,19 +73,22 @@ namespace LineWars.Controllers
                     case (LootType.Card):
                         userInfoController.UnlockCard(drop.Drop.Value);
                         break;
+                    case (LootType.Blessing):
+                        userInfoController.GlobalBlessingsPull[drop.Drop.BlessingId] += drop.Drop.Value;
+                        break;
                 }
             }
         }
 
-        public bool CanBuy(LootBoxType boxType)
+        public bool CanBuy(LootBoxType boxType, int amount = 1)
         {
             var box = typeToInfos[boxType];
             switch (box.CostType)
             {
                 case CostType.Gold:
-                    return userInfoController.UserGold >= box.Cost;
+                    return userInfoController.UserGold >= box.Cost * amount;
                 case CostType.Diamond:
-                    return userInfoController.UserDiamond >= box.Cost;
+                    return userInfoController.UserDiamond >= box.Cost * amount;
                 default:
                     throw new NotImplementedException();
             }
@@ -102,10 +105,10 @@ namespace LineWars.Controllers
             switch(box.CostType)
             {
                 case CostType.Gold:
-                    userInfoController.UserGold -= box.Cost;
+                    userInfoController.UserGold -= box.Cost * amount;
                     break;
                 case CostType.Diamond:
-                    userInfoController.UserDiamond -= box.Cost;
+                    userInfoController.UserDiamond -= box.Cost * amount;
                     break;
             }
 

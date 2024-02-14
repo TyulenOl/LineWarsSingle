@@ -3,6 +3,7 @@ using System.Collections;
 using System.Linq;
 using LineWars.Model;
 using LineWars.Controllers;
+using LineWars.Infrastructure;
 using UnityEngine;
 
 namespace LineWars
@@ -12,7 +13,8 @@ namespace LineWars
         [SerializeField] private bool autoInitialize = true;
         
         [field:SerializeField] public GameReferee GameReferee { get;  set; }
-        [field:SerializeField] public WinOrLoseAction WinOrLoseAction { get; set; }
+        [field:SerializeField] public WinOrLoseAction WinAction { get; set; }
+        [field:SerializeField] public WinOrLoseAction LoseAction { get; set; }
         [field:SerializeField] public PlayerInitializer PlayerInitializer { get;  set; }
         
         [field: Header("Getters")]
@@ -83,37 +85,49 @@ namespace LineWars
                 Debug.LogError($"Нет {nameof(GameReferee)}");
                 return;
             }
-            if (WinOrLoseAction == null)
-                Debug.LogError($"Нет {nameof(Controllers.WinOrLoseAction)}");
+
+            if (WinAction == null)
+            {
+                Debug.LogError($"Нет {nameof(WinAction)}");
+                return;
+            }
+            
+            if (LoseAction == null)
+            {
+                Debug.LogError($"Нет {nameof(LoseAction)}");
+                return;
+            }
             
             GameReferee.Initialize(Player.LocalPlayer, AllPlayers
                 .Select(x => x.Value)
                 .Where(x => x != Player.LocalPlayer));
             
-            GameReferee.Wined += WinOrLoseAction.OnWin;
-            GameReferee.Losed += WinOrLoseAction.OnLose;
+            GameReferee.Wined += WinGame;
+            GameReferee.Losed += LoseGame;
         }
 
         [EditorButton]
         public void WinGame()
         {
-            WinOrLoseAction.OnWin();
+            WinAction.Execute();
         }
         
         [EditorButton]
         public void LoseGame()
         {
-            WinOrLoseAction.OnLose();
+            LoseAction.Execute();
         }
 
         public void PauseGame()
         {
-            
+            if (PauseInstaller.Instance)
+                PauseInstaller.Pause(true);
         }
 
         public void ResumeGame()
         {
-            
+            if (PauseInstaller.Instance)
+                PauseInstaller.Pause(false);
         }
         
         protected override void OnDestroy()

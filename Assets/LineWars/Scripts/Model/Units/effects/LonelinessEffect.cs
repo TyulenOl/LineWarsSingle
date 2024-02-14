@@ -3,23 +3,20 @@ using System.Collections.Generic;
 namespace LineWars.Model
 {
     public class LonelinessEffect<TNode, TEdge, TUnit> : 
-        Effect<TNode, TEdge, TUnit>, IPowerEffect
+        Effect<TNode, TEdge, TUnit>
         where TNode : class, INodeForGame<TNode, TEdge, TUnit>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
-        public override EffectType EffectType => EffectType.Lonelinesss;
+        public override EffectType EffectType => EffectType.Loneliness;
         private TNode executorNode;
         private int powerBonus;
-        private bool isBuffed;
-        public event Action<IPowerEffect, int, int> PowerChanged;
-
-        public int PowerBonus => powerBonus;
-        public int Power => powerBonus;
 
         public LonelinessEffect(TUnit targetUnit, int powerBonus) : base(targetUnit)
         {
             this.powerBonus = powerBonus;
+            characteristics[EffectCharecteristicType.Power] = () => this.powerBonus;
+            isActive = false;
         }
       
         public override void ExecuteOnEnter()
@@ -70,16 +67,16 @@ namespace LineWars.Model
 
         private void Buff()
         {
-            if (isBuffed) return;
+            if (isActive) return;
             TargetUnit.CurrentPower += powerBonus;
-            isBuffed = true;
+            isActive = true;
         }
 
         private void Debuff()
         {
-            if (!isBuffed) return;
+            if (!isActive) return;
             TargetUnit.CurrentPower -= powerBonus;
-            isBuffed = false;
+            isActive = false;
         }
     }
 }

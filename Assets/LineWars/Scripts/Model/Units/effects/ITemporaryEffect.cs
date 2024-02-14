@@ -2,6 +2,7 @@
 
 namespace LineWars.Model
 {
+    [Obsolete]
     public interface ITemporaryEffect
     {
         public int InitialRounds { get; }

@@ -58,6 +58,9 @@ namespace LineWars.Interface
             }
             else if (oldCard != null && newCard != null)
             {
+                if (oldCard == newCard) 
+                    return;
+                
                 var otherSlot = slots.FirstOrDefault(x => x.DeckCard == newCard && x != dropSlot);
                 if (otherSlot != null) // своп карты
                 {

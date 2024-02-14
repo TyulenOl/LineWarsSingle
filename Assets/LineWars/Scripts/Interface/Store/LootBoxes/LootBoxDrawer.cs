@@ -18,10 +18,11 @@ namespace LineWars.Interface
         [SerializeField] private Button button;
         [SerializeField] private CostDrawer costDrawer;
         [SerializeField] private Transform transformToGenerateSibling;
-        
+
         [SerializeField] private LayoutGroup dropLayoutGroup;
         [SerializeField] private DropElement dropElementPrefab;
 
+        [SerializeField] private LootShowcaseType lootShowcaseType;
         private readonly List<DropElement> dropElements = new();
 
         private LootBoxInfo lootBoxInfo;
@@ -32,49 +33,131 @@ namespace LineWars.Interface
         public void Redraw(LootBoxInfo lootBoxInfo, UnityAction onButtonClickAction = null)
         {
             button.onClick.RemoveAllListeners();
-            
+
             costDrawer.DrawCost(lootBoxInfo.Cost, lootBoxInfo.CostType);
             boxName.text = lootBoxInfo.Name;
-            if (boxDescription != null) 
+            if (boxDescription != null)
                 boxDescription.text = lootBoxInfo.Description;
             lootBoxImage.sprite = lootBoxInfo.BoxSprite;
-            
+
             RedrawBg(lootBoxInfo.Bg);
-            
-            if(onButtonClickAction != null)
+
+            if (onButtonClickAction != null)
                 button.onClick.AddListener(onButtonClickAction);
             this.lootBoxInfo = lootBoxInfo;
 
             if (dropLayoutGroup == null || dropElementPrefab == null)
                 return;
-            
-            foreach (var loot in lootBoxInfo.AllLoot
-                         .Distinct(new LootTypeComparer())
-                         .OrderBy(x => x.LootType))
+
+            foreach (var lootGroup in lootBoxInfo.AllLoot
+                         .OrderBy(x => x.LootType)
+                         .GroupBy(x => x.LootType))
             {
-                DrawLoot(loot);
+                DrawLoot(lootGroup);
             }
         }
 
-        private void DrawLoot(LootInfo lootInfo)
+        private void DrawLoot(IGrouping<LootType, LootInfo> LootGroup)
         {
-            if (lootInfo.LootType == LootType.Card)
+            if (LootGroup.Key == LootType.Card)
             {
-                foreach (var card in lootInfo.CardChances.OrderBy(x => x.Rarity))
+                switch(lootShowcaseType)
                 {
-                    var instance = Instantiate(dropElementPrefab, dropLayoutGroup.transform);
-                    instance.Icon.sprite = DrawHelper.LootTypeToSprite[lootInfo.LootType];
-                    instance.Background.color = DrawHelper.RarityToColor[card.Rarity];
-                    dropElements.Add(instance);
+                    case LootShowcaseType.ShowAllPossibilities:
+                        ShowAllCards(LootGroup);
+                        break;
+                    case LootShowcaseType.ShowBestPossibility:
+                        ShowBestChancesCard(LootGroup);
+                        break;
+                    default:
+                        DebugUtility.LogError("Not Implemented Showcase Type!!!");
+                        break;
+                }
+            }
+            else if (LootGroup.Key == LootType.Blessing)
+            {
+                switch (lootShowcaseType)
+                {
+                    case LootShowcaseType.ShowAllPossibilities:
+                        ShowAllBlessings(LootGroup);
+                        break;
+                    case LootShowcaseType.ShowBestPossibility:
+                        ShowBestChancesBlessings(LootGroup);
+                        break;
+                    default:
+                        DebugUtility.LogError("Not Implemented Showcase Type!!!");
+                        break;
                 }
             }
             else
             {
                 var instance = Instantiate(dropElementPrefab, dropLayoutGroup.transform);
-                instance.Icon.sprite = DrawHelper.LootTypeToSprite[lootInfo.LootType];
-                instance.Background.color = DrawHelper.LootTypeToColor[lootInfo.LootType];
+                instance.Icon.sprite = DrawHelper.LootTypeToSprite[LootGroup.Key];
+                instance.Background.color = DrawHelper.LootTypeToColor[LootGroup.Key];
                 dropElements.Add(instance);
             }
+        }
+
+        private void ShowAllCards(IGrouping<LootType, LootInfo> LootGroup)
+        {
+            var allRarities = LootGroup
+                    .SelectMany(info => info.CardChances
+                        .Select(chances => chances.Rarity))
+                    .Distinct()
+                    .OrderBy(rarity => rarity)
+                    .ToArray();
+
+            foreach (var rarity in allRarities)
+            {
+                var instance = Instantiate(dropElementPrefab, dropLayoutGroup.transform);
+                instance.Icon.sprite = DrawHelper.LootTypeToSprite[LootGroup.Key];
+                instance.Background.color = DrawHelper.RarityToColor[rarity];
+                dropElements.Add(instance);
+            }
+        }
+
+        private void ShowBestChancesCard(IGrouping<LootType, LootInfo> LootGroup)
+        {
+            var rarity = LootGroup
+                    .SelectMany(info => info.CardChances)
+                    .MaxItem((c1, c2) => c1.Chance.CompareTo(c2.Chance))
+                    .Rarity;
+
+            var instance = Instantiate(dropElementPrefab, dropLayoutGroup.transform);
+            instance.Icon.sprite = DrawHelper.LootTypeToSprite[LootGroup.Key];
+            instance.Background.color = DrawHelper.RarityToColor[rarity];
+            dropElements.Add(instance);
+        }
+
+        private void ShowAllBlessings(IGrouping<LootType, LootInfo> LootGroup)
+        {
+            var allRarities = LootGroup
+                    .SelectMany(info => info.BlessingChances
+                        .Select(chances => chances.Rarity))
+                    .Distinct()
+                    .OrderBy(rarity => rarity)
+                    .ToArray();
+
+            foreach (var rarity in allRarities)
+            {
+                var instance = Instantiate(dropElementPrefab, dropLayoutGroup.transform);
+                instance.Icon.sprite = DrawHelper.LootTypeToSprite[LootGroup.Key];
+                instance.Background.color = DrawHelper.RarityToColor[rarity];
+                dropElements.Add(instance);
+            }
+        }
+
+        private void ShowBestChancesBlessings(IGrouping<LootType, LootInfo> LootGroup)
+        {
+            var rarity = LootGroup
+                    .SelectMany(info => info.BlessingChances)
+                    .MaxItem((c1, c2) => c1.Chance.CompareTo(c2.Chance))
+                    .Rarity;
+
+            var instance = Instantiate(dropElementPrefab, dropLayoutGroup.transform);
+            instance.Icon.sprite = DrawHelper.LootTypeToSprite[LootGroup.Key];
+            instance.Background.color = DrawHelper.RarityToColor[rarity];
+            dropElements.Add(instance);
         }
 
         private void OnDisable()
@@ -101,7 +184,7 @@ namespace LineWars.Interface
                 return obj.LootType.GetHashCode();
             }
         }
-        
+
         private void RedrawBg(GameObject newBg)
         {
             if (bg != null)
@@ -109,6 +192,12 @@ namespace LineWars.Interface
             var newBgInstance = Instantiate(newBg, transformToGenerateSibling);
             newBgInstance.transform.SetAsFirstSibling();
             bg = newBgInstance;
+        }
+
+        private enum LootShowcaseType
+        {
+            ShowAllPossibilities,
+            ShowBestPossibility
         }
     }
 }

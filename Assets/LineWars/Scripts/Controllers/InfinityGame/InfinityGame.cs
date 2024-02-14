@@ -18,7 +18,9 @@ namespace LineWars.Controllers
         private static InfinityGameMode? modeToLoad;
         private static InfinityGameSettings settingsToLoad;
         
-        [SerializeField] private SerializedDictionary<InfinityGameMode, InfinityGameSettings> gameModeSettings;
+        //[SerializeField] private SerializedDictionary<InfinityGameMode, InfinityGameSettings> gameModeSettings;
+        [SerializeField] private SerializedDictionary<InfinityGameMode, InfinityGameSettingsCreator> gameModeSettingsCreator;
+        
         
         [Header("References")]
         [SerializeField] private GraphCreator graphCreator;
@@ -42,14 +44,14 @@ namespace LineWars.Controllers
         {
             if (loadingType == null)
             {
-                InitializeBySettings(gameModeSettings[gameMode]);
+                InitializeBySettings(gameModeSettingsCreator[gameMode].InfinityGameSettings);
                 return;
             }
             
             switch (loadingType)
             {
                 case LoadingType.ByMode:
-                    InitializeBySettings(gameModeSettings[modeToLoad.Value]);
+                    InitializeBySettings(gameModeSettingsCreator[modeToLoad.Value].InfinityGameSettings);
                     break;
                 case LoadingType.BySettings:
                     InitializeBySettings(settingsToLoad);
@@ -77,6 +79,11 @@ namespace LineWars.Controllers
             
             mapCreator.GenerateMap(monoGraph);
             cameraController.gameObject.SetActive(true);
+
+            if (settings.PlayersSettings.WinAction != null)
+                singleGameRoot.WinAction = settings.PlayersSettings.WinAction;
+            if (settings.PlayersSettings.LoseAction != null)
+                singleGameRoot.LoseAction = settings.PlayersSettings.LoseAction;
             
             singleGameRoot.StartGame();
         }
@@ -232,10 +239,10 @@ namespace LineWars.Controllers
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            if (gameModeSettings != null)
+            if (gameModeSettingsCreator != null)
                 foreach (InfinityGameMode mode in Enum.GetValues(typeof(InfinityGameMode)))
                 {
-                    gameModeSettings.TryAdd(mode, new InfinityGameSettings());
+                    gameModeSettingsCreator.TryAdd(mode, null);
                 }
         }
 #endif
