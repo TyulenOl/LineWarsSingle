@@ -1,7 +1,5 @@
 using System;
-using LineWars.Model;
 using System.Collections.Generic;
-using LineWars.Controllers;
 using UnityEngine;
 
 namespace LineWars.Model
@@ -43,6 +41,7 @@ namespace LineWars.Model
 
         [Header("Card Settings")]
         [SerializeField] private List<CardChances> cardChances;
+        [SerializeField] private List<BlessingChances> blessingChances;
 
         [Header("Blessing Settings")]
         [SerializeField] private List<BlessingChances> blessingChanses;
@@ -51,10 +50,11 @@ namespace LineWars.Model
         public int MinCount => minCount;
         public int MaxCount => maxCount;
         public IReadOnlyList<CardChances> CardChances => cardChances;
+
         public IReadOnlyList<BlessingChances> BlessingChances => blessingChanses;
     }
 
-    [System.Serializable]
+    [Serializable]
     public class CardChances
     {
         [SerializeField] private Rarity rarity;
@@ -64,7 +64,8 @@ namespace LineWars.Model
         public float Chance => chance;
     }
 
-    [System.Serializable]
+
+    [Serializable]
     public class BlessingChances
     {
         [SerializeField] private Rarity rarity;

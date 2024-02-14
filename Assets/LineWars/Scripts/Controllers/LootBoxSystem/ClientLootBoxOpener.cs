@@ -1,8 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using DataStructures;
 using LineWars.Controllers;
-using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace LineWars.Model
 {
@@ -58,7 +59,7 @@ namespace LineWars.Model
                         break;
                     case LootType.Blessing:
                         drops.Add(HandleBlessing(loot));
-                         break;
+                        break;
                 }
             }
 
@@ -85,7 +86,7 @@ namespace LineWars.Model
             var randomCard = Random.Range(0, elligbleCards.Length);
             return new Drop(LootType.Card, elligbleCards[randomCard]);
         }
-
+        
         private Drop HandleBlessing(LootInfo info)
         {
             var value = Random.Range(info.MinCount, info.MaxCount);

@@ -48,31 +48,55 @@ namespace LineWars.Interface
             if (dropLayoutGroup == null || dropElementPrefab == null)
                 return;
             
-            foreach (var loot in lootBoxInfo.AllLoot
-                         .Distinct(new LootTypeComparer())
-                         .OrderBy(x => x.LootType))
+            foreach (var lootGroup in lootBoxInfo.AllLoot
+                         .OrderBy(x => x.LootType)
+                         .GroupBy(x => x.LootType))
             {
-                DrawLoot(loot);
+                DrawLoot(lootGroup);
             }
         }
 
-        private void DrawLoot(LootInfo lootInfo)
+        private void DrawLoot(IGrouping<LootType, LootInfo> LootGroup)
         {
-            if (lootInfo.LootType == LootType.Card)
+            if (LootGroup.Key == LootType.Card)
             {
-                foreach (var card in lootInfo.CardChances.OrderBy(x => x.Rarity))
+                var allRarities = LootGroup
+                    .SelectMany(info => info.CardChances
+                        .Select(chances => chances.Rarity))
+                    .Distinct()
+                    .OrderBy(rarity => rarity)
+                    .ToArray();
+                
+                foreach (var rarity in allRarities)
                 {
                     var instance = Instantiate(dropElementPrefab, dropLayoutGroup.transform);
-                    instance.Icon.sprite = DrawHelper.LootTypeToSprite[lootInfo.LootType];
-                    instance.Background.color = DrawHelper.RarityToColor[card.Rarity];
+                    instance.Icon.sprite = DrawHelper.LootTypeToSprite[LootGroup.Key];
+                    instance.Background.color = DrawHelper.RarityToColor[rarity];
+                    dropElements.Add(instance);
+                }
+            }
+            else if (LootGroup.Key == LootType.Blessing)
+            {
+                var allRarities = LootGroup
+                    .SelectMany(info => info.BlessingChances
+                        .Select(chances => chances.Rarity))
+                    .Distinct()
+                    .OrderBy(rarity => rarity)
+                    .ToArray();
+                
+                foreach (var rarity in allRarities)
+                {
+                    var instance = Instantiate(dropElementPrefab, dropLayoutGroup.transform);
+                    instance.Icon.sprite = DrawHelper.LootTypeToSprite[LootGroup.Key];
+                    instance.Background.color = DrawHelper.RarityToColor[rarity];
                     dropElements.Add(instance);
                 }
             }
             else
             {
                 var instance = Instantiate(dropElementPrefab, dropLayoutGroup.transform);
-                instance.Icon.sprite = DrawHelper.LootTypeToSprite[lootInfo.LootType];
-                instance.Background.color = DrawHelper.LootTypeToColor[lootInfo.LootType];
+                instance.Icon.sprite = DrawHelper.LootTypeToSprite[LootGroup.Key];
+                instance.Background.color = DrawHelper.LootTypeToColor[LootGroup.Key];
                 dropElements.Add(instance);
             }
         }
