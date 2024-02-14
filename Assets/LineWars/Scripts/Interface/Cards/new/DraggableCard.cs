@@ -5,7 +5,10 @@ using UnityEngine.EventSystems;
 
 namespace LineWars.Interface
 {
-    public class DraggableCard: MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+    public class DraggableCard: MonoBehaviour,
+        IBeginDragHandler,
+        IDragHandler, 
+        IEndDragHandler
     {
         [SerializeField] private BaseCardDrawer baseCardDrawer;
         [SerializeField] private RectTransform parentTransform;
@@ -48,27 +51,34 @@ namespace LineWars.Interface
             rectTransform = GetComponent<RectTransform>();
         }
 
-        public void OnBeginDrag(PointerEventData eventData)
+        public virtual void OnBeginDrag(PointerEventData eventData)
         {
+            StartDrag();
+        }
+        
+        public virtual void OnDrag(PointerEventData eventData)
+        {
+            Drag(eventData);
+        }
+
+        public virtual void OnEndDrag(PointerEventData eventData)
+        {
+            EndDrag();
+        }
+        
+        protected void StartDrag()
+        {  
             isDragging = true;
-            
             transform.localPosition = Vector3.zero;
             transform.SetParent(MainCanvas.Instance.Canvas.transform);
             canvasGroup.blocksRaycasts = false;
-            
             StartDragging?.Invoke(this);
         }
 
-        public void OnDrag(PointerEventData eventData)
+        protected void Drag(PointerEventData eventData)
         {
             if(!IsActive || !isDragging) return;
-            
             rectTransform.anchoredPosition += eventData.delta / MainCanvas.Instance.Canvas.scaleFactor;
-        }
-
-        public void OnEndDrag(PointerEventData eventData)
-        {
-            EndDrag();
         }
 
         public void EndDrag()

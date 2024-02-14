@@ -16,12 +16,9 @@ namespace LineWars.Controllers
         [Space]
         [SerializeField, Min(1)] private int priseTypeLenInBits = 10;
         [Space]
-        [SerializeField] private SerializedDictionary<string, Prize> purchaseIdToPrize;
-        [Tooltip("Соотношение сторон 1:1")]
-        [SerializeField] private SerializedDictionary<string, Sprite> purchaseIdToSprite;
         [SerializeField] private SerializedDictionary<string, Prize> promoCodes = new();
+        [SerializeField] private Sprite diamondsSprite;
         [SerializeField] private string lockAdId;
-        
         
         [Header("References")]
         [SerializeField] private YandexGameProvider yandexGameProvider;
@@ -160,7 +157,7 @@ namespace LineWars.Controllers
         public override bool CanBuyPurchase(string id)
         {
             if (!CheckEnableSdk()) return false;
-            return purchaseIdToPrize.ContainsKey(id);
+            return RewardUtilities.CanDecodePurchaseId(id);
         }
 
         public override void BuyPurchase(string id)
@@ -181,10 +178,10 @@ namespace LineWars.Controllers
                 yg.id,
                 yg.title,
                 yg.description,
-                purchaseIdToSprite.TryGetValue(yg.id, out var sprite) ? sprite : null, 
+                diamondsSprite, 
                 int.TryParse(yg.priceValue, out var value) ? value : -1, 
                 "Ян",
-                purchaseIdToPrize.TryGetValue(yg.id, out var prize) ? prize : null);
+                RewardUtilities.DecodePurchaseId(yg.id));
         }
 
         private void OnRewardVideoEvent(int id)
@@ -224,18 +221,10 @@ namespace LineWars.Controllers
                 return;
             }
             
-            if (purchaseIdToPrize.TryGetValue(id, out var prize))
-            {
-                Reward(prize);
-                FullscreenPanel.OpenSuccessPanel(new Money(prize.Type.ToCostType(), prize.Amount));
-                InvokePurchaseSuccessEvent(id);
-            }
-            else
-            {
-                Debug.LogError("The purchase cannot be processed!");
-                FullscreenPanel.OpenErrorPanel();
-                InvokeErrorVideoEvent();
-            }
+            var prize = RewardUtilities.DecodePurchaseId(id);
+            Reward(prize);
+            FullscreenPanel.OpenSuccessPanel(new Money(prize.Type.ToCostType(), prize.Amount));
+            InvokePurchaseSuccessEvent(id);
         }
         
         private void OnPurchaseFailedEvent(string id)
