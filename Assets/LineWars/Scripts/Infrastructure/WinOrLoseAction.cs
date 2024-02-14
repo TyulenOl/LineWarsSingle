@@ -64,7 +64,7 @@ namespace LineWars.Infrastructure
             if (companiesActions.HasFlag(CompaniesActions.WinChoseMission))
                 GameRoot.Instance.CompaniesController.WinChoseMission();
             
-            WinOrLoseScene.Load(true, gold, diamonds, canDoublicateGold);
+            WinOrLoseScene.Load(isWin, gold, diamonds, canDoublicateGold);
         }
     }
 

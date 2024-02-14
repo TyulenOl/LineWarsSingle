@@ -80,16 +80,6 @@ namespace LineWars.Model
                 task.Start();
                 return task;
             }     
-
-            private void DebugBullshit(GameProjection game)
-            {
-                UnityEngine.Debug.Log($"{game.UnitsIndexList.Count} Units");
-                foreach (var unit in game.UnitsIndexList.Values)
-                {
-                    if (unit.CurrentHp <= 0)
-                        UnityEngine.Debug.Log("you suck!");
-                }
-            }
         }
     }
 }
