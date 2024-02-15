@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using LineWars.Controllers;
+using UnityEngine;
 
 namespace LineWars.Model
 {
@@ -8,6 +9,7 @@ namespace LineWars.Model
         IPowerBasedHealAction<Node, Edge, Unit>
     {
         [SerializeField] private UnitAnimation unitAnimation;
+        [SerializeField] private SFXData healSFX;
 
         protected override bool NeedAutoComplete => false;
 
@@ -44,13 +46,13 @@ namespace LineWars.Model
                     };
                     responses.Respond(AnimationResponseType.Healed, context2);
                 }
-                Action.Execute(target);
-                Complete();
+                ExecuteInstant(target);
             }
         }
         private void ExecuteInstant(Unit target)
         {
             Action.Execute(target);
+            Executor.PlaySfx(healSFX);
             Complete();
         }
 
