@@ -4,11 +4,12 @@ using LineWars.Model;
 using UnityEngine;
 using System;
 using System.Collections;
+using System.Globalization;
 using AYellowpaper.SerializedCollections;
 
 namespace LineWars.Controllers
 {
-    public class UserInfoController: MonoBehaviour, IBlessingsPull, IBlessingSelector
+    public class UserInfoController: MonoBehaviour, IBlessingsPull, IBlessingSelector, ITimeIndexer
     {
         [SerializeField] private UserInfoPreset defaultUserInfoPreset;
 
@@ -38,6 +39,8 @@ namespace LineWars.Controllers
 
         public IReadOnlyUserInfo UserInfo => currentInfo;
         public IBlessingsPull GlobalBlessingsPull => this;
+        public ITimeIndexer KeyToDateTime => this; 
+            
         public void Initialize(
             IProvider<UserInfo> provider, 
             IStorage<int, DeckCard> deckCardStorage,
@@ -91,6 +94,7 @@ namespace LineWars.Controllers
             userInfo.SelectedBlessings ??= new List<BlessingId>();
             userInfo.UnlockedCards ??= new List<int>();
             userInfo.UsedPromoCodes ??= new List<string>();
+            userInfo.KeyToDateTime ??= new SerializedDictionary<string, string>();
             
             foreach (LootBoxType boxType in Enum.GetValues(typeof(LootBoxType)))
                 userInfo.LootBoxes.TryAdd(boxType, 0);
@@ -415,8 +419,26 @@ namespace LineWars.Controllers
         }
 
         #endregion
-        
 
+        #region ITimeIndexerImplimintation
+
+        DateTime ITimeIndexer.this[string key]
+        {
+            get => DateTime.Parse(currentInfo.KeyToDateTime[key], CultureInfo.InvariantCulture);
+            set
+            {
+                var serialized = value.ToString(CultureInfo.InvariantCulture);
+                currentInfo.KeyToDateTime[key] = serialized;
+            }
+        }
+
+        public bool ContainsKey(string key)
+        {
+            return currentInfo.KeyToDateTime.ContainsKey(key);
+        }
+
+        #endregion
+        
         public int GetBoxes(LootBoxType boxType)
         {
             return currentInfo.LootBoxes[boxType];

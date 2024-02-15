@@ -14,6 +14,7 @@ public static class DrawHelper
     public static IReadOnlyDictionary<Rarity, GameObject> RarityToShopCardBg => Instance.RarityToShopCardBg;
     public static IReadOnlyDictionary<GradientType, Gradient> TypeToGradient => Instance.TypeToGradient;
     public static IReadOnlyDictionary<LootType, Color> LootTypeToColor => Instance.LootTypeToColor;
+    public static IReadOnlyDictionary<EffectType, Sprite> EffectTypeToIcon => Instance.EffectTypeToSprite;
     public static Sprite GoldSprite => Instance.GoldSprite;
     
     public static FullBlessingReDrawInfo GetBlessingReDrawInfoByBlessingId(BlessingId blessingId)
@@ -92,9 +93,39 @@ public static class DrawHelper
         return null;
     }
 
+    public static Sprite GetIconEffectType(EffectType effectType)
+    {
+        if (Instance.EffectTypeToSprite.TryGetValue(effectType, out var info))
+            return info;
+        return null;
+    }
+
     public static ActionOrEffectReDrawInfo GetReDrawInfoByEffectType(EffectType effectType)
     {
-        return new ActionOrEffectReDrawInfo(null, effectType.ToString(), "-");
+        switch(effectType)
+        {
+            case EffectType.AuraPowerBuff:
+                return new ActionOrEffectReDrawInfo(
+                    GetIconEffectType(EffectType.AuraPowerBuff),
+                    "Заточка cтали",
+                    "Повышает всем дружеским юнитам на соседних клетках силу духа на свою силу духа.");
+            case EffectType.Armored:
+                return new ActionOrEffectReDrawInfo(
+                    GetIconEffectType(EffectType.Armored),
+                    "Поднять wиты!",
+                    "В начале раунда получает броню, равную силе духа.");
+            case EffectType.Loneliness:
+                return new ActionOrEffectReDrawInfo(
+                    GetIconEffectType(EffectType.Loneliness),
+                    "Один в поле не воин",
+                    "Сила духа повышается на 4, если на клетке юнита стоит еще один юнит.");
+            case EffectType.FightingSpirit:
+                return new ActionOrEffectReDrawInfo(
+                    GetIconEffectType(EffectType.FightingSpirit),
+                    "Боевой дух",
+                    "Повышает силу духа на 1, за каждого дружеского юнита на соседних клетках");
+        }
+        return null;
     }
     
     public static ActionOrEffectReDrawInfo GetReDrawInfoByCommandType(CommandType commandType)

@@ -17,7 +17,8 @@ namespace LineWars.Controllers
 
             if (GameRoot.Instance == null)
                 return;
-            if (GameRoot.Instance.CompaniesController.ChosenMission.MissionStatus == MissionStatus.Completed)
+            var status = GameRoot.Instance.CompaniesController.ChosenMission.MissionStatus;
+            if (status == MissionStatus.Completed)
             {
                 if (overrideWin)
                     singleGameRoot.WinAction = overrideWin;
