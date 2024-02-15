@@ -41,7 +41,6 @@ namespace LineWars.Model
 
         [Header("Card Settings")]
         [SerializeField] private List<CardChances> cardChances;
-        [SerializeField] private List<BlessingChances> blessingChances;
 
         [Header("Blessing Settings")]
         [SerializeField] private List<BlessingChances> blessingChanses;
