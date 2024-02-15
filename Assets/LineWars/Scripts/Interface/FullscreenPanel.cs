@@ -48,6 +48,13 @@ namespace LineWars.Interface
                 new TextRedrawInfo($"Вы успешно активировали промокод {promoCode}", Color.white)
             );
         }
+
+        public static void OpenSuccessLockAdPanel()
+        {
+            OpenPanel(
+                new TextRedrawInfo("Отключение рекламы прошло успешно", Color.red),
+                new TextRedrawInfo($"Вы успешно отключили рекламу", Color.white));
+        }
         
         private void _OpenPanel(TextRedrawInfo title, TextRedrawInfo description)
         {

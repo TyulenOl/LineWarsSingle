@@ -10,12 +10,11 @@ namespace LineWars.Interface
     public class CardDraggableSet: MonoBehaviour
     {
         [SerializeField] private BaseCardDrawer staticDrawer;
-        [SerializeField] private DraggableCard draggableCard;
-        [SerializeField] private Button button;
+        [SerializeField] private DelayDraggableCard draggableCard;
         
         
         private DeckCard deckCard;
-        private bool isActive = true;
+        [SerializeField, ReadOnlyInspector]private bool isActive = true;
 
         public DeckCard DeckCard
         {
@@ -41,7 +40,13 @@ namespace LineWars.Interface
             }
         }
 
-        public UnityEvent OnClick => button.onClick;
+        public ScrollRect ScrollRect
+        {
+            get => draggableCard.ScrollRect;
+            set => draggableCard.ScrollRect = value;
+        }
+
+        public UnityEvent OnClick => draggableCard.OnClick;
 
         private void Start()
         {

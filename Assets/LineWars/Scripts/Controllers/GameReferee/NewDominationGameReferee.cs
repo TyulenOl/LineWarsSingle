@@ -40,7 +40,7 @@ namespace LineWars
 
         private void OnPhaseEntered(PhaseType currentType)
         {
-            if (currentType != PhaseType.Replenish)
+            if (currentType != PhaseType.Payday)
                 return;
             PastRounds++;
             if (PastRounds >= rounds)

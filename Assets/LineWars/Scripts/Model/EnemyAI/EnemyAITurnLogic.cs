@@ -35,22 +35,8 @@ namespace LineWars.Model
                 stopwatch.Stop();
                 UnityEngine.Debug.Log($"{stopwatch.ElapsedMilliseconds} ms");
 
-                ai.StartCoroutine(ExecuteTurnCoroutine(allCommands, gameProjection));
-            }
-
-            private IEnumerator ExecuteTurnCoroutine(PossibleOutcome[] commandEvalList, GameProjection gameProjection)
-            {
-                Debug.Log($"{Prefix} Execute Turn Coroutine");
-                yield return new WaitForSeconds(ai.firstCommandPause);
-                var bestBlueprint = commandEvalList.MaxItem((i1, i2) => i1.Score.CompareTo(i2.Score));
-                foreach (var blueprint in bestBlueprint.Commands)
-                {
-                    var command = blueprint.GenerateMonoCommand(gameProjection);
-                    UnitsController.ExecuteCommand(command);
-                    yield return new WaitForSeconds(ai.commandPause);
-                }
-
-                InvokeEnded();
+                var bestBlueprint = allCommands.MaxItem((i1, i2) => i1.Score.CompareTo(i2.Score));
+                ai.StartCoroutine(PlayOutcome(bestBlueprint, gameProjection));
             }
 
             private Task<PossibleOutcome[]> FindAllOutcomes(GameProjection gameProjection)
@@ -80,16 +66,6 @@ namespace LineWars.Model
                 task.Start();
                 return task;
             }     
-
-            private void DebugBullshit(GameProjection game)
-            {
-                UnityEngine.Debug.Log($"{game.UnitsIndexList.Count} Units");
-                foreach (var unit in game.UnitsIndexList.Values)
-                {
-                    if (unit.CurrentHp <= 0)
-                        UnityEngine.Debug.Log("you suck!");
-                }
-            }
         }
     }
 }

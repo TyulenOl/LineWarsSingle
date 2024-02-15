@@ -24,7 +24,9 @@ namespace LineWars.Interface
             foreach (var box in boxes)
             {
                 var instance = Instantiate(lootBoxDrawerPrefab, boxesLayout.transform);
-                instance.Redraw(box, () => {
+                instance.Redraw(box, () =>
+                {
+                    buyPanelDrawer.Button.interactable = GameRoot.Instance.LootBoxController.CanBuy(box.BoxType);
                     buyPanelDrawer.gameObject.SetActive(true); 
                     buyPanelDrawer.Redraw(box, () => OnButtonClick(box));
                 });

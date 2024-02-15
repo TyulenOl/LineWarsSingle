@@ -7,6 +7,7 @@ using LineWars.Model;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 using Utilities.Runtime;
 
 namespace LineWars.Controllers
@@ -28,10 +29,16 @@ namespace LineWars.Controllers
         [SerializeField] private float minHeight = 3f;
 
         [Header("Paddings")] 
-        [SerializeField] private float paddingsTop;
-        [SerializeField] private float paddingsRight;
-        [SerializeField] private float paddingsBottom;
-        [SerializeField] private float paddingsLeft;
+        [SerializeField] private bool usePixels;
+        [SerializeField, ConditionallyVisible(nameof(usePixels))] private float paddingsTopPixels;
+        [SerializeField, ConditionallyVisible(nameof(usePixels))] private float paddingsRightPixels;
+        [SerializeField, ConditionallyVisible(nameof(usePixels))] private float paddingsBottomPixels;
+        [SerializeField, ConditionallyVisible(nameof(usePixels))] private float paddingsLeftPixels;
+        
+        [SerializeField, ConditionallyVisible(nameof(usePixels), true)] private float paddingsTopUnits;
+        [SerializeField, ConditionallyVisible(nameof(usePixels), true)] private float paddingsRightUnits;
+        [SerializeField, ConditionallyVisible(nameof(usePixels), true)] private float paddingsBottomUnits;
+        [SerializeField, ConditionallyVisible(nameof(usePixels), true)] private float paddingsLeftUnits;
 
         private Canvas canvas;
         private Camera mainCamera;
@@ -76,8 +83,16 @@ namespace LineWars.Controllers
             mapPointMax = bounds.max;
             mapPointMin = bounds.min;
 
-            maxHeight = Mathf.Min((mapPointMax - mapPointMin).x / (2 * mainCamera.aspect),
-                (mapPointMax - mapPointMin).y / 2);
+            var paddingsSize = usePixels
+                ? FromScreenToWorld(new Vector2(Mathf.Abs(paddingsRightPixels - paddingsLeftPixels),
+                    Mathf.Abs(paddingsTopPixels - paddingsBottomPixels)))
+                : new Vector2(Mathf.Abs(paddingsRightUnits - paddingsLeftUnits),
+                    Mathf.Abs(paddingsTopUnits - paddingsBottomUnits));
+            
+            maxHeight = Mathf.Min(((mapPointMax - mapPointMin).x - paddingsSize.x) / (2 * mainCamera.aspect),
+                 ((mapPointMax - mapPointMin).y - paddingsSize.y) / 2);
+            // maxHeight = Mathf.Min((mapPointMax - mapPointMin).x / (2 * mainCamera.aspect),
+            //     (mapPointMax - mapPointMin).y / 2);
 
             mainCamera.orthographicSize = Mathf.Clamp(mainCamera.orthographicSize, minHeight, maxHeight);
             zoomValue = mainCamera.orthographicSize;
@@ -108,8 +123,8 @@ namespace LineWars.Controllers
             MouseZoom();
             TouchZoom();
 
-            UpdateOrthographicSize();
             UpdateVelocity();
+            UpdateOrthographicSize();
         }
 
         public void MoveTo(Vector2 point)
@@ -225,14 +240,16 @@ namespace LineWars.Controllers
 
         private Vector3 ClampCameraPosition(Vector3 position)
         {
-            var maxPaddingCorner = new Vector2(FromScreenToWorld(paddingsRight), FromScreenToWorld(paddingsTop)) *
-                                   canvas.scaleFactor;
-            var minPaddingCorner = new Vector2(FromScreenToWorld(paddingsLeft), FromScreenToWorld(paddingsBottom)) *
-                                   canvas.scaleFactor;
+            var maxPaddingCorner = usePixels
+                ? FromScreenToWorld(new Vector2(paddingsRightPixels, paddingsTopPixels)) * canvas.scaleFactor
+                : new Vector2(paddingsRightUnits, paddingsTopUnits);
+            var minPaddingCorner = usePixels
+                ? FromScreenToWorld(new Vector2(paddingsLeftPixels, paddingsBottomPixels)) * canvas.scaleFactor
+                : new Vector2(paddingsLeftUnits, paddingsBottomUnits);
 
             var halfCameraSize = GetCameraSize() / 2;
-            var maxLimitPoint = mapPointMax - halfCameraSize + maxPaddingCorner;
-            var minLimitPoint = mapPointMin + halfCameraSize - minPaddingCorner;
+            var maxLimitPoint = mapPointMax - halfCameraSize - maxPaddingCorner;
+            var minLimitPoint = mapPointMin + halfCameraSize + minPaddingCorner;
 
             return new Vector3(Mathf.Clamp(position.x, minLimitPoint.x, maxLimitPoint.x),
                 Mathf.Clamp(position.y, minLimitPoint.y, maxLimitPoint.y),
@@ -249,7 +266,12 @@ namespace LineWars.Controllers
         private float FromScreenToWorld(float value)
         {
             var valueInWorld = mainCamera.ScreenToWorldPoint(new Vector3(0, value)).y;
-            return -(cameraTransform.position.y - mainCamera.orthographicSize - valueInWorld);
+            return valueInWorld - (cameraTransform.position.y - mainCamera.orthographicSize);
+        }
+        
+        private Vector2 FromScreenToWorld(Vector2 vector2)
+        {
+            return new Vector2(FromScreenToWorld(vector2.x), FromScreenToWorld(vector2.y));
         }
     }
 }

@@ -12,7 +12,7 @@ namespace LineWars.Interface
     {
         private static SDKAdapterBase SDKAdapter => GameRoot.Instance.SdkAdapter;
         
-        [SerializeField] private TextMeshProUGUI title, description, priceValue;
+        [SerializeField] private TextMeshProUGUI title, description, priceValue, currencyValue;
         [SerializeField] private Image image;
         [SerializeField] private Button button;
         [SerializeField] private bool addCurrency_toPrice = true;
@@ -38,7 +38,8 @@ namespace LineWars.Interface
             if (priceValue)
             {
                 priceValue.text = Data.PriceValue.ToString();
-                if (addCurrency_toPrice) priceValue.text += Data.CurrencyName;
+                if (addCurrency_toPrice 
+                    && currencyValue != null) currencyValue.text = Data.CurrencyName;
             }
 
             if (image) image.sprite = Data.Sprite;

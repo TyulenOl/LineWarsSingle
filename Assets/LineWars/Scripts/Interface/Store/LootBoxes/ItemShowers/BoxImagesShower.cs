@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using LineWars.Controllers;
+using LineWars.Interface;
 using LineWars.Model;
 using UnityEngine;
 using UnityEngine.Events;
@@ -16,6 +17,8 @@ namespace LineWars
         [SerializeField] private GoldShower goldShowerPrefab;
         [SerializeField] private UpgradeCardShower upgradeCardShowerPrefab;
         [SerializeField] private DiamondsShower diamondsShowerPrefab;
+        [SerializeField] private BlessingItemShower blessingShowerPrefab;
+        
         
         [SerializeField] private List<Transform> transformsToInstantiateShowers;
 
@@ -60,6 +63,9 @@ namespace LineWars
                     case LootType.Diamond:
                         ShowDiamonds(currentTransform, drop.Drop.Value);
                         break;
+                    case LootType.Blessing:
+                        ShowBlessing(currentTransform, drop.Drop.BlessingId, drop.Drop.Value);
+                        break;
                 }
                 lastTransformIndex--;
                 yield return new WaitForSeconds(delayInSeconds);
@@ -91,6 +97,15 @@ namespace LineWars
         {
             var instance = Instantiate(cardShowerPrefab, parentTransform);
             instance.ShowItem(deckCard);
+            activeShowers.Add(instance);
+        }
+
+        private void ShowBlessing(Transform parentTransform, BlessingId blessingId, int value)
+        {
+            var instance = Instantiate(blessingShowerPrefab, parentTransform);
+            var info = DrawHelper.GetBlessingReDrawInfoByBlessingId(blessingId);
+            info.Amount = value;
+            instance.ShowItem(info);
             activeShowers.Add(instance);
         }
         

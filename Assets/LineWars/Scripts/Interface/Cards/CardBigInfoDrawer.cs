@@ -70,7 +70,14 @@ namespace LineWars
             actionsPanelDrawer.ReDrawActions(deckCard);
 
             if (costInfo)
-                costInfo.text = $"{deckCard.Cost}(+TODO)";
+            {
+                var info = deckCard.CostProgression.GetFirstIncrement(deckCard.Cost);
+                
+                if (info.CanBuy)
+                    costInfo.text = $"{deckCard.Cost}(+{info.Cost})";
+                else
+                    costInfo.text = $"{deckCard.Cost}(+\u221e)";
+            }
         }
     }
 }

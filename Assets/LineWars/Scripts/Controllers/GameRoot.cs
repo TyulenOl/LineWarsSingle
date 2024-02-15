@@ -41,12 +41,15 @@ namespace LineWars.Controllers
         private IProvider<MissionInfo> missionInfoProvider;
         private IProvider<UserInfo> userInfoProvider;
         private IGetter<DateTime> timeGetter;
+        private IGetter<DateTime> reusableTimeGetter;
         private SDKAdapterBase sdkAdapter;
 
         public IStorage<int, DeckCard> CardsDatabase => GameStartedLog() ? cardsDatabase : null;
         public IStorage<int, MissionData> MissionsStorage => GameStartedLog() ? missionsStorage : null;
         public IStorage<BlessingId, BaseBlessing> BlessingStorage => GameStartedLog() ? blessingStorage: null;
-
+        public IGetter<DateTime> TimeGetter => GameStartedLog() ? timeGetter : null;
+        public IGetter<DateTime> ReusableTimeGetter => GameStartedLog() ? reusableTimeGetter : null;
+        
         public DecksController DecksController => GameStartedLog() ? decksController : null;
         public CompaniesController CompaniesController => GameStartedLog() ? companiesController : null;
         public UserInfoController UserController =>  GameStartedLog() ? userController : null;
@@ -96,8 +99,10 @@ namespace LineWars.Controllers
             }
             
             GameReady = true;
+
+            timeGetter = new GetLocalTime();
+            reusableTimeGetter = new GetLocalTime();
             
-            timeGetter = gameObject.AddComponent<GetWorldTime>();
             InitializeProviders();
             
             CompaniesController.Initialize(missionInfoProvider, missionsStorage);
@@ -179,7 +184,7 @@ namespace LineWars.Controllers
         }
         private void InitializeLootBoxController()
         {
-            var lootBoxOpenerFabric = new ClientLootBoxOpenerFabric(cardsDatabase);
+            var lootBoxOpenerFabric = new ClientLootBoxOpenerFabric(cardsDatabase, blessingStorage);
             var dropConverter = new DuplicateEreaserDropConverter(userController.UserInfo, cardsDatabase);
             lootBoxController.Initialize(
                 userController.UserInfo, 

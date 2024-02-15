@@ -4,11 +4,11 @@ namespace LineWars.Interface
 {
     public class FullBlessingReDrawInfo
     {
-        public string Name { get; }
-        public string Description { get; }
-        public int Amount { get; }
-        public Color BgColor { get; }
-        public Sprite Sprite { get; }
+        public string Name { get; set; }
+        public string Description { get; set;}
+        public int Amount { get; set;}
+        public Color BgColor { get; set;}
+        public Sprite Sprite { get; set;}
 
         public FullBlessingReDrawInfo(string name, string description, Color bgColor, Sprite sprite, int amount)
         {

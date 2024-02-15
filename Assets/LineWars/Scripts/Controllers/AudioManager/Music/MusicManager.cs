@@ -21,7 +21,7 @@ namespace LineWars.Controllers
 
         private AudioSource source;
         private MusicLogic logic;
-
+        private float initialVolume;
         public MusicData CurrentMusicData { get; private set; }
         public UnityEvent<MusicData, MusicData> MusicChanged;
 
@@ -48,6 +48,7 @@ namespace LineWars.Controllers
 
             source = GetComponent<AudioSource>();
             logic = musicLogicData.GetMusicLogic(this);
+            initialVolume = source.volume;
         }
 
         private void Start()
@@ -90,6 +91,7 @@ namespace LineWars.Controllers
         {
             var prevData = CurrentMusicData;
             source.clip = musicData.AudioClip;
+            source.volume = source.volume * musicData.VolumeCoeficient;
             source.Play();
             CurrentMusicData = musicData;
             MusicChanged.Invoke(prevData, musicData);

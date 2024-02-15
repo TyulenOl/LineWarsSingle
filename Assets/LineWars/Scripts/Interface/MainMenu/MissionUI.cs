@@ -55,7 +55,7 @@ namespace LineWars
         
         private void OnClick()
         {
-            GameRoot.Instance.CompaniesController.ChoseMissionId = id;
+            GameRoot.Instance.CompaniesController.ChosenMissionId = id;
             missionInfoUI.Redraw(missionData, DrawHelper.GetOnMissionButtonTextByMissionStatus(GameRoot.Instance.CompaniesController.GetMissionStatus(MissionInfo.MissionId)));
         }
 

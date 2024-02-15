@@ -6,6 +6,9 @@ namespace LineWars.Model
     public class FightingSpiritEffectInitializer : EffectInitializer
     {
         [SerializeField] private int powerBonus;
+
+        public override EffectType EffectType => EffectType.FightingSpirit;
+
         public override Effect<Node, Edge, Unit> GetEffect(Unit unit)
         {
             return new FightingSpiritEffect<Node, Edge, Unit>(unit, powerBonus);

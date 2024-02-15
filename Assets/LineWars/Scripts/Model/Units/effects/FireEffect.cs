@@ -5,22 +5,19 @@ namespace LineWars.Model
 {
     public class FireEffect<TNode, TEdge, TUnit> : 
         TemporaryEffect<TNode, TEdge, TUnit>,
-        IStackableEffect, IPowerEffect
+        IStackableEffect
         where TNode : class, INodeForGame<TNode, TEdge, TUnit>
         where TEdge : class, IEdgeForGame<TNode, TEdge, TUnit>
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
         private int firePower;
 
-        public event Action<IPowerEffect, int, int> PowerChanged;
-
         public FireEffect(TUnit targetUnit, int rounds, int firePower) : base(targetUnit, rounds)
         {
             this.firePower = firePower;
+            characteristics[EffectCharecteristicType.Power] = () => this.firePower;
         }
         public override EffectType EffectType => EffectType.Fire;
-
-        public int Power => firePower;
 
         public override void ExecuteOnEnter()
         {
@@ -46,9 +43,12 @@ namespace LineWars.Model
                 throw new ArgumentException("Can't stack this effect");
             }
             Rounds += fireEffect.Rounds;
-            var prevPower = fireEffect.Power;
+            var prevPower = fireEffect.firePower;
             firePower = Mathf.Max(firePower, fireEffect.firePower);
-            PowerChanged?.Invoke(fireEffect, prevPower, firePower);
+            InvokeCharacteristicsChanged(this,
+                EffectCharecteristicType.Power,
+                prevPower,
+                firePower);
         }
 
         public bool CanStack(IStackableEffect effect)

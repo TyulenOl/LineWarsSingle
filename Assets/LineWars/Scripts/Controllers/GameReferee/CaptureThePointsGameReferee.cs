@@ -28,23 +28,25 @@ namespace LineWars
                 Debug.LogWarning($"{nameof(CaptureThePointsGameReferee)} have not found any {nameof(capturePoints)}!");
             }
 
-            foreach(var node in capturePoints)
+            PhaseManager.Instance.PhaseEntered.AddListener(OnPhaseEntered);
+        }
+
+        private void OnPhaseEntered(PhaseType phaseEntered)
+        {
+            foreach (var node in capturePoints)
             {
-                node.Replenished += () =>
+                if (node.Owner != null)
                 {
-                    if (node.Owner != null)
+                    var score = 1;
+                    if (TryGetComponent(out NodeScore scoreComponent))
                     {
-                        var score = 1;
-                        if(TryGetComponent(out NodeScore scoreComponent))
-                        {
-                            score = scoreComponent.Score;
-                        }
-                        SetScoreForPlayer(
-                            node.Owner,
-                            GetScoreForPlayer(node.Owner)
-                            + score);
+                        score = scoreComponent.Score;
                     }
-                };
+                    SetScoreForPlayer(
+                        node.Owner,
+                        GetScoreForPlayer(node.Owner)
+                        + score);
+                }
             }
         }
     }

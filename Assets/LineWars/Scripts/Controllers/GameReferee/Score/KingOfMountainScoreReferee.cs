@@ -18,7 +18,8 @@ namespace LineWars
             {
                 Debug.LogWarning(@"При победе ""Царь горы"" не была назначена ""гора""");
             }
-            
+
+            PhaseManager.Instance.PhaseEntered.AddListener(OnPhaseEntered);
             mountain.Replenished += () =>
             {
                 if (mountain.Owner != null)
@@ -29,6 +30,13 @@ namespace LineWars
                         + mountain.GetComponent<NodeScore>().Score);
                 }
             };
+        }
+
+        public void OnPhaseEntered(PhaseType phase)
+        {
+            {
+
+            }
         }
     }
 }

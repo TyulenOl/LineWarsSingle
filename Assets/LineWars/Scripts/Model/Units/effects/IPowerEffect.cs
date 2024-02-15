@@ -2,6 +2,7 @@
 
 namespace LineWars.Model
 {
+    [Obsolete]
     public interface IPowerEffect
     {
         public int Power { get; }
