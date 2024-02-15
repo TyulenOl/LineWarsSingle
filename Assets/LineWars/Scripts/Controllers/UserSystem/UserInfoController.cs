@@ -94,6 +94,7 @@ namespace LineWars.Controllers
             userInfo.SelectedBlessings ??= new List<BlessingId>();
             userInfo.UnlockedCards ??= new List<int>();
             userInfo.UsedPromoCodes ??= new List<string>();
+            userInfo.KeyToDateTime ??= new SerializedDictionary<string, string>();
             
             foreach (LootBoxType boxType in Enum.GetValues(typeof(LootBoxType)))
                 userInfo.LootBoxes.TryAdd(boxType, 0);

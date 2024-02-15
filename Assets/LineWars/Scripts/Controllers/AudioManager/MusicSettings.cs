@@ -21,7 +21,7 @@ namespace LineWars.Controllers
         private void LoadSettings()
         {
             if (!PlayerPrefs.HasKey(nameof(EnableAuthorMusic)))
-                PlayerPrefs.GetInt(nameof(EnableAuthorMusic), defaultEnableAuthorMusic ? 1 : 0);
+                PlayerPrefs.SetInt(nameof(EnableAuthorMusic), defaultEnableAuthorMusic ? 1 : 0);
             EnableAuthorMusic = PlayerPrefs.GetInt(nameof(EnableAuthorMusic)) == 1;
         }
 
