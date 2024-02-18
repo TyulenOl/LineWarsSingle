@@ -56,6 +56,8 @@ namespace LineWars.Controllers
 
         private float zoomValue;
 
+        private Vector2 lastScreenSize;
+
         private void Awake()
         {
             if (Instance == null)
@@ -73,6 +75,7 @@ namespace LineWars.Controllers
                 cameraTransform = mainCamera.GetComponent<Transform>();
 
             canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
+            lastScreenSize = new Vector2(Screen.width,Screen.height);
         }
 
         private void Start()
@@ -83,16 +86,7 @@ namespace LineWars.Controllers
             mapPointMax = bounds.max;
             mapPointMin = bounds.min;
 
-            var paddingsSize = usePixels
-                ? FromScreenToWorld(new Vector2(Mathf.Abs(paddingsRightPixels - paddingsLeftPixels),
-                    Mathf.Abs(paddingsTopPixels - paddingsBottomPixels)))
-                : new Vector2(Mathf.Abs(paddingsRightUnits - paddingsLeftUnits),
-                    Mathf.Abs(paddingsTopUnits - paddingsBottomUnits));
-            
-            maxHeight = Mathf.Min(((mapPointMax - mapPointMin).x - paddingsSize.x) / (2 * mainCamera.aspect),
-                 ((mapPointMax - mapPointMin).y - paddingsSize.y) / 2);
-            // maxHeight = Mathf.Min((mapPointMax - mapPointMin).x / (2 * mainCamera.aspect),
-            //     (mapPointMax - mapPointMin).y / 2);
+            maxHeight = CalculateMaximumHeight();
 
             mainCamera.orthographicSize = Mathf.Clamp(mainCamera.orthographicSize, minHeight, maxHeight);
             zoomValue = mainCamera.orthographicSize;
@@ -100,6 +94,13 @@ namespace LineWars.Controllers
 
         private void Update()
         {
+            var screenSize = new Vector2(Screen.width, Screen.height);
+            if (screenSize != lastScreenSize)
+            {
+                maxHeight = CalculateMaximumHeight();
+                mainCamera.orthographicSize = Mathf.Clamp(mainCamera.orthographicSize, minHeight, maxHeight);
+            }
+
             if ((Input.GetMouseButtonDown(0) || Input.touches.Any(touch => touch.phase == TouchPhase.Began)) &&
                 !PointerIsOverUI())
             {
@@ -254,6 +255,18 @@ namespace LineWars.Controllers
             return new Vector3(Mathf.Clamp(position.x, minLimitPoint.x, maxLimitPoint.x),
                 Mathf.Clamp(position.y, minLimitPoint.y, maxLimitPoint.y),
                 cameraTransform.position.z);
+        }
+
+        private float CalculateMaximumHeight()
+        {
+            var paddingsSize = usePixels
+                ? FromScreenToWorld(new Vector2(Mathf.Abs(paddingsRightPixels - paddingsLeftPixels),
+                    Mathf.Abs(paddingsTopPixels - paddingsBottomPixels)))
+                : new Vector2(Mathf.Abs(paddingsRightUnits - paddingsLeftUnits),
+                    Mathf.Abs(paddingsTopUnits - paddingsBottomUnits));
+            
+            return Mathf.Min(((mapPointMax - mapPointMin).x - paddingsSize.x) / (2 * mainCamera.aspect),
+                ((mapPointMax - mapPointMin).y - paddingsSize.y) / 2);
         }
 
         private Vector2 GetCameraSize()
