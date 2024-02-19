@@ -101,8 +101,8 @@ namespace LineWars.Controllers
                 mainCamera.orthographicSize = Mathf.Clamp(mainCamera.orthographicSize, minHeight, maxHeight);
             }
 
-            if ((Input.GetMouseButtonDown(0) || Input.touches.Any(touch => touch.phase == TouchPhase.Began)) && !isDragging &&
-                !PointerIsOverUI())
+            if ((Input.GetMouseButtonDown(0) || (Input.touches != null && Input.touches.Any(touch => touch.phase == TouchPhase.Began))) 
+                && !isDragging && !PointerIsOverUI())
             {
                 pivotPoint = mainCamera.ScreenToWorldPoint(Input.mousePosition);
                 isDragging = true;
@@ -110,7 +110,7 @@ namespace LineWars.Controllers
 
             if (Input.GetMouseButton(0) && isDragging)
             {
-                if (Input.touches.Any(touch => touch.phase is TouchPhase.Ended or TouchPhase.Began))
+                if (Input.touches != null && Input.touches.Any(touch => touch.phase is TouchPhase.Ended or TouchPhase.Began))
                     pivotPoint = mainCamera.ScreenToWorldPoint(GetMidpointBetweenTouches());
                 else
                 {
