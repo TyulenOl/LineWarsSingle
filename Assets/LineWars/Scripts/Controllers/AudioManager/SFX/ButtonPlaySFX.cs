@@ -1,12 +1,10 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace LineWars.Controllers
 {
     [RequireComponent(typeof(Button))]
+    [DisallowMultipleComponent]
     public class ButtonPlaySFX : PlaySFX
     {
         private void Start()
