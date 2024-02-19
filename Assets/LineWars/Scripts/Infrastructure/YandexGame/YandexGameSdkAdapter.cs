@@ -251,20 +251,20 @@ namespace LineWars.Controllers
             return SDKEnabled;
         }
 
-        private void OnApplicationFocus(bool hasFocus)
-        {
-            if (hasFocus)
-            {
-                YandexGame.ConsumePurchases();
-            }
-        }
-
-        private void OnApplicationPause(bool pauseStatus)
-        {
-            if (!pauseStatus)
-            {
-                YandexGame.ConsumePurchases();
-            }
-        }
+        // private void OnApplicationFocus(bool hasFocus)
+        // {
+        //     if (hasFocus)
+        //     {
+        //         YandexGame.ConsumePurchases();
+        //     }
+        // }
+        //
+        // private void OnApplicationPause(bool pauseStatus)
+        // {
+        //     if (!pauseStatus)
+        //     {
+        //         YandexGame.ConsumePurchases();
+        //     }
+        // }
     }
 }
