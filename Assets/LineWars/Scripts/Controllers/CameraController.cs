@@ -101,7 +101,7 @@ namespace LineWars.Controllers
                 mainCamera.orthographicSize = Mathf.Clamp(mainCamera.orthographicSize, minHeight, maxHeight);
             }
 
-            if ((Input.GetMouseButtonDown(0) || Input.touches.Any(touch => touch.phase == TouchPhase.Began)) &&
+            if ((Input.GetMouseButtonDown(0) || Input.touches.Any(touch => touch.phase == TouchPhase.Began)) && !isDragging &&
                 !PointerIsOverUI())
             {
                 pivotPoint = mainCamera.ScreenToWorldPoint(Input.mousePosition);
@@ -110,7 +110,7 @@ namespace LineWars.Controllers
 
             if (Input.GetMouseButton(0) && isDragging)
             {
-                if (Input.touches.Any(touch => touch.phase == TouchPhase.Ended))
+                if (Input.touches.Any(touch => touch.phase is TouchPhase.Ended or TouchPhase.Began))
                     pivotPoint = mainCamera.ScreenToWorldPoint(GetMidpointBetweenTouches());
                 else
                 {
@@ -124,8 +124,8 @@ namespace LineWars.Controllers
             MouseZoom();
             TouchZoom();
 
-            UpdateVelocity();
             UpdateOrthographicSize();
+            UpdateVelocity();
         }
 
         public void MoveTo(Vector2 point)
@@ -179,7 +179,7 @@ namespace LineWars.Controllers
             var activeTouches =
                 Input.touches.Where(touch => touch.phase != TouchPhase.Canceled && touch.phase != TouchPhase.Ended)
                     .Select(touch => touch.position).ToArray();
-            return activeTouches.Aggregate((touch1, touch2) => touch1 + touch2) / activeTouches.Count();
+            return activeTouches.Aggregate((touch1, touch2) => touch1 + touch2) / activeTouches.Length;
         }
 
         private void DragCamera(Vector2 position)
@@ -217,13 +217,21 @@ namespace LineWars.Controllers
             {
                 var touch0 = Input.GetTouch(0);
                 var touch1 = Input.GetTouch(1);
+                
+                var touch0DeltaPos = touch0.phase is TouchPhase.Began or TouchPhase.Stationary ? Vector2.zero : touch0.deltaPosition;
+                var touch1DeltaPos = touch1.phase is TouchPhase.Began or TouchPhase.Stationary ? Vector2.zero : touch1.deltaPosition;
+
                 var previousMagnitude =
-                    ((touch0.position - touch0.deltaPosition) - (touch1.position - touch1.deltaPosition)).magnitude;
+                    ((touch0.position - touch0DeltaPos) - (touch1.position - touch1DeltaPos)).magnitude;
                 var currentMagnitude = (touch0.position - touch1.position).magnitude;
 
                 var difference = currentMagnitude - previousMagnitude;
-
+                
+#if UNITY_WEBGL
+                zoomValue = mainCamera.orthographicSize + difference * 0.1f;
+#else
                 zoomValue = mainCamera.orthographicSize - difference * 0.1f;
+#endif
             }
         }
 
