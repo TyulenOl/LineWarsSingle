@@ -83,17 +83,29 @@ namespace LineWars.Interface
         
         private void ReDrawBuyNodes(BuyStateMessage buyStateMessage)
         {
+            if(MonoGraph.Instance == null || MonoGraph.Instance.Nodes == null)
+                return;
             foreach (var node in MonoGraph.Instance.Nodes)
             {
-                node.GetComponent<NodeTargetDrawer>().ReDrawBuyInfo(false);
+                if(node == null)
+                    continue;
+                var targetDrawer = node.GetComponent<NodeTargetDrawer>();
+                if(targetDrawer == null)
+                    continue;
+                targetDrawer.ReDrawBuyInfo(false);
             }
             
-            if (buyStateMessage == null)
+            if (buyStateMessage == null || buyStateMessage.NodesToSpawnPreset == null)
                 return;
             
             foreach (var node in buyStateMessage.NodesToSpawnPreset)
             {
-                node.GetComponent<NodeTargetDrawer>().ReDrawBuyInfo(true);
+                if(node == null)
+                    continue;
+                var targetDrawer = node.GetComponent<NodeTargetDrawer>();
+                if(targetDrawer == null)
+                    continue;
+                targetDrawer.ReDrawBuyInfo(true);
             }
         }
         
