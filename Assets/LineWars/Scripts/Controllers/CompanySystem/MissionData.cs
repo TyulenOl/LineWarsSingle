@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using Utilities.Runtime;
 
 namespace LineWars
 {
@@ -9,11 +10,12 @@ namespace LineWars
         [SerializeField] private string missionName;
         [SerializeField] [TextArea(5, 10)] private string missionDescription;
         [SerializeField] private Sprite missionImage;
-        [SerializeField] private SceneName sceneToLoad;
+        //[SerializeField] private SceneName sceneToLoad;
+        [SerializeField] private StableEnum<SceneName> sceneToLoadStable;
         
         public string MissionName => missionName;
         public string MissionDescription => missionDescription;
         public Sprite MissionImage => missionImage;
-        public SceneName SceneToLoad => sceneToLoad;
+        public SceneName SceneToLoad => sceneToLoadStable;
     }
 }
