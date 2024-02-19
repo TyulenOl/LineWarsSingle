@@ -59,6 +59,8 @@ namespace LineWars.Model
 
         private void CollectUnit(TUnit unit)
         {
+            if (unit == TargetUnit)
+                return;
             if (unit.OwnerId != TargetUnit.OwnerId)
                 return;
             if(collectedUnits.Contains(unit))
@@ -73,6 +75,8 @@ namespace LineWars.Model
 
         private void DeleteUnit(TUnit unit)
         {
+            if (unit == TargetUnit)
+                return;
             if(unit.OwnerId != TargetUnit.OwnerId)
                 return;
             if (!collectedUnits.Contains(unit))

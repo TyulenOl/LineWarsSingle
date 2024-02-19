@@ -1,0 +1,81 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: AlternativeForLizards
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings:
+    - serializedVersion: 3
+      m_BuildTarget: DefaultTexturePlatform
+      m_MaxTextureSize: 512
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: -1
+      m_TextureCompression: 1
+      m_CompressionQuality: 50
+      m_CrunchedCompression: 0
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 0
+      m_IgnorePlatformSupport: 0
+      m_AndroidETC2FallbackOverride: 0
+      m_ForceMaximumCompressionQuality_BC6H_BC7: 0
+    packingSettings:
+      serializedVersion: 2
+      padding: 4
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 1
+      enableTightPacking: 1
+      enableAlphaDilation: 0
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 2800000, guid: 676f87b3decb81840a312d982bacc46c, type: 3}
+    - {fileID: 2800000, guid: 4e9df5e2c917b6c459499ba713b07486, type: 3}
+    - {fileID: 2800000, guid: 491bb66839612764c90783433bca7f52, type: 3}
+    - {fileID: 2800000, guid: d359deabad52b514e8c996cdaa6bd70b, type: 3}
+    - {fileID: 2800000, guid: 0c495831917ce3545915aa58c46828ef, type: 3}
+    - {fileID: 2800000, guid: 63632b3543d37ad44be89597dd22af2e, type: 3}
+    bindAsDefault: 0
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+    packedSpriteRenderDataKeys:
+    - 0c495831917ce3545915aa58c46828ef: 21300000
+    - 4e9df5e2c917b6c459499ba713b07486: 21300000
+    - 676f87b3decb81840a312d982bacc46c: 21300000
+    - 63632b3543d37ad44be89597dd22af2e: 21300000
+    - 491bb66839612764c90783433bca7f52: 21300000
+    - d359deabad52b514e8c996cdaa6bd70b: 21300000
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 0c495831917ce3545915aa58c46828ef, type: 3}
+  - {fileID: 21300000, guid: 4e9df5e2c917b6c459499ba713b07486, type: 3}
+  - {fileID: 21300000, guid: 676f87b3decb81840a312d982bacc46c, type: 3}
+  - {fileID: 21300000, guid: 63632b3543d37ad44be89597dd22af2e, type: 3}
+  - {fileID: 21300000, guid: 491bb66839612764c90783433bca7f52, type: 3}
+  - {fileID: 21300000, guid: d359deabad52b514e8c996cdaa6bd70b, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - Alternative_1_05
+  - Alternative_1_02
+  - Alternative_1_01
+  - Alternative_1_06
+  - Alternative_1_03
+  - Alternative_1_04
+  m_RenderDataMap: {}
+  m_Tag: AlternativeForLizards
+  m_IsVariant: 0
