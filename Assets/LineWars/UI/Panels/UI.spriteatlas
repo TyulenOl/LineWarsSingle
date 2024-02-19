@@ -51,7 +51,6 @@ SpriteAtlas:
     - {fileID: 2800000, guid: be822c5ae0d9b2840906cec2376fb6b6, type: 3}
     - {fileID: 2800000, guid: e6f76d10219de554099c7b601fd47df2, type: 3}
     - {fileID: 2800000, guid: d8272e1d60bcc0c47a022f44a996dada, type: 3}
-    - {fileID: 2800000, guid: e2951a912eb0ea843b1fe05e15cc5276, type: 3}
     - {fileID: 2800000, guid: 3d93de9fdedf32940ae90f108f86d851, type: 3}
     - {fileID: 2800000, guid: e6f34cd42346d0248a58306f179870c1, type: 3}
     - {fileID: 2800000, guid: e426e434e4a5a9c4592f36807169efc9, type: 3}
@@ -74,7 +73,6 @@ SpriteAtlas:
     - e6f76d10219de554099c7b601fd47df2: 21300000
     - 2337dc215ab024e46a748813b666a81e: 21300000
     - 3361fd5117e823d47be7de43a806bbae: 21300000
-    - e2951a912eb0ea843b1fe05e15cc5276: 21300000
     - d51ebde1ccf1e7c4187abf0153047592: 21300000
     - 750ed973b77400143aa56f9e716de514: 21300000
     - f95f6d9358514b44e9656d75565e8910: 21300000
@@ -111,7 +109,6 @@ SpriteAtlas:
   - {fileID: 21300000, guid: e6f76d10219de554099c7b601fd47df2, type: 3}
   - {fileID: 21300000, guid: 2337dc215ab024e46a748813b666a81e, type: 3}
   - {fileID: 21300000, guid: 3361fd5117e823d47be7de43a806bbae, type: 3}
-  - {fileID: 21300000, guid: e2951a912eb0ea843b1fe05e15cc5276, type: 3}
   - {fileID: 21300000, guid: d51ebde1ccf1e7c4187abf0153047592, type: 3}
   - {fileID: 21300000, guid: 750ed973b77400143aa56f9e716de514, type: 3}
   - {fileID: 21300000, guid: f95f6d9358514b44e9656d75565e8910, type: 3}
@@ -147,7 +144,6 @@ SpriteAtlas:
   - CardsBorderAndBackground
   - ShortLine
   - MenuIcon
-  - Name
   - Arrow
   - ButtonBlack
   - OpenMission
