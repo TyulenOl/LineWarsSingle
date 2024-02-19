@@ -5,7 +5,8 @@ using UnityEngine.Events;
 
 namespace LineWars.Controllers
 {
-    [RequireComponent(typeof(AudioSource))] 
+    [RequireComponent(typeof(AudioSource))]
+    [Obsolete]
     public class MusicManager : MonoBehaviour
     {
         public static MusicManager Instance { get; private set; }
