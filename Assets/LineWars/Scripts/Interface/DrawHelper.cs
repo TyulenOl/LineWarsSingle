@@ -8,6 +8,10 @@ using UnityEngine;
 
 public static class DrawHelper
 {
+    public const string FontForNumber = "New Rocker";
+    public const string FontForTitle = "Fita_Poluustav";
+    public const string FontForDescription = "ModestTYGRA";
+    
     private static DrawHelperInstance Instance => GameRoot.Instance.DrawHelper;
     public static IReadOnlyDictionary<LootType, Sprite> LootTypeToSprite => Instance.LootTypeToSprite;
     public static IReadOnlyDictionary<Rarity, Color> RarityToColor => Instance.RarityToColor;

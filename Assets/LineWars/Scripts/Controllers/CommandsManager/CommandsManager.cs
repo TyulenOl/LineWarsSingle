@@ -177,8 +177,9 @@ namespace LineWars.Controllers
             
             Player.TurnEnded += OnTurnEnded;
             Player.TurnStarted += OnTurnStarted;
+            Player.Replenished += OnReplenish;
         }
-
+        
         private void OnDestroy()
         {
             stateMachine?.SetState(idleState);
@@ -186,9 +187,10 @@ namespace LineWars.Controllers
             {
                 Player.TurnEnded -= OnTurnStarted;
                 Player.TurnStarted -= OnTurnStarted;
+                Player.Replenished -= OnReplenish;
             }
         }
-
+        
         public bool CanExecuteAnyCommand()
         {
             return stateMachine.CurrentState == findTargetState && Executor.CanDoAnyAction;
@@ -603,6 +605,10 @@ namespace LineWars.Controllers
         private void OnTurnStarted(IActor _, PhaseType phaseType)
         {
             ToPhase(phaseType);
+        }
+        
+        private void OnReplenish()
+        {
             blissingIsExecuted = false;
         }
 
