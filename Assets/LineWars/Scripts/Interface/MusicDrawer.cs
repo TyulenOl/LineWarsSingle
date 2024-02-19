@@ -8,12 +8,12 @@ namespace LineWars.Interface
     public class MusicDrawer: MonoBehaviour
     {
         private static readonly int animateId = Animator.StringToHash("animate");
-        private static MusicManager MusicManager => MusicManager.Instance;
+        private static PluginMusicManager MusicManager => PluginMusicManager.Instance;
         
         [SerializeField] private Animator animator;
         [SerializeField] private TMP_Text author;
         [SerializeField] private TMP_Text soundName;
-        private MusicData current;
+        private PluginMusicData current;
         
 
         private void OnEnable()
@@ -28,7 +28,7 @@ namespace LineWars.Interface
             MusicManager.MusicChanged.RemoveListener(MusicChanged);
         }
 
-        private void MusicChanged(MusicData before, MusicData after)
+        private void MusicChanged(PluginMusicData before, PluginMusicData after)
         {
             if (after != null)
             {
@@ -36,7 +36,7 @@ namespace LineWars.Interface
             }
         }
 
-        private void Animate(MusicData musicData)
+        private void Animate(PluginMusicData musicData)
         {
             if (current == musicData)
                 return;
