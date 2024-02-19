@@ -41,7 +41,7 @@ namespace LineWars.Interface
             if (current == musicData)
                 return;
             
-            Debug.Log("Animate");
+            //Debug.Log("Animate");
             current = musicData;
             
             var haveName = !string.IsNullOrEmpty(musicData.Name);
