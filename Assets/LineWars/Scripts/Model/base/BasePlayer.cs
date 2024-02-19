@@ -47,6 +47,7 @@ namespace LineWars.Model
         public event Action<int, int> IncomeChanged;
         public event Action<IActor, PhaseType> TurnStarted;
         public event Action<IActor, PhaseType> TurnEnded;
+        public event Action Replenished;
 
         public IReadOnlyCollection<Owned> OwnedObjects => myOwned;
         public bool IsMyOwn(Owned owned) => myOwned.Contains(owned);
@@ -271,6 +272,7 @@ namespace LineWars.Model
             var objects = new List<Owned>(OwnedObjects);
             foreach (var owned in objects)
                 owned.Replenish();
+            Replenished?.Invoke();
         }
 
         protected virtual void ExecutePayday()

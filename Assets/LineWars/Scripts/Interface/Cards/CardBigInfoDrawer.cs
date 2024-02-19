@@ -76,7 +76,7 @@ namespace LineWars
                 if (info.CanBuy)
                     costInfo.text = $"{deckCard.Cost}(+{info.Cost})";
                 else
-                    costInfo.text = $"{deckCard.Cost}(+\u221e)";
+                    costInfo.text = $"{deckCard.Cost}";
             }
         }
     }
