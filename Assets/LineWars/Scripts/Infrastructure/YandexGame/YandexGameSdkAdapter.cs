@@ -118,6 +118,7 @@ namespace LineWars.Controllers
             if (!CheckEnableSdk()) return null;
             
             return YandexGame.purchases
+                .Where(CanConvertPurchase)
                 .Select(ConvertPurchase)
                 .ToArray();
         }
@@ -170,6 +171,11 @@ namespace LineWars.Controllers
                 return;
             }
             YandexGame.BuyPayments(id);
+        }
+
+        private bool CanConvertPurchase(Purchase yg)
+        {
+            return yg != null && RewardUtilities.CanDecodePurchaseId(yg.id);
         }
         
         private PurchaseData ConvertPurchase(Purchase yg)
@@ -244,5 +250,21 @@ namespace LineWars.Controllers
                 DebugUtility.LogError("Yandex SDK not enabled!");
             return SDKEnabled;
         }
+
+        // private void OnApplicationFocus(bool hasFocus)
+        // {
+        //     if (hasFocus)
+        //     {
+        //         YandexGame.ConsumePurchases();
+        //     }
+        // }
+        //
+        // private void OnApplicationPause(bool pauseStatus)
+        // {
+        //     if (!pauseStatus)
+        //     {
+        //         YandexGame.ConsumePurchases();
+        //     }
+        // }
     }
 }

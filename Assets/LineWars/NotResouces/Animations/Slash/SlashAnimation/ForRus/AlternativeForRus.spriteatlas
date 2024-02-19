@@ -1,0 +1,68 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: AlternativeForRus
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings: []
+    packingSettings:
+      serializedVersion: 2
+      padding: 4
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 1
+      enableTightPacking: 1
+      enableAlphaDilation: 0
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 2800000, guid: 9148625b8bf5e4248b5a1b45958cfeee, type: 3}
+    - {fileID: 2800000, guid: 33991d2a362118f4bb415416e9ae98dc, type: 3}
+    - {fileID: 2800000, guid: bee5a92dfc8af044b92abb2a57ef6efd, type: 3}
+    - {fileID: 2800000, guid: 287a2e2171e639447ad109b884d7524a, type: 3}
+    - {fileID: 2800000, guid: 5ea8049aaa6af9248bd55d2f2dd4f110, type: 3}
+    - {fileID: 2800000, guid: 10e87a9635b198c4d832f2088b152982, type: 3}
+    bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+    packedSpriteRenderDataKeys:
+    - 287a2e2171e639447ad109b884d7524a: 21300000
+    - 10e87a9635b198c4d832f2088b152982: 21300000
+    - 33991d2a362118f4bb415416e9ae98dc: 21300000
+    - 5ea8049aaa6af9248bd55d2f2dd4f110: 21300000
+    - 9148625b8bf5e4248b5a1b45958cfeee: 21300000
+    - bee5a92dfc8af044b92abb2a57ef6efd: 21300000
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 287a2e2171e639447ad109b884d7524a, type: 3}
+  - {fileID: 21300000, guid: 10e87a9635b198c4d832f2088b152982, type: 3}
+  - {fileID: 21300000, guid: 33991d2a362118f4bb415416e9ae98dc, type: 3}
+  - {fileID: 21300000, guid: 5ea8049aaa6af9248bd55d2f2dd4f110, type: 3}
+  - {fileID: 21300000, guid: 9148625b8bf5e4248b5a1b45958cfeee, type: 3}
+  - {fileID: 21300000, guid: bee5a92dfc8af044b92abb2a57ef6efd, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - Alternative_2_04
+  - Alternative_2_06
+  - Alternative_2_02
+  - Alternative_2_05
+  - Alternative_2_01
+  - Alternative_2_03
+  m_RenderDataMap: {}
+  m_Tag: AlternativeForRus
+  m_IsVariant: 0

@@ -9,6 +9,8 @@ namespace LineWars.Controllers
     {
         public static SpeechManager Instance { get; private set; }
         private AudioSource source;
+        public AudioSource Source => source;
+
         public event Action SpeechEnded;
 
         private void Awake()
@@ -37,7 +39,8 @@ namespace LineWars.Controllers
         private IEnumerator PlayCoroutine(AudioClip audioClip)
         {
             source.PlayOneShot(audioClip);
-            yield return new WaitForSeconds(audioClip.length);
+            while (source.isPlaying)
+                yield return null;
             InvokeSpeechEnded();
         }
         

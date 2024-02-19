@@ -8,7 +8,10 @@ namespace LineWars.Education
         public void WinEducation()
         {
             if(GameRoot.Instance != null)
+            {
                 GameRoot.Instance.CompaniesController.WinChoseMission();
+                GameRoot.Instance.CompaniesController.UnlockNextMission();
+            }
         }
     }
 }

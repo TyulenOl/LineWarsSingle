@@ -171,6 +171,10 @@ namespace LineWars.Model
                         Debug.Log(actionCommand.Action);
                         var isCompleted = false;
                         actionCommand.Action.ActionCompleted += OnActionCompleted;
+                        if(actionCommand.Action is IExecutorAction<Unit> unitAction)
+                        {
+                            unitAction.Executor.Died.AddListener(OnUnitActionCompleted);
+                        }
                         UnitsController.ExecuteCommand(command);
                         while (!isCompleted)
                         {
@@ -180,8 +184,15 @@ namespace LineWars.Model
                         yield return new WaitForSeconds(ai.commandPause);
                         void OnActionCompleted()
                         {
+                            if (isCompleted) return;
+                            if(actionCommand.Action is IExecutorAction<Unit> uAction)
+                                uAction.Executor.Died.RemoveListener(OnUnitActionCompleted);
                             actionCommand.Action.ActionCompleted -= OnActionCompleted;
                             isCompleted = true;
+                        }
+                        void OnUnitActionCompleted(Unit unit)
+                        {
+                            OnActionCompleted();
                         }
                     }
                     else

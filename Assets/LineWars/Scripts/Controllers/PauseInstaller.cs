@@ -1,5 +1,6 @@
 ﻿using System;
 using DataStructures;
+using Plugins.Audio.Core;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -165,15 +166,30 @@ namespace LineWars
                 {
                     if (pause) AudioListener.pause = true;
                     else AudioListener.pause = closingADValues.audioPause;
+                    
+                    if (pause)
+                        AudioPauseHandler.Instance?.PauseAudio();
+                    else if (closingADValues.audioPause)
+                        AudioPauseHandler.Instance?.PauseAudio();
+                    else
+                        AudioPauseHandler.Instance?.UnpauseAudio();
                 }
                 else
                 {
                     if (pause)
-                    {
+                    {                   
                         audioPauseOnAd = AudioListener.pause;
                         AudioListener.pause = true;
                     }
                     else AudioListener.pause = audioPauseOnAd;
+                    
+                    if (pause)
+                        AudioPauseHandler.Instance?.PauseAudio();
+                    else if (audioPauseOnAd)
+                        AudioPauseHandler.Instance?.PauseAudio();
+                    else
+                        AudioPauseHandler.Instance?.UnpauseAudio();
+                    
                 }
             }
 
