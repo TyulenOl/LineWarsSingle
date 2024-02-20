@@ -36,6 +36,12 @@ namespace LineWars.Model
         Rider,
         Hedgehog,
         VenomLizard,
-        Michailo
+        Michailo,
+        SuperHedgehog,
+        SuperVenomLizard,
+        SuperBig,
+        SuperLizLuchnik,
+        SuperLizMechnik,
+        SuperRider
     }
 }
