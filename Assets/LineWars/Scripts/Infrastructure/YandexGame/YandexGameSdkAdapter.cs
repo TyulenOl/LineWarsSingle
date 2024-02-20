@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using AYellowpaper.SerializedCollections;
 using LineWars.Interface;
 using LineWars.Model;
@@ -251,20 +252,14 @@ namespace LineWars.Controllers
             return SDKEnabled;
         }
 
-        // private void OnApplicationFocus(bool hasFocus)
-        // {
-        //     if (hasFocus)
-        //     {
-        //         YandexGame.ConsumePurchases();
-        //     }
-        // }
-        //
-        // private void OnApplicationPause(bool pauseStatus)
-        // {
-        //     if (!pauseStatus)
-        //     {
-        //         YandexGame.ConsumePurchases();
-        //     }
-        // }
+        public override void SendMetrica(string eventName)
+        {
+            YandexMetrica.Send(eventName);
+        }
+
+        public override void SendMetrica(string eventName, IDictionary<string, string> eventParams)
+        {
+            YandexMetrica.Send(eventName, eventParams);
+        }
     }
 }

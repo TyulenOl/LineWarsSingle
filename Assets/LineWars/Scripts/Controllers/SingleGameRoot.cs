@@ -5,6 +5,7 @@ using LineWars.Model;
 using LineWars.Controllers;
 using LineWars.Infrastructure;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace LineWars
 {
@@ -31,6 +32,7 @@ namespace LineWars
         public Deck CurrentDeck { get; private set; }
         public IBlessingsPull LocalBlessingPull { get; private set; }
         public IBlessingsPull GlobalBlessingPull { get; private set; }
+        public SceneName Scene => (SceneName)SceneManager.GetActiveScene().buildIndex;
         
         private void Start()
         {
@@ -110,12 +112,30 @@ namespace LineWars
         public void WinGame()
         {
             WinAction.Execute();
+            
+            if (GameRoot.Instance != null && GameRoot.Instance.SdkAdapter != null)
+            {
+                if (CurrentDeck != null)
+                {
+                    foreach (var card in CurrentDeck.Cards)
+                        GameRoot.Instance.SdkAdapter.SendCardMetrica(card, Scene, true);
+                }
+            }
         }
         
         [EditorButton]
         public void LoseGame()
         {
             LoseAction.Execute();
+            
+            if (GameRoot.Instance != null && GameRoot.Instance.SdkAdapter != null)
+            {
+                if (CurrentDeck != null)
+                {
+                    foreach (var card in CurrentDeck.Cards)
+                        GameRoot.Instance.SdkAdapter.SendCardMetrica(card, Scene, false);
+                }
+            }
         }
 
         public void PauseGame()

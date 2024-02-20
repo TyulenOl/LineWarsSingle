@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using LineWars.Model;
 using UnityEngine;
 using UnityEngine.Events;
@@ -97,6 +98,30 @@ namespace LineWars.Controllers
         {
             successLockAd?.Invoke();
             SuccesLockAd?.Invoke();
+        }
+
+        public abstract void SendMetrica(string eventName);
+        public abstract void SendMetrica(string eventName, IDictionary<string, string> eventParams);
+
+        public void SendCardMetrica(DeckCard deckCard, SceneName sceneName, bool isWin)
+        {
+            var eventParams = new Dictionary<string, string>()
+            {
+                {"cardName", deckCard?.Name},
+                {"level", sceneName.ToString()},
+                {"isWin", isWin.ToString()},
+            };
+            SendMetrica("card", eventParams);
+        }
+
+        public void SendButtonMetrica(string buttonId)
+        {
+            var eventParams = new Dictionary<string, string>()
+            {
+                {"buttonId", buttonId},
+            };
+            
+            SendMetrica("button", eventParams);
         }
     }
 }

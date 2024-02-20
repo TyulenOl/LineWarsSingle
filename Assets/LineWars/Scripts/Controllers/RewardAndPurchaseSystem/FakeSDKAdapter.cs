@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using LineWars.Model;
 
 namespace LineWars.Controllers
@@ -54,6 +55,16 @@ namespace LineWars.Controllers
         public override PurchaseData[] GetPurchases(PrizeType prizeType)
         {
             return Array.Empty<PurchaseData>();
+        }
+
+        public override void SendMetrica(string eventName)
+        {
+            
+        }
+
+        public override void SendMetrica(string eventName, IDictionary<string, string> eventParams)
+        {
+           
         }
     }
 }

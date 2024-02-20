@@ -6,6 +6,7 @@ using UnityEngine.UI;
 namespace LineWars.Controllers
 {
     [RequireComponent(typeof(Button))]
+    [DisallowMultipleComponent]
     public class OpenAdButton: MonoBehaviour
     {
         private static SDKAdapterBase SdkAdapter => GameRoot.Instance.SdkAdapter;
