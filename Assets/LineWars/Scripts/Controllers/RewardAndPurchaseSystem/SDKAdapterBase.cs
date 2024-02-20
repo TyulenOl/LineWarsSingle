@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using LineWars.Model;
 using UnityEngine;
 using UnityEngine.Events;
@@ -98,5 +99,8 @@ namespace LineWars.Controllers
             successLockAd?.Invoke();
             SuccesLockAd?.Invoke();
         }
+
+        public abstract void SendMetrica(string eventName);
+        public abstract void SendMetrica(string eventName, IDictionary<string, string> eventParams);
     }
 }
