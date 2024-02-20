@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using DataStructures.PriorityQueue;
+using UnityEngine;
 
 namespace LineWars.Model
 {
@@ -236,10 +237,17 @@ namespace LineWars.Model
             IReadOnlyDictionary<TNode, int> interferingNodes)
         {
             if (startNodes.Count == 0)
-                throw new ArgumentException("Нет стартовых нод!");
+            {
+                Debug.LogError("Нет стартовых нод!");
+                yield break;
+            }
+
             if (startNodes.Keys.Any(x => !idToNode.ContainsKey(x.Id))
                 || interferingNodes.Keys.Any(x => !idToNode.ContainsKey(x.Id)))
-                throw new InvalidOperationException("Есть ноды не содержащиеся в графе!");
+            {
+                Debug.LogError("Есть ноды не содержащиеся в графе!");
+                yield break;
+            }
 
             var closedNodes = new HashSet<TNode>();
             var priorityQueue = new PriorityQueue<TNode, int>(0);
