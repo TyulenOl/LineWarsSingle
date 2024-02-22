@@ -31,7 +31,6 @@ namespace LineWars.Model
             currentBlessing = allBlessings[rnd];
             if (currentBlessing.CanExecute())
             {
-                Debug.Log(currentBlessing);
                 currentBlessing.Completed += BlissingOnCompleted;
                 currentBlessing.Execute();
             }
