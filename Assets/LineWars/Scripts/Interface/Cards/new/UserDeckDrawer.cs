@@ -32,8 +32,6 @@ namespace LineWars.Interface
 
         private void OnDisable()
         {
-            SaveDeck();
-            
             foreach (var slot in slots)
             {
                 slot.OnDropCard -= SlotOnOnDropCard;
@@ -72,6 +70,8 @@ namespace LineWars.Interface
                     cardsDrawer.DeckCardToDrawer[newCard].IsActive = false;
                 }
             }
+            
+            SaveDeck();
         }
         
         private void SlotOnDragEnding(CardDropSlot slot, DeckCard card)
@@ -81,6 +81,7 @@ namespace LineWars.Interface
                 slot.DeckCard = null;
                 if (cardsDrawer != null) 
                     cardsDrawer.DeckCardToDrawer[card].IsActive = true;
+                SaveDeck();
             }
             
             dragStarting = false;

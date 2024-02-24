@@ -193,7 +193,7 @@ namespace LineWars.Controllers
 
         private void OnRewardVideoEvent(int id)
         {
-            Debug.Log("OnRewardVideoEvent");
+            //Debug.Log("OnRewardVideoEvent");
             try
             {
                 var (type, amount) = RewardUtilities.DecodeId(id, priseTypeLenInBits);
