@@ -214,6 +214,7 @@ namespace LineWars.Controllers
     public enum Platform
     {
         Local,
-        YandexGame
+        YandexGame,
+        RuStore
     }
 }

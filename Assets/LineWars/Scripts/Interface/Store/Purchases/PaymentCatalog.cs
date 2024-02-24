@@ -57,7 +57,7 @@ namespace LineWars.Interface
 
         public void UpdatePurchasesList()
         {
-            var purchases = SdkAdapter.GetPurchases(prizeType);
+            var purchases = SdkAdapter.GetProducts(prizeType);
             if (disableWhenPurchasesEmpty && purchases.Length == 0)
             {
                 disabledObject?.SetActive(false);
@@ -85,7 +85,7 @@ namespace LineWars.Interface
             }
         }
 
-        private void SpawnPurchasesList(PurchaseData[] purchases)
+        private void SpawnPurchasesList(ProductData[] purchases)
         {
             purchasesDrawers = new PurchaseDrawer[purchases.Length];
             for (var i = 0; i < purchases.Length; i++)
@@ -104,7 +104,7 @@ namespace LineWars.Interface
         {
             for (int i = 0; i < purchasesDrawers.Length; i++)
             {
-                PurchaseData purchaseInfo = SdkAdapter.PurchaseByID(purchasesDrawers[i].Data.Id);
+                ProductData purchaseInfo = SdkAdapter.ProductByID(purchasesDrawers[i].Data.Id);
                 if (purchaseInfo != null)
                 {
                     purchasesDrawers[i].Data = purchaseInfo;

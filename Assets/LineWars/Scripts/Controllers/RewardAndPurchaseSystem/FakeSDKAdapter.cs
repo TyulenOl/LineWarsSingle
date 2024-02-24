@@ -22,39 +22,39 @@ namespace LineWars.Controllers
             Reward(prizeType, amount);
         }
 
-        public override bool CanBuyPurchase(string id)
+        public override bool CanBuyProduct(string id)
         {
             return false;
         }
 
-        public override void BuyPurchase(string id)
+        public override void BuyProduct(string id)
         {
             
         }
 
-        public override PurchaseData PurchaseByID(string id)
+        public override ProductData ProductByID(string id)
         {
             return null;
         }
 
-        public override int GetPurchaseCount()
+        public override int GetProductCount()
         {
             return 0;
         }
 
-        public override int GetPurchaseCount(PrizeType prizeType)
+        public override int GetProductCount(PrizeType prizeType)
         {
             return 0;
         }
 
-        public override PurchaseData[] GetPurchases()
+        public override ProductData[] GetProducts()
         {
-            return Array.Empty<PurchaseData>();
+            return Array.Empty<ProductData>();
         }
 
-        public override PurchaseData[] GetPurchases(PrizeType prizeType)
+        public override ProductData[] GetProducts(PrizeType prizeType)
         {
-            return Array.Empty<PurchaseData>();
+            return Array.Empty<ProductData>();
         }
 
         public override void SendMetrica(string eventName)
