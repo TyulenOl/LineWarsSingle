@@ -300,10 +300,11 @@ namespace LineWars.Model
             return deckCard.CalculateCost(GetCountUnitByType(deckCard.Unit.Type));
         }
 
-        public IEnumerable<Unit> GetAllEnemiesUnits()
+        public Unit[] GetAllEnemiesUnits()
         {
             return SingleGameRoot.Instance.AllUnits.Values
-                .Where(x => x.OwnerId != Id);
+                .Where(x => x.OwnerId != Id)
+                .ToArray();
         }
 
 
