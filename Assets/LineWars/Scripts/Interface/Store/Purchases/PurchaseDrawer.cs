@@ -17,7 +17,7 @@ namespace LineWars.Interface
         [SerializeField] private Button button;
         [SerializeField] private bool addCurrency_toPrice = true;
         
-        public UnityEvent<PurchaseData> OnClick;
+        public UnityEvent<ProductData> OnClick;
         
         private void OnEnable()
         {
@@ -44,7 +44,7 @@ namespace LineWars.Interface
 
             if (image) image.sprite = Data.Sprite;
 
-            if (button) button.interactable = SDKAdapter.CanBuyPurchase(Data.Id);
+            if (button) button.interactable = SDKAdapter.CanBuyProduct(Data.Id);
         }
 
         private void OnButtonClick()

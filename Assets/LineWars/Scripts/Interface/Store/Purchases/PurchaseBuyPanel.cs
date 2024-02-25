@@ -10,7 +10,7 @@ namespace LineWars.Interface
     {
         [SerializeField] private PurchaseDrawer purchaseDrawer;
 
-        public void OpenWindow(PurchaseData purchaseInfo)
+        public void OpenWindow(ProductData purchaseInfo)
         {
             gameObject.SetActive(true);
             

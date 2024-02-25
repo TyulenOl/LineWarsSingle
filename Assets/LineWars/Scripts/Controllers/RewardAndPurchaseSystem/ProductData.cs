@@ -2,7 +2,7 @@
 
 namespace LineWars.Model
 {
-    public class PurchaseData
+    public class ProductData
     {
         private string id;
         private string title;
@@ -20,7 +20,7 @@ namespace LineWars.Model
         public string CurrencyName => currencyName;
         public Prize Prize => prize;
 
-        public PurchaseData(string id, string title, string description, Sprite sprite, int priceValue, string currencyName, Prize prize)
+        public ProductData(string id, string title, string description, Sprite sprite, int priceValue, string currencyName, Prize prize)
         {
             this.id = id;
             this.title = title;
