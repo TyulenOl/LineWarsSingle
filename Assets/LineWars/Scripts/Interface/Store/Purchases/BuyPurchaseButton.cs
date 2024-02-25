@@ -17,7 +17,7 @@ namespace LineWars.Interface
         {
             button.onClick.AddListener(BuyPurchase);
             if (purchaseContainer.Data != null)
-                button.interactable = SDKAdapter.CanBuyPurchase(purchaseContainer.Data.Id);
+                button.interactable = SDKAdapter.CanBuyProduct(purchaseContainer.Data.Id);
         }
         
         private void OnDisable()
@@ -28,7 +28,7 @@ namespace LineWars.Interface
         private void BuyPurchase()
         {
             if (purchaseContainer.Data != null)
-                SDKAdapter.BuyPurchase(purchaseContainer.Data.Id);
+                SDKAdapter.BuyProduct(purchaseContainer.Data.Id);
         }
     }
 }

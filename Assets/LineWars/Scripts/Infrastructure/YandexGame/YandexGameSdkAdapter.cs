@@ -107,14 +107,14 @@ namespace LineWars.Controllers
             }
         }
 
-        public override PurchaseData PurchaseByID(string id)
+        public override ProductData ProductByID(string id)
         {
             if (!CheckEnableSdk()) return null;
             
             return ConvertPurchase(YandexGame.PurchaseByID(id));
         }
 
-        public override PurchaseData[] GetPurchases() 
+        public override ProductData[] GetProducts() 
         {
             if (!CheckEnableSdk()) return null;
             
@@ -124,18 +124,18 @@ namespace LineWars.Controllers
                 .ToArray();
         }
 
-        public override PurchaseData[] GetPurchases(PrizeType prizeType)
+        public override ProductData[] GetProducts(PrizeType prizeType)
         {
             if (!CheckEnableSdk()) return null;
             
-            return GetPurchases()
+            return GetProducts()
                 .Where(x => x.Prize != null && x.Prize.Type == prizeType)
                 .ToArray();
         }
 
         public override void LockAd()
         {
-            BuyPurchase(lockAdId);
+            BuyProduct(lockAdId);
         }
 
         private void _LockAd()
@@ -144,29 +144,29 @@ namespace LineWars.Controllers
             //TODO
         }
 
-        public override int GetPurchaseCount()
+        public override int GetProductCount()
         {
             if (!CheckEnableSdk()) return -1;
             return YandexGame.purchases.Length;
         }
 
-        public override int GetPurchaseCount(PrizeType prizeType)
+        public override int GetProductCount(PrizeType prizeType)
         {
             if (!CheckEnableSdk()) return -1;
-            return GetPurchases(prizeType).Length;
+            return GetProducts(prizeType).Length;
         }
         
-        public override bool CanBuyPurchase(string id)
+        public override bool CanBuyProduct(string id)
         {
             if (!CheckEnableSdk()) return false;
             return RewardUtilities.CanDecodePurchaseId(id);
         }
 
-        public override void BuyPurchase(string id)
+        public override void BuyProduct(string id)
         {
             if (!CheckEnableSdk()) return;
             
-            if (!CanBuyPurchase(id))
+            if (!CanBuyProduct(id))
             {
                 Debug.LogError($"Cant buy this Purchase {nameof(id)}={id}");
                 return;
@@ -179,9 +179,9 @@ namespace LineWars.Controllers
             return yg != null && RewardUtilities.CanDecodePurchaseId(yg.id);
         }
         
-        private PurchaseData ConvertPurchase(Purchase yg)
+        private ProductData ConvertPurchase(Purchase yg)
         {
-            return new PurchaseData(
+            return new ProductData(
                 yg.id,
                 yg.title,
                 yg.description,
@@ -245,12 +245,7 @@ namespace LineWars.Controllers
             InvokePurchasesUpdated();
         }
         
-        private bool CheckEnableSdk()
-        {
-            if (!SDKEnabled)
-                DebugUtility.LogError("Yandex SDK not enabled!");
-            return SDKEnabled;
-        }
+
 
         public override void SendMetrica(string eventName)
         {

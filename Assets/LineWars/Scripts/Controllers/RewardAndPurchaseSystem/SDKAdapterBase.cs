@@ -23,6 +23,7 @@ namespace LineWars.Controllers
         public event Action SuccesLockAd; 
         
         protected UserInfoController UserInfoController => GameRoot.Instance.UserController;
+        public virtual bool NeedInterstitialAd => false;
         
         public abstract void Initialize();
         public abstract bool SDKEnabled { get; }
@@ -31,14 +32,14 @@ namespace LineWars.Controllers
         
         public void RewardForAd(Prize prize) => RewardForAd(prize.Type, prize.Amount); 
         protected abstract void RewardForAd(PrizeType prizeType, int amount);
-        public abstract bool CanBuyPurchase(string id);
-        public abstract void BuyPurchase(string id);
-        public abstract PurchaseData PurchaseByID(string id);
+        public abstract bool CanBuyProduct(string id);
+        public abstract void BuyProduct(string id);
+        public abstract ProductData ProductByID(string id);
         
-        public abstract int GetPurchaseCount();
-        public abstract int GetPurchaseCount(PrizeType prizeType);
-        public abstract PurchaseData[] GetPurchases();
-        public abstract PurchaseData[] GetPurchases(PrizeType prizeType);
+        public abstract int GetProductCount();
+        public abstract int GetProductCount(PrizeType prizeType);
+        public abstract ProductData[] GetProducts();
+        public abstract ProductData[] GetProducts(PrizeType prizeType);
       
         
         protected void Reward(Prize prize)
@@ -122,6 +123,13 @@ namespace LineWars.Controllers
             };
             
             SendMetrica("button", eventParams);
+        }
+
+        protected bool CheckEnableSdk()
+        {
+            if (!SDKEnabled)
+                DebugUtility.LogError("SDK is not enabled!");
+            return SDKEnabled;
         }
     }
 }

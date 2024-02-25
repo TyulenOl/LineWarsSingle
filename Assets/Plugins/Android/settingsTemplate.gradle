@@ -21,6 +21,9 @@ dependencyResolutionManagement {
         maven {
             url "https://artifactory-external.vkpartner.ru/artifactory/maven" // Assets/RuStoreSDK/BillingClient/Editor/BillingClientDependencies.xml:7
         }
+        maven {
+            url "https://maven.google.com/" // Assets/YandexMobileAds/Editor/YandexMobileadsDependencies.xml:7, Assets/YandexMobileAds/Editor/YandexMobileadsDependencies.xml:12
+        }
         mavenLocal()
 // Android Resolver Repos End
         flatDir {
