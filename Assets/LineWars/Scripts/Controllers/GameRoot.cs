@@ -28,6 +28,7 @@ namespace LineWars.Controllers
         [SerializeField] private YandexGameProvider yandexGameProvider;
         
         [Header("Api")]
+        [SerializeField] private RuStoreAdapter ruStoreAdapter;
         [SerializeField] private YandexGameSdkAdapter yandexGameSdkAdapter;
         [SerializeField] private FakeSDKAdapter fakeSDKAdapter;
 
@@ -78,6 +79,7 @@ namespace LineWars.Controllers
             {
                 Platform.Local => fakeSDKAdapter,
                 Platform.YandexGame => yandexGameSdkAdapter,
+                Platform.RuStore => ruStoreAdapter,
                 _ => throw new ArgumentOutOfRangeException()
             };
             
@@ -130,6 +132,9 @@ namespace LineWars.Controllers
                     InitializeYandexGameProvider();
                     break;
                 }
+                case Platform.RuStore:
+                    InitializeJsonProviders();
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }

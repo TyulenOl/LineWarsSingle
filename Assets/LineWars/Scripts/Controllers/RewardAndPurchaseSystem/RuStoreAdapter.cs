@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using LineWars.Interface;
 using UnityEngine.SceneManagement;
+using YandexMobileAds.Base;
 
 namespace LineWars.Controllers
 {
@@ -15,7 +16,8 @@ namespace LineWars.Controllers
         [SerializeField] private string[] productsId;
         [SerializeField] private Sprite diamondsSprite;
         [SerializeField] private float adFreePause;
-        [SerializeField] private string adUnitId = "demo-interstitial-yandex";
+        [SerializeField] private string interstitialAdUnitId = "demo-interstitial-yandex";
+        [SerializeField] private string rewardAdUnitId = "demo-rewarded-yandex";
         private YandexInterstitialAd interstitialAd;
         private YandexRewardAd rewardAd;
         private RuStoreBillingClient ruStoreBillingClient;
@@ -27,14 +29,15 @@ namespace LineWars.Controllers
         public override void Initialize()
         {
             interstitialAd = new();
-            interstitialAd.Initialize(adUnitId);
+            interstitialAd.Initialize(interstitialAdUnitId);
             rewardAd = new();
-            rewardAd.Initialize(adUnitId);
+            rewardAd.Initialize(rewardAdUnitId);
             ruStoreBillingClient = RuStoreBillingClient.Instance;
             ruStoreBillingClient.Init();
             CheckPurchasesAvailability();
             InitPurchases();
             timeSinceLastAd = adFreePause;
+            GameRoot.Instance.StartGame();
             SceneManager.sceneLoaded += OnSceneChanged;
         }
 
@@ -153,7 +156,7 @@ namespace LineWars.Controllers
             return RewardUtilities.CanDecodePurchaseId(id);
         }
 
-        public void FullScreenAd()
+        private void FullScreenAd()
         {
             DebugUtility.Log("SHOWING AD!");
             interstitialAd.ShowInterstitial();
@@ -161,18 +164,27 @@ namespace LineWars.Controllers
 
         public override int GetProductCount()
         {
+            if (!CheckEnableSdk())
+                return -1;
+
             return products.Count;
         }
 
         public override int GetProductCount(PrizeType prizeType)
         {
-           return products
+            if (!CheckEnableSdk())
+                return -1;
+
+            return products
                 .Where(x => x.Prize != null && x.Prize.Type == prizeType)
                 .Count();
         }
 
         public override ProductData[] GetProducts()
         {
+            if (!CheckEnableSdk())
+                return null;
+
             return products.ToArray();
         }
 
@@ -208,7 +220,19 @@ namespace LineWars.Controllers
 
         protected override void RewardForAd(PrizeType prizeType, int amount)
         {
-            throw new NotImplementedException();
+            if (!CheckEnableSdk())
+                return;
+
+            rewardAd.Rewarded += OnRewarded;
+
+            void OnRewarded(object _, Reward _1)
+            {
+                rewardAd.Rewarded -= OnRewarded;
+                Reward(prizeType, amount);
+
+                FullscreenPanel.OpenSuccessPanel(new Money(CostType.Gold, amount));
+                InvokeRewardVideoEvent(prizeType, amount);
+            }
         }
     }
 }

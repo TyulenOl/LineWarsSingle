@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="rustore_BillingClientSettings_consoleApplicationId" translatable="false"></string>
-    <string name="rustore_BillingClientSettings_deeplinkScheme" translatable="false"></string>
+    <string name="rustore_BillingClientSettings_consoleApplicationId" translatable="false">2063542124</string>
+    <string name="rustore_BillingClientSettings_deeplinkScheme" translatable="false">linewarsrvl</string>
     <string name="rustore_BillingClientSettings_allowNativeErrorHandling" translatable="false">False</string>
     <string name="rustore_BillingClientSettings_enableLogs" translatable="false">False</string>
 

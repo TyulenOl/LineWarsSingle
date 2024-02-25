@@ -39,7 +39,7 @@ namespace LineWars.Controllers
             }
         }
 
-        public void HandleAdLoaded(object sender, RewardedAdLoadedEventArgs args)
+        private void HandleAdLoaded(object sender, RewardedAdLoadedEventArgs args)
         {
             // The ad was loaded successfully. Now you can handle it.
             rewardedAd = args.RewardedAd;
@@ -53,13 +53,13 @@ namespace LineWars.Controllers
             rewardedAd.OnRewarded += HandleRewarded;
         }
 
-        public void HandleAdFailedToLoad(object sender, AdFailedToLoadEventArgs args)
+        private void HandleAdFailedToLoad(object sender, AdFailedToLoadEventArgs args)
         {
             // Ad {args.AdUnitId} failed for to load with {args.Message}
             // Attempting to load a new ad from the OnAdFailedToLoad event is strongly discouraged.
         }
 
-        public void HandleAdDismissed(object sender, EventArgs args)
+        private void HandleAdDismissed(object sender, EventArgs args)
         {
             // Called when an ad is dismissed.
 
@@ -70,7 +70,7 @@ namespace LineWars.Controllers
             RequestRewardedAd();
         }
 
-        public void HandleAdFailedToShow(object sender, AdFailureEventArgs args)
+        private void HandleAdFailedToShow(object sender, AdFailureEventArgs args)
         {
             // Called when rewarded ad failed to show.
 
@@ -81,27 +81,27 @@ namespace LineWars.Controllers
             RequestRewardedAd();
         }
 
-        public void HandleAdClicked(object sender, EventArgs args)
+        private void HandleAdClicked(object sender, EventArgs args)
         {
             // Called when a click is recorded for an ad.
         }
 
-        public void HandleAdShown(object sender, EventArgs args)
+        private void HandleAdShown(object sender, EventArgs args)
         {
             // Called when an ad is shown.
         }
 
-        public void HandleImpression(object sender, ImpressionData impressionData)
+        private void HandleImpression(object sender, ImpressionData impressionData)
         {
             // Called when an impression is recorded for an ad.
         }
 
-        public void HandleRewarded(object sender, Reward args)
+        private void HandleRewarded(object sender, Reward args)
         {
             Rewarded.Invoke(sender, args);
         }
 
-        public void DestroyRewardedAd()
+        private void DestroyRewardedAd()
         {
             if (rewardedAd != null)
             {

@@ -40,7 +40,7 @@ namespace LineWars.Controllers
             }
         }
 
-        public void HandleInterstitialLoaded(object sender, InterstitialAdLoadedEventArgs args)
+        private void HandleInterstitialLoaded(object sender, InterstitialAdLoadedEventArgs args)
         {
             // The ad was loaded successfully. Now you can handle it.
             interstitial = args.Interstitial;
@@ -53,13 +53,13 @@ namespace LineWars.Controllers
             interstitial.OnAdDismissed += HandleInterstitialDismissed;
         }
 
-        public void HandleInterstitialFailedToLoad(object sender, AdFailedToLoadEventArgs args)
+        private void HandleInterstitialFailedToLoad(object sender, AdFailedToLoadEventArgs args)
         {
             // Ad {args.AdUnitId} failed for to load with {args.Message}
             // Attempting to load a new ad from the OnAdFailedToLoad event is strongly discouraged.
         }
 
-        public void HandleInterstitialDismissed(object sender, EventArgs args)
+        private void HandleInterstitialDismissed(object sender, EventArgs args)
         {
             // Called when ad is dismissed.
 
@@ -70,7 +70,7 @@ namespace LineWars.Controllers
             RequestInterstitial();
         }
 
-        public void HandleInterstitialFailedToShow(object sender, EventArgs args)
+        private void HandleInterstitialFailedToShow(object sender, EventArgs args)
         {
             // Called when an InterstitialAd failed to show.
 
@@ -81,22 +81,22 @@ namespace LineWars.Controllers
             RequestInterstitial();
         }
 
-        public void HandleAdClicked(object sender, EventArgs args)
+        private void HandleAdClicked(object sender, EventArgs args)
         {
             // Called when a click is recorded for an ad.
         }
 
-        public void HandleInterstitialShown(object sender, EventArgs args)
+        private void HandleInterstitialShown(object sender, EventArgs args)
         {
             // Called when ad is shown.
         }
 
-        public void HandleImpression(object sender, ImpressionData impressionData)
+        private void HandleImpression(object sender, ImpressionData impressionData)
         {
             // Called when an impression is recorded for an ad.
         }
 
-        public void DestroyInterstitial()
+        private void DestroyInterstitial()
         {
             if (interstitial != null)
             {
