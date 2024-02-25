@@ -50,7 +50,7 @@ SpriteAtlas:
     - {fileID: 2800000, guid: e8e4cc98937ac0240bc2165e197d9c11, type: 3}
     - {fileID: 2800000, guid: be822c5ae0d9b2840906cec2376fb6b6, type: 3}
     - {fileID: 2800000, guid: e6f76d10219de554099c7b601fd47df2, type: 3}
-    - {fileID: 2800000, guid: d8272e1d60bcc0c47a022f44a996dada, type: 3}
+    - {fileID: 2800000, guid: 83eb6152626c06344b393123bac4ffce, type: 3}
     - {fileID: 2800000, guid: 3d93de9fdedf32940ae90f108f86d851, type: 3}
     - {fileID: 2800000, guid: e6f34cd42346d0248a58306f179870c1, type: 3}
     - {fileID: 2800000, guid: e426e434e4a5a9c4592f36807169efc9, type: 3}
@@ -66,12 +66,13 @@ SpriteAtlas:
     - {fileID: 2800000, guid: 34f57cea91f6346499f8bf736d619bb9, type: 3}
     - {fileID: 2800000, guid: 71c9bf541ef2de046b4ae467da8dbc66, type: 3}
     - {fileID: 2800000, guid: a015392df615fcd4e9f6df174803aefd, type: 3}
-    - {fileID: 2800000, guid: 83eb6152626c06344b393123bac4ffce, type: 3}
+    - {fileID: 2800000, guid: 8c23fc40accf7a44b98504a9834b5096, type: 3}
     bindAsDefault: 1
     isAtlasV2: 0
     cachedData: {fileID: 0}
     packedSpriteRenderDataKeys:
     - e6f76d10219de554099c7b601fd47df2: 21300000
+    - 8c23fc40accf7a44b98504a9834b5096: 21300000
     - 2337dc215ab024e46a748813b666a81e: 21300000
     - 3361fd5117e823d47be7de43a806bbae: 21300000
     - d51ebde1ccf1e7c4187abf0153047592: 21300000
@@ -100,7 +101,6 @@ SpriteAtlas:
     - 34f57cea91f6346499f8bf736d619bb9: 21300000
     - b3eaac4b1bb5e21489baad2230661d34: 21300000
     - dc33eadc0d819cd43b7b96eebb7dd38a: 21300000
-    - d8272e1d60bcc0c47a022f44a996dada: 21300000
     - a015392df615fcd4e9f6df174803aefd: 21300000
     - c634509d67fe316498f2915f64e360f8: 21300000
     - 732b311f0baafba4eae8665ec5748f39: 21300000
@@ -109,6 +109,7 @@ SpriteAtlas:
   m_MasterAtlas: {fileID: 0}
   m_PackedSprites:
   - {fileID: 21300000, guid: e6f76d10219de554099c7b601fd47df2, type: 3}
+  - {fileID: 21300000, guid: 8c23fc40accf7a44b98504a9834b5096, type: 3}
   - {fileID: 21300000, guid: 2337dc215ab024e46a748813b666a81e, type: 3}
   - {fileID: 21300000, guid: 3361fd5117e823d47be7de43a806bbae, type: 3}
   - {fileID: 21300000, guid: d51ebde1ccf1e7c4187abf0153047592, type: 3}
@@ -137,7 +138,6 @@ SpriteAtlas:
   - {fileID: 21300000, guid: 34f57cea91f6346499f8bf736d619bb9, type: 3}
   - {fileID: 21300000, guid: b3eaac4b1bb5e21489baad2230661d34, type: 3}
   - {fileID: 21300000, guid: dc33eadc0d819cd43b7b96eebb7dd38a, type: 3}
-  - {fileID: 21300000, guid: d8272e1d60bcc0c47a022f44a996dada, type: 3}
   - {fileID: 21300000, guid: a015392df615fcd4e9f6df174803aefd, type: 3}
   - {fileID: 21300000, guid: c634509d67fe316498f2915f64e360f8, type: 3}
   - {fileID: 21300000, guid: 732b311f0baafba4eae8665ec5748f39, type: 3}
@@ -145,10 +145,11 @@ SpriteAtlas:
   - {fileID: 21300000, guid: 0177a8dfdea51b84c9eb65630663f6a4, type: 3}
   m_PackedSpriteNamesToIndex:
   - CardsBorderAndBackground
+  - LineWarsLogoBig
   - ShortLine
   - MenuIcon
   - Arrow
-  - logonew
+  - LogoText
   - ButtonBlack
   - OpenMission
   - Border2
@@ -173,7 +174,6 @@ SpriteAtlas:
   - CircleBorder
   - Circle2
   - ScreBG
-  - LineWarsIcon
   - DefeatedMission
   - PanelBorderBackgroundAdvanced 50%
   - LongLine2
