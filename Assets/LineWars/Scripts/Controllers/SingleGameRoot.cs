@@ -1,4 +1,5 @@
-﻿using DataStructures;
+﻿using System;
+using DataStructures;
 using System.Collections;
 using System.Linq;
 using LineWars.Model;
@@ -32,6 +33,12 @@ namespace LineWars
         public Deck CurrentDeck { get; private set; }
         public IBlessingsPull LocalBlessingPull { get; private set; }
         public IBlessingsPull GlobalBlessingPull { get; private set; }
+
+        public bool GameStarted { get; private set; }
+        public event Action OnGameStart;
+        public event Action Won;
+        public event Action Lost;
+        
         public SceneName Scene => (SceneName)SceneManager.GetActiveScene().buildIndex;
         
         private void Start()
@@ -57,6 +64,8 @@ namespace LineWars
             {
                 yield return null;
                 PhaseManager.Instance.StartGame();
+                GameStarted = true;
+                OnGameStart?.Invoke();
             }
         }
 
@@ -104,38 +113,40 @@ namespace LineWars
                 .Select(x => x.Value)
                 .Where(x => x != Player.LocalPlayer));
             
-            GameReferee.Wined += WinGame;
-            GameReferee.Losed += LoseGame;
+            GameReferee.Won += WinGame;
+            GameReferee.Lost += LoseGame;
         }
 
         [EditorButton]
         public void WinGame()
         {
             WinAction.Execute();
+            Won?.Invoke();
             
-            if (GameRoot.Instance != null && GameRoot.Instance.SdkAdapter != null)
-            {
-                if (CurrentDeck != null)
-                {
-                    foreach (var card in CurrentDeck.Cards)
-                        GameRoot.Instance.SdkAdapter.SendCardMetrica(card, Scene, true);
-                }
-            }
+            // if (GameRoot.Instance != null && GameRoot.Instance.SdkAdapter != null)
+            // {
+            //     if (CurrentDeck != null)
+            //     {
+            //         foreach (var card in CurrentDeck.Cards)
+            //             GameRoot.Instance.SdkAdapter.SendCardMetrica(card, Scene, true);
+            //     }
+            // }
         }
         
         [EditorButton]
         public void LoseGame()
         {
             LoseAction.Execute();
+            Lost?.Invoke();
             
-            if (GameRoot.Instance != null && GameRoot.Instance.SdkAdapter != null)
-            {
-                if (CurrentDeck != null)
-                {
-                    foreach (var card in CurrentDeck.Cards)
-                        GameRoot.Instance.SdkAdapter.SendCardMetrica(card, Scene, false);
-                }
-            }
+            // if (GameRoot.Instance != null && GameRoot.Instance.SdkAdapter != null)
+            // {
+            //     if (CurrentDeck != null)
+            //     {
+            //         foreach (var card in CurrentDeck.Cards)
+            //             GameRoot.Instance.SdkAdapter.SendCardMetrica(card, Scene, false);
+            //     }
+            // }
         }
 
         public void PauseGame()

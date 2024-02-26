@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using LineWars.Infrastructure;
 using LineWars.Model;
 using UnityEngine;
 using UnityEngine.Events;
@@ -103,21 +105,41 @@ namespace LineWars.Controllers
 
         public abstract void SendMetrica(string eventName);
         public abstract void SendMetrica(string eventName, IDictionary<string, string> eventParams);
-
-        public void SendCardMetrica(DeckCard deckCard, SceneName sceneName, bool isWin)
+        
+        protected bool CheckEnableSdk()
         {
-            var eventParams = new Dictionary<string, string>()
+            if (!SDKEnabled)
+                DebugUtility.LogError("SDK is not enabled!");
+            return SDKEnabled;
+        }
+        
+        public void SendDeckMetrica(Deck deck)
+        {
+            if (deck == null)
+                return;
+            
+            foreach (var card in deck.Cards)
+                SendDeckCardMetrica(card);
+        }
+
+        public void SendDeckCardMetrica(DeckCard deckCard)
+        {
+            if (deckCard == null)
+                return;
+            
+            var eventParams = new Dictionary<string, string>
             {
-                {"cardName", deckCard?.Name},
-                {"level", sceneName.ToString()},
-                {"isWin", isWin.ToString()},
+                {"cardType", deckCard.Unit.Type.ToString()}
             };
             SendMetrica("card", eventParams);
         }
 
         public void SendButtonMetrica(string buttonId)
         {
-            var eventParams = new Dictionary<string, string>()
+            if (buttonId == null)
+                return;
+            
+            var eventParams = new Dictionary<string, string>
             {
                 {"buttonId", buttonId},
             };
@@ -125,11 +147,76 @@ namespace LineWars.Controllers
             SendMetrica("button", eventParams);
         }
 
-        protected bool CheckEnableSdk()
+        public void SendStartLevelMetrica(SceneName scene)
         {
-            if (!SDKEnabled)
-                DebugUtility.LogError("SDK is not enabled!");
-            return SDKEnabled;
+            var eventParams = new Dictionary<string, string>
+            {
+                {"startLevel", scene.ToString()},
+            };
+            
+            SendMetrica("missionStart", eventParams);
+        }
+
+        public void SendFinishLevelMetrica(SceneName scene, LevelFinishStatus finishStatus)
+        {
+            var eventParams = new Dictionary<string, string>
+            {
+                {"endLevel", $"{scene}-{finishStatus}"},
+            };
+            SendMetrica("missionEnd", eventParams);
+        }
+
+        public void SendFirst60SecondsInGameMetrica()
+        {
+            SendMetrica("first60sec");
+        }
+
+        public void SendFirstEducationMetrica()
+        {
+            SendMetrica("firstEducation");
+        }
+
+        public void SendFirstCompanyMetrica()
+        {
+            SendMetrica("firstCompany");
+        }
+
+        public void SendFirstPurchaseMetrica()
+        {
+            SendMetrica("firstPurchase");
+        }
+
+        public void SendFirstButtonMetrica(string buttonId)
+        {
+            var eventParams = new Dictionary<string, string>
+            {
+                {"firstButtonId", buttonId},
+            };
+            SendMetrica("firstButton", eventParams);
+        }
+
+        public void SendBlessingMetrica(BlessingId blessingId)
+        {
+            if (blessingId == BlessingId.Null)
+                return;
+            
+            var eventParams = new Dictionary<string, string>
+            {
+                {"blessing", blessingId.ToString()},
+            };
+            SendMetrica("blessing", eventParams);
+        }
+
+        public void SendBlessingsMetrica(IBlessingsPull blessingsPull)
+        {
+            if (blessingsPull == null)
+                return;
+            
+            foreach (var (blessingId, count) in blessingsPull)
+            {
+                if (count != 0)
+                    SendBlessingMetrica(blessingId);
+            }
         }
     }
 }

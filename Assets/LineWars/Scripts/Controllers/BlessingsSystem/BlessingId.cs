@@ -47,5 +47,10 @@ namespace LineWars.Model
         {
             return HashCode.Combine((int) blessingType, (int) rarity);
         }
+
+        public override string ToString()
+        {
+            return $"{BlessingType} {Rarity}";
+        }
     }
 }
