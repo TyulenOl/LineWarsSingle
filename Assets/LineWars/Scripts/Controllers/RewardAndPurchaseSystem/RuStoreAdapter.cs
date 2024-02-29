@@ -219,11 +219,9 @@ namespace LineWars.Controllers
         }
 
         protected override void RewardForAd(PrizeType prizeType, int amount)
-        {
-            if (!CheckEnableSdk())
-                return;
-
+        { 
             rewardAd.Rewarded += OnRewarded;
+            rewardAd.ShowRewardedAd();
 
             void OnRewarded(object _, Reward _1)
             {
