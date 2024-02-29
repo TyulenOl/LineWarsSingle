@@ -9,6 +9,7 @@ namespace LineWars
         public static string GenerateKeyForPlayerPrefs<T>(int id)
         {
             return $"{nameof(T)}_{id}";
+            
         }
     }
 }

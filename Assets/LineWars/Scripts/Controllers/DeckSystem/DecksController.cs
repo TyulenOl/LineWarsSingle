@@ -48,10 +48,15 @@ namespace LineWars.Model
         /// <summary>
         /// Сохранение деки и внос ее в базу данных
         /// </summary>
-        public void ProcessDeck(Deck deck)
+        public void ProcessDeck([NotNull] Deck deck)
         {
+            if (deck == null) throw new ArgumentNullException(nameof(deck));
+
+            var isEquals = allDecks.ContainsKey(deck.Id) && deck.Equals(allDecks[deck.Id]);
             allDecks[deck.Id] = deck;
-            SaveDeck(deck);
+            
+            if (!isEquals)
+                SaveDeck(deck);
         }
 
         private Deck AssignDeck(Deck deck)

@@ -8,6 +8,6 @@ namespace LineWars.Model
     {
         public int Id { get; }
         public string Name { get; }
-        public IReadOnlyList<TDeckCard> Cards { get; }
+        public IReadOnlyCollection<TDeckCard> Cards { get; }
     }
 }
