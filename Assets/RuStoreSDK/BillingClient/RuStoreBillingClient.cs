@@ -171,7 +171,7 @@ namespace RuStore.BillingClient {
             if (!IsPlatformSupported((error) => { })) {
                 return BillingClientTheme.Light;
             }
-
+            
             return (BillingClientTheme)_clientWrapper.Call<int>("getThemeCode");
         }
 

@@ -6,7 +6,7 @@ namespace RuStore.BillingClient {
 
         public string consoleApplicationId;
         public string deeplinkScheme;
-        public bool allowNativeErrorHandling;
-        public bool enableLogs;
+        public bool allowNativeErrorHandling = true;
+        public bool enableLogs = true;
     }
 }
