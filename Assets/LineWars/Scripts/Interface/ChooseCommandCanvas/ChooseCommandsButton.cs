@@ -29,7 +29,8 @@ namespace LineWars
             hash = commandPreset;
             var sprite = DrawHelper.GetIconByCommandType(hash.Action.CommandType);
             commandImage.sprite = sprite;
-            costOfAction.text = commandPreset.Action.GetActionPointsCost().ToString();
+            if(costOfAction != null)
+                costOfAction.text = commandPreset.Action.GetActionPointsCost().ToString();
         }
 
         private void OnButtonClick()

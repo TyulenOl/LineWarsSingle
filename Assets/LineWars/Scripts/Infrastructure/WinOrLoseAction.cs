@@ -8,9 +8,9 @@ namespace LineWars.Infrastructure
     [CreateAssetMenu]
     public class WinOrLoseAction : ScriptableAction
     {
-        [SerializeField] private int minGold = 50;
-        [SerializeField] private int maxGold = 125;
-        [SerializeField] private int minDiamonds = 0;
+        [SerializeField] private int minGold = 100;
+        [SerializeField] private int maxGold = 250;
+        [SerializeField] private int minDiamonds = 1;
         [SerializeField] private int maxDiamonds = 10;
 
         [Header("Settings")]
