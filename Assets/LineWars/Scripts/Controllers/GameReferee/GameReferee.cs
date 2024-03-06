@@ -11,8 +11,8 @@ namespace LineWars
     {
         protected Player Player;
         protected List<BasePlayer> Enemies;
-        public event Action Wined;
-        public event Action Losed;
+        public event Action Won;
+        public event Action Lost;
 
         protected virtual bool noBaseWinCondition => true;
         
@@ -72,12 +72,12 @@ namespace LineWars
 
         protected void Win()
         {
-            Wined?.Invoke();
+            Won?.Invoke();
         }
 
         protected void Lose()
         {
-            Losed?.Invoke();
+            Lost?.Invoke();
         }
     }
 }

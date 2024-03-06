@@ -13,6 +13,8 @@ namespace LineWars.Controllers
         private UserInfoController userInfoController;
         private IReadOnlyUserInfo userInfo;
         private IConverter<DropInfo, ContextedDropInfo> dropConverter;
+
+        public event Action<LootBoxType> OnBoxOpen;
         public IEnumerable<LootBoxInfo> lootBoxes => typeToInfos.Values;
 
         public void Initialize(
@@ -50,6 +52,7 @@ namespace LineWars.Controllers
             userInfoController.SetBoxes(boxType, currentBoxes - 1);
             var result = dropConverter.Convert(dropInfo);
             SaveDrop(result);
+            OnBoxOpen?.Invoke(boxType);
             return result;
         }
         //Получатель: Артём
@@ -111,11 +114,8 @@ namespace LineWars.Controllers
                     userInfoController.UserDiamond -= box.Cost * amount;
                     break;
             }
-
-            
         }
 
         public void Buy(LootBoxType boxType) => Buy(boxType, 1);
-
     }
 }

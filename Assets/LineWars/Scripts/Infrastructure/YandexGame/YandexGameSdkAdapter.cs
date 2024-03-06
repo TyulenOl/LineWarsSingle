@@ -252,7 +252,9 @@ namespace LineWars.Controllers
             YandexMetrica.Send(eventName);
         }
 
-        public override void SendMetrica(string eventName, IDictionary<string, string> eventParams)
+        public override void SendMetrica(
+            string eventName,
+            IDictionary<string, string> eventParams)
         {
             YandexMetrica.Send(eventName, eventParams);
         }
