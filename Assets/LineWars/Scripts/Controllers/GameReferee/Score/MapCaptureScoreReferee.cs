@@ -23,8 +23,14 @@ namespace LineWars
                         SetScoreForPlayer(after, GetScoreForPlayer(after) + nodeScore);
                 };
             }
-        }
-        
+
+            foreach (var node in MonoGraph.Instance.Nodes)
+            {
+                var nodeScore = node.GetComponent<NodeScore>().Score;
+                if (node.Owner != null)
+                    SetScoreForPlayer(node.Owner, GetScoreForPlayer(node.Owner) + nodeScore);
+            }
+        } 
         
         private void AssignNodes()
         {
@@ -33,7 +39,7 @@ namespace LineWars
                 if (!node.TryGetComponent<NodeScore>(out var nodeScore))
                 {
                     Debug.LogWarning($"Not component {nameof(NodeScore)} on {node.name}");
-                    node.gameObject.AddComponent<NodeScore>();
+                    node.gameObject.AddComponent<NodeScore>().Score = 1;
                 }
             }
         }

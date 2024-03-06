@@ -35,7 +35,6 @@ namespace LineWars.Controllers
             ruStoreBillingClient = RuStoreBillingClient.Instance;
             ruStoreBillingClient.Init();
             CheckPurchasesAvailability();
-            InitPurchases();
             timeSinceLastAd = adFreePause;
             GameRoot.Instance.StartGame();
             SceneManager.sceneLoaded += OnSceneChanged;
@@ -62,11 +61,19 @@ namespace LineWars.Controllers
             void OnSuccess(FeatureAvailabilityResult featureAvailabilityResult)
             {
                 isPurchasesAvailable = featureAvailabilityResult.isAvailable;
+                Debug.Log(featureAvailabilityResult.cause);
+                Debug.Log(featureAvailabilityResult.isAvailable);
+                Debug.Log(featureAvailabilityResult.cause.name);
+                Debug.Log(featureAvailabilityResult.cause.description);
+                InitPurchases();
             }
 
             void OnError(RuStoreError error)
             {
                 isPurchasesAvailable = false;
+                Debug.Log(error);
+                Debug.Log(error.name);
+                Debug.Log(error.description);
             }
         }
 
