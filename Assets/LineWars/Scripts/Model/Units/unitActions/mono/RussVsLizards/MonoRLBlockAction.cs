@@ -12,14 +12,6 @@ namespace LineWars.Model
         [SerializeField] protected SFXList sfxList;
 
         private IDJ DJ;
-        
-        private void OnDestroy()
-        {
-            CanBlockChanged = null;
-        }
-
-        public bool IsBlocked => Action.IsBlocked;
-        public event Action<bool, bool> CanBlockChanged;
 
         public bool CanBlock() => Action.CanBlock();
 
@@ -30,7 +22,6 @@ namespace LineWars.Model
 
         public void EnableBlock()
         {
-            //TODO: анимации и звуки
             Action.EnableBlock();
             if(sfxList != null)
                 Executor.PlaySfx(DJ.GetSound(sfxList));
@@ -38,9 +29,7 @@ namespace LineWars.Model
 
         protected override RLBlockAction<Node, Edge, Unit> GetAction()
         {
-            var action = new RLBlockAction<Node, Edge, Unit>(Executor);
-            action.CanBlockChanged += (before, after) => CanBlockChanged?.Invoke(before, after);
-            return action;
+            return new RLBlockAction<Node, Edge, Unit>(Executor);
         }
         
         public override void Accept(IMonoUnitActionVisitor visitor) => visitor.Visit(this);

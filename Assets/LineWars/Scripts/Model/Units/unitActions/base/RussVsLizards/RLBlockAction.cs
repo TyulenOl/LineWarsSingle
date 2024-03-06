@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace LineWars.Model
+﻿namespace LineWars.Model
 {
     public class RLBlockAction<TNode, TEdge, TUnit> :
         UnitAction<TNode, TEdge, TUnit>,
@@ -10,46 +8,22 @@ namespace LineWars.Model
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
 
     {
-        private bool isBlocked;
-
-        public bool IsBlocked
-        {
-            get => isBlocked;
-            private set
-            {
-                var previous = isBlocked;
-                if (isBlocked == previous)
-                    return;
-
-                isBlocked = value;
-                CanBlockChanged?.Invoke(previous, isBlocked);
-            }
-        }
-
-        public event Action<bool, bool> CanBlockChanged;
-
         public override CommandType CommandType => CommandType.Block;
 
         public RLBlockAction(TUnit executor) : base(executor)
         {
         }
 
-        public bool CanBlock() => ActionPointsCondition();
+        public bool CanBlock()
+        {
+            return ActionPointsCondition()
+                   && Executor.CurrentArmor < Executor.CurrentPower; // проверка на дурака
+        }
 
         public void EnableBlock()
         {
-            Executor.CurrentArmor += Executor.CurrentActionPoints - GetActionPointsAfterModify();
+            Executor.CurrentArmor = Executor.CurrentPower;
             CompleteAndAutoModify();
-        }
-
-        public override void OnReplenish()
-        {
-            base.OnReplenish();
-            if (isBlocked)
-            {
-                isBlocked = false;
-                Executor.CurrentArmor = 0;
-            }
         }
 
         public override void Accept(IBaseUnitActionVisitor<TNode, TEdge, TUnit> visitor)

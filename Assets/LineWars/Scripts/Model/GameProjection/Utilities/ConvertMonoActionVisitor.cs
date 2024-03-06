@@ -188,7 +188,7 @@ namespace LineWars.Model
         public void Visit(MonoHealSacrificeAction action)
         {
             Result = new HealSacrificeAction<NodeProjection, EdgeProjection, UnitProjection>
-                (Unit);
+                (Unit, action.UnitToPowerBuff);
             Result.ActionModifier = action.Action.ActionModifier;
         }
 

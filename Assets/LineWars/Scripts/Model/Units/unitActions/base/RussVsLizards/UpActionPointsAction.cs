@@ -16,10 +16,10 @@
         public bool IsAvailable(TUnit target)
         {
             return target != null &&
-                ActionPointsCondition() &&
-                target.CurrentPower != 0 &&
-                target.OwnerId == Executor.OwnerId &&
-                Executor.Node.GetLine(target.Node) != null;
+                   target.OwnerId == Executor.OwnerId &&
+                   ActionPointsCondition() &&
+                   Executor.CurrentPower != 0 &&
+                   Executor.Node.GetLine(target.Node) != null;
         }
 
         public void Execute(TUnit target)
@@ -30,10 +30,10 @@
 
         public IActionCommand GenerateCommand(TUnit target)
         {
-            return new TargetedUniversalCommand
-                <TUnit,
-                UpActionPointsAction<TNode, TEdge, TUnit>,
-                TUnit>(Executor, target);
+            return new TargetedUniversalCommand<TUnit, UpActionPointsAction<TNode, TEdge, TUnit>, TUnit>(
+                Executor,
+                target
+            );
         }
 
         public override void Accept(IBaseUnitActionVisitor<TNode, TEdge, TUnit> visitor)
