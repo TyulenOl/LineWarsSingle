@@ -161,7 +161,29 @@ namespace LineWars.Controllers
         {
             var eventParams = new Dictionary<string, string>
             {
-                {"endLevel", $"{scene}-{finishStatus}"},
+                {"endLevel", $"{scene} {finishStatus}"},
+            };
+            SendMetrica("missionEnd", eventParams);
+        }
+        
+        public void SendStartEndlessLevelMetrica(SceneName scene, InfinityGameMode infinityGameMode)
+        {
+            var eventParams = new Dictionary<string, string>
+            {
+                {"startLevel", $"{scene} {infinityGameMode}"},
+            };
+            
+            SendMetrica("missionStart", eventParams);
+        }
+        
+        public void SendFinishEndlessLevelMetrica(
+            SceneName scene, 
+            InfinityGameMode infinityGameMode,
+            LevelFinishStatus finishStatus)
+        {
+            var eventParams = new Dictionary<string, string>
+            {
+                {"endLevel", $"{scene} {infinityGameMode} {finishStatus}"},
             };
             SendMetrica("missionEnd", eventParams);
         }
@@ -217,6 +239,42 @@ namespace LineWars.Controllers
                 if (count != 0)
                     SendBlessingMetrica(blessingId);
             }
+        }
+
+        public void SendBuyBlessingMetrica(BaseBlessing baseBlessing)
+        {
+            if (baseBlessing == null || baseBlessing.BlessingId == BlessingId.Null)
+                return;
+            
+            var eventParams = new Dictionary<string, string>
+            {
+                {"buyBlessing", baseBlessing.BlessingId.ToString()},
+            };
+            
+            SendMetrica("store", eventParams);
+        }
+        
+        public void SendBuyCardMetrica(DeckCard deckCard)
+        {
+            if (deckCard == null)
+                return;
+
+            var eventParams = new Dictionary<string, string>
+            {
+                {"buyCard", deckCard.Unit.Type.ToString()}
+            };
+            
+            SendMetrica("store", eventParams);
+        }
+
+        public void SendOpenCaseMetrica(LootBoxType lootBoxType)
+        {
+            var eventParams = new Dictionary<string, string>
+            {
+                {"openCase", lootBoxType.ToString()}
+            };
+            
+            SendMetrica("store", eventParams);
         }
     }
 }

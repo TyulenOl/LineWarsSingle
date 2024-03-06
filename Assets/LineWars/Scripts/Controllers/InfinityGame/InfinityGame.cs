@@ -32,6 +32,8 @@ namespace LineWars.Controllers
         [SerializeField] private InfinityGameMode gameMode;
         [SerializeField] private bool log = true;
 
+        public InfinityGameMode? CurrentMode { get; private set; }
+
         private MonoGraph monoGraph;
 
         protected override void Awake()
@@ -40,22 +42,34 @@ namespace LineWars.Controllers
             Initialize();
         }
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            CurrentMode = null;
+        }
+
         public void Initialize()
         {
             if (loadingType == null)
             {
                 InitializeBySettings(gameModeSettingsCreator[gameMode].InfinityGameSettings);
+                CurrentMode = gameMode;
                 return;
             }
             
             switch (loadingType)
             {
                 case LoadingType.ByMode:
+                {
                     InitializeBySettings(gameModeSettingsCreator[modeToLoad.Value].InfinityGameSettings);
+                    CurrentMode = modeToLoad;
                     break;
+                }
                 case LoadingType.BySettings:
+                {
                     InitializeBySettings(settingsToLoad);
                     break;
+                }
                 default:
                     throw new ArgumentOutOfRangeException();
             }

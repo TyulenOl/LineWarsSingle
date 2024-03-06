@@ -27,6 +27,7 @@ namespace LineWars.Controllers
         private IStorage<BlessingId, BaseBlessing> blessingStorage;
 
         private UserInfo currentInfo;
+        private bool startSave;
         
         private HashSet<DeckCard> openedCardsSet;
         public IEnumerable<DeckCard> OpenedCards => openedCardsSet;
@@ -499,11 +500,13 @@ namespace LineWars.Controllers
 
         private void SaveCurrentUserInfo()
         {
-            StartCoroutine(SaveCurrentUserInfoCoroutine());
+            if (!startSave)
+                StartCoroutine(SaveCurrentUserInfoCoroutine());
         }
         
         private IEnumerator SaveCurrentUserInfoCoroutine()
         {
+            startSave = true;
             yield return null;
 #if UNITY_EDITOR
             if (!debugMode)
@@ -511,6 +514,7 @@ namespace LineWars.Controllers
 #else      
             userInfoProvider.Save(currentInfo, 0);
 #endif
+            startSave = false;
         }
     }
 }

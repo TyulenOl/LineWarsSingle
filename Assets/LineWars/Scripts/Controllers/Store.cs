@@ -28,6 +28,9 @@ namespace LineWars.Controllers
         private Dictionary<BlessingId, Money> blessingToCostInMoneys;
         private BlessingId[] blessingsForPurchase;
 
+        public event Action<BaseBlessing> OnBuyBlessing;
+        public event Action<DeckCard> OnBuyCard;  
+
         public bool StoreInitialized => isStoreInitialized;
         public IReadOnlyList<int> CardsForPurchase => cardsForPurchase;
         public IReadOnlyList<BlessingId> BlessingsForPurchase => blessingsForPurchase;
@@ -136,6 +139,7 @@ namespace LineWars.Controllers
                     throw new ArgumentOutOfRangeException();
             }
             userInfoController.GlobalBlessingsPull[blessingId]++;
+            OnBuyBlessing?.Invoke(blessingStorage.IdToValue[blessingId]);
         }
         
         public bool CanBuy(int cardId)
@@ -151,7 +155,6 @@ namespace LineWars.Controllers
             };
 
             return canAfford && haveInStore && !cardOpen;
-
         }
 
         public bool CanBuy(DeckCard card)
@@ -177,6 +180,7 @@ namespace LineWars.Controllers
             }
 
             userInfoController.UnlockCard(cardId);
+            OnBuyCard?.Invoke(card);
         }
 
         public void Buy(DeckCard card)

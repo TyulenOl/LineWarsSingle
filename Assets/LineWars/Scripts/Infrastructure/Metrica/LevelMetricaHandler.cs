@@ -2,7 +2,7 @@
 
 namespace LineWars.Infrastructure
 {
-    public class MetricaLevelHandler: LevelEventsHandler
+    public class LevelMetricaHandler: LevelEventsHandler
     {
         private static SDKAdapterBase SDKAdapter => GameRoot.Instance?.SdkAdapter;
         

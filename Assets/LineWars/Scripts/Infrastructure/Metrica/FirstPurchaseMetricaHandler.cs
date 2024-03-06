@@ -4,7 +4,7 @@ using UnityEngine;
 namespace LineWars.Infrastructure
 {
     [DefaultExecutionOrder(121)]
-    public class FirstPurchaseHandler: MonoBehaviour
+    public class FirstPurchaseMetricaHandler: MonoBehaviour
     {
         private const string Id = "firstPurchase";
         public UserInfoController UserInfoController => GameRoot.Instance?.UserController;
