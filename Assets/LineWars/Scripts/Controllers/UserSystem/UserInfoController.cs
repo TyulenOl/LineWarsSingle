@@ -9,7 +9,11 @@ using AYellowpaper.SerializedCollections;
 
 namespace LineWars.Controllers
 {
-    public class UserInfoController: MonoBehaviour, IBlessingsPull, IBlessingSelector, ITimeIndexer
+    public class UserInfoController: MonoBehaviour,
+        IBlessingsPull, 
+        IBlessingSelector, 
+        ITimeIndexer,
+        IBooleanIndexer
     {
         [SerializeField] private UserInfoPreset defaultUserInfoPreset;
 
@@ -23,6 +27,7 @@ namespace LineWars.Controllers
         private IStorage<BlessingId, BaseBlessing> blessingStorage;
 
         private UserInfo currentInfo;
+        private bool startSave;
         
         private HashSet<DeckCard> openedCardsSet;
         public IEnumerable<DeckCard> OpenedCards => openedCardsSet;
@@ -39,7 +44,8 @@ namespace LineWars.Controllers
 
         public IReadOnlyUserInfo UserInfo => currentInfo;
         public IBlessingsPull GlobalBlessingsPull => this;
-        public ITimeIndexer KeyToDateTime => this; 
+        public ITimeIndexer KeyToDateTime => this;
+        public IBooleanIndexer KeyToBool => this;
             
         public void Initialize(
             IProvider<UserInfo> provider, 
@@ -95,6 +101,7 @@ namespace LineWars.Controllers
             userInfo.UnlockedCards ??= new List<int>();
             userInfo.UsedPromoCodes ??= new List<string>();
             userInfo.KeyToDateTime ??= new SerializedDictionary<string, string>();
+            userInfo.KeyToBool ??= new SerializedDictionary<string, bool>();
             
             foreach (LootBoxType boxType in Enum.GetValues(typeof(LootBoxType)))
                 userInfo.LootBoxes.TryAdd(boxType, 0);
@@ -438,6 +445,24 @@ namespace LineWars.Controllers
         }
 
         #endregion
+
+        #region IBooleadIndexerImplimintation
+
+        bool IBooleanIndexer.this[string key]
+        {
+            get => currentInfo.KeyToBool.ContainsKey(key) ? currentInfo.KeyToBool[key] : false;
+            set
+            {
+                var isUpdated = !currentInfo.KeyToBool.ContainsKey(key)
+                                || currentInfo.KeyToBool[key] != value;
+
+                currentInfo.KeyToBool[key] = value;
+                if (isUpdated)
+                    SaveCurrentUserInfo();
+            }
+        }
+
+        #endregion
         
         public int GetBoxes(LootBoxType boxType)
         {
@@ -475,11 +500,13 @@ namespace LineWars.Controllers
 
         private void SaveCurrentUserInfo()
         {
-            StartCoroutine(SaveCurrentUserInfoCoroutine());
+            if (!startSave)
+                StartCoroutine(SaveCurrentUserInfoCoroutine());
         }
         
         private IEnumerator SaveCurrentUserInfoCoroutine()
         {
+            startSave = true;
             yield return null;
 #if UNITY_EDITOR
             if (!debugMode)
@@ -487,6 +514,7 @@ namespace LineWars.Controllers
 #else      
             userInfoProvider.Save(currentInfo, 0);
 #endif
+            startSave = false;
         }
     }
 }

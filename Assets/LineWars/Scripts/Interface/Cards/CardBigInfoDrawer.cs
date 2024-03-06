@@ -13,13 +13,6 @@ namespace LineWars
     {
         [SerializeField] private TMP_Text unitName;
         [SerializeField] private TMP_Text description;
-        
-        [SerializeField] private TMP_Text hpText;
-        [SerializeField] private TMP_Text armorText;
-        [SerializeField] private TMP_Text attackText;
-        [SerializeField] private TMP_Text apText;
-
-        [SerializeField] private TMP_Text costInfo;
 
         [SerializeField] private Image cardImage;
 
@@ -59,25 +52,8 @@ namespace LineWars
             
             if (description != null)
                 description.text = deckCard.Description;
-
-            if(hpText != null)
-                hpText.text = deckCard.Unit.MaxHp.ToString();
-            if (attackText != null)
-                attackText.text = deckCard.Unit.InitialPower.ToString();
-            if(apText != null)
-                apText.text = deckCard.Unit.MaxActionPoints.ToString();
             
             actionsPanelDrawer.ReDrawActions(deckCard);
-
-            if (costInfo)
-            {
-                var info = deckCard.CostProgression.GetFirstIncrement(deckCard.Cost);
-                
-                if (info.CanBuy)
-                    costInfo.text = $"{deckCard.Cost}(+{info.Cost})";
-                else
-                    costInfo.text = $"{deckCard.Cost}";
-            }
         }
     }
 }

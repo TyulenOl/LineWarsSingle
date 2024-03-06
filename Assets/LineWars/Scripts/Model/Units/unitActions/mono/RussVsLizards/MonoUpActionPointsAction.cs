@@ -1,13 +1,15 @@
-﻿using UnityEngine;
+﻿using LineWars.Controllers;
+using UnityEngine;
 
 namespace LineWars.Model
 {
+    [Tooltip("Восполняет очки действия союзному юниту на свою силу духа")]
     public class MonoUpActionPointsAction :
         MonoUnitAction<UpActionPointsAction<Node, Edge, Unit>>,
-        ITargetedAction<Unit>,
         IUpActionPointsAction<Node, Edge, Unit>
     {
         [SerializeField] private UnitAnimation unitAnimation;
+        [SerializeField] private SFXData sfx;
 
         protected override bool NeedAutoComplete => false;
         protected override UpActionPointsAction<Node, Edge, Unit> GetAction()
@@ -30,6 +32,14 @@ namespace LineWars.Model
 
         private void ExecuteInstant(Unit target) 
         {
+            if (sfx != null)
+            {
+                SfxManager.Instance.Play(sfx);
+            }
+            else
+            {
+                Debug.LogWarning($"Sfx is null on {gameObject.name}");
+            }
             Action.Execute(target);
             Complete();
         }

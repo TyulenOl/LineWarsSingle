@@ -19,7 +19,9 @@ namespace LineWars.Model
         public SerializedDictionary<LootBoxType, int> LootBoxes;
         public SerializedDictionary<int, int> CardLevels;
         public SerializedDictionary<BlessingId, int> Blessings;
+        
         public SerializedDictionary<string, string> KeyToDateTime;
+        public SerializedDictionary<string, bool> KeyToBool;
         
         public List<int> UnlockedCards;
         public List<BlessingId> SelectedBlessings;

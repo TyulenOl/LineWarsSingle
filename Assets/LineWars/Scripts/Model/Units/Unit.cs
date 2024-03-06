@@ -33,6 +33,8 @@ namespace LineWars.Model
         [Header("Sounds")] 
         [SerializeField] private SFXList HpHealedSounds;
         [SerializeField] private SFXList HpDamagedSounds;
+        public bool EnableHealSfx = true;
+        public bool EnableDamageSfx = true;
         private IDJ dj;
         
         [Header("Actions Settings")] 
@@ -138,7 +140,17 @@ namespace LineWars.Model
                 if (before == currentHp) return;
                 HpChanged.Invoke(before, currentHp);
                 UnitHPChanged?.Invoke(this, before, currentHp);
-                SfxManager.Instance.Play(before < currentHp ? dj.GetSound(HpHealedSounds) : dj.GetSound(HpDamagedSounds));
+
+                if (before < currentHp)
+                {
+                    if (EnableHealSfx) 
+                        SfxManager.Instance.Play(dj.GetSound(HpHealedSounds));
+                }
+                else
+                {
+                    if (EnableDamageSfx) 
+                        SfxManager.Instance.Play(dj.GetSound(HpDamagedSounds));
+                }
 
                 if (currentHp == 0)
                 {
@@ -311,7 +323,7 @@ namespace LineWars.Model
         protected override void OnReplenish()
         {
             CurrentActionPoints = maxActionPoints;
-            CurrentArmor = 0;
+            CurrentArmor -= 2;
             
             foreach (var unitAction in MonoActions)
                 unitAction.OnReplenish();

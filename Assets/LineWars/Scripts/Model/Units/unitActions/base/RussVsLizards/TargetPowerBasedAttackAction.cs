@@ -17,7 +17,7 @@ namespace LineWars.Model
         {
             return target != null &&
                 ActionPointsCondition() &&
-                target.CurrentPower != 0 &&
+                //target.CurrentPower != 0 &&
                 target.OwnerId != Executor.OwnerId &&
                 Executor.Node.GetLine(target.Node) != null;
         }

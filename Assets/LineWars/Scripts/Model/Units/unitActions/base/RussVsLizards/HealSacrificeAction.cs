@@ -1,4 +1,6 @@
-﻿namespace LineWars.Model
+﻿using System.Collections.Generic;
+
+namespace LineWars.Model
 {
     public class HealSacrificeAction<TNode, TEdge, TUnit> :
         UnitAction<TNode, TEdge, TUnit>,
@@ -8,15 +10,16 @@
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
         public override CommandType CommandType => CommandType.HealSacrifice;
+        public readonly IReadOnlyDictionary<UnitType, int> unitsToBuffAttack;
 
-        public HealSacrificeAction(TUnit executor) : base(executor)
+        public HealSacrificeAction(TUnit executor, IReadOnlyDictionary<UnitType, int> unitsToBuffAttack) : base(executor)
         {
+            this.unitsToBuffAttack = unitsToBuffAttack;
         }
 
         public bool IsAvailable(TUnit target)
         {
             return ActionPointsCondition() && 
-                Executor.CurrentPower > 0 &&
                 target.OwnerId == Executor.OwnerId;
          }
 
@@ -24,16 +27,15 @@
         {
             foreach(var node in Executor.Node.GetNeighbors())
             {
-                if (node.AllIsFree) continue;
-
-                if (!node.LeftIsFree &&
-                    node.LeftUnit.OwnerId == Executor.OwnerId &&
-                    node.LeftUnit.Size == UnitSize.Little)
-                    node.LeftUnit.CurrentHp += Executor.CurrentPower;
-
-                if(!node.RightIsFree && 
-                    node.RightUnit.OwnerId == Executor.OwnerId)
-                    node.RightUnit.CurrentHp += Executor.CurrentPower;
+                foreach (var unit in node.Units)
+                {
+                    if (unit.OwnerId == Executor.OwnerId)
+                    {
+                        if (unitsToBuffAttack != null && unitsToBuffAttack.TryGetValue(unit.Type, out var buff))
+                            unit.AddEffect(new PowerBuffEffect<TNode, TEdge, TUnit>(unit, buff));
+                        unit.CurrentHp += Executor.CurrentHp;
+                    }
+                }
             }
             Executor.CurrentHp = 0;
             CompleteAndAutoModify();

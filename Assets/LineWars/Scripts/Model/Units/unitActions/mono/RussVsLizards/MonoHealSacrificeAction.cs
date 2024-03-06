@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using AYellowpaper.SerializedCollections;
+using LineWars.Controllers;
+using UnityEngine;
 
 namespace LineWars.Model
 {
@@ -7,11 +10,15 @@ namespace LineWars.Model
         IHealSacrificeAction<Node, Edge, Unit>
     {
         [SerializeField] private UnitAnimation unitAnimation;
+        [SerializeField] private SFXData sfx;
+        [SerializeField] private SerializedDictionary<UnitType, int> unitToPowerBuff;
 
         protected override bool NeedAutoComplete => false;
+        public IReadOnlyDictionary<UnitType, int> UnitToPowerBuff => unitToPowerBuff;
+
         protected override HealSacrificeAction<Node, Edge, Unit> GetAction()
         {
-            return new HealSacrificeAction<Node, Edge, Unit>(Executor);
+            return new HealSacrificeAction<Node, Edge, Unit>(Executor, unitToPowerBuff);
         }
         public bool IsAvailable(Unit target)
         {
@@ -46,6 +53,13 @@ namespace LineWars.Model
 
         private void ExecuteInstant(Unit target)
         {
+            Executor.EnableDamageSfx = false;
+            
+            if (sfx == null)
+                Debug.LogWarning($"sfx is null on {gameObject.name}");
+            else
+                SfxManager.Instance.Play(sfx);
+            
             Action.Execute(target);
             Complete();
         }

@@ -175,7 +175,7 @@ namespace LineWars.Model
 
         public void Visit(HealSacrificeAction<TNode, TEdge, TUnit> action)
         {
-            Result = new HealSacrificeAction<TNode, TEdge, TUnit>(Unit);
+            Result = new HealSacrificeAction<TNode, TEdge, TUnit>(Unit, action.unitsToBuffAttack);
             Result.ActionModifier = action.ActionModifier;
         }
 

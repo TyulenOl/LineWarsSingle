@@ -67,10 +67,6 @@ crashlytics-build.properties
 UserSettings
 Assets/YandexGame
 Assets/YandexGame.meta
-Assets/ExternalDependencyManager
-Assets/ExternalDependencyManager.meta
-Assets/RuStoreSDK
-Assets/RuStoreSDK.meta
 
 
 # Never ignore DLLs in the FMOD subfolder.

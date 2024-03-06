@@ -116,6 +116,7 @@ namespace LineWars.Controllers
             InitializeLootBoxController();
             
             OnGameReady?.Invoke();
+            OnGameReady = null;
         }
 
         private void InitializeProviders()
