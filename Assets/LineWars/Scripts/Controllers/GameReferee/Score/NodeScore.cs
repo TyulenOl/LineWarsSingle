@@ -6,7 +6,7 @@ namespace LineWars
     [RequireComponent(typeof(Node))]
     public class NodeScore: MonoBehaviour
     {
-        [SerializeField, Min(0)] private int score;
+        [SerializeField, Min(0)] private int score = 1;
         public int Score
         {
             get => score;
