@@ -12,6 +12,7 @@ namespace LineWars.Interface
     public class GameUI : Singleton<GameUI>
     {
         [SerializeField] private TMP_Text scoreText;
+        [SerializeField] private TMP_Text lizardsScoreText;
         [SerializeField] private EnemyTurnPanel enemyTurnPanel;
         
         private IExecutor currentExecutor;
