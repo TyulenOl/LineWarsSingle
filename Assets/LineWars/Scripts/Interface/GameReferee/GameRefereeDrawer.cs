@@ -6,10 +6,11 @@ namespace LineWars.Interface
 {
     public sealed class GameRefereeDrawer: MonoBehaviour
     {
-        [SerializeField] List<ConcreteGameRefereeDrawer> concreteGameRefereeDrawers;
-
-        private Dictionary<Type, ConcreteGameRefereeDrawer> typeToDrawer;
+        [SerializeField] private List<ConcreteGameRefereeDrawer> concreteGameRefereeDrawers;
+        [SerializeField] private LevelInfoPanel levelInfoPanel;
         
+        private Dictionary<Type, ConcreteGameRefereeDrawer> typeToDrawer;
+
         private void Awake()
         {
             typeToDrawer = new Dictionary<Type, ConcreteGameRefereeDrawer>();
@@ -32,9 +33,12 @@ namespace LineWars.Interface
             var type = gameReferee.GetType();
             foreach (var drawer in typeToDrawer.Values)
                 drawer.Hide();
-            
+
             if (typeToDrawer.TryGetValue(type, out var showDrawer))
+            {
                 showDrawer.Show(gameReferee);
+                levelInfoPanel.ReDraw(gameReferee);
+            }
             else
             {
                 Debug.LogWarning($"Cant draw gameReferee of type {type}");
