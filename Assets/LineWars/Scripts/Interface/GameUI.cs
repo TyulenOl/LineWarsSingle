@@ -11,9 +11,10 @@ namespace LineWars.Interface
 {
     public class GameUI : Singleton<GameUI>
     {
-        [SerializeField] private TMP_Text scoreText;
-        [SerializeField] private TMP_Text lizardsScoreText;
+        // [SerializeField] private TMP_Text scoreText;
+        // [SerializeField] private TMP_Text lizardsScoreText;
         [SerializeField] private EnemyTurnPanel enemyTurnPanel;
+        [SerializeField] private GameRefereeDrawer gameRefereeDrawer;
         
         private IExecutor currentExecutor;
         private List<TargetDrawer> currentDrawers = new();
@@ -26,44 +27,45 @@ namespace LineWars.Interface
             CommandsManager.ExecutorChanged += OnExecutorChanged;
             CommandsManager.FightNeedRedraw += ReDrawCurrentTargets;
             CommandsManager.BuyNeedRedraw += ReDrawBuyNodes;
+            gameRefereeDrawer.DrawReferee(SingleGameRoot.Instance.GameReferee);
             
-            SubscribeEventForGameReferee();
+            //SubscribeEventForGameReferee();
         }
         
-        private void SubscribeEventForGameReferee()
-        {
-            if (SingleGameRoot.Instance.GameReferee is ScoreReferee scoreReferee)
-            {
-                scoreReferee.ScoreChanged += (player, before, after) =>
-                {
-                    if (player == Player.LocalPlayer)
-                    {
-                        scoreText.text = $"{after}/{scoreReferee.ScoreForWin}";
-                    }
-                };
-
-                scoreText.text = $"{scoreReferee.GetScoreForPlayer(Player.LocalPlayer)}/{scoreReferee.ScoreForWin}";
-            }
-            if (SingleGameRoot.Instance.GameReferee is SiegeGameReferee siegeGameReferee)
-            {
-                siegeGameReferee.CurrentRoundsChanged += (currentRounds) =>
-                {
-                    scoreText.text = $"{currentRounds}/{siegeGameReferee.RoundsToWin}";
-                };
-
-                scoreText.text = $"{siegeGameReferee.CurrentRounds}/{siegeGameReferee.RoundsToWin}";
-            }
-            
-            if (SingleGameRoot.Instance.GameReferee is NewDominationGameReferee dominationGameReferee)
-            {
-                dominationGameReferee.RoundsAmountChanged += () =>
-                {
-                    scoreText.text = $"{dominationGameReferee.RoundsToWin}";
-                };
-
-                scoreText.text = $"{dominationGameReferee.RoundsToWin}";
-            }
-        }
+        // private void SubscribeEventForGameReferee()
+        // {
+        //     if (SingleGameRoot.Instance.GameReferee is ScoreReferee scoreReferee)
+        //     {
+        //         scoreReferee.ScoreChanged += (player, before, after) =>
+        //         {
+        //             if (player == Player.LocalPlayer)
+        //             {
+        //                 scoreText.text = $"{after}/{scoreReferee.ScoreForWin}";
+        //             }
+        //         };
+        //
+        //         scoreText.text = $"{scoreReferee.GetScoreForPlayer(Player.LocalPlayer)}/{scoreReferee.ScoreForWin}";
+        //     }
+        //     if (SingleGameRoot.Instance.GameReferee is SiegeGameReferee siegeGameReferee)
+        //     {
+        //         siegeGameReferee.CurrentRoundsChanged += (currentRounds) =>
+        //         {
+        //             scoreText.text = $"{currentRounds}/{siegeGameReferee.RoundsToWin}";
+        //         };
+        //
+        //         scoreText.text = $"{siegeGameReferee.CurrentRounds}/{siegeGameReferee.RoundsToWin}";
+        //     }
+        //     
+        //     if (SingleGameRoot.Instance.GameReferee is NewDominationGameReferee dominationGameReferee)
+        //     {
+        //         dominationGameReferee.RoundsAmountChanged += () =>
+        //         {
+        //             scoreText.text = $"{dominationGameReferee.RoundsToWin}";
+        //         };
+        //
+        //         scoreText.text = $"{dominationGameReferee.RoundsToWin}";
+        //     }
+        // }
 
         protected override void OnDestroy()
         {

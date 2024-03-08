@@ -1,3 +1,4 @@
+using System;
 using JetBrains.Annotations;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,10 @@ namespace LineWars.Model
     public class WallToWallGameReferee : GameReferee
     {
         protected override bool noBaseWinCondition => false;
-        public override void Initialize([NotNull] Player player, IEnumerable<BasePlayer> enemies)
+        
+        public event Action<BasePlayer, int> ScoreChanged;
+        
+        public override void Initialize(Player player, IEnumerable<BasePlayer> enemies)
         {
             base.Initialize(player, enemies);
             //player.PhaseExceptions.Add(PhaseType.Buy);
@@ -15,13 +19,29 @@ namespace LineWars.Model
             {
                 //enemy.PhaseExceptions.Add(PhaseType.Buy);
                 enemy.OwnedRemoved += Enemy_OwnerRemoved;
+                enemy.PlayerOwnedAdded += OnPlayerOwnedAdded;
             }
             player.OwnedRemoved += Me_OwnedRemoved;
+            player.PlayerOwnedAdded += OnPlayerOwnedAdded;
+        }
+
+
+
+        public int GetScoreForPlayer()
+        {
+            return Player.MyUnits.Count();
+        }
+        
+        public int GetScoreForEnemies()
+        {
+            return Enemies.First().MyUnits.Count();
         }
 
         private void Me_OwnedRemoved(Owned obj)
         {
-            if (Player.MyUnits.Count() == 0)
+            ScoreChanged?.Invoke(Player, Player.MyUnits.Count());
+            
+            if (!Player.MyUnits.Any())
                 Lose();
         }
 
@@ -29,10 +49,17 @@ namespace LineWars.Model
         {
             foreach(var enemy in Enemies)
             {
+                ScoreChanged?.Invoke(enemy, enemy.MyUnits.Count());
                 if (enemy.MyUnits.Count() != 0)
                     return;
             }
+            
             Win();
+        }
+        
+        private void OnPlayerOwnedAdded(BasePlayer player, Owned obj)
+        {
+            ScoreChanged?.Invoke(player, player.MyUnits.Count());
         }
     }
 }

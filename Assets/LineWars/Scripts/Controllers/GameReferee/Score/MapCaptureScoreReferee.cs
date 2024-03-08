@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace LineWars
 {
+    /// <summary>
+    /// Захвати n точек
+    /// </summary>
     public class MapCaptureScoreReferee: ScoreReferee
     {
         public override void Initialize(Player player, IEnumerable<BasePlayer> enemies)

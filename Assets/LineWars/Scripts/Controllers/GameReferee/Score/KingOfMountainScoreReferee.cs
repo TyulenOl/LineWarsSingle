@@ -5,6 +5,10 @@ using UnityEngine;
 
 namespace LineWars
 {
+    
+    /// <summary>
+    /// Захвати гору, за нее каждый раунд дается одно очко.
+    /// </summary>
     public class KingOfMountainScoreReferee: ScoreReferee
     {
         [SerializeField] private Node mountain;
