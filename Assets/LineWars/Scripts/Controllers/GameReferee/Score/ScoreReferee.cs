@@ -29,6 +29,17 @@ namespace LineWars
                 .Select(x => new KeyValuePair<BasePlayer, int>(x, 0))
             );
         }
+        
+        public int GetScoreForPlayer()
+        {
+            return GetScoreForPlayer(Player);
+        }
+        
+        public int GetScoreForEnemies()
+        {
+            return GetScoreForPlayer(Enemies.First());
+        }
+
 
         public int GetScoreForPlayer(BasePlayer basePlayer)
         {
@@ -41,7 +52,7 @@ namespace LineWars
             
             var before = playersScore[basePlayer];
             playersScore[basePlayer] = score;
-            ScoreChanged?.Invoke(basePlayer, before, score);
+            ScoreChanged?.Invoke(basePlayer, score, scoreForWin);
 
             if (GetScoreForPlayer(basePlayer) >= scoreForWin)
             {

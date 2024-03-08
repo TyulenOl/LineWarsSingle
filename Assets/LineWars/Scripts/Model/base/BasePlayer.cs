@@ -43,6 +43,10 @@ namespace LineWars.Model
 
         public event Action<Owned> OwnedAdded;
         public event Action<Owned> OwnedRemoved;
+        
+        public event Action<BasePlayer, Owned> PlayerOwnedAdded;
+        public event Action<BasePlayer, Owned> PlayerOwnedRemoved;
+        
         public event Action<int, int> CurrentMoneyChanged;
         public event Action<int, int> IncomeChanged;
         public event Action<IActor, PhaseType> TurnStarted;
@@ -202,6 +206,7 @@ namespace LineWars.Model
 
             myOwned.Add(owned);
             OwnedAdded?.Invoke(owned);
+            PlayerOwnedAdded?.Invoke(this, owned);
         }
 
         protected virtual void BeforeAddOwned(Node node)
@@ -245,6 +250,7 @@ namespace LineWars.Model
 
             myOwned.Remove(owned);
             OwnedRemoved?.Invoke(owned);
+            PlayerOwnedRemoved?.Invoke(this, owned);
         }
 
         protected virtual void BeforeRemoveOwned(Node node)

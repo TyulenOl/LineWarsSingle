@@ -18,13 +18,13 @@ namespace LineWars
             private set
             {
                 currentRounds = value;
-                CurrentRoundsChanged?.Invoke(value);
+                CurrentRoundsChanged?.Invoke(value, roundsToWin);
             } 
         }
 
         protected override bool noBaseWinCondition => false;
         public int RoundsToWin => roundsToWin;
-        public event Action<int> CurrentRoundsChanged;
+        public event Action<int, int> CurrentRoundsChanged;
         
         public override void Initialize([NotNull] Player player, IEnumerable<BasePlayer> enemies)
         {

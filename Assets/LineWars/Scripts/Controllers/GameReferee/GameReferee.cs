@@ -11,6 +11,7 @@ namespace LineWars
     {
         protected Player Player;
         protected List<BasePlayer> Enemies;
+        protected List<BasePlayer> AllPlayers;
         public event Action Won;
         public event Action Lost;
 
@@ -25,6 +26,8 @@ namespace LineWars
                 .Where(x => x != null)
                 .Where(x => x != Player)
                 .ToList();
+
+            AllPlayers = new[] {Player}.Concat(Enemies).ToList();
 
             if(noBaseWinCondition) 
             {

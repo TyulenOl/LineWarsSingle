@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace LineWars
 {
+    /// <summary>
+    /// Захват ключевых точек, каждый раунд за кахжую точку дается 1 очко
+    /// </summary>
     public class CaptureThePointsGameReferee : ScoreReferee
     {
         [SerializeField] private List<Node> capturePoints;
