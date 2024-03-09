@@ -19,7 +19,7 @@ namespace LineWars.Controllers
 
         protected override void RewardForAd(PrizeType prizeType, int amount)
         {
-            Reward(prizeType, amount);
+            _Reward(prizeType, amount);
         }
 
         public override bool CanBuyProduct(string id)

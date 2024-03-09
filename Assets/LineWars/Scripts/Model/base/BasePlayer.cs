@@ -46,6 +46,9 @@ namespace LineWars.Model
         
         public event Action<BasePlayer, Owned> PlayerOwnedAdded;
         public event Action<BasePlayer, Owned> PlayerOwnedRemoved;
+
+        public event Action<BasePlayer, Unit> PlayerUnitSpawn; 
+        public event Action<BasePlayer, DeckCard> PlayerBuyDeckCard; 
         
         public event Action<int, int> CurrentMoneyChanged;
         public event Action<int, int> IncomeChanged;
@@ -146,11 +149,14 @@ namespace LineWars.Model
             {
                 Owned.Connect(this, node);
             }
-            OnSpawnUnit();
+            
+            OnSpawnUnit(unitInstance);
+            PlayerUnitSpawn?.Invoke(this, unitInstance);
+            
             return unitInstance;
         }
 
-        protected virtual void OnSpawnUnit()
+        protected virtual void OnSpawnUnit(Unit unit)
         {
         }
 
@@ -173,6 +179,12 @@ namespace LineWars.Model
         {
             CurrentMoney -= GetDeckCardPurchaseInfo(deckCard);
             SpawnUnit(node, deckCard.Unit);
+            PlayerBuyDeckCard?.Invoke(this, deckCard);
+        }
+
+        public bool CanBuyAnyCard()
+        {
+            return SingleGameRoot.Instance.CurrentDeck.Cards.Any(CanBuyDeckCard);
         }
 
         #endregion

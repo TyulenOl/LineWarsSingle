@@ -6,7 +6,7 @@ using UnityEngine.Events;
 
 namespace LineWars.Interface
 {
-    public class CommandsManagerListener: MonoBehaviour
+    public class CommandsManagerStateListener: MonoBehaviour
     {
         private static CommandsManager CommandsManager => CommandsManager.Instance;
 

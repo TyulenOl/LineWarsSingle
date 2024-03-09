@@ -16,7 +16,7 @@ namespace LineWars.Infrastructure
         {
             if (SDKAdapter != null)
             {
-                SDKAdapter.SendFinishLevelMetrica(Scene, levelFinishStatus);
+                SDKAdapter.SendFinishLevelMetrica(Scene, levelFinishStatus, SingleGameRoot.Instance.CurrentRound);
                 if (levelFinishStatus != LevelFinishStatus.Exit)
                     SDKAdapter.SendFinishLevelMetrica(Scene, LevelFinishStatus.Exit);
             }

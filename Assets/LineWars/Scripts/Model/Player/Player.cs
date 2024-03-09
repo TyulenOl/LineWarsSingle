@@ -193,9 +193,9 @@ namespace LineWars.Model
             additionalVisibleNodeTurn[node] = turnsCount;
         }
 
-        protected override void OnSpawnUnit()
+        protected override void OnSpawnUnit(Unit unit)
         {
-            base.OnSpawnUnit();
+            base.OnSpawnUnit(unit);
             RecalculateVisibility();
         }
 
