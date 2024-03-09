@@ -6,7 +6,7 @@ using UnityEngine;
 namespace LineWars.Infrastructure
 {
     [RequireComponent(typeof(BasePlayer))]
-    public class MetricaPLayerListener: MonoBehaviour
+    public class MetricaPlayerListener: MonoBehaviour
     {
         private BasePlayer basePlayer;
         private static SDKAdapterBase SDKAdapter => GameRoot.Instance?.SdkAdapter;

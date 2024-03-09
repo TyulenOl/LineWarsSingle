@@ -150,7 +150,7 @@ namespace LineWars.Controllers
                 void OnSuccess()
                 {
                     var prize = RewardUtilities.DecodePurchaseId(successPayment.purchaseId);
-                    Reward(prize);
+                    _Reward(prize);
                     FullscreenPanel.OpenSuccessPanel(new Money(prize.Type.ToCostType(), prize.Amount));
                     InvokePurchaseSuccessEvent(successPayment.purchaseId);
                 }
@@ -233,7 +233,7 @@ namespace LineWars.Controllers
             void OnRewarded(object _, Reward _1)
             {
                 rewardAd.Rewarded -= OnRewarded;
-                Reward(prizeType, amount);
+                _Reward(prizeType, amount);
 
                 FullscreenPanel.OpenSuccessPanel(new Money(CostType.Gold, amount));
                 InvokeRewardVideoEvent(prizeType, amount);

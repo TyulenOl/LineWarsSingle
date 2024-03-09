@@ -40,6 +40,11 @@ namespace LineWars.Interface
         {
             OpenPanel(new TextRedrawInfo("Успешно", Color.red), money);
         }
+        
+        public static void OpenSuccessPanel(Prize prize)
+        {
+            OpenPanel(new TextRedrawInfo("Успешно", Color.red), new Money(prize.Type.ToCostType(), prize.Amount));
+        }
 
         public static void OpenPromoCodePanel(string promoCode)
         {

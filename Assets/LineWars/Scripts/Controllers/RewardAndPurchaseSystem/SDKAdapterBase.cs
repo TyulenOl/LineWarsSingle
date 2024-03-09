@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using LineWars.Infrastructure;
+using LineWars.Interface;
 using LineWars.Model;
 using UnityEngine;
 using UnityEngine.Events;
@@ -44,12 +45,12 @@ namespace LineWars.Controllers
         public abstract ProductData[] GetProducts(PrizeType prizeType);
       
         
-        protected void Reward(Prize prize)
+        protected void _Reward(Prize prize)
         {
-            Reward(prize.Type, prize.Amount);
+            _Reward(prize.Type, prize.Amount);
         }
 
-        protected void Reward(PrizeType prizeType, int amount)
+        protected void _Reward(PrizeType prizeType, int amount)
         {
             switch (prizeType)
             {
@@ -65,6 +66,12 @@ namespace LineWars.Controllers
                 default:
                     throw new ArgumentOutOfRangeException(nameof(prizeType), prizeType, null);
             }
+        }
+
+        public void Reward(Prize prize)
+        {
+            _Reward(prize);
+            FullscreenPanel.OpenSuccessPanel(prize);
         }
 
         protected void InvokeRewardVideoEvent(PrizeType prizeType, int amount)
@@ -297,6 +304,19 @@ namespace LineWars.Controllers
             };
             
             SendMetrica("store", eventParams);
+        }
+
+        public void SendUsePromocodeMetrica(string promocode)
+        {
+            if (string.IsNullOrEmpty(promocode))
+                return;
+            
+            var eventParams = new Dictionary<string, string>
+            {
+                {"usePromocode", promocode}
+            };
+            
+            SendMetrica("usePromocode", eventParams);
         }
     }
 }

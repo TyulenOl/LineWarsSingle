@@ -35,6 +35,14 @@ namespace LineWars.Model
         }
         
         protected override string DefaultName => "Благословление силы";
-        protected override string DefaultDescription => $"Добавляет всем союзным юнитам <color=#E22B12>{powerBuff}</color> ед. силы на {roundsCount} раундов";
+        protected override string DefaultDescription
+        {
+            get
+            {
+                return $"Добавляет всем союзным юнитам " +
+                       $"<color=#E22B12>{powerBuff}</color> ед. силы " +
+                       $"на {roundsCount} {roundsCount.Pluralize("раунд", "раунда", "раундов")}";
+            }
+        }
     }
 }

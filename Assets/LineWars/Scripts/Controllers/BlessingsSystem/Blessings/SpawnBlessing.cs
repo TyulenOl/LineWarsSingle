@@ -44,7 +44,27 @@ namespace LineWars.Model
         }
 
         protected override string DefaultName => "Благословление \"Призыв\"";
-        protected override string DefaultDescription => $"Призывает {string.Join(", ", unitPrefabsToSpawn.Select(x => x.UnitName))}" +
-                                                        " на ваших изначальных спавнах";
+        protected override string DefaultDescription
+        {
+            get
+            {
+                var units = string.Join(
+                    ", ", 
+                    unitPrefabsToSpawn
+                        .GroupBy(x => x.UnitName)
+                        .Select(x =>
+                        {
+                            var count = x.Count();
+                            if (count > 1)
+                            {
+                                return  $"юнита \"{x.Key}\" х{count}";
+                            }
+                            return $"юнита \"{x.Key}\"";
+                        })
+                );
+
+                return $"Призывает {units}";
+            }
+        }
     }
 }

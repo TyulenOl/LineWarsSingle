@@ -85,9 +85,10 @@ namespace LineWars.Controllers
                 && promoCodes.TryGetValue(promoCode, out var prize)
                 && !UserInfoController.PromoCodeIsUsed(promoCode))
             {
-                Reward(prize);
+                _Reward(prize);
                 UserInfoController.UsePromoCode(promoCode);
                 FullscreenPanel.OpenPromoCodePanel(promoCode);
+                SendUsePromocodeMetrica(promoCode);
             }
         }
 
@@ -197,7 +198,7 @@ namespace LineWars.Controllers
             try
             {
                 var (type, amount) = RewardUtilities.DecodeId(id, priseTypeLenInBits);
-                Reward(type, amount);
+                _Reward(type, amount);
                 
                 FullscreenPanel.OpenSuccessPanel(new Money(CostType.Gold, amount));
                 InvokeRewardVideoEvent(type, amount);
@@ -229,7 +230,7 @@ namespace LineWars.Controllers
             }
             
             var prize = RewardUtilities.DecodePurchaseId(id);
-            Reward(prize);
+            _Reward(prize);
             FullscreenPanel.OpenSuccessPanel(new Money(prize.Type.ToCostType(), prize.Amount));
             InvokePurchaseSuccessEvent(id);
         }
