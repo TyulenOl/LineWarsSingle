@@ -35,7 +35,7 @@ namespace LineWars.Interface
             {
                 completionPercentage += Time.deltaTime / timeInSeconds;
                 var easeOutQuart = 1 - Mathf.Pow(1 - completionPercentage, 4);
-                movableRectTransform.localPosition = Vector2.Lerp(startPoint,new Vector2(movableRectTransform.localPosition.y, targetPosition.x), easeOutQuart);
+                movableRectTransform.localPosition = Vector2.Lerp(startPoint,new Vector2(movableRectTransform.localPosition.x, targetPosition.y), easeOutQuart);
                 yield return null;
             }
         }
