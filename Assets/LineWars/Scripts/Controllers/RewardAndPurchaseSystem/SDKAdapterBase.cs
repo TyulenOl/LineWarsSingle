@@ -134,6 +134,17 @@ namespace LineWars.Controllers
             SendMetrica("card", eventParams);
         }
 
+        public void SendUseDeckCardMetrica(DeckCard deckCard)
+        {
+            if (deckCard == null)
+                return;
+            var eventParams = new Dictionary<string, string>
+            {
+                {"UseCardType", deckCard.Unit.Type.ToString()}
+            };
+            SendMetrica("useCard", eventParams);
+        }
+
         public void SendButtonMetrica(string buttonId)
         {
             if (buttonId == null)
@@ -227,6 +238,17 @@ namespace LineWars.Controllers
                 {"blessing", blessingId.ToString()},
             };
             SendMetrica("blessing", eventParams);
+        }
+
+        public void SendUseBlessingMetrica(BlessingId blessingId)
+        {
+            if (blessingId == BlessingId.Null)
+                return;
+            var eventParams = new Dictionary<string, string>
+            {
+                {"useBlessing", blessingId.ToString()},
+            };
+            SendMetrica("useBlessing", eventParams);
         }
 
         public void SendBlessingsMetrica(IBlessingsPull blessingsPull)
