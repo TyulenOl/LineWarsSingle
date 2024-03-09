@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace LineWars.Interface
 {
-    public class MoneyDrawerSimple: MonoBehaviour
+    public class MoneyDrawer: MonoBehaviour
     {
         [SerializeField] private GameObject diamondsPart;
         [SerializeField] private GameObject goldPart;

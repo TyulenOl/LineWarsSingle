@@ -182,6 +182,11 @@ namespace LineWars.Model
             PlayerBuyDeckCard?.Invoke(this, deckCard);
         }
 
+        public bool CanBuyAnyCard()
+        {
+            return SingleGameRoot.Instance.CurrentDeck.Cards.Any(CanBuyDeckCard);
+        }
+
         #endregion
 
         public bool CanAfford(PurchaseInfo purchaseInfo)

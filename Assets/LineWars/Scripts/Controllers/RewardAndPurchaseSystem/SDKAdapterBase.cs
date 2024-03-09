@@ -71,7 +71,7 @@ namespace LineWars.Controllers
         public void Reward(Prize prize)
         {
             _Reward(prize);
-            FullscreenPanel.OpenSuccessPanel(prize);
+            UIPanel.OpenSuccessPanel(prize);
         }
 
         protected void InvokeRewardVideoEvent(PrizeType prizeType, int amount)
@@ -175,11 +175,21 @@ namespace LineWars.Controllers
             SendMetrica("missionStart", eventParams);
         }
 
-        public void SendFinishLevelMetrica(SceneName scene, LevelFinishStatus finishStatus)
+        public void SendFinishLevelMetrica(SceneName scene, LevelFinishStatus finishStatus, int round)
         {
             var eventParams = new Dictionary<string, string>
             {
                 {"endLevel", $"{scene} {finishStatus}"},
+                {"round", round.ToString()}
+            };
+            SendMetrica("missionEnd", eventParams);
+        }
+        
+        public void SendFinishLevelMetrica(SceneName scene, LevelFinishStatus finishStatus)
+        {
+            var eventParams = new Dictionary<string, string>
+            {
+                {"endLevel", $"{scene} {finishStatus}"}
             };
             SendMetrica("missionEnd", eventParams);
         }

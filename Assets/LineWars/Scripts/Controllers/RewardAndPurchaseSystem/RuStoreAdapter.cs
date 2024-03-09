@@ -122,7 +122,7 @@ namespace LineWars.Controllers
 
         private void OnPurchaseFailedEvent(string id)
         {
-            FullscreenPanel.OpenErrorPanel();
+            UIPanel.OpenErrorPanel();
             InvokePurchaseFailedEvent(id);
         }
 
@@ -151,7 +151,7 @@ namespace LineWars.Controllers
                 {
                     var prize = RewardUtilities.DecodePurchaseId(successPayment.purchaseId);
                     _Reward(prize);
-                    FullscreenPanel.OpenSuccessPanel(new Money(prize.Type.ToCostType(), prize.Amount));
+                    UIPanel.OpenSuccessPanel(new Money(prize.Type.ToCostType(), prize.Amount));
                     InvokePurchaseSuccessEvent(successPayment.purchaseId);
                 }
             }
@@ -235,7 +235,7 @@ namespace LineWars.Controllers
                 rewardAd.Rewarded -= OnRewarded;
                 _Reward(prizeType, amount);
 
-                FullscreenPanel.OpenSuccessPanel(new Money(CostType.Gold, amount));
+                UIPanel.OpenSuccessPanel(new Money(CostType.Gold, amount));
                 InvokeRewardVideoEvent(prizeType, amount);
             }
         }

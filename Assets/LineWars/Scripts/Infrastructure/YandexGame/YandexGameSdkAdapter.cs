@@ -87,7 +87,7 @@ namespace LineWars.Controllers
             {
                 _Reward(prize);
                 UserInfoController.UsePromoCode(promoCode);
-                FullscreenPanel.OpenPromoCodePanel(promoCode);
+                UIPanel.OpenPromoCodePanel(promoCode);
                 SendUsePromocodeMetrica(promoCode);
             }
         }
@@ -200,21 +200,21 @@ namespace LineWars.Controllers
                 var (type, amount) = RewardUtilities.DecodeId(id, priseTypeLenInBits);
                 _Reward(type, amount);
                 
-                FullscreenPanel.OpenSuccessPanel(new Money(CostType.Gold, amount));
+                UIPanel.OpenSuccessPanel(new Money(CostType.Gold, amount));
                 InvokeRewardVideoEvent(type, amount);
             }
             catch
             {
                 Debug.LogError("DecodeId exception!");
                 
-                FullscreenPanel.OpenErrorPanel();
+                UIPanel.OpenErrorPanel();
                 InvokeErrorVideoEvent();
             }
         }
         
         private void OnErrorVideoEvent()
         {
-            FullscreenPanel.OpenErrorPanel();
+            UIPanel.OpenErrorPanel();
             InvokeErrorVideoEvent();
         }
         
@@ -223,7 +223,7 @@ namespace LineWars.Controllers
             if (id == lockAdId)
             {
                 UserInfoController.LockAd = true;
-                FullscreenPanel.OpenSuccessLockAdPanel();
+                UIPanel.OpenSuccessLockAdPanel();
                 InvokeSuccessLockAd();
                 InvokePurchaseSuccessEvent(id);
                 return;
@@ -231,13 +231,13 @@ namespace LineWars.Controllers
             
             var prize = RewardUtilities.DecodePurchaseId(id);
             _Reward(prize);
-            FullscreenPanel.OpenSuccessPanel(new Money(prize.Type.ToCostType(), prize.Amount));
+            UIPanel.OpenSuccessPanel(new Money(prize.Type.ToCostType(), prize.Amount));
             InvokePurchaseSuccessEvent(id);
         }
         
         private void OnPurchaseFailedEvent(string id)
         {
-            FullscreenPanel.OpenErrorPanel();
+            UIPanel.OpenErrorPanel();
             InvokePurchaseFailedEvent(id);
         }
         

@@ -27,17 +27,33 @@ namespace LineWars
         
         [field: Header("Controllers")]
         [field: SerializeField] public CommandsManager CommandsManager { get; set; }
+
+        [Header("Debug")]
+        [SerializeField] private int currentRound;
         
+        public int CurrentRound
+        {
+            get => currentRound;
+            private set
+            {
+                currentRound = value;
+                RoundChanged?.Invoke(value);
+            }
+        }
+
         public readonly IndexList<BasePlayer> AllPlayers = new();
         public readonly IndexList<Unit> AllUnits = new();
+     
         public Deck CurrentDeck { get; private set; }
         public IBlessingsPull LocalBlessingPull { get; private set; }
         public IBlessingsPull GlobalBlessingPull { get; private set; }
+        
 
         public bool GameStarted { get; private set; }
         public event Action OnGameStart;
         public event Action Won;
         public event Action Lost;
+        public event Action<int> RoundChanged;
         
         public SceneName Scene => (SceneName)SceneManager.GetActiveScene().buildIndex;
         
@@ -57,6 +73,8 @@ namespace LineWars
             InitializeAndRegisterAllPlayers();
             InitializeGameReferee();
             CommandsManager.Initialize(LocalBlessingPull, BlessingStorageGetter.Get());
+            PhaseManager.Instance.PhaseEntered.AddListener(PhaseManagerOnStateEntered);
+            currentRound = 1;
             
             StartCoroutine(StartGameCoroutine());
 
@@ -166,6 +184,13 @@ namespace LineWars
             base.OnDestroy();
             if (SfxManager.Instance != null) SfxManager.Instance.StopAllSounds();
             if (SpeechManager.Instance != null) SpeechManager.Instance.StopAllSounds();
+            if (PhaseManager.Instance != null) PhaseManager.Instance.PhaseEntered.RemoveListener(PhaseManagerOnStateEntered);
+        }
+        
+        private void PhaseManagerOnStateEntered(PhaseType phase)
+        {
+            if (phase == PhaseType.Replenish)
+                CurrentRound++;
         }
     }
 }
