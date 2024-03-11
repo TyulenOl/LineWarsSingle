@@ -11,7 +11,8 @@ namespace LineWars.Interface
     {
         private const string toggleKey = "skipFinishBuyTurnDialog";
         private static UserInfoController UserController => GameRoot.Instance?.UserController;
-        private static Player Player => Player.LocalPlayer; 
+        private static Player Player => Player.LocalPlayer;
+        private static SingleGameRoot SingleGameRoot => SingleGameRoot.Instance; 
         
         private Button button;
         [SerializeField] private GameObject buyUnitsLayerContainer;
@@ -20,6 +21,22 @@ namespace LineWars.Interface
         private void Awake()
         {
             button = GetComponent<Button>();
+        }
+
+        private void Start()
+        {
+            if (SingleGameRoot.GameReferee is WallToWallGameReferee 
+                && Player.CanBuyAnyCard())
+            {
+                Player.PlayerBuyDeckCard += OnPlayerBuyDeckCardWTW;
+                button.interactable = false;
+            }
+        }
+
+        private void OnPlayerBuyDeckCardWTW(BasePlayer basePlayer, DeckCard deckCard)
+        {
+            Player.PlayerBuyDeckCard -= OnPlayerBuyDeckCardWTW;
+            button.interactable = true;
         }
 
         private void OnEnable()
