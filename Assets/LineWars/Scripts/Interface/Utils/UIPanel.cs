@@ -13,7 +13,7 @@ namespace LineWars.Interface
         [SerializeField] private FullScreenPanel fullScreenPanel;
         [SerializeField] private DialogPanel dialogPanel;
 
-        private IPanel[] Panels;
+        private IPanel[] Panels = new IPanel[0];
 
         private void Start()
         {

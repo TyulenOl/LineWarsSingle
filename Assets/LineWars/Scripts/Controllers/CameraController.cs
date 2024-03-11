@@ -193,14 +193,17 @@ namespace LineWars.Controllers
             if (isDragging)
             {
                 var cameraPosition = cameraTransform.position;
-                horizontalVelocity = (cameraPosition - lastPosition) / Time.deltaTime;
+                if (Time.deltaTime > 0)
+                    horizontalVelocity = (cameraPosition - lastPosition) / Time.deltaTime;
                 lastPosition = cameraPosition;
             }
             else
             {
                 horizontalVelocity = Vector3.Lerp(horizontalVelocity, Vector3.zero, speedDampening * Time.deltaTime);
                 var resultPosition = cameraTransform.position + (Vector3)horizontalVelocity * Time.deltaTime;
-                cameraTransform.position = ClampCameraPosition(resultPosition);
+                var clampedPosition = ClampCameraPosition(resultPosition);
+                if (!float.IsNaN(clampedPosition.x) && !float.IsNaN(clampedPosition.y))
+                    cameraTransform.position = clampedPosition;
             }
         }
 

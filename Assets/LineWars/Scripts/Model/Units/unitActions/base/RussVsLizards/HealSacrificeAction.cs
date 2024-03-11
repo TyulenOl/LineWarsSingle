@@ -20,7 +20,8 @@ namespace LineWars.Model
         public bool IsAvailable(TUnit target)
         {
             return ActionPointsCondition() && 
-                target.OwnerId == Executor.OwnerId;
+                target.OwnerId == Executor.OwnerId
+                && target != Executor;
          }
 
         public void Execute(TUnit target)

@@ -31,5 +31,23 @@
         HealSacrifice,
         VenomousSpit
     }
+
+    public static class CommandTypeExtensions
+    {
+        public static bool IsAttack(this CommandType commandType)
+        {
+            return commandType is CommandType.Arson
+                or CommandType.Ram
+                or CommandType.Explosion
+                or CommandType.Fire
+                or CommandType.Stun
+                or CommandType.HealingAttack
+                or CommandType.MeleeAttack
+                or CommandType.ArmorBasedAttack
+                or CommandType.TargetPowerBasedAttack
+                or CommandType.BlowWithSwing
+                or CommandType.VenomousSpit;
+        }
+    }
 }   
 

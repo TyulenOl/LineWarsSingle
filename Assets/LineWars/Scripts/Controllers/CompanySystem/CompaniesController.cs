@@ -22,7 +22,8 @@ namespace LineWars.Controllers
         public MissionInfo ChosenMission => GetMissionInfo(ChosenMissionId); 
         public event Action AnyMissionInfoChanged;
 
-        public bool IsInfinityGameUnlocked => debugMode || missionInfos[0].MissionStatus == MissionStatus.Completed;
+        public bool IsInfinityGameUnlocked => debugMode || missionInfos.Values
+            .Any(x => x.MissionStatus == MissionStatus.Completed);
 
         public void Initialize(IProvider<MissionInfo> provider, IStorage<int, MissionData> storage)
         {

@@ -12,6 +12,7 @@ namespace LineWars
 {
     public class CardUpgradeLogic : MonoBehaviour
     {
+        [SerializeField] private LayoutGroup levelLayoutGroup;
         [SerializeField] private Button upgradeButton;
         [SerializeField] private TMP_Text upgradeCardsAmount;
         [SerializeField] private Image upgradeCardsIcon;
@@ -110,6 +111,8 @@ namespace LineWars
                 costCharacteristics.Next.text = nextCostInfo.CanBuy 
                     ? $"{nextLevel.Cost}(+{nextLevel.Cost})" 
                     : $"{nextLevel.Cost}";
+                
+                LayoutRebuilder.ForceRebuildLayoutImmediate(levelLayoutGroup.GetComponent<RectTransform>());
             }
             else
             {
