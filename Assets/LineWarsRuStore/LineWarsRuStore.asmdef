@@ -1,0 +1,22 @@
+{
+    "name": "LineWarsRuStore",
+    "rootNamespace": "",
+    "references": [
+        "GUID:04d767f33dad775409e3522e80831fa2",
+        "GUID:0041639803a7d864bb7774257e0cea16",
+        "GUID:403d8ee4abf1e694089c3e8d3edff032",
+        "GUID:74a2f377a9489774886f68df6293b199"
+    ],
+    "includePlatforms": [
+        "Android",
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
