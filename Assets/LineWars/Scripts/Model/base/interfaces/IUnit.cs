@@ -33,6 +33,7 @@ namespace LineWars.Model
         public event Action<TUnit, int, int> UnitPowerChanged;
         public event Action<TUnit, int, int> UnitArmorChanged;
         public event Action<TUnit> UnitReplenished;
+        
         public void DealDamageThroughArmor(int value)
         {
             if (value < 0)

@@ -64,6 +64,10 @@ namespace LineWars.Model
             if (level == 0)
                 return ZeroLevelInfo;
             level--;
+            
+            if (level < 0 || level >= levels.Count)
+                return null;
+            
             var additionalLevelInfo = levels[level];
             return ZeroLevelInfo.WithAdditionalInfo(additionalLevelInfo);
         }

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections;
 using LineWars.Model;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Utilities.Runtime.Extensions;
 
 namespace LineWars.Controllers
 {
@@ -16,6 +18,7 @@ namespace LineWars.Controllers
         [SerializeField] private float timeInMinutes;
         [SerializeField] private string keyID;
         [SerializeField] private Prize prizeForAd;
+        [SerializeField] private TMP_Text timerText;
         public Prize PrizeForAd
         {
             get => prizeForAd;
@@ -28,6 +31,12 @@ namespace LineWars.Controllers
         private void Awake()
         {
             button = GetComponent<Button>();
+        }
+
+        private void FixedUpdate()
+        {
+            if(timerText != null)
+                timerText.text = GetRemainingTimeString();
         }
 
         private void OnEnable()
@@ -90,6 +99,15 @@ namespace LineWars.Controllers
             var prevTime = UserController.KeyToDateTime[keyID];
             var totalSecond = (float)(time - prevTime).TotalSeconds;
             return timeInMinutes * 60 - totalSecond;
+        }
+
+        private string GetRemainingTimeString()
+        {
+            var seconds = GetTimeRemainingTimeInSeconds();
+            var (min, sec) = (seconds / 60, seconds % 60);
+            var x = min.ToChars(2);
+            var y = sec.ToChars(2);
+            return $"{min.ToChars(2)} : {sec.ToChars(2)}";
         }
         
         private void UpdateTime()
