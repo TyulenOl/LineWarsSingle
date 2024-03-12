@@ -20,16 +20,16 @@ namespace LineWars
 
         [SerializeField] private TMP_Text currentAp;
         [SerializeField] private LevelCharacteristics apCharacteristics;
-        
+
         [SerializeField] private TMP_Text currentHp;
         [SerializeField] private LevelCharacteristics hpCharacteristics;
-        
+
         [SerializeField] private TMP_Text currentPower;
         [SerializeField] private LevelCharacteristics powerCharacteristics;
-        
+
         [SerializeField] private TMP_Text costInfo;
         [SerializeField] private LevelCharacteristics costCharacteristics;
-        
+
         private DeckCard deckCard;
 
         private static CardUpgrader CardUpgrader => GameRoot.Instance.CardUpgrader;
@@ -49,7 +49,7 @@ namespace LineWars
         {
             upgradeButton.onClick.AddListener(UpgradeCard);
         }
-        
+
         private void OnDestroy()
         {
             if (upgradeButton != null)
@@ -60,9 +60,9 @@ namespace LineWars
         {
             if (deckCard == null)
                 return;
-            
+
             var canUpgrade = CardUpgrader.CanUpgrade(deckCard);
-            
+
             upgradeButton.interactable = canUpgrade;
 
             var costToUpgrade = CardUpgrader.GetUpgradePrice(deckCard);
@@ -76,64 +76,75 @@ namespace LineWars
             }
 
             levelText.text = $"{UserController.GetCardLevel(deckCard) + 1}";
+            
+            
+            var currentLevel = deckCard.GetLevelInfo(deckCard.Level);
+            var nextLevel = deckCard.GetLevelInfo(deckCard.Level + 1);
 
+            var currentCostInfo = currentLevel.CostProgression.GetFirstIncrement(currentLevel.Cost);
+            var nextCostInfo = nextLevel?.CostProgression.GetFirstIncrement(nextLevel.Cost);
 
-            if (canUpgrade)
-            {
-                currentAp.gameObject.SetActive(false);
-                currentHp.gameObject.SetActive(false);
-                currentPower.gameObject.SetActive(false);
-                costInfo.gameObject.SetActive(false);
-                
-                apCharacteristics.gameObject.SetActive(true);
-                hpCharacteristics.gameObject.SetActive(true);
-                powerCharacteristics.gameObject.SetActive(true);
-                costCharacteristics.gameObject.SetActive(true);
-             
-                var currentLevel = deckCard.GetLevelInfo(deckCard.Level);
-                var nextLevel = deckCard.GetLevelInfo(deckCard.Level + 1);
-                
-                apCharacteristics.Current.text = currentLevel.Unit.MaxActionPoints.ToString();
-                hpCharacteristics.Current.text = currentLevel.Unit.MaxHp.ToString();
-                powerCharacteristics.Current.text = currentLevel.Unit.InitialPower.ToString();
-                
-                apCharacteristics.Next.text = nextLevel.Unit.MaxActionPoints.ToString();
-                hpCharacteristics.Next.text = nextLevel.Unit.MaxHp.ToString();
-                powerCharacteristics.Next.text = nextLevel.Unit.InitialPower.ToString();
-                
-                
-                var currentCostInfo = currentLevel.CostProgression.GetFirstIncrement(currentLevel.Cost);
-                var nextCostInfo = nextLevel.CostProgression.GetFirstIncrement(nextLevel.Cost);
-                
-                costCharacteristics.Current.text = currentCostInfo.CanBuy 
-                    ? $"{currentLevel.Cost}(+{currentCostInfo.Cost})" 
-                    : $"{currentLevel.Cost}";
-                costCharacteristics.Next.text = nextCostInfo.CanBuy 
-                    ? $"{nextLevel.Cost}(+{nextLevel.Cost})" 
+            var currentCost = currentCostInfo.CanBuy
+                ? $"{currentLevel.Cost}(+{currentCostInfo.Cost})"
+                : $"{currentLevel.Cost}";
+
+            var nextCost = nextCostInfo == null
+                ? null
+                : nextCostInfo.CanBuy
+                    ? $"{nextLevel.Cost}(+{nextLevel.Cost})"
                     : $"{nextLevel.Cost}";
-                
-                LayoutRebuilder.ForceRebuildLayoutImmediate(levelLayoutGroup.GetComponent<RectTransform>());
+
+            DrawCharacteristic(
+                currentLevel.Unit.MaxActionPoints.ToString(),
+                nextLevel?.Unit.MaxActionPoints.ToString(),
+                currentAp,
+                apCharacteristics);
+
+            DrawCharacteristic(
+                currentLevel.Unit.MaxHp.ToString(),
+                nextLevel?.Unit.MaxHp.ToString(),
+                currentHp,
+                hpCharacteristics);
+
+            DrawCharacteristic(
+                currentLevel.Unit.InitialPower.ToString(),
+                nextLevel?.Unit.InitialPower.ToString(),
+                currentPower,
+                powerCharacteristics);
+
+            DrawCharacteristic(
+                currentLevel.Unit.MaxActionPoints.ToString(),
+                nextLevel?.Unit.MaxActionPoints.ToString(),
+                currentAp,
+                apCharacteristics);
+
+            DrawCharacteristic(
+                currentCost,
+                nextCost,
+                costInfo,
+                costCharacteristics);
+
+            LayoutRebuilder.ForceRebuildLayoutImmediate(levelLayoutGroup.GetComponent<RectTransform>());
+        }
+
+        private void DrawCharacteristic(
+            string current,
+            string next,
+            TMP_Text defaultText,
+            LevelCharacteristics ifLevelUpText)
+        {
+            if (next == null || current == next)
+            {
+                defaultText.gameObject.SetActive(true);
+                ifLevelUpText.gameObject.SetActive(false);
+                defaultText.text = current;
             }
             else
             {
-                currentAp.gameObject.SetActive(true);
-                currentHp.gameObject.SetActive(true);
-                currentPower.gameObject.SetActive(true);
-                costInfo.gameObject.SetActive(true);
-                
-                apCharacteristics.gameObject.SetActive(false);
-                hpCharacteristics.gameObject.SetActive(false);
-                powerCharacteristics.gameObject.SetActive(false);
-                costCharacteristics.gameObject.SetActive(false);
-                
-                currentHp.text = deckCard.Unit.MaxHp.ToString();
-                currentPower.text = deckCard.Unit.InitialPower.ToString();
-                currentAp.text = deckCard.Unit.MaxActionPoints.ToString();
-                
-                var currentCostInfo = deckCard.CostProgression.GetFirstIncrement(deckCard.Cost);
-                costInfo.text = currentCostInfo.CanBuy 
-                    ? $"{deckCard.Cost}(+{currentCostInfo.Cost})" 
-                    : $"{deckCard.Cost}";
+                defaultText.gameObject.SetActive(false);
+                ifLevelUpText.gameObject.SetActive(true);
+                ifLevelUpText.Current.text = current;
+                ifLevelUpText.Next.text = next;
             }
         }
 
