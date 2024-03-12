@@ -44,41 +44,5 @@ namespace LineWars.Interface
                 Debug.LogWarning($"Cant draw gameReferee of type {type}");
             }
         }
-        
-        // private void SubscribeEventForGameReferee()
-        // {
-        //     if (SingleGameRoot.Instance.GameReferee is ScoreReferee scoreReferee)
-        //     {
-        //         scoreReferee.ScoreChanged += (player, before, after) =>
-        //         {
-        //             if (player == Player.LocalPlayer)
-        //             {
-        //                 scoreText.text = $"{after}/{scoreReferee.ScoreForWin}";
-        //             }
-        //         };
-        //
-        //         scoreText.text = $"{scoreReferee.GetScoreForPlayer(Player.LocalPlayer)}/{scoreReferee.ScoreForWin}";
-        //     }
-        //     if (SingleGameRoot.Instance.GameReferee is SiegeGameReferee siegeGameReferee)
-        //     {
-        //         siegeGameReferee.CurrentRoundsChanged += (currentRounds) =>
-        //         {
-        //             scoreText.text = $"{currentRounds}/{siegeGameReferee.RoundsToWin}";
-        //         };
-        //
-        //         scoreText.text = $"{siegeGameReferee.CurrentRounds}/{siegeGameReferee.RoundsToWin}";
-        //     }
-        //     
-        //     if (SingleGameRoot.Instance.GameReferee is NewDominationGameReferee dominationGameReferee)
-        //     {
-        //         dominationGameReferee.RoundsAmountChanged += () =>
-        //         {
-        //             scoreText.text = $"{dominationGameReferee.RoundsToWin}";
-        //         };
-        //
-        //         scoreText.text = $"{dominationGameReferee.RoundsToWin}";
-        //     }
-        // }
-        
     }
 }
