@@ -1,34 +1,26 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using LineWars.Model;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace LineWars.Interface
 {
-    [RequireComponent(typeof(Image))]
     public class UnitPowerDrawer: MonoBehaviour
     {
-        private Image image;
-
         [SerializeField] private Unit unit;
-        [SerializeField] private Sprite canAttackSprite;
-        [SerializeField] private Sprite cantAttackSprite;
-
-        private void Awake()
-        {
-            image = GetComponent<Image>();
-        }
+        [SerializeField] private GameObject canAttackSprite;
+        [SerializeField] private GameObject cantAttackSprite;
 
         private void Start()
         {
             if (unit.UnitCommands.Any(x => x.IsAttack()))
             {
-                image.sprite = canAttackSprite;
+                canAttackSprite.gameObject.SetActive(true);
+                cantAttackSprite.gameObject.SetActive(false);
             }
             else
             {
-                image.sprite = cantAttackSprite;
+                canAttackSprite.gameObject.SetActive(false);
+                cantAttackSprite.gameObject.SetActive(true);
             }
         }
     }
