@@ -95,6 +95,8 @@ namespace LineWars.Controllers
 
         private float GetTimeRemainingTimeInSeconds()
         {
+            if(!UserController.KeyToDateTime.ContainsKey((keyID)))
+                return 0f;
             var time = TimeGetter.Get();
             var prevTime = UserController.KeyToDateTime[keyID];
             var totalSecond = (float)(time - prevTime).TotalSeconds;
