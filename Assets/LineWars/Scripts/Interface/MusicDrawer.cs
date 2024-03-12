@@ -1,8 +1,5 @@
-﻿using System;
-using LineWars.Controllers;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
-using static Codice.CM.Common.CmCallContext;
 
 namespace LineWars.Interface
 {

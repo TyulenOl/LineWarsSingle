@@ -1,4 +1,4 @@
-using Unity.Plastic.Newtonsoft.Json.Serialization;
+using System;
 using UnityEngine;
 
 namespace LineWars
