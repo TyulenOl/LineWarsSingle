@@ -26,7 +26,8 @@ namespace LineWars.Model
 
         private void OnReplenish(TUnit unit)
         {
-            TargetUnit.CurrentArmor += TargetUnit.CurrentPower;
+            if (unit.CurrentArmor < TargetUnit.CurrentPower)
+                TargetUnit.CurrentArmor = TargetUnit.CurrentPower;
         }
     }
 }

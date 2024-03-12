@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace LineWars.Model
 {
@@ -10,8 +11,15 @@ namespace LineWars.Model
         [SerializeField] private UnitAnimation unitAnimation;
 
         public int Rounds => rounds;
-
         protected override bool NeedAutoComplete => false;
+        
+        public int Damage => Action.Damage;
+        public event Action<int> DamageChanged
+        {
+            add => Action.DamageChanged += value;
+            remove => Action.DamageChanged -= value;
+        }
+        
         protected override VenomousSpitAction<Node, Edge, Unit> GetAction()
         {
             return new VenomousSpitAction<Node, Edge, Unit>(Executor, rounds);

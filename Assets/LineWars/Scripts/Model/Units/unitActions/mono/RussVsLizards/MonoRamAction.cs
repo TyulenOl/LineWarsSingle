@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace LineWars.Model
@@ -13,6 +14,13 @@ namespace LineWars.Model
 
         private int ramResponsesPlayingCount;
         private Node currentNode;
+        
+        public int Damage => Action.Damage;
+        public event Action<int> DamageChanged
+        {
+            add => Action.DamageChanged += value;
+            remove => Action.DamageChanged -= value;
+        }
 
         public bool CanRam(Node node)
         {

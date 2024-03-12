@@ -61,9 +61,9 @@ namespace LineWars.Controllers
                 {
                     case 0:
                         break;
-                    // case 1:
-                    //     Manager.ProcessCommandPreset(presets[0]);
-                    //     break;
+                    case 1:
+                        Manager.ProcessCommandPreset(presets[0]);
+                        break;
                     default:
                         if (presets.All(preset => !preset.IsActive))
                             break;

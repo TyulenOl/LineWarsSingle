@@ -1,7 +1,6 @@
 ﻿using System;
 using UnityEditor;
 using UnityEngine;
-using Utilities.Runtime;
 
 [CustomPropertyDrawer(typeof(BaseStableEnum), true)]
 public class StableEnumDrawer : PropertyDrawer

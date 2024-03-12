@@ -22,7 +22,7 @@ namespace LineWars.Model
         [SerializeField, Min(0)] private int initialPower;
         [SerializeField, Min(0)] private int maxHp;
         [SerializeField, Min(0)] private int visibility;
-        private int maxArmor = 100;
+        private int maxArmor = 20;
         [field: SerializeField] public Sprite Sprite { get; private set; }
         
         [SerializeField] private UnitType unitType;
@@ -238,14 +238,6 @@ namespace LineWars.Model
         {
             dj = new RandomDJ(0.5f);
             index = SingleGameRoot.Instance.AllUnits.Add(this);
-            
-            // currentHp += maxHp;
-            // currentArmor += 0;
-            // currentActionPoints += maxActionPoints;
-            // currentPower += initialPower;
-            
-            // monoUnitActions = GetComponents<MonoUnitAction>();
-            // moveAction = GetComponent<MonoMoveAction>();
             
             Node = node;
             UnitDirection = direction;

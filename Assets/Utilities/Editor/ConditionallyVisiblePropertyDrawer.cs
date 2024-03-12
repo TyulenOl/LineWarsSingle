@@ -1,6 +1,5 @@
 ﻿using UnityEditor;
 using UnityEngine;
-using Utilities.Runtime;
 
 namespace Utilities.Editor
 {

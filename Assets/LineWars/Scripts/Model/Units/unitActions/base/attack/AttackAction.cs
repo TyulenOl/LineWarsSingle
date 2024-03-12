@@ -1,4 +1,6 @@
 ﻿
+using System;
+
 namespace LineWars.Model
 {
     public abstract class AttackAction<TNode, TEdge, TUnit> :
@@ -10,6 +12,8 @@ namespace LineWars.Model
     {
         public bool AttackLocked { get; protected set; }
         public bool IsPenetratingDamage { get; protected set; }
+        public int Damage => Executor.CurrentPower;
+        public event Action<int> DamageChanged;
 
         public bool CanAttack(ITargetedAlive enemy, bool ignoreActionPointsCondition = false) =>
             CanAttackFrom(Executor.Node, enemy, ignoreActionPointsCondition);
@@ -59,6 +63,17 @@ namespace LineWars.Model
         protected AttackAction(TUnit executor, bool isPenetratingDamage) : base(executor)
         {
             IsPenetratingDamage = isPenetratingDamage;
+            Executor.UnitPowerChanged += OnUnitPowerChanged;
+        }
+
+        ~AttackAction()
+        {
+            Executor.UnitPowerChanged -= OnUnitPowerChanged;
+        }
+        
+        private void OnUnitPowerChanged(TUnit unit, int before, int after)
+        {
+            DamageChanged?.Invoke(after);
         }
     }
 }

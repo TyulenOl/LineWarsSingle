@@ -17,7 +17,6 @@ namespace LineWars.Model
         
         public abstract void Accept(IMonoUnitActionVisitor visitor);
         public abstract TResult Accept<TResult>(IUnitActionVisitor<TResult, Node, Edge, Unit> visitor);
-
     }
 
     [RequireComponent(typeof(Unit))]

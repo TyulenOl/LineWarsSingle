@@ -12,6 +12,14 @@ namespace LineWars.Model
 
         protected override bool NeedAutoComplete => false;
         public int FireEffectRounds => fireEffectRounds;
+        
+        public int Damage => Action.Damage;
+        public event Action<int> DamageChanged
+        {
+            add => Action.DamageChanged += value;
+            remove => Action.DamageChanged -= value;
+        }
+        
         protected override ArsonAction<Node, Edge, Unit> GetAction()
         {
             return new ArsonAction<Node, Edge, Unit>(Executor, fireEffectRounds);

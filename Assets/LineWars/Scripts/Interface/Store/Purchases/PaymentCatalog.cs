@@ -3,7 +3,6 @@ using LineWars.Controllers;
 using LineWars.Model;
 using UnityEngine;
 using UnityEngine.Events;
-using Utilities.Runtime;
 
 namespace LineWars.Interface
 {

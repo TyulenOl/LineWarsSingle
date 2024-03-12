@@ -1,3 +1,4 @@
+using System;
 using LineWars.Controllers;
 using UnityEngine;
 
@@ -12,6 +13,14 @@ namespace LineWars.Model
         [SerializeField] private SFXData attackReaction;
 
         protected override bool NeedAutoComplete => false;
+        
+        public int Damage => Action.Damage;
+        public event Action<int> DamageChanged
+        {
+            add => Action.DamageChanged += value;
+            remove => Action.DamageChanged -= value;
+        }
+        
         protected override HealingAttackAction<Node, Edge, Unit> GetAction()
         {
             return new HealingAttackAction<Node, Edge, Unit>(Executor);

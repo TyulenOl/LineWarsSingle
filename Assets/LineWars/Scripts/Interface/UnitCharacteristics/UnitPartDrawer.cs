@@ -1,8 +1,6 @@
 using LineWars.Model;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
-using LineWars;
 using UnityEngine.Serialization;
 
 namespace LineWars.Interface
@@ -15,7 +13,6 @@ namespace LineWars.Interface
         [SerializeField] private SpriteRenderer ifAvailablePanel;
         [SerializeField] private SpriteRenderer unitIsExecutorImage;
         [SerializeField] private SpriteRenderer canBlockSprite;
-        [SerializeField] private TMP_Text powerAmount;
         [SerializeField] private UnitProgressBar unitProgressBar;
         [SerializeField] private SpriteRenderer commandIcon;
         private Unit currentUnit;
@@ -41,7 +38,6 @@ namespace LineWars.Interface
         {
             UnitName.text = unitToInit.UnitName;
             unitProgressBar.Init(currentUnit.MaxHp, currentUnit.CurrentArmor, currentUnit.MaxActionPoints);
-            powerAmount.text = currentUnit.CurrentPower.ToString();
         }
 
         public void SetUnitAsExecutor(bool isExecutor)
@@ -72,7 +68,6 @@ namespace LineWars.Interface
         {
             unitProgressBar.SetValues(currentUnit.CurrentHp, currentUnit.MaxHp,
                 currentUnit.CurrentArmor, currentUnit.CurrentActionPoints, currentUnit.MaxActionPoints);
-            powerAmount.text = currentUnit.CurrentPower.ToString();
         }
     }
 }

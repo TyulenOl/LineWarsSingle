@@ -1,3 +1,5 @@
+using System;
+
 namespace LineWars.Model
 {
     public class TargetPowerBasedAttackAction<TNode, TEdge, TUnit> :
@@ -8,9 +10,21 @@ namespace LineWars.Model
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
         public override CommandType CommandType => CommandType.TargetPowerBasedAttack;
+        public int Damage => Executor.CurrentPower;
+        public event Action<int> DamageChanged;
+        private void OnUnitPowerChanged(TUnit unit, int before, int after)
+        {
+            DamageChanged?.Invoke(after);
+        }
 
         public TargetPowerBasedAttackAction(TUnit executor) : base(executor)
         {
+            Executor.UnitPowerChanged += OnUnitPowerChanged;
+        }
+
+        ~TargetPowerBasedAttackAction()
+        {
+            Executor.UnitPowerChanged -= OnUnitPowerChanged;
         }
 
         public bool IsAvailable(TUnit target)

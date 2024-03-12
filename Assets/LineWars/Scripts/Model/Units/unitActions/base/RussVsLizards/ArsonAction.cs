@@ -1,4 +1,6 @@
-﻿namespace LineWars.Model
+﻿using System;
+
+namespace LineWars.Model
 {
     public class ArsonAction<TNode, TEdge, TUnit> :
         UnitAction<TNode, TEdge, TUnit>,
@@ -10,10 +12,23 @@
         public override CommandType CommandType => CommandType.Arson;
         private int fireEffectRounds;
         public int FireEffectRounds => fireEffectRounds;
+        public int Damage => Executor.CurrentPower;
+        public event Action<int> DamageChanged;
 
         public ArsonAction(TUnit executor, int fireEffectRounds) : base(executor)
         {
             this.fireEffectRounds = fireEffectRounds;
+            Executor.UnitPowerChanged += OnUnitPowerChanged;
+        }
+
+        ~ArsonAction()
+        {
+            Executor.UnitPowerChanged -= OnUnitPowerChanged;
+        }
+
+        private void OnUnitPowerChanged(TUnit unit, int before, int after)
+        {
+            DamageChanged?.Invoke(after);
         }
 
         public bool IsAvailable(TNode target)
