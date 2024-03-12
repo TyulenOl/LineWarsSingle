@@ -1,3 +1,4 @@
+using LineWars;
 using System;
 using UnityEngine;
 
@@ -8,6 +9,8 @@ namespace Plugins.Audio.Core
         public static AudioPauseHandler Instance => _instance;
         
         private static AudioPauseHandler _instance;
+
+        [SerializeField] private BoolEventChannel listenedPauseSetChannel;
         
         private bool _isFocused = true;
         private bool _isAds = false;
@@ -42,12 +45,24 @@ namespace Plugins.Audio.Core
         {
             AppFocusHandle.OnFocus += Focus;
             AppFocusHandle.OnUnfocus += UnFocus;
+
+            listenedPauseSetChannel.Raised += HandleRaised;
         }
 
         private void OnDisable()
         {
             AppFocusHandle.OnFocus -= Focus;
             AppFocusHandle.OnUnfocus -= UnFocus;
+
+            listenedPauseSetChannel.Raised -= HandleRaised;
+        }
+
+        private void HandleRaised(bool value)
+        {
+            if(value)
+                PauseAudio();
+            else
+                UnpauseAudio();
         }
 
         private void Focus()

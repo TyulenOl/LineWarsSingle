@@ -10,6 +10,7 @@ namespace LineWars
 {
     public class PauseInstaller: Singleton<PauseInstaller>
     {
+        [SerializeField] private BoolEventChannel raisedPauseSetChannel;
         [Flags]
         public enum PauseType
         {
@@ -166,7 +167,7 @@ namespace LineWars
                 {
                     if (pause) AudioListener.pause = true;
                     else AudioListener.pause = closingADValues.audioPause;
-                    
+                    raisedPauseSetChannel.RaiseEvent(pause || closingADValues.audioPause);
                     /*if (pause)
                         AudioPauseHandler.Instance?.PauseAudio();
                     else if (closingADValues.audioPause)
@@ -182,14 +183,14 @@ namespace LineWars
                         AudioListener.pause = true;
                     }
                     else AudioListener.pause = audioPauseOnAd;
-                    
-                    /*if (pause)
+                    raisedPauseSetChannel.RaiseEvent(pause || audioPauseOnAd);
+                   /* if (pause)
                         AudioPauseHandler.Instance?.PauseAudio();
                     else if (audioPauseOnAd)
                         AudioPauseHandler.Instance?.PauseAudio();
                     else
                         AudioPauseHandler.Instance?.UnpauseAudio();*/
-                    
+
                 }
             }
 
