@@ -1,0 +1,20 @@
+{
+    "name": "WebGLPluginAudio",
+    "rootNamespace": "",
+    "references": [
+        "GUID:04d767f33dad775409e3522e80831fa2",
+        "GUID:403d8ee4abf1e694089c3e8d3edff032"
+    ],
+    "includePlatforms": [
+        "Editor",
+        "WebGL"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,3 +1,4 @@
+using Plugins.Audio.Core;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -5,13 +6,12 @@ using UnityEngine.Events;
 
 namespace LineWars.Controllers
 {
-    [RequireComponent(typeof(AudioSource))]
-    [Obsolete]
-    public class MusicManager : MonoBehaviour
+    [RequireComponent(typeof(SourceAudio))]
+    public class PluginMusicManager : MonoBehaviour
     {
-        public static MusicManager Instance { get; private set; }
-        [SerializeField] private MusicLogicData musicLogicData;
-        [SerializeField] private TwoStringEventChannel raisedMusicChangedEventChannel;
+        public static PluginMusicManager Instance { get; private set; }
+        [SerializeField] private PluginMusicLogicData musicLogicData;
+        [SerializeField] private TwoStringEventChannel raisedMusicChangedChannel;
         
         [Header("Fade Out Settings")]
         [SerializeField] private AnimationCurve fadeOutCurve;
@@ -21,17 +21,18 @@ namespace LineWars.Controllers
         [SerializeField] private AnimationCurve fadeInCurve;
         [SerializeField] private float fadeInTime;
 
-        private AudioSource source;
-        private MusicLogic logic;
+        private SourceAudio source;
+        private PluginMusicLogic logic;
         private float initialVolume;
-        public MusicData CurrentMusicData { get; private set; }
-        public UnityEvent<MusicData, MusicData> MusicChanged;
+        public PluginMusicData CurrentMusicData { get; private set; }
+        public UnityEvent<PluginMusicData, PluginMusicData> MusicChanged;
+        public UnityEvent<PluginMusicManager, PluginMusicData> MusicFinished;
 
         //  public AudioSource Source => source;
         public float Volume
         {
-            get => source.volume;
-            set => source.volume = value;
+            get => source.Volume;
+            set => source.Volume = value;
         }
 
         private void Awake()
@@ -48,22 +49,29 @@ namespace LineWars.Controllers
                 return;
             }
 
-            source = GetComponent<AudioSource>();
+            source = GetComponent<SourceAudio>();
             logic = musicLogicData.GetMusicLogic(this);
-            initialVolume = source.volume;
+            
         }
 
         private void Start()
         {
+            initialVolume = source.Volume;
             logic.Start();
+            source.OnFinished += InvokeMusicFinished;
         }
+
 
         private void Update()
         {
             logic.Update();
         }
+        private void InvokeMusicFinished()
+        {
+            MusicFinished.Invoke(this, CurrentMusicData);
+        }
 
-        private void SwitchMusicLogic(MusicLogicData data)
+        private void SwitchMusicLogic(PluginMusicLogicData data)
         {
             StartCoroutine(SwitchCoroutine());
             IEnumerator SwitchCoroutine()
@@ -73,7 +81,7 @@ namespace LineWars.Controllers
                 {
                     yield return null;
                     passedTime += Time.deltaTime;
-                    source.volume = fadeOutCurve.Evaluate(passedTime / fadeOutTime);
+                    source.Volume = fadeOutCurve.Evaluate(passedTime / fadeOutTime);
                 }
                 logic.Exit();
                 logic = data.GetMusicLogic(this);
@@ -84,20 +92,19 @@ namespace LineWars.Controllers
                 {
                     yield return null;
                     passedTime += Time.deltaTime;
-                    source.volume = fadeInCurve.Evaluate(passedTime / fadeOutTime);
+                    source.Volume = fadeInCurve.Evaluate(passedTime / fadeOutTime);
                 }
             }
         }
 
-        public void Play(MusicData musicData)
+        public void Play(PluginMusicData musicData)
         {
             var prevData = CurrentMusicData;
-            source.clip = musicData.AudioClip;
-            source.volume = source.volume * musicData.VolumeCoeficient;
-            source.Play();
+            source.Volume = source.Volume * musicData.VolumeCoeficient;
+            source.Play(musicData.AudioClipKey);
             CurrentMusicData = musicData;
             MusicChanged.Invoke(prevData, musicData);
-            raisedMusicChangedEventChannel.RaiseEvent(prevData.Name, prevData.Artist);
+            raisedMusicChangedChannel.RaiseEvent(musicData.Name, musicData.Artist);
         }
 
         public void Stop()
@@ -107,7 +114,6 @@ namespace LineWars.Controllers
             var prevData = CurrentMusicData;
             CurrentMusicData = null;
             source.Stop();
-            source.clip = null;
             MusicChanged.Invoke(prevData, null);
         }
     }

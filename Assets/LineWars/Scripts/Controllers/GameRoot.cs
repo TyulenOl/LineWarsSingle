@@ -25,12 +25,12 @@ namespace LineWars.Controllers
         [SerializeField] private CardUpgrader cardUpgrader;
         
         [Header("Providers")]
-        [SerializeField] private YandexGameProvider yandexGameProvider;
+        [SerializeField] private ProviderBase yandexGameProvider;
         
         [Header("Api")]
-        [SerializeField] private RuStoreAdapter ruStoreAdapter;
-        [SerializeField] private YandexGameSdkAdapter yandexGameSdkAdapter;
-        [SerializeField] private FakeSDKAdapter fakeSDKAdapter;
+        [SerializeField] private SDKAdapterBase ruStoreAdapter;
+        [SerializeField] private SDKAdapterBase yandexGameSdkAdapter;
+        [SerializeField] private SDKAdapterBase fakeSDKAdapter;
 
         [Space]
         [SerializeField] private Platform platform;

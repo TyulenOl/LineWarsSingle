@@ -2,54 +2,51 @@
 using LineWars.Controllers;
 using TMPro;
 using UnityEngine;
+using static Codice.CM.Common.CmCallContext;
 
 namespace LineWars.Interface
 {
     public class MusicDrawer: MonoBehaviour
     {
         private static readonly int animateId = Animator.StringToHash("animate");
-        private static PluginMusicManager MusicManager => PluginMusicManager.Instance;
         
         [SerializeField] private Animator animator;
         [SerializeField] private TMP_Text author;
         [SerializeField] private TMP_Text soundName;
-        private PluginMusicData current;
+        [SerializeField] private TwoStringEventChannel listenedMusicChangedChannel;
+
+        private string currentTitle;
+        private string currentArtist;
         
 
         private void OnEnable()
-        {
-            MusicManager.MusicChanged.AddListener(MusicChanged);
-            // if (MusicManager.CurrentMusicData != null)
-            //     Animate(MusicManager.CurrentMusicData);
+        { 
+            listenedMusicChangedChannel.Raised += MusicChanged;
         }
 
         private void OnDisable()
         {
-            MusicManager.MusicChanged.RemoveListener(MusicChanged);
+            listenedMusicChangedChannel.Raised -= MusicChanged;
         }
 
-        private void MusicChanged(PluginMusicData before, PluginMusicData after)
+        private void MusicChanged(string title, string artist)
         {
-            if (after != null)
+            if(title != currentTitle || artist != currentArtist)
             {
-                Animate(after);
+                currentTitle = title;
+                currentArtist = artist;
+                Animate(title, artist);
             }
         }
 
-        private void Animate(PluginMusicData musicData)
+        private void Animate(string title, string artist)
         {
-            if (current == musicData)
-                return;
-            
-            //Debug.Log("Animate");
-            current = musicData;
-            
-            var haveName = !string.IsNullOrEmpty(musicData.Name);
-            var haveAuthor = !string.IsNullOrEmpty(musicData.Artist);
+            var haveName = !string.IsNullOrEmpty(title);
+            var haveAuthor = !string.IsNullOrEmpty(artist);
 
-            author.text = musicData.Artist;
-            soundName.text = musicData.Name;
-            
+            author.text = artist;
+            soundName.text = title;
+
             if (haveName && haveAuthor)
                 animator.SetTrigger(animateId);
         }
