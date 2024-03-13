@@ -130,9 +130,13 @@ namespace LineWars
         {
             Instance?._Pause(pause);
         }
+
+        public static bool Paused { get; private set; }
         
         private void _Pause(bool pause)
         {
+            Paused = pause;
+            
             if (logPause)
                 Debug.Log("Pause game: " + pause);
 
