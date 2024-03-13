@@ -37,13 +37,14 @@ public class SceneTransition : MonoBehaviour
     private bool isStartUpdateProgress;
 
     private bool isStartLoading;
-    private bool loaded;
 
+    
+    public static bool Loaded { get; private set; }
     public static event Action StartLoad;
     public static event Action EndLoad;
     public static event Action StartUnload;
     public static event Action EndUnload;
-    public static bool Loaded => instance == null && instance.loaded;
+
 
     private void Awake()
     {
@@ -118,7 +119,7 @@ public class SceneTransition : MonoBehaviour
     public static void LoadScene(SceneName sceneName)
     {
         if (instance.isStartLoading) return;
-        instance.loaded = true;
+        Loaded = true;
         instance.isStartLoading = true;
         instance.animator.SetTrigger("sceneClosing");
         instance.sceneName = sceneName;
@@ -177,7 +178,7 @@ public class SceneTransition : MonoBehaviour
     public void ANIMATION_EVENT_EndAnimation()
     {
         //Debug.Log("EndUnload");
-        loaded = false;
+        Loaded = false;
         EndUnload?.Invoke();
     }
 
