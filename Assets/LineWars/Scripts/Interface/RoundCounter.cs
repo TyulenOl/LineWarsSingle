@@ -10,25 +10,32 @@ public class RoundCounter : MonoBehaviour
 {
     [SerializeField] private int counter;
     [SerializeField] private TMP_Text text;
+    [SerializeField] private Animator animator;
+    
+    private static readonly int animate = Animator.StringToHash("animate");
 
     public int Counter
     {
         get => counter;
         set
         {
+            if (value == counter)
+                return;
+            
             counter = value;
-            text.text = counter.ToString();
+            text.text = counter.ToChars(3);
+            animator.SetTrigger(animate);
         }
     }
 
-    private void Awake()
+    private void Start()
     {
-        SingleGameRoot.Instance.CommandsManager.StateEntered += OnStateChanged;
+        PhaseManager.Instance.PhaseEntered.AddListener(OnStateChanged);
     }
 
-    private void OnStateChanged(CommandsManagerStateType obj)
+    private void OnStateChanged(PhaseType obj)
     {
-        if (obj == CommandsManagerStateType.Buy)
+        if (obj == PhaseType.Replenish)
         {
             Counter++;
         }

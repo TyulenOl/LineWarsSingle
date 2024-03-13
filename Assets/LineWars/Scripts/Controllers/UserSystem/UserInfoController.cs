@@ -431,7 +431,9 @@ namespace LineWars.Controllers
 
         DateTime ITimeIndexer.this[string key]
         {
-            get => DateTime.Parse(currentInfo.KeyToDateTime[key], CultureInfo.InvariantCulture);
+            get => currentInfo.KeyToDateTime.ContainsKey(key)
+                ? DateTime.Parse(currentInfo.KeyToDateTime[key], CultureInfo.InvariantCulture)
+                : DateTime.Now;
             set
             {
                 var serialized = value.ToString(CultureInfo.InvariantCulture);
