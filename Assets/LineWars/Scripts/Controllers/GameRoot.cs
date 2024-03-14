@@ -100,21 +100,21 @@ namespace LineWars.Controllers
                 return;
             }
             
-            GameReady = true;
 
             timeGetter = new GetLocalTime();
             reusableTimeGetter = new GetLocalTime();
             
             InitializeProviders();
             
-            CompaniesController.Initialize(missionInfoProvider, missionsStorage);
-            UserController.Initialize(userInfoProvider, cardsDatabase, blessingStorage);
-            DecksController.Initialize(deckProvider, userController);
-            Store.Initialize(timeGetter, cardsDatabase, blessingStorage, userController);
-            BlessingsController.Initialize(userController, userController, blessingStorage);
-            CardUpgrader.Initialize(userController, cardsDatabase);
+            companiesController.Initialize(missionInfoProvider, missionsStorage);
+            userController.Initialize(userInfoProvider, cardsDatabase, blessingStorage);
+            decksController.Initialize(deckProvider, userController);
+            store.Initialize(timeGetter, cardsDatabase, blessingStorage, userController);
+            blessingsController.Initialize(userController, userController, blessingStorage);
+            cardUpgrader.Initialize(userController, cardsDatabase);
             InitializeLootBoxController();
             
+            GameReady = true;
             OnGameReady?.Invoke();
             OnGameReady = null;
         }

@@ -10,10 +10,14 @@ namespace LineWars.Controllers
 
         public MissionData FindNextMission(MissionData missionData)
         {
-            var index = order.FindIndex(missionData);
-            if (index < 0 || index >= order.Count)
+            if (order == null || missionData == null)
                 return null;
-            return order[index + 1];
+            
+            var index = order.IndexOf(missionData);
+            if (index < 0 || index + 1 >= order.Count)
+                return null;
+            return order[index];
+            
         }
     }
 }

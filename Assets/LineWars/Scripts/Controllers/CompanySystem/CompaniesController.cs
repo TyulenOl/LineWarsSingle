@@ -37,8 +37,13 @@ namespace LineWars.Controllers
 
         private void LoadMissionsSaves()
         {
-            missionInfos = companiesProvider.LoadAll()
-                .ToDictionary(m => m.MissionId, m => m);
+            missionInfos = new Dictionary<int, MissionInfo>();
+            foreach (var info in companiesProvider.LoadAll())
+            {
+                if (info == null)
+                    continue;
+                missionInfos.TryAdd(info.MissionId, info);
+            }
         }
 
         private void AssignAllMissions()

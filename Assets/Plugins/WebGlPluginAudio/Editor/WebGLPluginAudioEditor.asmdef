@@ -1,0 +1,18 @@
+{
+    "name": "WebGLPluginAudioEditor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:ecad798dd5a19d046b3c9258452e2d06"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

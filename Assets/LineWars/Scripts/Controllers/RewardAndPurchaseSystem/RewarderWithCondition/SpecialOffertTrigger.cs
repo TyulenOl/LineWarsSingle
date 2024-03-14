@@ -15,9 +15,21 @@ namespace LineWars.Infrastructure
         [SerializeField] private string startDate;
         [SerializeField] private string endDate;
 
+        private static GameRoot GameRoot => GameRoot.Instance;
         private static UserInfoController UserController => GameRoot.Instance?.UserController;
 
         private void Start()
+        {
+            if (GameRoot != null)
+            {
+                if (GameRoot.GameReady)
+                    CheckSpecialOffert();
+                else
+                    GameRoot.OnGameReady += CheckSpecialOffert;
+            }
+        }
+        
+        private void CheckSpecialOffert()
         {
             if (string.IsNullOrEmpty(id))
             {
