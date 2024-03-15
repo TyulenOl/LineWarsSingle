@@ -50,9 +50,9 @@ namespace LineWars
         {
             if (basePlayer == null) throw new ArgumentNullException(nameof(basePlayer));
             
-            var before = playersScore[basePlayer];
             playersScore[basePlayer] = score;
             ScoreChanged?.Invoke(basePlayer, score, scoreForWin);
+            Debug.Log(score);
 
             if (GetScoreForPlayer(basePlayer) >= scoreForWin)
             {

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using LineWars.Model;
 
@@ -8,13 +9,16 @@ namespace LineWars.Controllers
     {
         public Node SelectedNode { get; }
         public IReadOnlyList<CommandPreset> Data { get; }
+        public bool CanReselect { get; }
 
         public OnWaitingCommandMessage(
             IEnumerable<CommandPreset> data,
-            Node selectedNode)
+            Node selectedNode,
+            bool canReselect)
         {
             Data = data.ToArray();
             SelectedNode = selectedNode;
+            CanReselect = canReselect;
         }
     }
 

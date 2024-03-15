@@ -85,10 +85,12 @@ namespace LineWars.Interface
             {
                 if (before is { CanDoAnyAction: true })
                     ReDrawAllAvailability(unitsToReDraw, true);
+                else
+                    ReDrawAllAvailability(unitsToReDraw, false);
             }
             else
             {
-                ReDrawAllAvailability(unitsToReDraw, false);
+                ReDrawAllAvailability(unitsToReDraw, true);
             }
         }
 
@@ -96,8 +98,12 @@ namespace LineWars.Interface
         {
             foreach (var unit in units)
             {
-                if (!unit.CanDoAnyAction) continue;
                 var drawer = unit.GetComponent<UnitDrawer>();
+                if (isAvailable && (!unit.CanDoAnyAction || CommandsManager.Executor == unit))
+                {
+                    drawer.ReDrawAvailability(false);
+                    continue;
+                };
                 drawer.ReDrawAvailability(isAvailable);
             }
         }

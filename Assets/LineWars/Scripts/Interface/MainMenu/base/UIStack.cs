@@ -56,5 +56,10 @@ namespace LineWars
                 nextElement.gameObject.SetActive(true);
             }
         }
+
+        public Transform PeekElement()
+        {
+            return stackElements.Peek();
+        }
     }
 }

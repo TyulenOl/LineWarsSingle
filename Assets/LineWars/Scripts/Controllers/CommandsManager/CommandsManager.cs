@@ -498,6 +498,39 @@ namespace LineWars.Controllers
                    && CanExecuteBlessingCanExecuteCondition(id);
         }
 
+        public bool CanCancelExecutor()
+        {
+            return state == CommandsManagerStateType.Target && findTargetState.CanCancelExecutor();
+        }
+        
+        public void CancelExecutor()
+        {
+            if (!CanCancelExecutor())
+            {
+                LogError("Cant cancel executor!", gameObject);
+                return;
+            }
+            
+            findTargetState.CancelExecutor();
+        }
+
+        public void ReselectExecutor()
+        {
+            if (state != CommandsManagerStateType.WaitingSelectCommand)
+            {
+                InvalidStateLog(nameof(ReselectExecutor));
+                return;
+            }
+
+            if (!findTargetState.CanReselect())
+            {
+                LogError("Cant reselect!", gameObject);
+                return;
+            }
+            
+            findTargetState.Reselect();
+        }
+
         private bool CanExecuteBlessingConstrainsCondition(BlessingId id)
         {
             return NotHaveConstraints || Constrains.CanSelectBlessing(id);

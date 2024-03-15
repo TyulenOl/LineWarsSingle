@@ -30,19 +30,63 @@ namespace LineWars.Controllers
             {
                 if (!Manager.ActiveSelf)
                     return;
-                
+
                 if (newObject == null)
                     return;
-                if (Selector.SelectedObjects
-                        .Any(x => x.TryGetComponent(out IMonoExecutor executor) && executor == Manager.executor)
-                    && Manager.canCancelExecutor
-                    && (Manager.Constrains == null || Manager.Constrains.CanCancelExecutor))
+                if (CanCancelExecutor())
                 {
                     CancelExecutor();
                     return;
                 }
+
+                var presets = CollectAllOrders();
                 
-                var presets = Selector.SelectedObjects
+
+                if (!CanReselect())
+                {
+                    switch (presets.Length)
+                    {
+                        case 0:
+                            break;
+                        case 1:
+                            Manager.ProcessCommandPreset(presets[0]);
+                            break;
+                        default:
+                            if (presets.All(preset => !preset.IsActive))
+                                break;
+                            Manager.GoToWaitingSelectCommandState(
+                                new OnWaitingCommandMessage(
+                                    presets,
+                                    Selector.SelectedObjects.GetComponentMany<Node>().FirstOrDefault(),
+                                    false
+                                ));
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (presets.Length)
+                    {
+                        case 0:
+                            Reselect();
+                            break;
+                        default:
+                            if (presets.All(preset => !preset.IsActive))
+                                break;
+                            Manager.GoToWaitingSelectCommandState(
+                                new OnWaitingCommandMessage(
+                                    presets,
+                                    Selector.SelectedObjects.GetComponentMany<Node>().FirstOrDefault(),
+                                    true
+                                ));
+                            break;
+                    }
+                }
+            }
+
+            private CommandPreset[] CollectAllOrders()
+            {
+                return Selector.SelectedObjects
                     .GetComponentMany<IMonoTarget>()
                     .SelectMany(target => GetAllActionsForPair(Manager.executor, target)
                         .Select(action =>
@@ -56,24 +100,6 @@ namespace LineWars.Controllers
                                 )
                             )))
                     .ToArray();
-
-                switch (presets.Length)
-                {
-                    case 0:
-                        break;
-                    case 1:
-                        Manager.ProcessCommandPreset(presets[0]);
-                        break;
-                    default:
-                        if (presets.All(preset => !preset.IsActive))
-                            break;
-                        Manager.GoToWaitingSelectCommandState(
-                            new OnWaitingCommandMessage(
-                                presets,
-                                Selector.SelectedObjects.GetComponentMany<Node>().FirstOrDefault()
-                            ));
-                        break;
-                }
             }
 
             protected virtual IEnumerable<ITargetedAction> GetAllActionsForPair(
@@ -85,10 +111,48 @@ namespace LineWars.Controllers
                     .Where(x => x.IsAvailable(target) && CheckAction(x));
             }
 
-            private void CancelExecutor()
+            public bool CanCancelExecutor()
+            {
+                return Selector.SelectedObjects
+                           .Any(x => x.TryGetComponent(out IMonoExecutor executor)
+                                     && executor == Manager.executor)
+                       && Manager.canCancelExecutor
+                       && (Manager.Constrains == null || Manager.Constrains.CanCancelExecutor);
+            }
+
+            public void CancelExecutor()
             {
                 Manager.Executor = null;
                 Manager.stateMachine.SetState(Manager.findExecutorState);
+            }
+
+            public bool CanReselect()
+            {
+                return Selector.SelectedObjects
+                           .Any(o =>
+                               o.TryGetComponent(out IMonoExecutor executor)
+                               && o.TryGetComponent(out Owned owned)
+                               && Manager.Player.IsMyOwn(owned)
+                               && executor != Manager.executor
+                               && executor.CanDoAnyAction)
+                       && Manager.canCancelExecutor
+                       && (Manager.Constrains == null || Manager.Constrains.CanCancelExecutor);
+            }
+
+            public void Reselect()
+            {
+                var newExecutors = Selector.SelectedObjects
+                    .Select(o => o.GetComponent<IMonoExecutor>())
+                    .Where(x => x != null)
+                    .ToArray();
+                if (newExecutors.Length > 1)
+                    Manager.LogError("So many executors", Manager);
+                
+                Manager.Executor = newExecutors[0];
+                if (Manager.stateMachine.CurrentState != this)
+                    Manager.stateMachine.SetState(Manager.findTargetState);
+                else
+                    Manager.SendFightRedrawMessage(Array.Empty<IMonoTarget>(), CheckAction);
             }
 
             protected virtual bool CheckAction(IExecutorAction action)

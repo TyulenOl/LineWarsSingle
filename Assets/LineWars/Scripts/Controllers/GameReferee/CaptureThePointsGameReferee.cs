@@ -36,6 +36,8 @@ namespace LineWars
 
         private void OnPhaseEntered(PhaseType phaseEntered)
         {
+            if (phaseEntered != PhaseType.Replenish)
+                return;
             foreach (var node in capturePoints)
             {
                 if (node.Owner != null)

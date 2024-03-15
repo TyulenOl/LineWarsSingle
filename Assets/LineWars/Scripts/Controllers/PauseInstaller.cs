@@ -1,92 +1,27 @@
 ﻿using System;
 using DataStructures;
-//using Plugins.Audio.Core;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
 namespace LineWars
 {
+    [Flags]
+    public enum PauseType
+    {
+        AudioPause = 1,
+        TimeScalePause = 2,
+        CursorActivity = 4,
+        EventSystemLock = 8,
+        All = AudioPause | TimeScalePause | CursorActivity | EventSystemLock
+    }
+    
     public class PauseInstaller: Singleton<PauseInstaller>
     {
         [SerializeField] private BoolEventChannel raisedPauseSetChannel;
-        [Flags]
-        public enum PauseType
-        {
-            AudioPause = 1,
-            TimeScalePause = 2,
-            CursorActivity = 4,
-            EventSystemLock = 8
-        }
+        [SerializeField] private PauseType pauseType;
 
-        public enum PauseMethod
-        {
-            RememberPreviousState,
-            CustomState
-        };
-        
-        public enum CursorVisible
-        {
-            [InspectorName("Show Cursor")] Show,
-            [InspectorName("Hide Cursor")] Hide
-        };
-
-        [Serializable]
-        public class ClosingADValues
-        {
-            [Tooltip("Значение временной шкалы при закрытии")]
-            public float timeScale = 1;
-
-            [Tooltip("Значение аудио паузы при закрытии")]
-            public bool audioPause;
-
-            [Tooltip("Показать или скрыть курсор при закрытии")]
-            public CursorVisible cursorVisible;
-
-            [Tooltip("Выберите мод блокировки курсора при закрытии")]
-            public CursorLockMode cursorLockMode;
-        }
-
-        [Serializable]
-        public class CustomEvents
-        {
-            public UnityEvent OpenAd;
-            public UnityEvent CloseAd;
-        }
-
-
-        [Tooltip(
-            "Данный скрипт будет ставить звук или верменную шкалу на паузу взависимости от выбранной настройки Pause Type." +
-             "\n •  Audio Pause - Ставить звук на паузу." +
-             "\n •  Time Scale Pause - Останавливать время." +
-             "\n •  Cursor Activity - Скрывать курсор." +
-             "\n •  All - Ставить на паузу и звук и время." +
-             "\n •  Nothing To Control - Не контролировать никакие параметры (подпишите свои методы в  Custom Events)."
-        )]
-        public PauseType pauseType;
-        
-        [Tooltip(
-             "RememberPreviousState - Ставить паузу при открытии. После закрытия звук, временная шкала, курсор - придут в изначальное значение." +
-             "\n CustomState - Укажите свои значения, которые будут выставляться при открытии и закрытии"
-        )]
-        public PauseMethod pauseMethod;
-
-        [Tooltip("Установите значения при закрытии рекламы")]
-        [ConditionallyVisible(nameof(pauseMethod))]
-        public ClosingADValues closingADValues;
-
-        [SerializeField, 
-         Tooltip("Установить значения в методе Awake (то есть при старте сцены)." +
-                 "\nЭто позволит не прописывать события вроде аудио пауза = false или timeScale = 1 в ваших скриптах в методах Awake или Start, что позволит убрать путаницу.")] 
-        private bool awakeSetValues;
-        [SerializeField, ConditionallyVisible(nameof(awakeSetValues)), Tooltip("Установите значения, которые применятся в методе Awake.")]
-        private ClosingADValues awakeValues;
-
-        [Tooltip("Ивенты для выполнения собственных методов. Вызываются при открытии или закрытии любой рекламы.")]
-        public CustomEvents customEvents;
-
-        [SerializeField]
-        private bool logPause;
+        [SerializeField] private bool logPause;
 
         private static bool audioPauseOnAd;
         private static float timeScaleOnAd;
@@ -95,44 +30,38 @@ namespace LineWars
         private static bool start;
         private static bool awaitingClosure;
         private EventSystem eventSystem;
-
-        protected override void Awake()
-        {
-            base.Awake();
-            if (awakeSetValues)
-            {
-                audioPauseOnAd = awakeValues.audioPause;
-                timeScaleOnAd = awakeValues.timeScale;
-                cursorVisibleOnAd = awakeValues.cursorVisible == CursorVisible.Show ? true : false;
-                cursorLockModeOnAd = awakeValues.cursorLockMode;
-                start = true;
-
-                ClosingADValues closingValuesOrig = closingADValues;
-                closingADValues = awakeValues;
-                Pause(false);
-                closingADValues = closingValuesOrig;
-            }
-        }
+        public static bool Paused { get; private set; }
 
         private void Start()
         {
-            if (!start)
-            {
-                start = true;
-                audioPauseOnAd = AudioListener.pause;
-                timeScaleOnAd = Time.timeScale;
-                cursorVisibleOnAd = Cursor.visible;
-                cursorLockModeOnAd = Cursor.lockState;
-            }
+            if (start) return;
+            start = true;
+            audioPauseOnAd = AudioListener.pause;
+            timeScaleOnAd = Time.timeScale;
+            cursorVisibleOnAd = Cursor.visible;
+            cursorLockModeOnAd = Cursor.lockState;
         }
 
         public static void Pause(bool pause)
         {
-            Instance?._Pause(pause);
+            if (Instance != null)
+                Instance._Pause(pause);
+        }
+        
+        public static void Pause(PauseType pauseType, bool pause)
+        {
+            if (Instance != null)
+                Instance._Pause(pauseType, pause);
         }
         
         private void _Pause(bool pause)
         {
+            _Pause(pauseType, pause);
+        }
+        private void _Pause(PauseType pauseType, bool pause)
+        {
+            Paused = pause;
+            
             if (logPause)
                 Debug.Log("Pause game: " + pause);
 
@@ -162,53 +91,27 @@ namespace LineWars
             
             if (pauseType.HasFlag(PauseType.AudioPause))
             {
-                if (pauseMethod == PauseMethod.CustomState)
-                {
-                    if (pause) AudioListener.pause = true;
-                    else AudioListener.pause = closingADValues.audioPause;
-                    raisedPauseSetChannel.RaiseEvent(pause || closingADValues.audioPause);
-                    /*if (pause)
-                        AudioPauseHandler.Instance?.PauseAudio();
-                    else if (closingADValues.audioPause)
-                        AudioPauseHandler.Instance?.PauseAudio();
-                    else
-                        AudioPauseHandler.Instance?.UnpauseAudio();*/
+                if (pause)
+                {                   
+                    audioPauseOnAd = AudioListener.pause;
+                    AudioListener.pause = true;
+                    raisedPauseSetChannel.RaiseEvent(true);
                 }
                 else
                 {
-                    if (pause)
-                    {                   
-                        audioPauseOnAd = AudioListener.pause;
-                        AudioListener.pause = true;
-                    }
-                    else AudioListener.pause = audioPauseOnAd;
-                    raisedPauseSetChannel.RaiseEvent(pause || audioPauseOnAd);
-                   /* if (pause)
-                        AudioPauseHandler.Instance?.PauseAudio();
-                    else if (audioPauseOnAd)
-                        AudioPauseHandler.Instance?.PauseAudio();
-                    else
-                        AudioPauseHandler.Instance?.UnpauseAudio();*/
-
+                    AudioListener.pause = audioPauseOnAd;
+                    raisedPauseSetChannel.RaiseEvent(false);
                 }
             }
 
             if (pauseType.HasFlag(PauseType.TimeScalePause))
             {
-                if (pauseMethod == PauseMethod.CustomState)
+                if (pause)
                 {
-                    if (pause) Time.timeScale = 0;
-                    else Time.timeScale = closingADValues.timeScale;
+                    timeScaleOnAd = Time.timeScale;
+                    Time.timeScale = 0;
                 }
-                else
-                {
-                    if (pause)
-                    {
-                        timeScaleOnAd = Time.timeScale;
-                        Time.timeScale = 0;
-                    }
-                    else Time.timeScale = timeScaleOnAd;
-                }
+                else Time.timeScale = timeScaleOnAd;
             }
 
             if (pauseType.HasFlag(PauseType.CursorActivity))
@@ -223,26 +126,10 @@ namespace LineWars
                 }
                 else
                 {
-                    if (pauseMethod == PauseMethod.CustomState)
-                    {
-                        if (closingADValues.cursorVisible == CursorVisible.Hide)
-                            Cursor.visible = false;
-                        else Cursor.visible = true;
-
-                        Cursor.lockState = closingADValues.cursorLockMode;
-                    }
-                    else
-                    {
-                        Cursor.visible = cursorVisibleOnAd;
-                        Cursor.lockState = cursorLockModeOnAd;
-                    }
+                    Cursor.visible = cursorVisibleOnAd;
+                    Cursor.lockState = cursorLockModeOnAd;
                 }
             }
-
-            if (pause) 
-                customEvents.OpenAd.Invoke();
-            else 
-                customEvents.CloseAd.Invoke();
         }
     }
 }
