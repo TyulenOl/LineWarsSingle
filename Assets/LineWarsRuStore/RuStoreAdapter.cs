@@ -102,6 +102,8 @@ namespace RuStoreLineWars
                     item.currency,
                     RewardUtilities.DecodePurchaseId(item.productId)));
                 }
+
+                products.Sort((p1, p2) => p1.PriceValue.CompareTo(p2.PriceValue));
             }
         }
 
@@ -110,12 +112,10 @@ namespace RuStoreLineWars
             if (!CheckEnableSdk())
                 return;
 
-            Debug.Log("trying to purchase!");
             ruStoreBillingClient.PurchaseProduct(id, 1, null, OnError, OnSuccess);
 
             void OnError(RuStoreError error)
             {
-                Debug.Log("Purchase failed!");
                 OnPurchaseFailedEvent(id);
             }
 
@@ -133,27 +133,22 @@ namespace RuStoreLineWars
 
         private void ConfirmPurchase(PaymentResult paymentResult)
         {
-            Debug.Log("Trying to confirm!");
             if(paymentResult is PaymentCancelled cancelledPayment)
             {
-                Debug.Log("Payment cancelled");
                 OnPurchaseFailedEvent(cancelledPayment.purchaseId);
                 return;
             }
             if(paymentResult is PaymentFailure failedPayment)
             {
-                Debug.Log("Payment failed on confirming");
                 OnPurchaseFailedEvent(failedPayment.purchaseId);
                 return;
             }
             if(paymentResult is PaymentSuccess successPayment)
             {
-                Debug.Log("succ");
                 ruStoreBillingClient.ConfirmPurchase(successPayment.purchaseId, OnError, OnSuccess);
 
                 void OnError(RuStoreError error)
                 {
-                    Debug.Log("FUUUUCK!");
                     Debug.Log(error.name);
                     Debug.Log(error.description);
                     OnPurchaseFailedEvent(successPayment.purchaseId);
@@ -161,7 +156,6 @@ namespace RuStoreLineWars
 
                 void OnSuccess()
                 {
-                    Debug.Log("HELL YEAH!");
                     var prize = RewardUtilities.DecodePurchaseId(successPayment.productId);
                     _Reward(prize);
                     UIPanel.OpenSuccessPanel(new Money(prize.Type.ToCostType(), prize.Amount));
