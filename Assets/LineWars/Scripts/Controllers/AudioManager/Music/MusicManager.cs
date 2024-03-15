@@ -6,7 +6,6 @@ using UnityEngine.Events;
 namespace LineWars.Controllers
 {
     [RequireComponent(typeof(AudioSource))]
-    [Obsolete]
     public class MusicManager : MonoBehaviour
     {
         public static MusicManager Instance { get; private set; }
@@ -97,7 +96,7 @@ namespace LineWars.Controllers
             source.Play();
             CurrentMusicData = musicData;
             MusicChanged.Invoke(prevData, musicData);
-            raisedMusicChangedEventChannel.RaiseEvent(prevData.Name, prevData.Artist);
+            raisedMusicChangedEventChannel.RaiseEvent(musicData.Name, musicData.Artist);
         }
 
         public void Stop()

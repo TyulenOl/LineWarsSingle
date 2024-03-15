@@ -34,7 +34,8 @@ namespace LineWars.Controllers
 
         public override void Exit()
         {
-            manager.StopCoroutine(musicCoroutine);
+            if(musicCoroutine != null)
+                manager.StopCoroutine(musicCoroutine);
             manager.Stop();
         }
 

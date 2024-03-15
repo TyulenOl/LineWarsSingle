@@ -2,7 +2,7 @@
 <resources>
     <string name="rustore_BillingClientSettings_consoleApplicationId" translatable="false">2063542124</string>
     <string name="rustore_BillingClientSettings_deeplinkScheme" translatable="false">rusvlizards</string>
-    <string name="rustore_BillingClientSettings_allowNativeErrorHandling" translatable="false">True</string>
+    <string name="rustore_BillingClientSettings_allowNativeErrorHandling" translatable="false">False</string>
     <string name="rustore_BillingClientSettings_enableLogs" translatable="false">True</string>
 
 </resources>
