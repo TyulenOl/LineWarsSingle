@@ -27,7 +27,7 @@ namespace RuStoreLineWars
         public override bool SDKEnabled => isPurchasesAvailable;
         private float timeSinceLastAd;
 
-        public override void Initialize()
+        protected override void Initialize()
         {
             interstitialAd = new();
             interstitialAd.Initialize(interstitialAdUnitId);

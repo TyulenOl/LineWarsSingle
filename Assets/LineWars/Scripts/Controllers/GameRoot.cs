@@ -14,6 +14,7 @@ namespace LineWars.Controllers
         [SerializeField] private DeckCardsScriptableStorage cardsDatabase;
         [SerializeField] private MissionsScriptableStorage missionsStorage;
         [SerializeField] private BlessingStorage blessingStorage;
+        [SerializeField] private PromoCodeContainer promoCodeContainer;
 
         [Header("Controllers")]
         [SerializeField] private DecksController decksController;
@@ -83,7 +84,7 @@ namespace LineWars.Controllers
                 _ => throw new ArgumentOutOfRangeException()
             };
             
-            sdkAdapter.Initialize();
+            sdkAdapter.Initialize(promoCodeContainer.promoCodes);
         }
 
         public void StartGame()
