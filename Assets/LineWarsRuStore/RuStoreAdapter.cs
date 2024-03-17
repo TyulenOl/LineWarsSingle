@@ -58,23 +58,50 @@ namespace RuStoreLineWars
         private void CheckPurchasesAvailability()
         {
             ruStoreBillingClient.CheckPurchasesAvailability(OnError, OnSuccess);
-
+            
             void OnSuccess(FeatureAvailabilityResult featureAvailabilityResult)
             {
                 isPurchasesAvailable = featureAvailabilityResult.isAvailable;
-                Debug.Log(featureAvailabilityResult.cause);
-                Debug.Log(featureAvailabilityResult.isAvailable);
-                Debug.Log(featureAvailabilityResult.cause.name);
-                Debug.Log(featureAvailabilityResult.cause.description);
+                Debug.Log("CPA Success: " +  isPurchasesAvailable);
                 InitPurchases();
             }
 
             void OnError(RuStoreError error)
             {
                 isPurchasesAvailable = false;
-                Debug.Log(error);
+                Debug.Log("CPA error");
                 Debug.Log(error.name);
                 Debug.Log(error.description);
+            }
+        }
+
+        private void FinishPurchases()
+        {
+            /*var purchaseListData = purchaseProvider.Load(0);
+            var purchaseList = new List<UnfinishedPurchaseData>(purchaseListData.purchaseList);
+            foreach (var purchase in purchaseList)
+            {
+                if (purchase.IsSuccess)
+                {
+                    ConfirmSuccessfulPurchase(purchase.PurchaseId, purchase.ProductId);
+                }
+            }*/
+
+            ruStoreBillingClient.GetPurchases(OnFailure, OnSuccess);
+
+            void OnFailure(RuStoreError error)
+            {
+                Debug.Log("Loading purchases failed");
+            }
+
+            void OnSuccess(List<Purchase> purchases)
+            {
+                foreach(var currentPurchase in purchases)
+                {
+                    if(currentPurchase.productType == Product.ProductType.CONSUMABLE &&
+                        currentPurchase.purchaseState == Purchase.PurchaseState.PAID)
+                        ConfirmSuccessfulPurchase(currentPurchase.purchaseId, currentPurchase.productId);
+                }
             }
         }
 
@@ -84,22 +111,30 @@ namespace RuStoreLineWars
 
             void OnError(RuStoreError error)
             {
+                Debug.Log("Init Purchases error: " + error.name);
                 products = new List<ProductData>();
             }
 
             void OnSuccess(List<Product> product)
             {
-               foreach (var item in product)
+                products = new();
+                Debug.Log("Init purchases success");
+                foreach (var item in product)
                 {
+                    Debug.Log(item.currency);
+                    Debug.Log(item.price);
                     products.Add(new ProductData(
                     item.productId,
                     item.title,
                     item.description,
                     diamondsSprite,
-                    item.price,
+                    item.price / 100,
                     item.currency,
                     RewardUtilities.DecodePurchaseId(item.productId)));
                 }
+
+                products.Sort((p1, p2) => p1.PriceValue.CompareTo(p2.PriceValue));
+                FinishPurchases();
             }
         }
 
@@ -141,20 +176,27 @@ namespace RuStoreLineWars
             }
             if(paymentResult is PaymentSuccess successPayment)
             {
-                ruStoreBillingClient.ConfirmPurchase(successPayment.purchaseId, OnError, OnSuccess);
+                ConfirmSuccessfulPurchase(successPayment.purchaseId, successPayment.productId);
+            }
+        }
 
-                void OnError(RuStoreError error)
-                {
-                    OnPurchaseFailedEvent(successPayment.purchaseId);
-                }
+        private void ConfirmSuccessfulPurchase(string purchaseId, string productId)
+        {
+            ruStoreBillingClient.ConfirmPurchase(purchaseId, OnError, OnSuccess);
 
-                void OnSuccess()
-                {
-                    var prize = RewardUtilities.DecodePurchaseId(successPayment.purchaseId);
-                    _Reward(prize);
-                    UIPanel.OpenSuccessPanel(new Money(prize.Type.ToCostType(), prize.Amount));
-                    InvokePurchaseSuccessEvent(successPayment.purchaseId);
-                }
+            void OnError(RuStoreError error)
+            {
+                Debug.Log(error.name);
+                Debug.Log(error.description);
+                OnPurchaseFailedEvent(purchaseId);
+            }
+
+            void OnSuccess()
+            {
+                var prize = RewardUtilities.DecodePurchaseId(productId);
+                _Reward(prize);
+                UIPanel.OpenSuccessPanel(new Money(prize.Type.ToCostType(), prize.Amount));
+                InvokePurchaseSuccessEvent(purchaseId);
             }
         }
 
