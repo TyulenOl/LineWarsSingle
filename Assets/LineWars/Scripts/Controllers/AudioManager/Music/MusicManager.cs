@@ -25,6 +25,7 @@ namespace LineWars.Controllers
         private float initialVolume;
         public MusicData CurrentMusicData { get; private set; }
         public UnityEvent<MusicData, MusicData> MusicChanged;
+        public bool IsPlaying => source.isPlaying;
 
         //  public AudioSource Source => source;
         public float Volume
