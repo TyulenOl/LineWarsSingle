@@ -16,7 +16,7 @@ namespace LineWars.Controllers
             var index = order.IndexOf(missionData);
             if (index < 0 || index + 1 >= order.Count)
                 return null;
-            return order[index];
+            return order[index + 1];
             
         }
     }
