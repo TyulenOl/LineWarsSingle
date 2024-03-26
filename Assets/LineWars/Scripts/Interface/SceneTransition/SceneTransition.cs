@@ -41,10 +41,10 @@ public class SceneTransition : MonoBehaviour
     
     public static bool Loaded { get; private set; }
     public static event Action StartLoad;
+    public static event Action<SceneName> StartLoadScene; 
     public static event Action EndLoad;
     public static event Action StartUnload;
     public static event Action EndUnload;
-
 
     private void Awake()
     {
@@ -173,6 +173,7 @@ public class SceneTransition : MonoBehaviour
     {
         //Debug.Log("StartLoad");
         StartLoad?.Invoke();
+        StartLoadScene?.Invoke(sceneName);
     }
 
     public void ANIMATION_EVENT_EndAnimation()

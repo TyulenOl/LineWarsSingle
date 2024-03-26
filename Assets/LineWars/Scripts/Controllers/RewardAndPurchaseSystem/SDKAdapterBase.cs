@@ -345,7 +345,7 @@ namespace LineWars.Controllers
             {
                 _Reward(prize);
                 UserInfoController.UsePromoCode(promoCode);
-                UIPanel.OpenSuccessUsePromoCodePanel(promoCode);
+                UIPanel.OpenSuccessUsePromoCodePanel(promoCode, prize);
                 SendUsePromocodeMetrica(promoCode);
                 return true;
             }

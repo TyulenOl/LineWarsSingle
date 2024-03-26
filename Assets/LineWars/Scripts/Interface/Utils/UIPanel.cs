@@ -156,11 +156,15 @@ namespace LineWars.Interface
             OpenFullscreenPanel(new TextInfo("Успешно", Color.red), new Money(prize.Type.ToCostType(), prize.Amount));
         }
 
-        public static void OpenSuccessUsePromoCodePanel(string promoCode)
+        public static void OpenSuccessUsePromoCodePanel(string promoCode, Prize value)
         {
             OpenFullscreenPanel(
                 new TextInfo("Активация промокода", Color.red),
-                new TextInfo($"Вы успешно активировали промокод {promoCode}", Color.white)
+                new TextInfo(
+                    $"Вы успешно активировали промокод \"{promoCode}\" " +
+                    $"Награда - {value}", 
+                    Color.white
+                )
             );
         }
 

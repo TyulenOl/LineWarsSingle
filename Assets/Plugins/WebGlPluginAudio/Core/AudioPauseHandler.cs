@@ -59,6 +59,7 @@ namespace Plugins.Audio.Core
 
         private void HandleRaised(bool value)
         {
+            Debug.Log($"HandleRaised = {value}");
             if(value)
                 PauseAudio();
             else
