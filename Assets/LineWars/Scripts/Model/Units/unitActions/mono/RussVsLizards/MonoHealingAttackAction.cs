@@ -6,15 +6,19 @@ namespace LineWars.Model
 {
     public class MonoHealingAttackAction :
         MonoUnitAction<HealingAttackAction<Node, Edge, Unit>>,
-        ITargetedAction<Unit>,
         IHealingAttackAction<Node, Edge, Unit>
     {
         [SerializeField] private ActionUnitAnimation attackAnimation;
         [SerializeField] private SFXData attackReaction;
 
+        [SerializeField] private HealingAttackMode mode;
+        [SerializeField, ConditionallyVisible(nameof(mode), HealingAttackMode.Constant)] private int constHeal;
+        public HealingAttackMode Mode => mode;
+        public int ConstHeal => constHeal;
+
         protected override bool NeedAutoComplete => false;
-        
         public int Damage => Action.Damage;
+        
         public event Action<int> DamageChanged
         {
             add => Action.DamageChanged += value;
@@ -23,7 +27,7 @@ namespace LineWars.Model
         
         protected override HealingAttackAction<Node, Edge, Unit> GetAction()
         {
-            return new HealingAttackAction<Node, Edge, Unit>(Executor);
+            return new HealingAttackAction<Node, Edge, Unit>(Executor, mode, constHeal);
         }
 
         public bool IsAvailable(Unit target)
@@ -90,8 +94,7 @@ namespace LineWars.Model
 
         public IActionCommand GenerateCommand(Unit target)
         {
-            return new TargetedUniversalCommand<Unit, MonoHealingAttackAction, Unit>
-                (this, target);
+            return new TargetedUniversalCommand<Unit, MonoHealingAttackAction, Unit>(this, target);
         }
 
         public override void Accept(IMonoUnitActionVisitor visitor)

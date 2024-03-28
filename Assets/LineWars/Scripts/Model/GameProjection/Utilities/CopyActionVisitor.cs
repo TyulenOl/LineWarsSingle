@@ -109,7 +109,7 @@ namespace LineWars.Model
 
         public void Visit(HealingAttackAction<TNode, TEdge, TUnit> action)
         {
-            Result = new HealingAttackAction<TNode, TEdge, TUnit>(Unit);
+            Result = new HealingAttackAction<TNode, TEdge, TUnit>(Unit, action.Mode, action.ConsHeal);
             Result.ActionModifier = action.ActionModifier;
         }
 

@@ -119,7 +119,7 @@ namespace LineWars.Model
 
         public void Visit(MonoHealingAttackAction action)
         {
-            Result = new HealingAttackAction<NodeProjection, EdgeProjection, UnitProjection>(Unit);
+            Result = new HealingAttackAction<NodeProjection, EdgeProjection, UnitProjection>(Unit, action.Mode, action.ConstHeal);
             Result.ActionModifier = action.Action.ActionModifier;
         }
 

@@ -31,7 +31,6 @@ namespace LineWars.Model
             return ActionPointsCondition() &&
                 target != null &&
                 target.OwnerId != Executor.OwnerId &&
-                target.CurrentActionPoints != 0 &&
                 Executor.Node.GetLine(target.Node) != null;
         }
 
@@ -43,7 +42,7 @@ namespace LineWars.Model
 
         private void Stun(TUnit target)
         {
-            target.CurrentActionPoints -= Executor.CurrentPower;
+            target.CurrentActionPoints -= 1;
             target.DealDamageThroughArmor(Executor.CurrentPower);
         }
 

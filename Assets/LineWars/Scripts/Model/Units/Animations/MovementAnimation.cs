@@ -18,7 +18,6 @@ namespace LineWars.Model
             if (movementFunction is null)
             {
                 movementFunction = ScriptableObject.CreateInstance<LinearMovementFunction>();
-                Debug.LogWarning($"У юнита {name} нет функции передвижения! Была выбрана дефолтная функция");
             }
         }
 
