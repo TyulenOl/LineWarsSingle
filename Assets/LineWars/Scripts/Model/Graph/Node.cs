@@ -187,17 +187,37 @@ namespace LineWars.Model
 
             if (relativePosition.x > 0)
             {
-                Selector.SelectedObjects = new[] {rightUnit?.gameObject, gameObject}
-                    .Where(x => x != null)
-                    .Distinct()
-                    .ToArray();
+                if (!AnyIsFree) // обе заняты
+                {
+                    Selector.SelectedObjects = new[] {rightUnit?.gameObject, gameObject}
+                        .Where(x => x != null)
+                        .Distinct()
+                        .ToArray();
+                }
+                else
+                {
+                    Selector.SelectedObjects = new[] {rightUnit?.gameObject, gameObject, leftUnit?.gameObject}
+                        .Where(x => x != null)
+                        .Distinct()
+                        .ToArray();
+                }
             }
             else
             {
-                Selector.SelectedObjects = new[] {leftUnit?.gameObject, gameObject}
-                    .Where(x => x != null)
-                    .Distinct()
-                    .ToArray();
+                if (!AnyIsFree) // обе заняты
+                {
+                    Selector.SelectedObjects = new[] {leftUnit?.gameObject, gameObject}
+                        .Where(x => x != null)
+                        .Distinct()
+                        .ToArray();
+                }
+                else
+                {
+                    Selector.SelectedObjects = new[] {leftUnit?.gameObject, gameObject, rightUnit?.gameObject}
+                        .Where(x => x != null)
+                        .Distinct()
+                        .ToArray();
+                }
             }
         }
 

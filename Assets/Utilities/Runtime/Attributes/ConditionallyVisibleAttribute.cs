@@ -1,16 +1,30 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
-namespace Utilities.Runtime
+public class ConditionallyVisibleAttribute: PropertyAttribute
 {
-    public class ConditionallyVisibleAttribute: PropertyAttribute
+    public VisibilityAttributeMode Mode { get; }
+    public string PropertyName { get; }
+    public bool Invert { get; }
+    public object Value { get; }
+    
+    public ConditionallyVisibleAttribute(string propName, bool invert = false)
     {
-        public bool invert { get; }
-        public string propertyName { get; }
-        
-        public ConditionallyVisibleAttribute(string propName, bool invert = false)
-        {
-            this.invert = invert;
-            propertyName = propName;
-        }
+        Mode = VisibilityAttributeMode.Boolean;
+        PropertyName = propName;
+        Invert = invert;
     }
+    
+    public ConditionallyVisibleAttribute(string propName, object value)
+    {
+        Mode = VisibilityAttributeMode.Object;
+        PropertyName = propName;
+        Value = value;
+    }
+}
+
+public enum VisibilityAttributeMode
+{
+    Boolean,
+    Object
 }

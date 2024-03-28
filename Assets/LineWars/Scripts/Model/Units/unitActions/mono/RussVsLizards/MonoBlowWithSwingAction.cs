@@ -1,4 +1,5 @@
-﻿using LineWars.Controllers;
+﻿using System;
+using LineWars.Controllers;
 using UnityEngine;
 
 namespace LineWars.Model
@@ -13,6 +14,13 @@ namespace LineWars.Model
         [SerializeField] private UnitAnimation swingAnimation;
 
         private IDJ dj;
+        
+        public int Damage => Action.Damage;
+        public event Action<int> DamageChanged
+        {
+            add => Action.DamageChanged += value;
+            remove => Action.DamageChanged -= value;
+        }
 
         private void Awake()
         {

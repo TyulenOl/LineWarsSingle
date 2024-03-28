@@ -1,3 +1,5 @@
+using System;
+
 namespace LineWars.Model
 {
     public class StunAttackAction<TNode, TEdge, TUnit> :
@@ -8,8 +10,20 @@ namespace LineWars.Model
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
         public override CommandType CommandType => CommandType.Stun;
+        public int Damage => Executor.CurrentPower;
+        public event Action<int> DamageChanged;
+        private void OnUnitPowerChanged(TUnit unit, int before, int after)
+        {
+            DamageChanged?.Invoke(after);
+        }
         public StunAttackAction(TUnit executor) : base(executor)
         {
+            Executor.UnitPowerChanged += OnUnitPowerChanged;
+        }
+
+        ~StunAttackAction()
+        {
+            Executor.UnitPowerChanged -= OnUnitPowerChanged;
         }
 
         public bool IsAvailable(TUnit target)
@@ -17,7 +31,6 @@ namespace LineWars.Model
             return ActionPointsCondition() &&
                 target != null &&
                 target.OwnerId != Executor.OwnerId &&
-                target.CurrentActionPoints != 0 &&
                 Executor.Node.GetLine(target.Node) != null;
         }
 
@@ -29,7 +42,7 @@ namespace LineWars.Model
 
         private void Stun(TUnit target)
         {
-            target.CurrentActionPoints -= Executor.CurrentPower;
+            target.CurrentActionPoints -= 1;
             target.DealDamageThroughArmor(Executor.CurrentPower);
         }
 

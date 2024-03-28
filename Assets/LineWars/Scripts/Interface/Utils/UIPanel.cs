@@ -12,13 +12,23 @@ namespace LineWars.Interface
     {
         [SerializeField] private FullScreenPanel fullScreenPanel;
         [SerializeField] private DialogPanel dialogPanel;
+        [SerializeField] private PromocodePanel promocodePanel;
 
         private IPanel[] Panels = new IPanel[0];
 
         private void Start()
         {
-            Panels = new IPanel[] {fullScreenPanel, dialogPanel};
+            Panels = new IPanel[] {fullScreenPanel, dialogPanel, promocodePanel};
             dialogPanel.Initialize();
+            promocodePanel.Initialize();
+        }
+        
+        public static void OpenPromoCodePanel(Func<string, bool> onEntered)
+        {
+            if (Instance != null)
+                Instance.promocodePanel.OpenPanel(onEntered);
+            else
+                Debug.LogError($"{nameof(UIPanel)} is null!");
         }
 
         public static void OpenDialogPanel(
@@ -146,11 +156,15 @@ namespace LineWars.Interface
             OpenFullscreenPanel(new TextInfo("Успешно", Color.red), new Money(prize.Type.ToCostType(), prize.Amount));
         }
 
-        public static void OpenPromoCodePanel(string promoCode)
+        public static void OpenSuccessUsePromoCodePanel(string promoCode, Prize value)
         {
             OpenFullscreenPanel(
                 new TextInfo("Активация промокода", Color.red),
-                new TextInfo($"Вы успешно активировали промокод {promoCode}", Color.white)
+                new TextInfo(
+                    $"Вы успешно активировали промокод \"{promoCode}\" " +
+                    $"Награда - {value}", 
+                    Color.white
+                )
             );
         }
 
@@ -419,6 +433,53 @@ namespace LineWars.Interface
             }
         }
 
+        [Serializable]
+        private class PromocodePanel: IPanel
+        {
+            [SerializeField] private GameObject panelObject;
+            [SerializeField] private TMP_InputField inputField;
+            [SerializeField] private int characterLimit = 9;
+            [SerializeField] private GameObject onErrorPanel;
+
+            private Func<string, bool> onEntered;
+            
+            public void Initialize()
+            {
+                inputField.text = "";
+                inputField.characterLimit = characterLimit;
+                inputField.onValueChanged.AddListener(OnValueChanged);
+            }
+
+            private void OnValueChanged(string value)
+            {
+                onErrorPanel.gameObject.SetActive(false);
+                if (value.Length < characterLimit)
+                    return;
+                if (onEntered == null)
+                    return;
+
+                var success= onEntered(value.ToUpper());
+                
+                if (!success)
+                    onErrorPanel.gameObject.SetActive(true);
+                else
+                {
+                    inputField.text = "";
+                }
+            }
+
+            public void OpenPanel(Func<string, bool> onEntered)
+            {
+                panelObject.gameObject.SetActive(true);
+                this.onEntered = onEntered;
+            }
+
+            public void ClosePanel()
+            {
+                panelObject.SetActive(false);
+            }
+        }
+        
         private interface IPanel
         {
             public void ClosePanel();

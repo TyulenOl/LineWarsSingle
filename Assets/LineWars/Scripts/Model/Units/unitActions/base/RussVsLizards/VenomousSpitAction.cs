@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static UnityEngine.UI.CanvasScaler;
+﻿
+using System;
 
 namespace LineWars.Model
 {
@@ -17,10 +13,22 @@ namespace LineWars.Model
         private int venomRounds;
         public override CommandType CommandType => CommandType.VenomousSpit;
         public int VenomRounds => venomRounds;
+        public int Damage => Executor.CurrentPower;
+        public event Action<int> DamageChanged;
+        private void OnUnitPowerChanged(TUnit unit, int before, int after)
+        {
+            DamageChanged?.Invoke(after);
+        }
 
         public VenomousSpitAction(TUnit executor, int venomRounds) : base(executor)
         {
             this.venomRounds = venomRounds;
+            Executor.UnitPowerChanged += OnUnitPowerChanged;
+        }
+
+        ~VenomousSpitAction()
+        {
+            Executor.UnitPowerChanged -= OnUnitPowerChanged;
         }
 
         public bool IsAvailable(TUnit target)

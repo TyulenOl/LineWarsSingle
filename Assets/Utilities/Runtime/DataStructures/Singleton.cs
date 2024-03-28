@@ -24,7 +24,8 @@ namespace DataStructures
             }
             else
             {
-                Debug.LogError($"Duplicated {typeof(T).Name} singleton object in this scene!");
+                //Debug.LogError($"Duplicated {typeof(T).Name} singleton object in this scene!");
+                Destroy(this);
             }
         }
 

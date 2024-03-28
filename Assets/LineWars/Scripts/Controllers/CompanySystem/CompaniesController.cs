@@ -9,6 +9,7 @@ namespace LineWars.Controllers
     public class CompaniesController : MonoBehaviour
     {
         [SerializeField] private List<int> defaultUnlockMissionIds;
+        [SerializeField] private MissionsOrder missionsOrder;
         
         [Header("Debug")]
         [SerializeField] private bool debugMode;
@@ -20,7 +21,6 @@ namespace LineWars.Controllers
         
         public int ChosenMissionId { get; set; }
         public MissionInfo ChosenMission => GetMissionInfo(ChosenMissionId); 
-        public event Action AnyMissionInfoChanged;
 
         public bool IsInfinityGameUnlocked => debugMode || missionInfos.Values
             .Any(x => x.MissionStatus == MissionStatus.Completed);
@@ -30,37 +30,75 @@ namespace LineWars.Controllers
             companiesProvider = provider;
             missionStorage = storage;
             
-            missionInfos = provider.LoadAll()
-                .ToDictionary(m => m.MissionId, m => m);
+            LoadMissionsSaves();
+            AssignAllMissions();
+            UnlockDefaultMissions();
+        }
 
+        private void LoadMissionsSaves()
+        {
+            missionInfos = new Dictionary<int, MissionInfo>();
+            foreach (var info in companiesProvider.LoadAll())
+            {
+                if (info == null)
+                    continue;
+                missionInfos.TryAdd(info.MissionId, info);
+            }
+        }
+
+        private void AssignAllMissions()
+        {
+            // добавление новых миссий
             foreach (var storageKey in missionStorage.Keys)
                 TryAddNewMission(storageKey);
-
+            // удаление устаревших миссий
+            foreach (var missionKey in missionInfos.Keys.ToArray())
+            {
+                if (!missionStorage.ContainsKey(missionKey))
+                    missionInfos.Remove(missionKey);
+            }
+            
+            // восстановление связей миссий по ордеру
+            foreach (var (id, missionInfo) in missionInfos)
+            {
+                if (missionInfo.MissionStatus != MissionStatus.Completed)
+                    continue;
+                
+                var nextMission = missionsOrder.FindNextMission(missionStorage.IdToValue[id]);
+                if (nextMission == null || !missionStorage.ContainsValue(nextMission))
+                    continue;
+                var nextMissionId = missionStorage.ValueToId[nextMission];
+                UnlockMission(nextMissionId);
+            }
+        }
+        
+        private void TryAddNewMission(int missionId)
+        {
+            missionInfos.TryAdd(missionId, new MissionInfo()
+            {
+                MissionId = missionId,
+                MissionStatus = MissionStatus.Locked
+            });
+        }
+        
+        private void UnlockDefaultMissions()
+        {
             // открытие изначальных миссий
             foreach (var id in defaultUnlockMissionIds)
             {
                 if (missionInfos.ContainsKey(id))
                     UnlockMission(id);
             }
-            
-            AssignAllMissions();
-        }
-
-        private void AssignAllMissions()
-        {
-            foreach (var (id, missionInfo) in missionInfos)
-            {
-                if (missionInfo.MissionStatus == MissionStatus.Completed
-                    && missionInfos.ContainsKey(id + 1)
-                    && missionInfos[id + 1].MissionStatus == MissionStatus.Locked)
-                {
-                    missionInfos[id + 1].MissionStatus = MissionStatus.Unlocked;
-                }
-            }
         }
 
         public void DefeatChoseMissionIfNoWin()
         {
+            if (!missionInfos.ContainsKey(ChosenMissionId))
+            {
+                Debug.LogError($"No contains mission by id = {ChosenMissionId}");
+                return;
+            }
+            
             var missionInfo = missionInfos[ChosenMissionId];
             if (missionInfo.MissionStatus 
                 is MissionStatus.Completed 
@@ -73,6 +111,12 @@ namespace LineWars.Controllers
         
         public void WinChoseMission()
         {
+            if (!missionInfos.ContainsKey(ChosenMissionId))
+            {
+                Debug.LogError($"No contains mission by id = {ChosenMissionId}");
+                return;
+            }
+            
             var missionInfo = missionInfos[ChosenMissionId];
             if (missionInfo.MissionStatus is MissionStatus.Completed) return;
             
@@ -82,21 +126,18 @@ namespace LineWars.Controllers
         
         public void UnlockMission(int missionId)
         {
+            if (!missionInfos.ContainsKey(missionId))
+            {
+                Debug.LogError($"No contains mission by id = {missionId}");
+                return;
+            }
+            
             var missionInfo = missionInfos[missionId];
             if (missionInfo.MissionStatus is not MissionStatus.Locked) return;
             
             
             missionInfo.MissionStatus = MissionStatus.Unlocked;
             SaveMission(missionInfo);
-        }
-        
-        private void TryAddNewMission(int missionId)
-        {
-            missionInfos.TryAdd(missionId, new MissionInfo()
-            {
-                MissionId = missionId,
-                MissionStatus = MissionStatus.Locked
-            });
         }
 
         public MissionInfo GetMissionInfo(int missionId)
@@ -106,11 +147,26 @@ namespace LineWars.Controllers
                 copy.MissionStatus = MissionStatus.Unlocked;
             return copy;
         }
+
+        public bool ContainsNextMission(int missionId)
+        {
+            if (!missionStorage.ContainsKey(missionId))
+                return false;
+            var nextMission = missionsOrder.FindNextMission(missionStorage.IdToValue[missionId]);
+            return nextMission != null && missionStorage.ContainsValue(nextMission);
+        }
         
         public void UnlockNextMission()
         {
-            if (missionInfos.ContainsKey(ChosenMissionId + 1))
-                UnlockMission(ChosenMissionId + 1);
+            if (!missionInfos.ContainsKey(ChosenMissionId))
+            {
+                Debug.LogError($"No contains mission by id = {ChosenMissionId}");
+                return;
+            }
+            
+            var nextMission = missionsOrder.FindNextMission(missionStorage.IdToValue[ChosenMissionId]);
+            if (nextMission != null && missionStorage.ContainsValue(nextMission))
+                UnlockMission(missionStorage.ValueToId[nextMission]);
         }
 
         public MissionStatus GetMissionStatus(int missionId)
@@ -126,12 +182,6 @@ namespace LineWars.Controllers
         {
             if (!debugMode) 
                 companiesProvider.Save(info, info.MissionId);
-        }
-
-        private void OnValidate()
-        {
-            if (Application.isPlaying)
-                AnyMissionInfoChanged?.Invoke();
         }
     }
 }

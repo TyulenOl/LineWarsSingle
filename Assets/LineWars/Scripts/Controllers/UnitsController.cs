@@ -26,7 +26,23 @@ namespace LineWars
 
         private void _ExecuteCommand([NotNull] ICommand command, bool dontCheckExecute = true)
         {
-            if (dontCheckExecute || command.CanExecute())
+            if (dontCheckExecute)
+            {
+                Execute();
+            }
+            else
+            {
+                if (command.CanExecute())
+                {
+                    Execute();
+                }
+                else
+                {
+                    Debug.LogError($"Cant execute command: {command.GetLog()}");
+                }
+            }
+
+            void Execute()
             {
                 currentCommandIndex++;
                 if (needLog)

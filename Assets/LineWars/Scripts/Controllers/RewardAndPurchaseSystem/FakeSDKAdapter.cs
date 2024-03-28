@@ -8,7 +8,7 @@ namespace LineWars.Controllers
     {
         public override bool SDKEnabled => true;
 
-        public override void Initialize()
+        protected override void Initialize()
         {
             GameRoot.Instance.StartGame();
         }

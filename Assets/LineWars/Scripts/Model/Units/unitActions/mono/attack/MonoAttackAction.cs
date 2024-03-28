@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using LineWars.Controllers;
 using UnityEngine;
 
@@ -18,7 +19,13 @@ namespace LineWars.Model
         [field: SerializeField] public bool InitialIsPenetratingDamage { get; private set; }
 
         public bool IsPenetratingDamage => Action.IsPenetratingDamage;
-        
+
+        public int Damage => Action.Damage;
+        public event Action<int> DamageChanged
+        {
+            add => Action.DamageChanged += value;
+            remove => Action.DamageChanged -= value;
+        }
 
         public virtual bool CanAttack(ITargetedAlive enemy, bool ignoreActionPointsCondition = false) =>
             Action.CanAttack(enemy, ignoreActionPointsCondition);

@@ -34,7 +34,8 @@ namespace LineWars.Controllers
 
         public override void Exit()
         {
-            manager.StopCoroutine(musicCoroutine);
+            if(musicCoroutine != null)
+                manager.StopCoroutine(musicCoroutine);
             manager.Stop();
         }
 
@@ -43,7 +44,9 @@ namespace LineWars.Controllers
             while (true)
             {
                 manager.Play(data.MusicData);
-                yield return new WaitForSeconds(data.MusicData.AudioClip.length + data.PauseTime);
+
+                while (manager.IsPlaying)
+                    yield return new WaitForFixedUpdate();
             }
         }
     }

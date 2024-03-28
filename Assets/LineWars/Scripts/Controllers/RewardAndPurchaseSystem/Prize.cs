@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace LineWars.Model
 {
@@ -15,6 +16,19 @@ namespace LineWars.Model
         {
             this.type = type;
             this.amount = amount;
+        }
+
+        public override string ToString()
+        {
+            var currency = type switch
+            {
+                PrizeType.Gold => amount.Pluralize("монета", "монеты", "монет"),
+                PrizeType.Diamonds => amount.Pluralize("кристалл", "кристалла", "кристаллов"),
+                PrizeType.UpgradeCards => amount.Pluralize("карта улучшений", "карты улучшений", "карт улучшений"),
+                _ => throw new ArgumentOutOfRangeException()
+            };
+
+            return $"{amount} {currency}";
         }
     }
 }

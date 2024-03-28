@@ -14,6 +14,7 @@ namespace LineWars.Controllers
         [SerializeField] private DeckCardsScriptableStorage cardsDatabase;
         [SerializeField] private MissionsScriptableStorage missionsStorage;
         [SerializeField] private BlessingStorage blessingStorage;
+        [SerializeField] private PromoCodeContainer promoCodeContainer;
 
         [Header("Controllers")]
         [SerializeField] private DecksController decksController;
@@ -25,12 +26,12 @@ namespace LineWars.Controllers
         [SerializeField] private CardUpgrader cardUpgrader;
         
         [Header("Providers")]
-        [SerializeField] private YandexGameProvider yandexGameProvider;
+        [SerializeField] private ProviderBase yandexGameProvider;
         
         [Header("Api")]
-        [SerializeField] private RuStoreAdapter ruStoreAdapter;
-        [SerializeField] private YandexGameSdkAdapter yandexGameSdkAdapter;
-        [SerializeField] private FakeSDKAdapter fakeSDKAdapter;
+        [SerializeField] private SDKAdapterBase ruStoreAdapter;
+        [SerializeField] private SDKAdapterBase yandexGameSdkAdapter;
+        [SerializeField] private SDKAdapterBase fakeSDKAdapter;
 
         [Space]
         [SerializeField] private Platform platform;
@@ -83,7 +84,7 @@ namespace LineWars.Controllers
                 _ => throw new ArgumentOutOfRangeException()
             };
             
-            sdkAdapter.Initialize();
+            sdkAdapter.Initialize(promoCodeContainer.promoCodes);
         }
 
         public void StartGame()
@@ -100,21 +101,21 @@ namespace LineWars.Controllers
                 return;
             }
             
-            GameReady = true;
 
             timeGetter = new GetLocalTime();
             reusableTimeGetter = new GetLocalTime();
             
             InitializeProviders();
             
-            CompaniesController.Initialize(missionInfoProvider, missionsStorage);
-            UserController.Initialize(userInfoProvider, cardsDatabase, blessingStorage);
-            DecksController.Initialize(deckProvider, userController);
-            Store.Initialize(timeGetter, cardsDatabase, blessingStorage, userController);
-            BlessingsController.Initialize(userController, userController, blessingStorage);
-            CardUpgrader.Initialize(userController, cardsDatabase);
+            companiesController.Initialize(missionInfoProvider, missionsStorage);
+            userController.Initialize(userInfoProvider, cardsDatabase, blessingStorage);
+            decksController.Initialize(deckProvider, userController);
+            store.Initialize(timeGetter, cardsDatabase, blessingStorage, userController);
+            blessingsController.Initialize(userController, userController, blessingStorage);
+            cardUpgrader.Initialize(userController, cardsDatabase);
             InitializeLootBoxController();
             
+            GameReady = true;
             OnGameReady?.Invoke();
             OnGameReady = null;
         }

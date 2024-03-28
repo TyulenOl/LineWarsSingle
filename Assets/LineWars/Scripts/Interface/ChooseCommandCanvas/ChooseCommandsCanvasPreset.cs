@@ -1,7 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using LineWars.Controllers;
 using UnityEngine;
 
@@ -9,13 +5,20 @@ namespace LineWars
 {
     public class ChooseCommandsCanvasPreset : MonoBehaviour
     {
-        [SerializeField] private List<ChooseCommandsButton> buttons;
+        [SerializeField] private ReselectPreset reselectPreset;
+        [SerializeField] private NoReselectPreset noReselectPreset;
         public void ReDraw(OnWaitingCommandMessage message)
         {
             gameObject.SetActive(true);
-            for (var i = 0; i < buttons.Count; i++)
+            if (reselectPreset != null && message.CanReselect)
             {
-                buttons[i].ReDraw(message.Data[i]);
+                noReselectPreset.gameObject.SetActive(false);
+                reselectPreset.ReDraw(message);
+            }
+            else
+            {
+                reselectPreset?.gameObject.SetActive(false);
+                noReselectPreset.ReDraw(message);
             }
         }
     }

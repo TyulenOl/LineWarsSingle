@@ -39,8 +39,7 @@ namespace LineWars.Model
             void OnMoveEnd(UnitAnimation anim)
             {
                 moveAnimation.Ended.RemoveListener(OnMoveEnd);
-                Action.MoveTo(target);
-                Complete();
+                MoveInstant(target);
             }
         }
 

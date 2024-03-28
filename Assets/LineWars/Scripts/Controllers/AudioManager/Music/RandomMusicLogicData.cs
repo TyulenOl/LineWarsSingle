@@ -62,7 +62,8 @@ namespace LineWars.Controllers
                 manager.Stop();
                 yield return new WaitForSeconds(data.PauseTime);
                 manager.Play(possibleMusics[musicId]);
-                yield return new WaitForSeconds(possibleMusics[musicId].AudioClip.length);
+                while(manager.IsPlaying)
+                    yield return new WaitForFixedUpdate();
             }
         }
     }

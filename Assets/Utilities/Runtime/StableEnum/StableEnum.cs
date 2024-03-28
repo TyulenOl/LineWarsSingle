@@ -2,53 +2,49 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
-namespace Utilities.Runtime
+[Serializable]
+public class StableEnum<T> :
+    BaseStableEnum,
+    IEquatable<StableEnum<T>>,
+    ISerializationCallbackReceiver
+    where T : Enum
 {
-    [Serializable]
-    public class StableEnum<T> :
-        BaseStableEnum,
-        IEquatable<StableEnum<T>>,
-        ISerializationCallbackReceiver
-        where T : Enum
+    [SerializeField] protected T _value;
+
+    public T value
     {
-        [SerializeField] protected T _value;
+        get => _value;
+        set => _value = value;
+    }
 
-        public T value
+    public override object valueObject => _value;
+
+    public void OnBeforeSerialize()
+    {
+        _proxy = _value.ToName();
+        _index = (int) (ValueType) _value;
+    }
+
+    public void OnAfterDeserialize()
+    {
+        if (!StableEnumHelper.TryParse(_proxy, out _value))
         {
-            get => _value;
-            set => _value = value;
-        }
-
-        public override object valueObject => _value;
-
-        public void OnBeforeSerialize()
-        {
-            _proxy = _value.ToName();
-            _index = (int) (ValueType) _value;
-        }
-
-        public void OnAfterDeserialize()
-        {
-            if (!StableEnumHelper.TryParse(_proxy, out _value))
+            if (Enum.IsDefined(typeof(T), _index))
             {
-                if (Enum.IsDefined(typeof(T), _index))
-                {
-                    _value = (T) (ValueType) _index; // awful boxing, stupid c#  (╯°□°）╯︵ ┻━┻
-                }
-                else
-                {
-                    Debug.LogErrorFormat(
-                        "Deserialization failed: \"{0}\" enum has neither \"{1}\" value, nor \"{2}\" index", typeof(T),
-                        _proxy, _index);
-                }
+                _value = (T) (ValueType) _index; // awful boxing, stupid c#  (╯°□°）╯︵ ┻━┻
+            }
+            else
+            {
+                Debug.LogErrorFormat(
+                    "Deserialization failed: \"{0}\" enum has neither \"{1}\" value, nor \"{2}\" index", typeof(T),
+                    _proxy, _index);
             }
         }
-
-        public bool Equals(StableEnum<T> other) => EqualityComparer<T>.Default.Equals(_value, other.value);
-        public override bool Equals(object obj) => Equals(obj as StableEnum<T>);
-        public override int GetHashCode() => _value.GetHashCode();
-        public static implicit operator T(StableEnum<T> stableEnum) => stableEnum._value;
-        public static T Convert(StableEnum<T> stableEnum) => stableEnum._value;
     }
+
+    public bool Equals(StableEnum<T> other) => EqualityComparer<T>.Default.Equals(_value, other.value);
+    public override bool Equals(object obj) => Equals(obj as StableEnum<T>);
+    public override int GetHashCode() => _value.GetHashCode();
+    public static implicit operator T(StableEnum<T> stableEnum) => stableEnum._value;
+    public static T Convert(StableEnum<T> stableEnum) => stableEnum._value;
 }

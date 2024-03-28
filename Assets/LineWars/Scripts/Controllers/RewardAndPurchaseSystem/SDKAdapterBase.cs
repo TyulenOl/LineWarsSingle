@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AYellowpaper.SerializedCollections;
 using LineWars.Infrastructure;
 using LineWars.Interface;
 using LineWars.Model;
@@ -26,9 +27,16 @@ namespace LineWars.Controllers
         public event Action SuccesLockAd; 
         
         protected UserInfoController UserInfoController => GameRoot.Instance.UserController;
+        private IDictionary<string, Prize> promocodes;
         public virtual bool NeedInterstitialAd => false;
-        
-        public abstract void Initialize();
+
+        public void Initialize(IDictionary<string, Prize> promocodes)
+        {
+            this.promocodes = promocodes;
+            Initialize();
+        }
+
+        protected abstract void Initialize();
         public abstract bool SDKEnabled { get; }
         public abstract void LockAd();
         public bool AdIsLocked => UserInfoController.LockAd;
@@ -327,6 +335,21 @@ namespace LineWars.Controllers
             };
             
             SendMetrica("usePromocode", eventParams);
+        }
+        
+        public bool UsePromoCode(string promoCode)
+        {
+            if (!string.IsNullOrEmpty(promoCode)
+                && promocodes.TryGetValue(promoCode, out var prize)
+                && !UserInfoController.PromoCodeIsUsed(promoCode))
+            {
+                _Reward(prize);
+                UserInfoController.UsePromoCode(promoCode);
+                UIPanel.OpenSuccessUsePromoCodePanel(promoCode, prize);
+                SendUsePromocodeMetrica(promoCode);
+                return true;
+            }
+            return false;
         }
     }
 }

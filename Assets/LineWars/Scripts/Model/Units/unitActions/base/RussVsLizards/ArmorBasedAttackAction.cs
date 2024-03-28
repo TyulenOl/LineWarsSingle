@@ -1,3 +1,4 @@
+using System;
 using LineWars.Model;
 
 namespace LineWars
@@ -10,46 +11,23 @@ namespace LineWars
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
         public override CommandType CommandType => CommandType.ArmorBasedAttack;
+        public int Damage => Executor.CurrentArmor;
+        public event Action<int> DamageChanged;
         
-        private bool listenChangeArmor;
-        private bool listenChangePower;
-        
-        private int startRoundAddedArmor;
         
         public ArmorBasedAttackAction(TUnit executor) : base(executor)
         {
-            // startRoundAddedArmor = executor.CurrentArmor;
-            //
-            // listenChangeArmor = true;
-            // listenChangePower = true;
-            //
-            // executor.CurrentPower = 0;
-            //
-            // executor.UnitReplenished += ExecutorOnUnitReplenished;
-            // executor.UnitPowerChanged += ExecutorOnUnitPowerChanged;
-            // executor.UnitArmorChanged += ExecutorOnUnitArmorChanged;
+            Executor.UnitArmorChanged += OnUnitArmorChanged;
         }
 
-        private void ExecutorOnUnitReplenished(TUnit unit)
+        ~ArmorBasedAttackAction()
         {
-            //Executor.CurrentArmor += startRoundAddedArmor;
+            Executor.UnitArmorChanged -= OnUnitArmorChanged;
         }
 
-        private void ExecutorOnUnitPowerChanged(TUnit unit, int before, int after)
+        private void OnUnitArmorChanged(TUnit unit, int before, int after)
         {
-            if (!listenChangePower)
-                return;
-            
-            var dif = after - before;
-            startRoundAddedArmor += dif;
-        }
-
-        private void ExecutorOnUnitArmorChanged(TUnit unit, int before, int after)
-        {
-            if (!listenChangePower)
-                return;
-            
-            
+            DamageChanged?.Invoke(after);
         }
 
         public void Execute(TUnit target)

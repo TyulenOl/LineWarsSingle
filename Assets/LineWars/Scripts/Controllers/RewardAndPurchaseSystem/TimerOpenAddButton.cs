@@ -4,7 +4,6 @@ using LineWars.Model;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Utilities.Runtime.Extensions;
 
 namespace LineWars.Controllers
 {
@@ -95,6 +94,8 @@ namespace LineWars.Controllers
 
         private float GetTimeRemainingTimeInSeconds()
         {
+            if(!UserController.KeyToDateTime.ContainsKey((keyID)))
+                return 0f;
             var time = TimeGetter.Get();
             var prevTime = UserController.KeyToDateTime[keyID];
             var totalSecond = (float)(time - prevTime).TotalSeconds;
@@ -105,8 +106,6 @@ namespace LineWars.Controllers
         {
             var seconds = GetTimeRemainingTimeInSeconds();
             var (min, sec) = (seconds / 60, seconds % 60);
-            var x = min.ToChars(2);
-            var y = sec.ToChars(2);
             return $"{min.ToChars(2)} : {sec.ToChars(2)}";
         }
         

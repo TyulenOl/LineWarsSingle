@@ -38,7 +38,10 @@ public class SceneTransition : MonoBehaviour
 
     private bool isStartLoading;
 
+    
+    public static bool Loaded { get; private set; }
     public static event Action StartLoad;
+    public static event Action<SceneName> StartLoadScene; 
     public static event Action EndLoad;
     public static event Action StartUnload;
     public static event Action EndUnload;
@@ -116,6 +119,7 @@ public class SceneTransition : MonoBehaviour
     public static void LoadScene(SceneName sceneName)
     {
         if (instance.isStartLoading) return;
+        Loaded = true;
         instance.isStartLoading = true;
         instance.animator.SetTrigger("sceneClosing");
         instance.sceneName = sceneName;
@@ -169,11 +173,13 @@ public class SceneTransition : MonoBehaviour
     {
         //Debug.Log("StartLoad");
         StartLoad?.Invoke();
+        StartLoadScene?.Invoke(sceneName);
     }
 
     public void ANIMATION_EVENT_EndAnimation()
     {
         //Debug.Log("EndUnload");
+        Loaded = false;
         EndUnload?.Invoke();
     }
 

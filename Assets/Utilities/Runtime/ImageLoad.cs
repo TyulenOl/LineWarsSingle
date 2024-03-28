@@ -3,115 +3,112 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-namespace Utilities.Runtime
+public class ImageLoad : MonoBehaviour
 {
-    public class ImageLoad : MonoBehaviour
+    public bool startLoad = true;
+    public RawImage rawImage;
+    public Image spriteImage;
+    public string urlImage;
+    public GameObject loadAnimObj;
+
+    [Tooltip("Вы можете выключить запись лога в консоль.")] 
+    [SerializeField] bool debug;
+
+    private void Awake()
     {
-        public bool startLoad = true;
-        public RawImage rawImage;
-        public Image spriteImage;
-        public string urlImage;
-        public GameObject loadAnimObj;
+        if (rawImage) rawImage.enabled = false;
+        if (spriteImage) spriteImage.enabled = false;
 
-        [Tooltip("Вы можете выключить запись лога в консоль.")] 
-        [SerializeField] bool debug;
+        if (startLoad) Load();
+        else if (loadAnimObj) loadAnimObj.SetActive(false);
+    }
 
-        private void Awake()
-        {
-            if (rawImage) rawImage.enabled = false;
-            if (spriteImage) spriteImage.enabled = false;
+    public void Load()
+    {
+        if (loadAnimObj) loadAnimObj.SetActive(true);
+        StartCoroutine(SwapPlayerPhoto(urlImage));
+    }
 
-            if (startLoad) Load();
-            else if (loadAnimObj) loadAnimObj.SetActive(false);
-        }
-
-        public void Load()
+    public void Load(string url)
+    {
+        if (url != "null")
         {
             if (loadAnimObj) loadAnimObj.SetActive(true);
-            StartCoroutine(SwapPlayerPhoto(urlImage));
+            StartCoroutine(SwapPlayerPhoto(url));
+        }
+    }
+
+    public void ClearImage()
+    {
+        if (rawImage)
+        {
+            rawImage.texture = null;
+            rawImage.enabled = false;
         }
 
-        public void Load(string url)
+        if (spriteImage)
         {
-            if (url != "null")
-            {
-                if (loadAnimObj) loadAnimObj.SetActive(true);
-                StartCoroutine(SwapPlayerPhoto(url));
-            }
+            spriteImage.sprite = null;
+            spriteImage.enabled = false;
         }
 
-        public void ClearImage()
+        if (loadAnimObj)
+            loadAnimObj.SetActive(false);
+    }
+
+    public void PutSprite(Sprite sprite)
+    {
+        if (rawImage)
         {
-            if (rawImage)
-            {
-                rawImage.texture = null;
-                rawImage.enabled = false;
-            }
-
-            if (spriteImage)
-            {
-                spriteImage.sprite = null;
-                spriteImage.enabled = false;
-            }
-
-            if (loadAnimObj)
-                loadAnimObj.SetActive(false);
+            rawImage.texture = sprite.texture;
+            rawImage.enabled = true;
         }
 
-        public void PutSprite(Sprite sprite)
+        if (spriteImage)
         {
-            if (rawImage)
-            {
-                rawImage.texture = sprite.texture;
-                rawImage.enabled = true;
-            }
-
-            if (spriteImage)
-            {
-                spriteImage.sprite = sprite;
-                spriteImage.enabled = true;
-            }
-
-            if (loadAnimObj)
-                loadAnimObj.SetActive(false);
+            spriteImage.sprite = sprite;
+            spriteImage.enabled = true;
         }
 
-        IEnumerator SwapPlayerPhoto(string url)
-        {
-            using (UnityWebRequest webRequest = UnityWebRequestTexture.GetTexture(url))
-            {
-                yield return webRequest.SendWebRequest();
+        if (loadAnimObj)
+            loadAnimObj.SetActive(false);
+    }
 
-                if (webRequest.result == UnityWebRequest.Result.ConnectionError ||
-                    webRequest.result == UnityWebRequest.Result.DataProcessingError)
+    IEnumerator SwapPlayerPhoto(string url)
+    {
+        using (UnityWebRequest webRequest = UnityWebRequestTexture.GetTexture(url))
+        {
+            yield return webRequest.SendWebRequest();
+
+            if (webRequest.result == UnityWebRequest.Result.ConnectionError ||
+                webRequest.result == UnityWebRequest.Result.DataProcessingError)
+            {
+                if (debug)
+                    Debug.LogError("Error: " + webRequest.error);
+            }
+            else
+            {
+                DownloadHandlerTexture handlerTexture = webRequest.downloadHandler as DownloadHandlerTexture;
+
+                if (rawImage)
                 {
-                    if (debug)
-                        Debug.LogError("Error: " + webRequest.error);
+                    if (handlerTexture.isDone)
+                        rawImage.texture = handlerTexture.texture;
+                    rawImage.enabled = true;
                 }
-                else
+
+                if (spriteImage)
                 {
-                    DownloadHandlerTexture handlerTexture = webRequest.downloadHandler as DownloadHandlerTexture;
+                    if (handlerTexture.isDone)
+                        spriteImage.sprite = Sprite.Create((Texture2D) handlerTexture.texture,
+                            new Rect(0, 0, handlerTexture.texture.width, handlerTexture.texture.height),
+                            Vector2.zero);
 
-                    if (rawImage)
-                    {
-                        if (handlerTexture.isDone)
-                            rawImage.texture = handlerTexture.texture;
-                        rawImage.enabled = true;
-                    }
-
-                    if (spriteImage)
-                    {
-                        if (handlerTexture.isDone)
-                            spriteImage.sprite = Sprite.Create((Texture2D) handlerTexture.texture,
-                                new Rect(0, 0, handlerTexture.texture.width, handlerTexture.texture.height),
-                                Vector2.zero);
-
-                        spriteImage.enabled = true;
-                    }
-
-                    if (loadAnimObj)
-                        loadAnimObj.SetActive(false);
+                    spriteImage.enabled = true;
                 }
+
+                if (loadAnimObj)
+                    loadAnimObj.SetActive(false);
             }
         }
     }

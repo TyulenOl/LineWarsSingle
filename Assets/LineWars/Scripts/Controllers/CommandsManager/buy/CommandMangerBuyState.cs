@@ -68,7 +68,7 @@ namespace LineWars.Controllers
                     return;
                 }
                 deckCard = card;
-                CheckForCompleteness();
+                //CheckForCompleteness();
             }
 
             private void CheckForCompleteness()

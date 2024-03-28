@@ -1,3 +1,5 @@
+using System;
+
 namespace LineWars.Model
 {
     public class HealingAttackAction<TNode, TEdge, TUnit> :
@@ -8,9 +10,22 @@ namespace LineWars.Model
         where TUnit : class, IUnit<TNode, TEdge, TUnit>
     {
         public override CommandType CommandType => CommandType.HealingAttack;
+        public int Damage => Executor.CurrentPower;
+        public HealingAttackMode Mode { get; }
+        public int ConsHeal { get; }
 
-        public HealingAttackAction(TUnit executor) : base(executor)
+        public event Action<int> DamageChanged;
+        
+        public HealingAttackAction(TUnit executor, HealingAttackMode mode, int consHeal) : base(executor)
         {
+            Executor.UnitPowerChanged += OnUnitPowerChanged;
+            this.Mode = mode;
+            this.ConsHeal = consHeal;
+        }
+
+        ~HealingAttackAction()
+        {
+            Executor.UnitPowerChanged -= OnUnitPowerChanged;
         }
 
         public bool IsAvailable(TUnit target)
@@ -31,7 +46,19 @@ namespace LineWars.Model
         {
             var enemyNode = target.Node;
             target.DealDamageThroughArmor(Executor.CurrentPower);
-            Executor.CurrentArmor += Executor.CurrentPower;
+
+            switch (Mode)
+            {
+                case HealingAttackMode.UseYorSelfPower:
+                    Executor.CurrentArmor += Executor.CurrentPower;
+                    break;
+                case HealingAttackMode.Constant:
+                    Executor.CurrentArmor += ConsHeal;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            
             if (target.IsDied
                 && enemyNode.AllIsFree
                 && UnitUtilities<TNode, TEdge, TUnit>.CanMoveTo(Executor, enemyNode)
@@ -47,6 +74,11 @@ namespace LineWars.Model
                 <TUnit, HealingAttackAction<TNode, TEdge, TUnit>, TUnit>
                 (this, target);
         }
+        
+        private void OnUnitPowerChanged(TUnit unit, int before, int after)
+        {
+            DamageChanged?.Invoke(after);
+        }
 
         public override void Accept(IBaseUnitActionVisitor<TNode, TEdge, TUnit> visitor)
         {
@@ -57,5 +89,11 @@ namespace LineWars.Model
         {
             return visitor.Visit(this);
         }
+    }
+
+    public enum HealingAttackMode
+    {
+        UseYorSelfPower,
+        Constant
     }
 }

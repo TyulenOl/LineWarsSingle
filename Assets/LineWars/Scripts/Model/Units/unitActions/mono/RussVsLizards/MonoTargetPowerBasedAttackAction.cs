@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace LineWars.Model
@@ -10,6 +11,14 @@ namespace LineWars.Model
         [SerializeField] private UnitAnimation attackAnimation;
 
         protected override bool NeedAutoComplete => false;
+        
+        public int Damage => Action.Damage;
+        public event Action<int> DamageChanged
+        {
+            add => Action.DamageChanged += value;
+            remove => Action.DamageChanged -= value;
+        }
+        
         protected override TargetPowerBasedAttackAction<Node, Edge, Unit> GetAction()
         {
             return new TargetPowerBasedAttackAction<Node, Edge, Unit>(Executor);

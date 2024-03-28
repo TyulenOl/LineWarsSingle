@@ -175,7 +175,8 @@ namespace LineWars.Model
                         {
                             unitAction.Executor.Died.AddListener(OnUnitActionCompleted);
                         }
-                        UnitsController.ExecuteCommand(command);
+
+                        UnitsController.ExecuteCommand(command, false);
                         while (!isCompleted)
                         {
                             yield return new WaitForFixedUpdate();
@@ -197,7 +198,7 @@ namespace LineWars.Model
                     }
                     else
                     {
-                        UnitsController.ExecuteCommand(command);
+                        UnitsController.ExecuteCommand(command, false);
                         yield return new WaitForSeconds(ai.commandPause);
                     }
                     

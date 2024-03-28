@@ -6,11 +6,11 @@ using UnityEngine.Events;
 namespace LineWars.Controllers
 {
     [RequireComponent(typeof(AudioSource))]
-    [Obsolete]
     public class MusicManager : MonoBehaviour
     {
         public static MusicManager Instance { get; private set; }
         [SerializeField] private MusicLogicData musicLogicData;
+        [SerializeField] private TwoStringEventChannel raisedMusicChangedEventChannel;
         
         [Header("Fade Out Settings")]
         [SerializeField] private AnimationCurve fadeOutCurve;
@@ -25,6 +25,7 @@ namespace LineWars.Controllers
         private float initialVolume;
         public MusicData CurrentMusicData { get; private set; }
         public UnityEvent<MusicData, MusicData> MusicChanged;
+        public bool IsPlaying => source.isPlaying;
 
         //  public AudioSource Source => source;
         public float Volume
@@ -96,6 +97,7 @@ namespace LineWars.Controllers
             source.Play();
             CurrentMusicData = musicData;
             MusicChanged.Invoke(prevData, musicData);
+            raisedMusicChangedEventChannel.RaiseEvent(musicData.Name, musicData.Artist);
         }
 
         public void Stop()
